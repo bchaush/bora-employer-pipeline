@@ -1,0 +1,184 @@
+---
+
+description: Testing, regression, non-interactive execution, and verification rules for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# Testing Enforcement
+
+This rule operationally enforces the testing and verification requirements in `BLUEPRINT.md`.
+
+## Core Principle
+
+"It works" is not sufficient evidence.
+
+A task is not complete merely because:
+
+* code runs once;
+* the happy path succeeds;
+* the UI looks correct;
+* an AI says the result is reasonable;
+* a single manual example passes.
+
+Verification must match the risk of the change.
+
+## Pre-Test Discipline
+
+Before running tests:
+
+1. inspect the repository's documented test commands;
+2. identify the smallest relevant test set;
+3. confirm the command is non-interactive and non-watch;
+4. inspect relevant existing tests before creating duplicates.
+
+Never start watch mode unless explicitly requested.
+
+## Non-Interactive Execution
+
+Use the repository's documented non-watch/non-interactive command.
+
+Do not assume every framework supports the same flags.
+
+If the default test command enters watch mode, choose the framework's supported one-shot or CI-safe equivalent.
+
+A hanging interactive process is not a successful test run.
+
+## Required Test Categories
+
+Where applicable, test:
+
+* normal/happy path;
+* boundary conditions;
+* missing input;
+* malformed input;
+* invalid enum/state values;
+* duplicate/retry behavior;
+* partial failure;
+* external dependency failure;
+* stale data;
+* unsupported AI output;
+* regression after bug fixes.
+
+Not every task needs every category, but consequential logic must cover relevant failure modes.
+
+## Regression Rule
+
+When fixing a bug:
+
+1. reproduce the failure where feasible;
+2. add or update a test that captures the failure;
+3. implement the fix;
+4. verify the regression test passes;
+5. verify nearby behavior remains intact.
+
+Do not fix only the visible symptom if the underlying invariant remains untested.
+
+## Safety-Critical Tests
+
+Changes affecting any of the following require stronger verification:
+
+* evidence lineage;
+* claim approval;
+* resume factual statements;
+* immutable resume fields;
+* work authorization;
+* OPT/STEM logic;
+* application submission controls;
+* PII handling;
+* external writes;
+* idempotency;
+* duplicate prevention;
+* approval gates;
+* audit history.
+
+For these areas, include explicit negative/failure-path testing where feasible.
+
+## Schema Tests
+
+Structured input and output must be tested against the approved schema.
+
+Test both:
+
+* valid payload acceptance;
+* invalid payload rejection.
+
+For AI-generated structured output, verify invalid payloads cannot proceed into rendering, persistence, or external actions.
+
+## Golden Tests
+
+Golden Tests protect high-value system behavior and locked semantic boundaries.
+
+Do not modify a Golden Test merely because new implementation fails it.
+
+If a Golden Test appears wrong:
+
+1. stop;
+2. explain the conflict;
+3. identify the Blueprint rule involved;
+4. obtain approval before changing the Golden Test.
+
+A Golden Test failure requires review according to the Blueprint.
+
+## Test Integrity
+
+Never:
+
+* delete a valid test to make code pass;
+* skip a failing test without approved reason;
+* weaken an assertion merely to accept current behavior;
+* replace deterministic assertions with vague AI judgment when code can verify the result;
+* silently change fixtures to hide a regression.
+
+## External Integrations
+
+Do not use live external services in routine tests when a deterministic mock, fixture, or sandbox is sufficient.
+
+For approved integration tests:
+
+* avoid destructive actions;
+* avoid real application submission;
+* avoid real email sending;
+* avoid exposing PII;
+* use test/sandbox modes where available.
+
+## Test Data
+
+Use synthetic or sanitized data by default.
+
+Do not commit real sensitive applicant, employer-contact, immigration, or third-party PII as test fixtures.
+
+## Completion Report
+
+Before declaring implementation complete, report:
+
+* tests executed;
+* whether they passed or failed;
+* areas not tested;
+* assumptions;
+* remaining risks;
+* any manual verification still required.
+
+Do not claim "all tests passed" unless the claimed test set was actually executed successfully.
+
+## Failure Handling
+
+If tests fail:
+
+* do not conceal the failure;
+* determine whether the issue is implementation, fixture, environment, schema, or architecture;
+* fix the root issue where possible;
+* rerun the relevant test set.
+
+If a valid locked rule appears to conflict with implementation, stop and surface the conflict.
+
+## Stop Rule
+
+Stop and request review if:
+
+* no safe non-interactive test command can be determined;
+* a Golden Test fails;
+* testing would require a destructive production action;
+* required test data would expose unapproved PII;
+* a failing test suggests a locked invariant may be broken;
+* completing the task would require disabling or weakening a valid test.
+

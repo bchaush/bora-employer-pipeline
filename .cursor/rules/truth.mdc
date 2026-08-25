@@ -1,0 +1,118 @@
+---
+
+description: Truth, evidence lineage, and anti-hallucination rules for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# Truth and Evidence Enforcement
+
+This rule operationally enforces the truth and evidence requirements in `BLUEPRINT.md`.
+
+## Core Rule
+
+No unsupported factual claim may be created, promoted, or exported by the system.
+
+If evidence is missing, the correct result is an explicit unknown state, not a plausible assumption.
+
+## Evidence Lineage
+
+Every material factual claim must trace to:
+
+* one or more approved `Evidence_ID` values; or
+* an approved `Claim_ID` whose evidence lineage is valid.
+
+No evidence lineage means:
+
+`FAIL_VALIDATION`
+
+Do not create a new factual claim merely because:
+
+* the job description contains the wording;
+* an ATS may reward the keyword;
+* the wording sounds reasonable;
+* a related experience appears transferable;
+* another model suggested it.
+
+## Evidence States
+
+Only use evidence states defined by `BLUEPRINT.md`.
+
+Never silently promote:
+
+* `UNKNOWN` to `SUPPORTED`;
+* `UNKNOWN` to `VERIFIED`;
+* `OBSERVED` to `VERIFIED`;
+* `NOT_FOUND_IN_PUBLIC_SEARCH` to a negative factual conclusion.
+
+A stronger state requires new evidence.
+
+## No Fabricated Outcomes
+
+Never invent:
+
+* percentages;
+* hours saved;
+* revenue impact;
+* productivity impact;
+* accuracy improvements;
+* user counts;
+* deployment scale;
+* business outcomes;
+* technical capabilities;
+* implementation scope.
+
+If the outcome was not measured, record it as unknown or use an approved qualitative evidence state where supported.
+
+## No False Equivalence
+
+Related experience may be described as transferable, but must not be represented as identical experience.
+
+Examples of prohibited equivalence include:
+
+* foreign regulatory reporting = U.S. regulatory expertise;
+* Google Apps Script = cloud engineering;
+* LLM API integration = ML engineering;
+* UAT = enterprise QA engineering;
+* AI-assisted coding = expertise in every generated framework;
+* prototype project = enterprise production deployment.
+
+## Historical Facts
+
+Do not silently modify:
+
+* employer names;
+* formal job titles;
+* employment dates;
+* education;
+* degrees;
+* institutional names;
+* other protected historical facts.
+
+## Missing Information
+
+Use explicit states defined by schemas and the Blueprint, such as:
+
+* `null`
+* `UNKNOWN`
+* `NOT_FOUND_IN_PUBLIC_SEARCH`
+* `HR_CONFIRMATION_NEEDED`
+* `SOURCE_VERIFICATION_REQUIRED`
+
+Never fill missing data with likely or typical values.
+
+## Resume and Application Outputs
+
+Every new or materially modified factual resume statement must pass lineage validation before export.
+
+Unsupported keywords must not be inserted merely to improve ATS similarity.
+
+A semantic match may change wording only when the revised wording truthfully describes existing evidence.
+
+## Stop Rule
+
+If requested output requires a factual claim that cannot be supported by existing approved evidence:
+
+1. do not invent the claim;
+2. identify the missing evidence;
+3. return the appropriate explicit unknown/gap state;
+4. surface the issue for human review where required.

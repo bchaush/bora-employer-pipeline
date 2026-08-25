@@ -1,0 +1,171 @@
+---
+
+description: Architecture, dependency, scope, and implementation-boundary rules for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# Architecture Enforcement
+
+This rule operationally enforces the architecture requirements in `BLUEPRINT.md`.
+
+## Canonical Architecture
+
+Do not redesign the system from scratch.
+
+Do not silently replace an approved component, storage model, integration pattern, or workflow.
+
+If implementation pressure reveals a better architecture:
+
+1. explain the problem with the current approach;
+2. propose the smallest viable alternative;
+3. identify affected files, schemas, tests, and workflows;
+4. explain migration risk and maintenance cost;
+5. wait for Bora's explicit approval before implementing the architecture change.
+
+## Minimal-Change Rule
+
+Prefer the smallest change that satisfies the approved requirement.
+
+Do not:
+
+* perform unrelated refactoring;
+* rename broad parts of the repository without need;
+* change multiple architectural layers for a local bug;
+* introduce new abstractions merely for elegance;
+* rewrite working code when a bounded fix is sufficient.
+
+## Dependency Discipline
+
+Do not introduce a new:
+
+* framework;
+* database;
+* cloud service;
+* queue;
+* vector database;
+* agent framework;
+* MCP server;
+* external API;
+* hosted service;
+* paid service;
+* infrastructure dependency
+
+unless there is a concrete approved need.
+
+Before proposing a new dependency, state:
+
+1. the exact problem it solves;
+2. why the existing architecture cannot solve that problem adequately;
+3. the simplest viable option;
+4. operational and maintenance implications;
+5. security/data implications;
+6. migration or lock-in risk.
+
+## Local-First Development
+
+During early implementation, prefer local, testable components before external integrations.
+
+Default progression:
+
+1. domain model;
+2. schemas;
+3. deterministic validators;
+4. tests;
+5. local workflow;
+6. one integration;
+7. verify;
+8. only then consider additional integrations.
+
+Do not connect external systems merely because the tool supports them.
+
+## Repository Authority
+
+The repository is the authoritative implementation state.
+
+Chat memory, model memory, and tool history are not authoritative databases.
+
+Material decisions must be represented in repository files such as:
+
+* `BLUEPRINT.md`;
+* `CURRENT_STATE.md`;
+* `CHANGELOG.md`;
+* `docs/decisions/`;
+* schemas;
+* tests;
+* approved evidence and claims.
+
+## AI Agent Roles
+
+Preserve the locked agent model:
+
+* ChatGPT: primary architecture, research, reasoning, and quality decisions;
+* Cursor: primary implementation agent;
+* Gemini: independent verifier and backup;
+* Claude: optional escalation/review only.
+
+Do not create a workflow that requires agreement from multiple models for routine operations.
+
+Do not make any optional model a core runtime dependency.
+
+## Deterministic Boundary
+
+If a rule can be enforced reliably in code, prefer code over prompt-only enforcement.
+
+Examples:
+
+* IDs;
+* duplicate prevention;
+* schemas;
+* immutable fields;
+* claim lineage;
+* audit history;
+* application state;
+* retry protection;
+* validation;
+* routing rules where deterministic;
+* export constraints.
+
+AI must not be used as the sole enforcement mechanism for deterministic safety rules.
+
+## Integration Boundary
+
+Treat all external systems as untrusted boundaries.
+
+Before data enters core processing:
+
+* validate schema;
+* reject or quarantine malformed data;
+* preserve explicit unknown values;
+* prevent duplicate ingestion where applicable;
+* ensure retry behavior cannot create duplicate side effects.
+
+## Failure Behavior
+
+Prefer fail-closed behavior for consequential operations.
+
+A failed validation must not silently continue with guessed values.
+
+A failed external integration must not silently convert into success.
+
+A partially completed operation must surface an explicit state.
+
+## State Changes
+
+Material behavior changes require:
+
+* relevant tests;
+* update to `CURRENT_STATE.md` where system state changed;
+* `CHANGELOG.md` entry where behavior materially changed;
+* architecture decision record when a new architectural choice was approved.
+
+## Stop Rule
+
+Stop and surface the issue before implementation if:
+
+* the task requires a material architecture change;
+* a new infrastructure dependency is required;
+* a database migration is required;
+* a requested integration conflicts with the Blueprint;
+* the existing architecture cannot safely support the requested behavior;
+* the change would create an irreversible or difficult-to-recover state transition.
+

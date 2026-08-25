@@ -1,0 +1,206 @@
+---
+
+description: Immigration, OPT, STEM OPT, E-Verify, sponsorship, and work-authorization safety rules for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# OPT and Work-Authorization Safety Enforcement
+
+This rule operationally enforces the immigration and work-authorization boundaries in `BLUEPRINT.md`.
+
+## Core Principle
+
+Immigration and work-authorization conclusions are consequential.
+
+AI must not convert descriptive language, incomplete employer information, recruiter statements, or job-board text into a definitive legal conclusion.
+
+When evidence is insufficient:
+
+`LEGAL_VERIFICATION_REQUIRED`
+
+## Initial OPT vs STEM OPT
+
+Never collapse these into one field or conclusion.
+
+Every serious role must distinguish:
+
+* Initial OPT relevance
+* Future STEM OPT quality
+
+A role may be useful for Initial OPT while being weak or unresolved for future STEM OPT.
+
+That distinction must remain explicit.
+
+## Source Hierarchy
+
+For consequential immigration facts, prefer:
+
+1. Brandeis ISSO
+2. USCIS
+3. DHS / SEVP
+4. official E-Verify information
+5. qualified immigration counsel where necessary
+
+Do not treat:
+
+* Reddit;
+* recruiters;
+* career blogs;
+* job boards;
+* model memory;
+* informal employer statements
+
+as authoritative legal sources.
+
+They may provide context or signals, not final legal determinations.
+
+## Job-Posting Boundary
+
+Descriptive job-posting text may be extracted and classified as wording.
+
+It must not by itself resolve:
+
+* OPT eligibility;
+* STEM OPT eligibility;
+* E-Verify participation;
+* legal work authorization;
+* sponsorship obligations;
+* immigration status.
+
+If an AI component attempts to produce a definitive conclusion from descriptive job-posting text alone, validators must reject the output with:
+
+`LEGAL_VERIFICATION_REQUIRED`
+
+## Work-Authorization Wording
+
+Store employer wording faithfully.
+
+Examples include:
+
+* sponsorship available;
+* sponsorship unavailable;
+* unrestricted work authorization required;
+* no future sponsorship;
+* work authorization wording unclear.
+
+Do not silently reinterpret employer wording beyond what the source supports.
+
+If meaning is ambiguous:
+
+`LEGAL_VERIFICATION_REQUIRED`
+
+or another approved unresolved state.
+
+## E-Verify
+
+E-Verify results must preserve the distinction between evidence states.
+
+Approved examples include:
+
+* `CONFIRMED`
+* `SEARCH_MATCH_FOUND`
+* `NOT_FOUND_IN_PUBLIC_SEARCH`
+* `UNKNOWN`
+* `HR_CONFIRMATION_NEEDED`
+
+Never convert:
+
+`NOT_FOUND_IN_PUBLIC_SEARCH`
+
+into:
+
+`NOT_ENROLLED`
+
+unless authoritative evidence supports that conclusion.
+
+Public-search absence is not proof of non-participation.
+
+## STEM Reliance
+
+Before treating employer E-Verify status or another immigration fact as sufficiently reliable for consequential STEM planning, require the verification level defined by the Blueprint.
+
+Where employer confirmation is still necessary:
+
+`HR_CONFIRMATION_NEEDED`
+
+Do not silently upgrade a weak signal into confirmed eligibility.
+
+## H-1B / Sponsorship History
+
+Historical H-1B or sponsorship evidence may be used as a signal of international-hiring familiarity.
+
+It must not be treated as proof that:
+
+* the current role will be sponsored;
+* the employer will sponsor Bora;
+* future sponsorship is guaranteed.
+
+Likewise, lack of historical filings must not automatically become:
+
+`EMPLOYER_WILL_NOT_SPONSOR`
+
+## Degree Relationship
+
+AI may help summarize how job duties appear related to Bora's degree and experience.
+
+It must not make the final legal determination that employment satisfies OPT requirements.
+
+If the relationship is consequential and unclear:
+
+`LEGAL_VERIFICATION_REQUIRED`
+
+## Application Questions
+
+Permanent human-control categories include consequential questions regarding:
+
+* current work authorization;
+* future sponsorship;
+* visa or immigration status;
+* legal attestations;
+* other ambiguous declarations defined by the Blueprint.
+
+The system may surface the question and relevant verified facts.
+
+It must not autonomously submit the answer.
+
+## No Plausible Filling
+
+Missing immigration facts must remain unresolved.
+
+Do not infer:
+
+* E-Verify participation from company size;
+* sponsorship willingness from industry;
+* OPT acceptance from remote-work status;
+* STEM eligibility from a STEM-sounding title;
+* legal eligibility from recruiter enthusiasm;
+* sponsorship policy from historical filings alone.
+
+## Structured Output
+
+Immigration-related structured outputs must use only approved schema states.
+
+Invalid or unsupported conclusions must fail validation before reaching:
+
+* fit decisions;
+* resume/application output;
+* ranking logic where consequential;
+* external submission.
+
+## Human Review
+
+Bora remains the human control gate for consequential work-authorization and sponsorship decisions.
+
+Where the Blueprint requires official or professional verification, the system must surface that requirement clearly.
+
+## Stop Rule
+
+Stop and return `LEGAL_VERIFICATION_REQUIRED` when:
+
+* the available source is insufficient for a consequential immigration conclusion;
+* official sources conflict;
+* job-posting language is ambiguous;
+* E-Verify status cannot be safely resolved;
+* sponsorship meaning is unclear;
+* Initial OPT and STEM OPT implications are being conflated;
+* an application answer requires Bora's direct legal/work-authorization attestation.

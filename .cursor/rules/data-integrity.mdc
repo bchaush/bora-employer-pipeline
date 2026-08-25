@@ -1,0 +1,212 @@
+---
+
+description: Data integrity, idempotency, concurrency, auditability, and PII-safety rules for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# Data Integrity Enforcement
+
+This rule operationally enforces the data-integrity and reliability requirements in `BLUEPRINT.md`.
+
+## Core Principle
+
+Data must never become more certain, more complete, or more authoritative merely because the system processed it.
+
+Unknown stays unknown.
+
+Invalid stays invalid.
+
+Conflicting data stays explicitly conflicted until resolved.
+
+## Read Before Write
+
+Before writing or modifying data logic:
+
+1. inspect relevant files in `schemas/`;
+2. inspect existing data models and identifiers;
+3. inspect existing uniqueness and state-transition rules;
+4. inspect existing tests for the affected data path.
+
+Do not create duplicate or competing schemas for the same entity.
+
+## Schema Validation
+
+All structured external input must be validated at the ingestion boundary.
+
+Reject or quarantine input when:
+
+* required fields are missing;
+* field types are invalid;
+* enum/state values are unsupported;
+* schema version is unsupported;
+* required identifiers are malformed;
+* structural assumptions are violated.
+
+Do not silently coerce malformed data into plausible valid data unless the schema explicitly defines that conversion.
+
+## Structured AI Output
+
+All structured AI payloads must pass strict JSON Schema validation before reaching:
+
+* rendering;
+* persistence;
+* resume generation;
+* application-package generation;
+* downstream automation;
+* external integrations.
+
+Invalid AI output must not be partially accepted.
+
+Retry according to approved logic or return an explicit processing error.
+
+## Duplicate Prevention
+
+Use deterministic identifiers and uniqueness rules where applicable.
+
+Do not rely only on fuzzy matching to prevent duplicate records.
+
+Where duplicate ingestion is possible:
+
+* define the stable identity key;
+* define what happens on conflict;
+* prevent duplicate side effects;
+* test repeated ingestion.
+
+Fuzzy matching may identify possible duplicates for review, but must not silently merge consequential records unless an approved deterministic rule allows it.
+
+## Idempotency
+
+Any retryable operation capable of creating an external or persistent side effect must be designed to be idempotent where feasible.
+
+Examples include:
+
+* job ingestion;
+* application-state updates;
+* follow-up creation;
+* exported artifacts;
+* external writes;
+* notifications.
+
+A retry caused by a timeout must not silently create a second logical action.
+
+## Concurrency
+
+Where two processes or users can update the same consequential record:
+
+* use appropriate transaction, locking, version, or optimistic-concurrency controls;
+* detect stale writes;
+* do not silently allow last-write-wins behavior where it could destroy reviewed state.
+
+## Immutable History
+
+Do not silently overwrite historical records that are required for auditability.
+
+Preserve history for material events such as:
+
+* evidence creation or status changes;
+* claim approval;
+* application submission;
+* resume version used;
+* consequential human approval;
+* external side effects;
+* major state transitions.
+
+Audit events should record, where applicable:
+
+* what changed;
+* previous state;
+* new state;
+* timestamp;
+* actor/source;
+* related entity ID.
+
+## PII and Sensitive Data
+
+Do not place unnecessary raw PII in:
+
+* application logs;
+* exception traces;
+* debug output;
+* test fixtures;
+* AI prompts;
+* screenshots;
+* committed repository files.
+
+Use synthetic or sanitized test data by default.
+
+If PII is required for an approved workflow, process only the minimum necessary data and follow the approved storage/access design.
+
+## Logging
+
+Logs must be useful for diagnosis without becoming a second uncontrolled sensitive-data store.
+
+Prefer:
+
+* identifiers;
+* event types;
+* validation results;
+* error codes;
+* sanitized context.
+
+Avoid logging raw third-party payloads by default.
+
+## External Boundaries
+
+Treat APIs, scraped pages, uploaded files, Google Sheets, browser data, and model output as untrusted input.
+
+Validate before use.
+
+A successful HTTP response does not prove the returned data is semantically valid.
+
+## Partial Failure
+
+Do not leave records in an apparently successful state when only part of an operation completed.
+
+Use explicit states such as:
+
+* `PROCESSING_ERROR`;
+* `VALIDATION_FAILED`;
+* `REVIEW_REQUIRED`;
+* another schema-approved state.
+
+Rollback or quarantine partial writes where appropriate.
+
+## State Preservation
+
+Never overwrite:
+
+* approved evidence;
+* approved claims;
+* submitted-application history;
+* prior resume versions;
+* audit history
+
+merely because newer processing produced a different result.
+
+New information should create an explicit update or version according to the approved data model.
+
+## Testing Requirements
+
+Where relevant, test:
+
+* duplicate ingestion;
+* repeated retry;
+* malformed input;
+* missing identifiers;
+* conflicting records;
+* stale writes;
+* partial failures;
+* invalid AI payloads;
+* sensitive-data logging behavior.
+
+## Stop Rule
+
+Stop and surface the issue if:
+
+* stable record identity cannot be determined;
+* a merge could destroy distinct real-world records;
+* schema requirements conflict;
+* safe concurrency behavior is undefined;
+* a write could overwrite authoritative history;
+* raw PII exposure is required but no approved handling design exists.
+

@@ -1,0 +1,230 @@
+---
+
+description: Resume generation, evidence lineage, immutable-field protection, patching, and export rules for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# Resume Enforcement
+
+This rule operationally enforces the resume requirements in `BLUEPRINT.md`.
+
+## Core Principle
+
+The resume is not the source of truth.
+
+The source of truth is:
+
+`evidence/` → approved claims → approved resume modules → application-specific derivative
+
+Do not reverse this architecture.
+
+## Master Resume Protection
+
+The protected master resume must never be modified directly by generation logic.
+
+Required flow:
+
+1. read protected master;
+2. create derivative copy;
+3. apply approved structured patch;
+4. validate;
+5. generate diff;
+6. export derivative;
+7. preserve master unchanged.
+
+If generation fails, the master remains untouched.
+
+## Immutable Fields
+
+Do not modify unless Bora explicitly changes the master source:
+
+* name;
+* contact information;
+* formal employers;
+* formal job titles;
+* employment dates;
+* education;
+* degree names;
+* institutional names;
+* fundamental visual structure.
+
+A job description must never cause historical facts to be renamed for better matching.
+
+## Adjustable Fields
+
+Only approved adjustable areas may change, including:
+
+* summary;
+* bullet selection;
+* bullet order;
+* supported wording;
+* skills ordering;
+* selected projects;
+* amount of space allocated to relevant experience;
+* removal of weaker material.
+
+All changes must remain evidence-supported.
+
+## Structured Patch Only
+
+Do not freehand rewrite the complete resume.
+
+The AI component should propose a structured patch describing only approved changes.
+
+Examples:
+
+* replace summary module;
+* move approved bullet;
+* include approved project bullet;
+* remove weaker module;
+* reorder supported skills;
+* flag unsupported requirement.
+
+Rendering code performs the actual document modification.
+
+## Claim Lineage
+
+Every new or materially reworded factual resume statement must have:
+
+* approved `Claim_ID`; or
+* approved `Evidence_ID` lineage allowed for direct use.
+
+No lineage:
+
+`FAIL_VALIDATION`
+
+Do not export the resume.
+
+## Keyword Rule
+
+Job-description terminology may be used only when it truthfully describes existing evidence.
+
+Allowed example:
+
+Existing evidence demonstrates requirements elicitation.
+
+JD terminology:
+
+`requirements gathering`
+
+A truthful supported wording adaptation may be used.
+
+Prohibited example:
+
+JD requires ServiceNow administration.
+
+No ServiceNow evidence exists.
+
+Do not insert ServiceNow as experience or skill.
+
+## Transferable Experience
+
+Related experience may be emphasized as transferable.
+
+Do not convert transferable experience into false equivalence.
+
+Examples:
+
+* regulatory reporting outside the U.S. may support controls/reconciliation experience;
+* it must not become U.S. regulatory reporting expertise.
+
+## Gap Visibility
+
+Unsupported important requirements must remain visible as gaps.
+
+The resume system must not "solve" a gap through creative wording.
+
+Use explicit gap states defined by the system.
+
+## Resume Diff
+
+Every generated resume must support a fast review of changes.
+
+Where applicable classify changes as:
+
+* `ADDED`
+* `REMOVED`
+* `REWORDED`
+* `REORDERED`
+* `UNCHANGED`
+* `GAP`
+* `WARNING`
+
+Bora should not need to reread the entire document to identify what changed.
+
+## Format Validation
+
+Before export, validate relevant structural rules including:
+
+* page count;
+* employer preservation;
+* title preservation;
+* date preservation;
+* education preservation;
+* section structure;
+* bullet formatting;
+* placeholders;
+* unsupported content;
+* excessive line growth;
+* export success.
+
+Do not solve overflow by making the document unreadably small.
+
+## Application-Specific Outputs
+
+Every generated resume derivative should have a distinct version identifier and traceability to:
+
+* Job_ID;
+* resume version;
+* patch used;
+* claims/evidence used;
+* validation result;
+* export result.
+
+A submitted application must retain a record of the exact resume version used.
+
+## AI Boundaries
+
+AI may:
+
+* rank approved bullets by relevance;
+* draft supported wording changes;
+* recommend project selection;
+* reorder supported skills;
+* identify gaps.
+
+AI may not:
+
+* create unsupported achievements;
+* rename formal titles;
+* manufacture technologies;
+* invent metrics;
+* change dates;
+* bypass lineage validation;
+* directly modify the protected master.
+
+## Export Boundary
+
+Rendering/export occurs only after:
+
+1. patch schema validation;
+2. claim lineage validation;
+3. immutable-field validation;
+4. relevant format validation.
+
+If any required validation fails:
+
+do not export a final application resume.
+
+## Stop Rule
+
+Stop and surface the issue if:
+
+* a requested change lacks evidence lineage;
+* the JD requires an unsupported skill that would need invention;
+* an immutable field would need alteration;
+* the master file would be modified directly;
+* formatting cannot be preserved safely;
+* the patch conflicts with the Blueprint;
+* validation fails.
+
