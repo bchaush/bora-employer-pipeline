@@ -1,0 +1,106 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://bora-employer-pipeline.local/schemas/requirement.schema.json",
+    "title": "Bora Employer Pipeline Requirement Record",
+    "description": "Canonical structured representation of one job requirement extracted from a job description. The record must preserve source wording and must not upgrade preferred, contextual, or ambiguous language into a mandatory requirement.",
+    "type": "object",
+    "additionalProperties": false,
+  
+    "required": [
+      "requirement_id",
+      "job_id",
+      "text",
+      "category",
+      "importance",
+      "seniority_implication",
+      "technology",
+      "experience_level",
+      "domain",
+      "relevance",
+      "source_text",
+      "source_location"
+    ],
+  
+    "properties": {
+      "requirement_id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Permanent identifier for this requirement within the analyzed job."
+      },
+  
+      "job_id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Job_ID of the job record from which this requirement was extracted."
+      },
+  
+      "text": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Normalized statement of the requirement. It must faithfully represent the source and must not introduce a stronger claim than the job description supports."
+      },
+  
+      "category": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Functional category assigned to the requirement. Exact category vocabulary is an implementation choice and is not locked by the Blueprint."
+      },
+  
+      "importance": {
+        "type": "string",
+        "enum": [
+          "MANDATORY",
+          "PREFERRED",
+          "UNCLEAR"
+        ],
+        "description": "Whether the job description supports treating the requirement as mandatory, preferred, or unclear. These states come directly from the Blueprint requirement-extraction rule."
+      },
+  
+      "seniority_implication": {
+        "type": ["string", "null"],
+        "description": "What, if anything, the requirement implies about expected seniority. Null when the source does not support a seniority conclusion."
+      },
+  
+      "technology": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Technologies explicitly associated with this requirement. Empty array when no technology is stated. Technology mention alone must not make the requirement mandatory."
+      },
+  
+      "experience_level": {
+        "type": ["string", "null"],
+        "description": "Experience level explicitly stated or clearly supported by the requirement, such as a stated number of years. Null when not specified."
+      },
+  
+      "domain": {
+        "type": ["string", "null"],
+        "description": "Business or technical domain explicitly connected to the requirement. Null when no domain is supported by the source."
+      },
+  
+      "relevance": {
+        "type": "string",
+        "enum": [
+          "HIGH",
+          "MEDIUM",
+          "LOW",
+          "UNKNOWN"
+        ],
+        "description": "How material this requirement is to evaluating the role. This vocabulary is a proposed implementation choice, not a Blueprint-defined enum."
+      },
+  
+      "source_text": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Exact or faithfully captured source wording from the job description that supports this requirement."
+      },
+  
+      "source_location": {
+        "type": ["string", "null"],
+        "description": "Location of the supporting wording within the job description, such as Qualifications, Responsibilities, Preferred Qualifications, or another identifiable section. Null only when the source structure does not provide a usable location."
+      }
+    }
+  }

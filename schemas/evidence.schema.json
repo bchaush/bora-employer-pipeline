@@ -1,0 +1,135 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://bora-employer-pipeline.local/schemas/evidence.schema.json",
+    "title": "Bora Employer Pipeline Evidence Record",
+    "description": "Canonical truth-layer record for one piece of evidence about Bora's experience. Evidence records must trace to an original source and must not contain invented outcomes, unsupported equivalence, or silently upgraded certainty.",
+    "type": "object",
+    "additionalProperties": false,
+  
+    "required": [
+      "evidence_id",
+      "experience_id",
+      "fact",
+      "capabilities",
+      "technologies",
+      "evidence_state",
+      "original_source",
+      "source_location",
+      "safe_for_external_use",
+      "notes"
+    ],
+  
+    "properties": {
+      "evidence_id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Permanent unique identifier for this evidence record."
+      },
+  
+      "experience_id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Identifier of the experience or project this evidence belongs to."
+      },
+  
+      "fact": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Atomic factual statement supported by the cited source. It must not introduce an unmeasured outcome, unsupported scope, or stronger claim than the source supports."
+      },
+  
+      "capabilities": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Capabilities directly demonstrated or supportably evidenced by this record. Empty array is permitted when no capability can yet be assigned without interpretation."
+      },
+  
+      "technologies": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Tools or technologies directly supported by the source. Empty array when none are evidenced."
+      },
+  
+      "evidence_state": {
+        "type": "string",
+        "enum": [
+          "VERIFIED",
+          "SUPPORTED",
+          "OBSERVED",
+          "UNKNOWN",
+          "CONTRADICTED"
+        ],
+        "description": "Evidence certainty state. These are the only states permitted by the Blueprint."
+      },
+  
+      "original_source": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Original source supporting the evidence, such as code, GitHub, project documentation, approved stakeholder material, employment records, university records, or another Level 0 source."
+      },
+  
+      "source_location": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Specific location within the original source where the supporting evidence can be found, such as file path, section, line range, page, commit, worksheet, or document heading."
+      },
+  
+      "safe_for_external_use": {
+        "type": "boolean",
+        "description": "Whether this evidence may be used in external-facing materials such as resumes, applications, networking, or interviews."
+      },
+  
+      "notes": {
+        "type": ["string", "null"],
+        "description": "Optional clarifications, caveats, interpretation boundaries, or provenance notes. Null when no note is needed."
+      },
+  
+      "limitations": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Explicit limits on what this evidence proves. Optional but strongly useful where scope could otherwise be overstated."
+      },
+  
+      "stakeholders": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Stakeholder roles directly supported by source evidence. This field is optional and should not contain inferred people or relationships."
+      },
+  
+      "workflow_stage": {
+        "type": ["string", "null"],
+        "description": "Optional workflow stage directly associated with the evidence, such as requirements, build, validation, UAT, deployment, handoff, reconciliation, or monitoring. Exact vocabulary is an implementation choice, not a Blueprint-defined enum."
+      },
+  
+      "tests": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Tests, checks, or validation activities directly supported by the source."
+      },
+  
+      "outcome": {
+        "type": ["string", "null"],
+        "description": "Measured or directly observed outcome only. Null when no outcome is supported. Never invent time saved, percentages, productivity gains, or business impact."
+      }
+    }
+  }
