@@ -19,6 +19,48 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Schema Milestone 1 Post-Close Hardening
+
+**Reason**
+
+Harden Schema Milestone 1 without redesign: shared Draft 2020-12 validator helper that always includes job-url enforcement, plus stronger requirement smoke coverage.
+
+**Changed**
+
+* Added `src/schema_validation.py` — loads Draft 2020-12 schemas and builds validators using `build_job_format_checker()` so production code cannot silently skip job-url checks with plain `FormatChecker()`.
+* Strengthened `tests/requirement_schema_smoke_test.py` with missing-required-field and unexpected-additional-property rejection tests.
+* Pointed `tests/job_schema_smoke_test.py` at the shared schema validator helper.
+* URL acceptance rules remain solely in `src/job_url_format.py` (not duplicated).
+
+**Affected Areas**
+
+* `src/schema_validation.py`
+* `tests/requirement_schema_smoke_test.py`
+* `tests/job_schema_smoke_test.py`
+
+**Risks / Tradeoffs**
+
+* Evidence smoke test still constructs its own validator; it can migrate to the shared helper later without schema changes.
+* Custom `job-url` format still requires importing the shared helper (or `build_job_format_checker`) in any new validation path.
+
+**Tests / Verification**
+
+All three smoke tests passed after hardening.
+
+**Approved By**
+
+Bora
+
+**Status**
+
+Implemented — Schema Milestone 1 hardening complete; no further Schema Milestone 1 work
+
+**Next Milestone**
+
+Evidence Repository + Claim Lineage Validator
+
+---
+
 ## 2026-08-26 — Schema Milestone 1 Closed
 
 **Reason**

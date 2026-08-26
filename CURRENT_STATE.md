@@ -26,8 +26,9 @@ Schema Milestone 1 closed. No production engine yet.
   * `discovered_date` stored separately from `date_first_seen` (also preserves `board_posted_date` and `date_last_verified`).
   * `source_verification_status` split from `role_status` freshness.
   * Shared deterministic job-url validator centralized in `src/job_url_format.py` (`format: "job-url"`).
+  * Shared Draft 2020-12 schema validator helper in `src/schema_validation.py` always attaches the job-url FormatChecker (prevents silent skip via plain `FormatChecker()`).
   * Job URLs accept http/https; reject credentials, bad schemes, empty host, and literal whitespace/control characters; percent-encoded paths remain valid.
-  * Behavioral smoke tests for all three schemas under `tests/` — all passing.
+  * Behavioral smoke tests for all three schemas under `tests/` — all passing (requirement smoke test includes missing-field and additional-property rejection).
 
 ## Current Task
 

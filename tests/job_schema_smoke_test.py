@@ -1,8 +1,5 @@
-import json
 import sys
 from pathlib import Path
-
-from jsonschema import Draft202012Validator
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,22 +9,11 @@ SRC_PATH = ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
-from job_url_format import build_job_format_checker  # noqa: E402
+from schema_validation import build_draft202012_validator  # noqa: E402
 
 
-with SCHEMA_PATH.open(encoding="utf-8") as f:
-    schema = json.load(f)
-
-
-# Shared deterministic job URL checker (http/https only), registered as
-# format "job-url" to match job.schema.json official_url / discovery_url.
-format_checker = build_job_format_checker()
-
-
-validator = Draft202012Validator(
-    schema,
-    format_checker=format_checker
-)
+# Shared Draft 2020-12 validator always includes job-url format enforcement.
+validator = build_draft202012_validator(SCHEMA_PATH)
 
 
 # Synthetic fixture only.

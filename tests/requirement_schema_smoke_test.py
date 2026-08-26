@@ -1,21 +1,18 @@
-import json
+import sys
 from pathlib import Path
-
-from jsonschema import Draft202012Validator, FormatChecker
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas" / "requirement.schema.json"
+SRC_PATH = ROOT / "src"
+
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+
+from schema_validation import build_draft202012_validator  # noqa: E402
 
 
-with SCHEMA_PATH.open(encoding="utf-8") as f:
-    schema = json.load(f)
-
-
-validator = Draft202012Validator(
-    schema,
-    format_checker=FormatChecker()
-)
+validator = build_draft202012_validator(SCHEMA_PATH)
 
 
 # Synthetic fixture only.
@@ -44,6 +41,18 @@ invalid_requirement["requirement_id"] = "REQ_TEST_002"
 invalid_requirement["importance"] = "OPTIONAL"
 
 
+# Deliberately invalid: omit a required field.
+missing_required_requirement = valid_requirement.copy()
+missing_required_requirement["requirement_id"] = "REQ_TEST_003"
+del missing_required_requirement["text"]
+
+
+# Deliberately invalid: unexpected additional property.
+extra_property_requirement = valid_requirement.copy()
+extra_property_requirement["requirement_id"] = "REQ_TEST_004"
+extra_property_requirement["invented_field"] = "should_be_rejected"
+
+
 valid_errors = list(validator.iter_errors(valid_requirement))
 
 if valid_errors:
@@ -64,6 +73,30 @@ if not invalid_errors:
 print("PASS 2: invalid importance state was correctly rejected.")
 
 for error in invalid_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+missing_required_errors = list(validator.iter_errors(missing_required_requirement))
+
+if not missing_required_errors:
+    print("FAIL: requirement missing a required field was accepted.")
+    raise SystemExit(1)
+
+print("PASS 3: missing required field was correctly rejected.")
+
+for error in missing_required_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+extra_property_errors = list(validator.iter_errors(extra_property_requirement))
+
+if not extra_property_errors:
+    print("FAIL: requirement with an unexpected additional property was accepted.")
+    raise SystemExit(1)
+
+print("PASS 4: unexpected additional property was correctly rejected.")
+
+for error in extra_property_errors:
     print(f"  Rejection reason: {error.message}")
 
 
