@@ -1,10 +1,10 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-08-25
+Updated: 2026-08-26
 
 ## Current Phase
 
-Workbench setup and repository governance.
+Schema Milestone 1 complete. Core structured-record schemas and behavioral smoke tests are in place.
 
 ## Completed
 
@@ -20,19 +20,26 @@ Workbench setup and repository governance.
 * ChatGPT selected as primary architect/research/reasoning layer.
 * Gemini designated as independent verifier and backup.
 * Claude designated as optional escalation/review only.
+* Schema Milestone 1:
+
+  * `schemas/job.schema.json` — job record with separate freshness dates, independent `role_status` and `source_verification_status` axes, and locked E-Verify vocabulary (no `NOT_ENROLLED`).
+  * `schemas/requirement.schema.json` — requirement record with Blueprint-aligned importance states.
+  * `schemas/evidence.schema.json` — evidence truth-layer record with Blueprint-aligned evidence states.
+  * Behavioral smoke tests for all three schemas under `tests/`.
 
 ## Current Task
 
-Complete repository workbench setup before any production feature development begins.
+Await next approved implementation task after Schema Milestone 1 closeout.
 
 ## Not Built Yet
 
-* Evidence repository
+* Evidence repository content
 * Claim bank
 * Forbidden-claim registry implementation
+* Deterministic claim/outcome validators (beyond JSON Schema)
 * Job ingestion
 * Job deduplication
-* Role verification
+* Role verification workflow
 * Job requirement extraction
 * OPT/work-authorization screening
 * Evidence matching
@@ -54,6 +61,7 @@ Complete repository workbench setup before any production feature development be
 * No resume-generation pipeline exists yet.
 * No PII should be stored in this repository unless explicitly designed and approved later.
 * No architectural dependency beyond the local repository has been approved.
+* JSON Schema gates reject malformed structured records; semantic fabricated-outcome protection remains a later deterministic validator layer.
 
 ## Current Source of Truth
 
@@ -63,14 +71,12 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Create repository folder structure.
-2. Create `CHANGELOG.md`.
-3. Create `GEMINI.md`.
-4. Create `.cursor/rules/`.
-5. Add initial rule files.
-6. Create `docs/decisions/`.
-7. Create schemas, tests, evidence, claims, prompts, source, golden-test, and log directories.
-8. Make the first clean Git commit.
+Await Bora's next approved task. Likely candidates after Schema Milestone 1:
+
+1. Additional schemas (claims, fit, resume patch, etc.) as approved.
+2. Deterministic validators beyond JSON Schema.
+3. Repository data directories and identifier conventions.
+4. First local ingestion/validation workflow.
 
 ## Do Not Start Yet
 
@@ -93,4 +99,4 @@ These begin only after the governed workbench is complete and the first implemen
 
 ## Next Approved Task
 
-Create the repository skeleton and persistent agent-rule structure.
+None assigned. Schema Milestone 1 is closed. Await explicit approval for the next implementation task.
