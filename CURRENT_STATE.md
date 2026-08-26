@@ -37,8 +37,9 @@ Claim Validation milestone closed. No production evidence repository content loa
   * Unified `validate_claim()` built (`src/claim_validation.py`).
   * Claim validation is citation-scoped: only Evidence_IDs cited by the claim affect claim validity.
   * Context conflicts (`allowed_contexts` ∩ `forbidden_contexts`) block reusable use via `CONTEXT_CONFLICT`.
-  * Sequence duplicate Evidence_IDs intentionally fail closed as repository identity-integrity protection.
+  * Sequence duplicate Evidence_IDs intentionally fail closed as repository identity-integrity protection (including uncited duplicates in sequence-form indexes).
   * All 7 related test suites pass.
+  * Post-close hardening: regression coverage for uncited sequence duplicates and CONTRADICTED claim-state non-reuse; evidence schema validator construction hoisted outside per-ID loop (no behavior change).
   * No production evidence repository content loaded yet.
 
 ## Current Task

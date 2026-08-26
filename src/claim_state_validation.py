@@ -190,6 +190,10 @@ def validate_claim_evidence_state_compatibility(
     cited_states: dict[str, str] = {}
     missing_ids: list[str] = []
 
+    evidence_validator = None
+    if validate_schemas:
+        evidence_validator = build_draft202012_validator(EVIDENCE_SCHEMA_PATH)
+
     for evidence_id in ordered_unique_ids:
         record = index.get(evidence_id)
         if record is None:
@@ -202,8 +206,7 @@ def validate_claim_evidence_state_compatibility(
             )
             continue
 
-        if validate_schemas:
-            evidence_validator = build_draft202012_validator(EVIDENCE_SCHEMA_PATH)
+        if evidence_validator is not None:
             evidence_schema_errors = _schema_error_messages(
                 evidence_validator,
                 record,

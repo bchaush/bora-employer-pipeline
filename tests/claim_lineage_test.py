@@ -315,4 +315,34 @@ print("PASS 13: malformed sequence without cited evidence failed closed.")
 print(f"  Result: {result_sequence_cited_missing_due_to_malformed}")
 
 
+# PASS 14: sequence duplicate Evidence_ID that is NOT cited still fails closed
+# Locked architecture: sequence duplicate IDs are repository identity-integrity
+# protection, even when the duplicated ID is unrelated to the current claim.
+result_uncited_sequence_duplicate = validate_claim_lineage(
+    make_claim("CLAIM_TEST_014", ["EVID_TEST_001"]),
+    [
+        make_evidence("EVID_TEST_001"),
+        make_evidence("EVID_UNRELATED"),
+        make_evidence("EVID_UNRELATED"),
+    ],
+)
+assert_false(
+    result_uncited_sequence_duplicate["valid"],
+    "uncited duplicate Evidence_ID in sequence was accepted",
+)
+assert_true(
+    any(
+        error.get("code") == "DUPLICATE_EVIDENCE_ID_IN_INDEX"
+        and error.get("evidence_id") == "EVID_UNRELATED"
+        for error in result_uncited_sequence_duplicate["errors"]
+    ),
+    "expected DUPLICATE_EVIDENCE_ID_IN_INDEX for uncited duplicate",
+)
+print(
+    "PASS 14: uncited duplicate Evidence_ID in sequence failed closed "
+    "(repository identity-integrity)."
+)
+print(f"  Result: {result_uncited_sequence_duplicate}")
+
+
 print("PASS: claim lineage behavioral tests completed successfully.")

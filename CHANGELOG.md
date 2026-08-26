@@ -19,6 +19,43 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Claim Validation Post-Close Hardening
+
+**Reason**
+
+Add locked-decision regression coverage and a small performance cleanup after Claim Validation closeout, without architecture redesign.
+
+**Changed**
+
+* Added lineage regression: sequence-form evidence index with a duplicate Evidence_ID that is not cited by the claim still fails closed (`DUPLICATE_EVIDENCE_ID_IN_INDEX`).
+* Added direct state-validator unit coverage: claim `evidence_state = CONTRADICTED` returns `CLAIM_STATE_NOT_REUSABLE` / invalid-for-reuse.
+* Hoisted `build_draft202012_validator(EVIDENCE_SCHEMA_PATH)` outside the per-Evidence_ID loop in `src/claim_state_validation.py` (performance cleanup only; no behavior change).
+* No architecture change.
+
+**Affected Areas**
+
+* `tests/claim_lineage_test.py`
+* `tests/claim_state_validation_test.py`
+* `src/claim_state_validation.py`
+
+**Risks / Tradeoffs**
+
+* None material. Sequence uncited-duplicate fail-closed remains intentionally stricter than citation-scoped malformed-record ignoring.
+
+**Tests / Verification**
+
+All 7 related suites passed after hardening.
+
+**Approved By**
+
+Bora
+
+**Status**
+
+Implemented — Claim Validation post-close hardening complete
+
+---
+
 ## 2026-08-26 — Claim Validation Milestone Closed
 
 **Reason**

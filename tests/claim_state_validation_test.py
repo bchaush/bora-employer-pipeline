@@ -257,4 +257,25 @@ print("PASS 12: cited malformed evidence failed state validation.")
 print(f"  Result: {result_cited_bad}")
 
 
+# PASS 13: CONTRADICTED claim state is never reusable/valid for reuse
+result_contradicted_claim = validate_claim_evidence_state_compatibility(
+    make_claim("CLAIM_STATE_013", ["EVID_V1"], "CONTRADICTED"),
+    {"EVID_V1": make_evidence("EVID_V1", "VERIFIED")},
+)
+assert_false(
+    result_contradicted_claim["valid"],
+    "CONTRADICTED claim state was treated as valid for reuse",
+)
+assert_true(
+    result_contradicted_claim["claim_state"] == "CONTRADICTED",
+    "claim_state not reported as CONTRADICTED",
+)
+assert_true(
+    has_code(result_contradicted_claim, "CLAIM_STATE_NOT_REUSABLE"),
+    "expected CLAIM_STATE_NOT_REUSABLE for CONTRADICTED claim",
+)
+print("PASS 13: CONTRADICTED claim state returns non-reusable/invalid-for-reuse result.")
+print(f"  Result: {result_contradicted_claim}")
+
+
 print("PASS: claim evidence-state compatibility tests completed successfully.")
