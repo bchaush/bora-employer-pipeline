@@ -4,7 +4,7 @@ Updated: 2026-08-26
 
 ## Current Phase
 
-Schema Milestone 1 complete. Core structured-record schemas and behavioral smoke tests are in place.
+Schema Milestone 1 closed. No production engine yet.
 
 ## Completed
 
@@ -20,23 +20,26 @@ Schema Milestone 1 complete. Core structured-record schemas and behavioral smoke
 * ChatGPT selected as primary architect/research/reasoning layer.
 * Gemini designated as independent verifier and backup.
 * Claude designated as optional escalation/review only.
-* Schema Milestone 1:
+* Schema Milestone 1 closed:
 
-  * `schemas/job.schema.json` — job record with separate freshness dates, independent `role_status` and `source_verification_status` axes, and locked E-Verify vocabulary (no `NOT_ENROLLED`).
-  * `schemas/requirement.schema.json` — requirement record with Blueprint-aligned importance states.
-  * `schemas/evidence.schema.json` — evidence truth-layer record with Blueprint-aligned evidence states.
-  * Behavioral smoke tests for all three schemas under `tests/`.
+  * `schemas/job.schema.json`, `schemas/requirement.schema.json`, and `schemas/evidence.schema.json` complete.
+  * `discovered_date` stored separately from `date_first_seen` (also preserves `board_posted_date` and `date_last_verified`).
+  * `source_verification_status` split from `role_status` freshness.
+  * Shared deterministic job-url validator centralized in `src/job_url_format.py` (`format: "job-url"`).
+  * Job URLs accept http/https; reject credentials, bad schemes, empty host, and literal whitespace/control characters; percent-encoded paths remain valid.
+  * Behavioral smoke tests for all three schemas under `tests/` — all passing.
 
 ## Current Task
 
-Await next approved implementation task after Schema Milestone 1 closeout.
+Await approval to begin the next milestone: Evidence Repository + Claim Lineage Validator.
 
 ## Not Built Yet
 
 * Evidence repository content
-* Claim bank
+* Claim bank / claim lineage validator
 * Forbidden-claim registry implementation
 * Deterministic claim/outcome validators (beyond JSON Schema)
+* Production pipeline engine
 * Job ingestion
 * Job deduplication
 * Role verification workflow
@@ -71,12 +74,9 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-Await Bora's next approved task. Likely candidates after Schema Milestone 1:
-
-1. Additional schemas (claims, fit, resume patch, etc.) as approved.
-2. Deterministic validators beyond JSON Schema.
-3. Repository data directories and identifier conventions.
-4. First local ingestion/validation workflow.
+1. Evidence Repository
+2. Claim Lineage Validator
+3. Additional schemas only as explicitly approved
 
 ## Do Not Start Yet
 
@@ -99,4 +99,4 @@ These begin only after the governed workbench is complete and the first implemen
 
 ## Next Approved Task
 
-None assigned. Schema Milestone 1 is closed. Await explicit approval for the next implementation task.
+Next milestone (pending explicit start approval): Evidence Repository + Claim Lineage Validator.

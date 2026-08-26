@@ -55,14 +55,14 @@
   
       "official_url": {
         "type": ["string", "null"],
-        "format": "uri",
-        "description": "Employer-owned careers-page URL when verified. Null if unavailable or not yet found."
+        "format": "job-url",
+        "description": "Employer-owned careers-page URL when verified. Null if unavailable or not yet found. Must be an absolute http or https URL without embedded credentials."
       },
   
       "discovery_url": {
         "type": ["string", "null"],
-        "format": "uri",
-        "description": "URL where the role was originally discovered, if available."
+        "format": "job-url",
+        "description": "URL where the role was originally discovered, if available. Must be an absolute http or https URL without embedded credentials."
       },
   
       "location": {

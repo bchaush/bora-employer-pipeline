@@ -1,30 +1,27 @@
 import json
+import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas" / "job.schema.json"
+SRC_PATH = ROOT / "src"
+
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+
+from job_url_format import build_job_format_checker  # noqa: E402
 
 
 with SCHEMA_PATH.open(encoding="utf-8") as f:
     schema = json.load(f)
 
 
-# jsonschema's default FormatChecker omits "uri" unless optional format
-# extras are installed. Register a stdlib checker so format: "uri" on
-# official_url / discovery_url is actually enforced in this smoke test.
-format_checker = FormatChecker()
-
-
-@format_checker.checks("uri")
-def is_uri(instance):
-    if not isinstance(instance, str):
-        return True
-    parsed = urlparse(instance)
-    return bool(parsed.scheme and parsed.scheme.isalpha() and (parsed.netloc or parsed.path))
+# Shared deterministic job URL checker (http/https only), registered as
+# format "job-url" to match job.schema.json official_url / discovery_url.
+format_checker = build_job_format_checker()
 
 
 validator = Draft202012Validator(
@@ -115,6 +112,63 @@ independent_axes_job["role_status"] = "POSSIBLY_STALE"
 invalid_role_status_job = valid_job.copy()
 invalid_role_status_job["job_id"] = "JOB_TEST_008"
 invalid_role_status_job["role_status"] = "SOURCE_VERIFICATION_REQUIRED"
+
+
+# Deliberately invalid enum values for locked vocabularies.
+invalid_source_verification_job = valid_job.copy()
+invalid_source_verification_job["job_id"] = "JOB_TEST_009"
+invalid_source_verification_job["source_verification_status"] = "UNVERIFIED"
+
+invalid_careers_page_status_job = valid_job.copy()
+invalid_careers_page_status_job["job_id"] = "JOB_TEST_010"
+invalid_careers_page_status_job["careers_page_status"] = "CHECKED"
+
+invalid_immigration_verification_job = valid_job.copy()
+invalid_immigration_verification_job["job_id"] = "JOB_TEST_011"
+invalid_immigration_verification_job["immigration_verification_status"] = "HR_CONFIRMATION_NEEDED"
+
+invalid_initial_opt_relevance_job = valid_job.copy()
+invalid_initial_opt_relevance_job["job_id"] = "JOB_TEST_012"
+invalid_initial_opt_relevance_job["initial_opt_relevance"] = "HIGH"
+
+invalid_future_stem_quality_job = valid_job.copy()
+invalid_future_stem_quality_job["job_id"] = "JOB_TEST_013"
+invalid_future_stem_quality_job["future_stem_quality"] = "EXCELLENT"
+
+invalid_opt_flag_job = valid_job.copy()
+invalid_opt_flag_job["job_id"] = "JOB_TEST_014"
+invalid_opt_flag_job["opt_flag"] = "RELEVANT"
+
+
+# Focused negative URL cases for the shared http/https job URL checker.
+invalid_ftp_url_job = valid_job.copy()
+invalid_ftp_url_job["job_id"] = "JOB_TEST_015"
+invalid_ftp_url_job["official_url"] = "ftp://example.com"
+
+invalid_mailto_url_job = valid_job.copy()
+invalid_mailto_url_job["job_id"] = "JOB_TEST_016"
+invalid_mailto_url_job["official_url"] = "mailto:hr@example.com"
+
+invalid_javascript_url_job = valid_job.copy()
+invalid_javascript_url_job["job_id"] = "JOB_TEST_017"
+invalid_javascript_url_job["official_url"] = "javascript:alert(1)"
+
+invalid_whitespace_url_job = valid_job.copy()
+invalid_whitespace_url_job["job_id"] = "JOB_TEST_018"
+invalid_whitespace_url_job["official_url"] = "https://example.com/careers page"
+
+
+# Positive: valid percent-encoded path characters remain allowed.
+percent_encoded_url_job = valid_job.copy()
+percent_encoded_url_job["job_id"] = "JOB_TEST_019"
+percent_encoded_url_job["official_url"] = "https://example.com/careers%20page"
+percent_encoded_url_job["discovery_url"] = "https://jobs.example.com/search%3Fq%3Danalyst"
+
+
+# Negative: embedded username/password credentials must be rejected.
+credential_url_job = valid_job.copy()
+credential_url_job["job_id"] = "JOB_TEST_020"
+credential_url_job["official_url"] = "https://user:pass@example.com/careers"
 
 
 valid_errors = list(validator.iter_errors(valid_job))
@@ -208,6 +262,163 @@ if not invalid_role_status_errors:
 print("PASS 8: SOURCE_VERIFICATION_REQUIRED in role_status was correctly rejected.")
 
 for error in invalid_role_status_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_source_verification_errors = list(
+    validator.iter_errors(invalid_source_verification_job)
+)
+
+if not invalid_source_verification_errors:
+    print("FAIL: invalid source_verification_status was accepted.")
+    raise SystemExit(1)
+
+print("PASS 9: invalid source_verification_status was correctly rejected.")
+
+for error in invalid_source_verification_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_careers_page_status_errors = list(
+    validator.iter_errors(invalid_careers_page_status_job)
+)
+
+if not invalid_careers_page_status_errors:
+    print("FAIL: invalid careers_page_status was accepted.")
+    raise SystemExit(1)
+
+print("PASS 10: invalid careers_page_status was correctly rejected.")
+
+for error in invalid_careers_page_status_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_immigration_verification_errors = list(
+    validator.iter_errors(invalid_immigration_verification_job)
+)
+
+if not invalid_immigration_verification_errors:
+    print("FAIL: invalid immigration_verification_status was accepted.")
+    raise SystemExit(1)
+
+print("PASS 11: invalid immigration_verification_status was correctly rejected.")
+
+for error in invalid_immigration_verification_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_initial_opt_relevance_errors = list(
+    validator.iter_errors(invalid_initial_opt_relevance_job)
+)
+
+if not invalid_initial_opt_relevance_errors:
+    print("FAIL: invalid initial_opt_relevance was accepted.")
+    raise SystemExit(1)
+
+print("PASS 12: invalid initial_opt_relevance was correctly rejected.")
+
+for error in invalid_initial_opt_relevance_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_future_stem_quality_errors = list(
+    validator.iter_errors(invalid_future_stem_quality_job)
+)
+
+if not invalid_future_stem_quality_errors:
+    print("FAIL: invalid future_stem_quality was accepted.")
+    raise SystemExit(1)
+
+print("PASS 13: invalid future_stem_quality was correctly rejected.")
+
+for error in invalid_future_stem_quality_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_opt_flag_errors = list(validator.iter_errors(invalid_opt_flag_job))
+
+if not invalid_opt_flag_errors:
+    print("FAIL: invalid opt_flag was accepted.")
+    raise SystemExit(1)
+
+print("PASS 14: invalid opt_flag was correctly rejected.")
+
+for error in invalid_opt_flag_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_ftp_url_errors = list(validator.iter_errors(invalid_ftp_url_job))
+
+if not invalid_ftp_url_errors:
+    print("FAIL: ftp URL was accepted.")
+    raise SystemExit(1)
+
+print("PASS 15: ftp URL was correctly rejected.")
+
+for error in invalid_ftp_url_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_mailto_url_errors = list(validator.iter_errors(invalid_mailto_url_job))
+
+if not invalid_mailto_url_errors:
+    print("FAIL: mailto URL was accepted.")
+    raise SystemExit(1)
+
+print("PASS 16: mailto URL was correctly rejected.")
+
+for error in invalid_mailto_url_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_javascript_url_errors = list(
+    validator.iter_errors(invalid_javascript_url_job)
+)
+
+if not invalid_javascript_url_errors:
+    print("FAIL: javascript URL was accepted.")
+    raise SystemExit(1)
+
+print("PASS 17: javascript URL was correctly rejected.")
+
+for error in invalid_javascript_url_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+invalid_whitespace_url_errors = list(
+    validator.iter_errors(invalid_whitespace_url_job)
+)
+
+if not invalid_whitespace_url_errors:
+    print("FAIL: whitespace-containing URL was accepted.")
+    raise SystemExit(1)
+
+print("PASS 18: whitespace-containing URL was correctly rejected.")
+
+for error in invalid_whitespace_url_errors:
+    print(f"  Rejection reason: {error.message}")
+
+
+percent_encoded_url_errors = list(validator.iter_errors(percent_encoded_url_job))
+
+if percent_encoded_url_errors:
+    print("FAIL: valid percent-encoded job URL was rejected.")
+    for error in percent_encoded_url_errors:
+        print(f"  - {error.message}")
+    raise SystemExit(1)
+
+print("PASS 19: percent-encoded job URL was accepted.")
+
+
+credential_url_errors = list(validator.iter_errors(credential_url_job))
+
+if not credential_url_errors:
+    print("FAIL: credential-bearing job URL was accepted.")
+    raise SystemExit(1)
+
+print("PASS 20: credential-bearing job URL was correctly rejected.")
+
+for error in credential_url_errors:
     print(f"  Rejection reason: {error.message}")
 
 
