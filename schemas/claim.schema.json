@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/claim.schema.json",
+  "title": "Bora Employer Pipeline Claim Record",
+  "description": "Canonical Level-2 approved claim record. A claim is a human-reviewed statement supported by one or more evidence records. It must never invent outcomes, upgrade evidence certainty, or omit evidence lineage.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "claim_id",
+    "wording",
+    "evidence_ids",
+    "evidence_state",
+    "allowed_contexts",
+    "forbidden_contexts",
+    "human_approval",
+    "date",
+    "version"
+  ],
+
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent unique Claim_ID for this reusable claim."
+    },
+
+    "wording": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Approved claim wording. Must remain faithful to cited evidence and must not introduce unsupported scope or fabricated outcomes."
+    },
+
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "One or more Evidence_ID values that support this claim. Empty lists are forbidden. No Evidence_ID means no factual claim."
+    },
+
+    "evidence_state": {
+      "type": "string",
+      "enum": [
+        "VERIFIED",
+        "SUPPORTED",
+        "OBSERVED",
+        "UNKNOWN",
+        "CONTRADICTED"
+      ],
+      "description": "Evidence certainty state for the claim. Uses only the locked Blueprint evidence states. Must not silently upgrade certainty."
+    },
+
+    "allowed_contexts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Contexts in which this claim may be used, such as resume, networking, or interview. Empty array means no allowed context has been approved yet."
+    },
+
+    "forbidden_contexts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Contexts in which this claim must not be used. Empty array when no explicit forbidden context is recorded."
+    },
+
+    "human_approval": {
+      "type": "boolean",
+      "description": "Explicit human approval flag. True only when a human has approved this claim. Must never be inferred, defaulted, or omitted."
+    },
+
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date associated with this claim version, typically the approval or last-reviewed date."
+    },
+
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version identifier for this claim wording/approval record."
+    }
+  }
+}

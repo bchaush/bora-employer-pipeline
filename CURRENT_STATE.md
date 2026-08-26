@@ -4,7 +4,7 @@ Updated: 2026-08-26
 
 ## Current Phase
 
-Schema Milestone 1 closed. No production engine yet.
+Claim Validation milestone closed. No production evidence repository content loaded yet. No production engine yet.
 
 ## Completed
 
@@ -28,18 +28,29 @@ Schema Milestone 1 closed. No production engine yet.
   * Shared deterministic job-url validator centralized in `src/job_url_format.py` (`format: "job-url"`).
   * Shared Draft 2020-12 schema validator helper in `src/schema_validation.py` always attaches the job-url FormatChecker (prevents silent skip via plain `FormatChecker()`).
   * Job URLs accept http/https; reject credentials, bad schemes, empty host, and literal whitespace/control characters; percent-encoded paths remain valid.
-  * Behavioral smoke tests for all three schemas under `tests/` — all passing (requirement smoke test includes missing-field and additional-property rejection).
+  * Behavioral smoke tests for all three schemas under `tests/` — all passing.
+* Claim Validation milestone closed:
+
+  * `schemas/claim.schema.json` built.
+  * Lineage validator built (`src/claim_lineage.py`).
+  * State compatibility validator built (`src/claim_state_validation.py`).
+  * Unified `validate_claim()` built (`src/claim_validation.py`).
+  * Claim validation is citation-scoped: only Evidence_IDs cited by the claim affect claim validity.
+  * Context conflicts (`allowed_contexts` ∩ `forbidden_contexts`) block reusable use via `CONTEXT_CONFLICT`.
+  * Sequence duplicate Evidence_IDs intentionally fail closed as repository identity-integrity protection.
+  * All 7 related test suites pass.
+  * No production evidence repository content loaded yet.
 
 ## Current Task
 
-Await approval to begin the next milestone: Evidence Repository + Claim Lineage Validator.
+Await next approved implementation task after Claim Validation closeout.
 
 ## Not Built Yet
 
-* Evidence repository content
-* Claim bank / claim lineage validator
+* Evidence repository content / loading
 * Forbidden-claim registry implementation
-* Deterministic claim/outcome validators (beyond JSON Schema)
+* Repository-wide evidence integrity validator
+* Deterministic fabricated-outcome / metric validators
 * Production pipeline engine
 * Job ingestion
 * Job deduplication
@@ -65,7 +76,9 @@ Await approval to begin the next milestone: Evidence Repository + Claim Lineage 
 * No resume-generation pipeline exists yet.
 * No PII should be stored in this repository unless explicitly designed and approved later.
 * No architectural dependency beyond the local repository has been approved.
-* JSON Schema gates reject malformed structured records; semantic fabricated-outcome protection remains a later deterministic validator layer.
+* JSON Schema gates reject malformed structured records.
+* Claim reusable-use requires schema + citation-scoped lineage + state compatibility + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
+* Semantic fabricated-outcome protection remains a later deterministic validator layer.
 
 ## Current Source of Truth
 
@@ -75,9 +88,12 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Evidence Repository
-2. Claim Lineage Validator
-3. Additional schemas only as explicitly approved
+Await Bora's next approved task. Likely candidates:
+
+1. Evidence repository content / loading conventions
+2. Forbidden-claim registry
+3. Repository-wide evidence integrity validator
+4. Additional schemas only as explicitly approved
 
 ## Do Not Start Yet
 
@@ -100,4 +116,4 @@ These begin only after the governed workbench is complete and the first implemen
 
 ## Next Approved Task
 
-Next milestone (pending explicit start approval): Evidence Repository + Claim Lineage Validator.
+None assigned. Claim Validation milestone is closed. Await explicit approval for the next implementation task.

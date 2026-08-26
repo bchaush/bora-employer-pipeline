@@ -19,6 +19,67 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Claim Validation Milestone Closed
+
+**Reason**
+
+Complete deterministic Claim Validation before loading production evidence repository content or building resume/application generation.
+
+**Changed**
+
+* Built `schemas/claim.schema.json` with Blueprint §15 claim fields and locked evidence states.
+* Built lineage validator in `src/claim_lineage.py` (exact, case-sensitive Evidence_ID resolution; no silent repairs).
+* Built state compatibility validator in `src/claim_state_validation.py`.
+* Built unified `validate_claim()` in `src/claim_validation.py` with `valid_record` vs `reusable` distinction.
+* Claim validation is citation-scoped: only Evidence_IDs cited by the claim are schema/state-checked; unrelated repository records do not invalidate the claim.
+* Context conflicts block reusable use (`CONTEXT_CONFLICT`); contexts are not silently removed; human approval cannot override.
+* Sequence duplicate Evidence_IDs intentionally fail closed as repository identity-integrity protection.
+* CONTRADICTED claims remain schema-legal for archival/audit use but are never reusable.
+* No production evidence repository content loaded yet.
+
+**Affected Areas**
+
+* `schemas/claim.schema.json`
+* `src/claim_lineage.py`
+* `src/claim_state_validation.py`
+* `src/claim_validation.py`
+* `tests/claim_schema_smoke_test.py`
+* `tests/claim_lineage_test.py`
+* `tests/claim_state_validation_test.py`
+* `tests/claim_validation_test.py`
+
+**Risks / Tradeoffs**
+
+* Repository-wide evidence integrity remains deferred to a future repository validator.
+* Fabricated-outcome / unsupported-metric truth checking remains outside this milestone.
+* Sequence duplicate-ID fail-closed is intentionally stricter than citation-scoped malformed-record ignoring.
+
+**Tests / Verification**
+
+All 7 related suites passed:
+
+* `python tests/claim_lineage_test.py`
+* `python tests/claim_state_validation_test.py`
+* `python tests/claim_validation_test.py`
+* `python tests/claim_schema_smoke_test.py`
+* `python tests/job_schema_smoke_test.py`
+* `python tests/requirement_schema_smoke_test.py`
+* `python tests/evidence_schema_smoke_test.py`
+
+**Approved By**
+
+Bora
+
+**Status**
+
+Implemented — Claim Validation milestone closed
+
+**Next Milestone**
+
+Await explicit approval (likely Evidence Repository content/loading, forbidden-claim registry, or repository-wide integrity validator)
+
+---
+
 ## 2026-08-26 — Schema Milestone 1 Post-Close Hardening
 
 **Reason**
