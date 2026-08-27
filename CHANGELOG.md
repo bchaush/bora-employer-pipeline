@@ -19,6 +19,48 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Repository-Level Evidence Integrity v1 CLOSED
+
+**Reason**
+
+Close `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` after Cursor implementation, required hardening, and independent Claude Code final recheck (`CLAUDE_EVIDENCE_INTEGRITY_FINAL_PASS`; no blockers; no remaining required hardening).
+
+**Changed**
+
+* Milestone status set to **CLOSED** in `CURRENT_STATE.md`.
+* Implementation trail preserved: `674784b` (implementation), `09213b2` (hardening).
+* Repository now deterministically enforces: recursive deterministic evidence JSON discovery; JSON parse integrity; duplicate JSON object-key rejection; canonical evidence-schema validation; global `Evidence_ID` uniqueness; filename stem ↔ `evidence_id` exact consistency; one canonical evidence record per JSON file; machine-readable error codes; fail-closed trusted index; missing-root failure; root-is-file failure; deliberate structurally-valid empty-root behavior.
+* Current real Evidence Repository: 12 Winter Walk Batch 1 records; all pass; trusted index contains all 12.
+* No reusable claims created; claim-scoped validation semantics unchanged (`NO_CLAIM_SCOPED_SEMANTIC_CHANGE`).
+* `EXPERIENCE_REGISTRY_DECISION_REQUIRED` remains OPEN and is explicitly not part of this closed milestone.
+* Next technical dependency recorded as `MINIMAL_EXPERIENCE_REGISTRY_V1` (not started; architecture not yet approved beyond the need for a canonical Experience reference source).
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Experience referential integrity remains deferred; evidence records may carry `experience_id` strings that are not yet registry-validated.
+
+**Tests / Verification**
+
+* `tests/evidence_repository_test.py` — PASS
+* All 7 existing suites — PASS
+* Real `evidence/` validation — valid; 12 records; trusted index length 12
+* `git diff --check` — clean
+
+**Approved By**
+
+Claude Code final audit PASS; ChatGPT closure instruction
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-26 — Evidence Integrity v1 hardening (duplicate JSON keys + empty-root policy)
 
 **Reason**
