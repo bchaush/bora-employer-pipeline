@@ -130,23 +130,26 @@ No production engine yet.
   * Downstream requested-context enforcement remains deferred until a résumé/application consumer exists.
   * Claim Repository result-type sealing remains deferred (no downstream sealed consumer yet).
   * Status: **CLOSED**.
-* Job Analysis v1 first vertical slice implemented (not CLOSED):
+* Job Analysis v1 first vertical slice (**CLOSED**):
 
-  * `analyze_job()` orchestration: structured extraction → requirement normalize/classify → Evidence/Claim match → gaps/unknowns → lane/decision.
-  * New schemas: `evidence_match.schema.json`, `job_analysis_result.schema.json`.
+  * First bounded trustworthy job-content analysis slice only (`analyze_job`): structured extraction → requirement normalize/classify → Evidence/Claim match → gaps/unknowns → lane/decision.
+  * Schemas: `evidence_match.schema.json`, `job_analysis_result.schema.json` (nested `$ref` + positive-match provenance).
   * AI boundary: requires `structured_extraction` (no paid model API; no fake free-form JD parser).
-  * Locked match vocabulary STRONG/SUPPORTED/PARTIAL/NONE/UNKNOWN with provenance; semantic traps enforced.
   * Synthetic BSA fixture under `fixtures/jobs/JOB_FIXTURE_BSA_001/`.
-  * Experience/Evidence/Claim repositories unchanged.
-  * First Claude Code adversarial audit found semantic-overmatch, decision-routing, classification, and schema issues.
-  * Bounded remediation applied (not CLOSED): regulatory false-PARTIAL removed; capability-gated matching; role-family gate on APPLY paths; generalized mandatory HIGH/NONE blockers; seniority defense-in-depth; mixed-cue/HR-noise classification; nested `$ref` + positive-match provenance in schemas.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (remediated; awaiting second Claude re-audit).
+  * Implementation commit: `b1a7302`. Remediation commit: `69df92f`.
+  * First Claude Code adversarial audit: changes required (semantic-overmatch, decision-routing, classification, schema).
+  * Second Claude Code adversarial audit: `CLAUDE_JOB_ANALYSIS_V1_FINAL_PASS`.
+  * Deferred hardening (safe-direction; not fixed at closure):
+    * **P-1** — `"X preferred, but not required"` currently classifies as `UNCLEAR` rather than `PREFERRED`.
+    * **P-2** — generic `"business process mapping"` fails conservatively to `NONE` until evidence/claim semantics are reviewed deliberately (Claims/Evidence unchanged).
+  * Experience/Evidence/Claim repositories unchanged; no résumé generation begun.
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+`JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` = **CLOSED**.
 
-First Claude audit findings remediated locally. Awaiting second independent Claude Code adversarial audit. Do not mark CLOSED yet. Do not begin résumé generation. Do not push until audit clears.
+No next milestone started. Do not begin résumé generation until explicitly approved.
 
 ## Not Built Yet
 
@@ -192,15 +195,14 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Second independent Claude Code adversarial audit of Job Analysis v1 (post-remediation).
-2. Close Job Analysis v1 only after re-audit clears + any further required hardening.
+1. Await explicit approval before starting the next milestone.
+2. Deferred job-analysis hardening P-1 / P-2 only when deliberately scheduled (no overclaiming).
 3. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Job Analysis v1 CLOSED before audit;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
@@ -211,4 +213,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Second Claude Code adversarial re-audit of remediated `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` (not CLOSED yet).
+None started. Await Bora’s explicit next-milestone instruction.

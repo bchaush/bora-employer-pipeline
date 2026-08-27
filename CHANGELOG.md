@@ -19,6 +19,41 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Close first job analysis vertical slice (CLOSED)
+
+**Reason**
+
+Claude Code second adversarial audit returned `CLAUDE_JOB_ANALYSIS_V1_FINAL_PASS`. Operationally close `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` without redesign, semantic changes, or résumé generation.
+
+**Changed**
+
+* Status → **CLOSED**.
+* Recorded audit trail: implementation `b1a7302`; remediation `69df92f`; first Claude audit required changes; second Claude audit `CLAUDE_JOB_ANALYSIS_V1_FINAL_PASS`.
+* Deferred hardening tracked (not fixed at closure):
+  * **P-1** — `"X preferred, but not required"` → currently `UNCLEAR` (safe-direction accuracy limitation).
+  * **P-2** — generic `"business process mapping"` → currently `NONE` until evidence/claim semantics reviewed deliberately.
+* Milestone scope remains the first bounded trustworthy job-content analysis slice only.
+* No Experience / Evidence / Claim JSON, wording, lineage, approvals, semantic guard, or Claim Repository implementation changes.
+* No résumé generation begun.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Tests / Verification**
+
+* All established suites + `job_analysis_test.py` — PASS
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+* Trust checks: `REQ_BSA_006=NONE`; Product Management cannot APPLY; MANDATORY+HIGH+NONE blocks apply; senior-title defense; positive-match provenance; nested schema validation — PASS
+* `git diff --check` — clean
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-27 — Harden first job analysis slice (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**
