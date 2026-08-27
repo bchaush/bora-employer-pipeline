@@ -1,0 +1,23 @@
+{
+  "evidence_id": "WW_CTRL_002",
+  "experience_id": "EXP_WW_001",
+  "fact": "Apps Script function safeSend_evaluateGate_() blocks live sending when Master_Kill_Switch is On, when Test_Mode_On_Off is On, or when Live_Followups_Allowed is not \"Yes\", before evaluating per-row Follow_Up_Queue eligibility.",
+  "capabilities": [
+    "safety controls",
+    "approval gating",
+    "fail-closed send logic"
+  ],
+  "technologies": [
+    "Google Apps Script"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "CODES-UP TO DATE.txt",
+  "source_location": "SafeSendEmail section — function safeSend_evaluateGate_() (run-level gates for Master_Kill_Switch, Test_Mode_On_Off, Live_Followups_Allowed)",
+  "safe_for_external_use": true,
+  "notes": "Code documents safeSend_run as the only permitted send path. This record describes control logic only.",
+  "limitations": [
+    "Does not prove that live email sending occurred",
+    "Does not prove continuous production use"
+  ],
+  "workflow_stage": "validation"
+}

@@ -1,0 +1,24 @@
+{
+  "evidence_id": "WW_SYNC_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "Workbook B Apps Script Approval Sync functions aSync_run() and aSync_runCore_() recalculate Adoption_Matrix columns K through O from approved Evidence_Log entries and write changes to Approval_Sync_Log, updating only those Adoption_Matrix columns plus the log.",
+  "capabilities": [
+    "status synchronization",
+    "controlled data propagation",
+    "audit logging"
+  ],
+  "technologies": [
+    "Google Apps Script",
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "CODES-UP TO DATE.txt",
+  "source_location": "Approval Sync section — file header (writes only Adoption_Matrix K:O and Approval_Sync_Log); functions aSync_run(), aSync_runCore_()",
+  "safe_for_external_use": true,
+  "notes": "Boston 2027 Workbook B export has empty Approval_Sync_Log rows in the handoff snapshot.",
+  "limitations": [
+    "Does not prove sync runs occurred in the current Boston 2027 handoff export",
+    "Does not prove daily production use"
+  ],
+  "workflow_stage": "build"
+}

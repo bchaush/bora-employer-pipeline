@@ -4,7 +4,7 @@ Updated: 2026-08-26
 
 ## Current Phase
 
-Claim Validation milestone closed. No production evidence repository content loaded yet. No production engine yet.
+Winter Walk Evidence Repository v1 Batch 1 = **CLOSED**. No claims created. No production engine yet.
 
 ## Completed
 
@@ -40,15 +40,25 @@ Claim Validation milestone closed. No production evidence repository content loa
   * Sequence duplicate Evidence_IDs intentionally fail closed as repository identity-integrity protection (including uncited duplicates in sequence-form indexes).
   * All 7 related test suites pass.
   * Post-close hardening: regression coverage for uncited sequence duplicates and CONTRADICTED claim-state non-reuse; evidence schema validator construction hoisted outside per-ID loop (no behavior change).
-  * No production evidence repository content loaded yet.
+* Winter Walk Evidence Repository v1 Batch 1 closed:
+
+  * 12 evidence records extracted under `evidence/winter_walk/` (`WW_ARCH_001`, `WW_ARCH_002`, `WW_CTRL_001`, `WW_CTRL_002`, `WW_MAP_001`, `WW_ADOPT_001`, `WW_DATA_001`, `WW_DATA_002`, `WW_CONN_001`, `WW_SYNC_001`, `WW_FUQ_001`, `WW_TEST_001`).
+  * Provenance-first extraction from current Apps Script (`CODES-UP TO DATE.txt`), Boston 2027 Workbook A/B exports, and locked `WinterWalk_Master_Blueprint.docx`.
+  * Independent Claude Code semantic audit completed.
+  * Three review corrections applied (`WW_DATA_001`, `WW_DATA_002`, `WW_TEST_001` capabilities/limitations).
+  * Final residual wording fix applied (`WW_TEST_001` notes: PII absence check).
+  * All 12 records pass evidence schema validation; all 7 existing test suites pass.
+  * No open Batch 1 findings.
+  * No claims created; schemas and validators unchanged.
 
 ## Current Task
 
-Await next approved implementation task after Claim Validation closeout.
+Await next approved implementation task after Winter Walk Evidence Batch 1 closeout.
 
 ## Not Built Yet
 
-* Evidence repository content / loading
+* Winter Walk Evidence Batch 2+
+* Claims derived from Winter Walk evidence
 * Forbidden-claim registry implementation
 * Repository-wide evidence integrity validator
 * Deterministic fabricated-outcome / metric validators
@@ -75,6 +85,8 @@ Await next approved implementation task after Claim Validation closeout.
 * No external integrations are connected.
 * No job applications can be submitted automatically.
 * No resume-generation pipeline exists yet.
+* No claims exist yet; Batch 1 evidence alone does not authorize resume wording.
+* Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No PII should be stored in this repository unless explicitly designed and approved later.
 * No architectural dependency beyond the local repository has been approved.
 * JSON Schema gates reject malformed structured records.
@@ -91,7 +103,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 Await Bora's next approved task. Likely candidates:
 
-1. Evidence repository content / loading conventions
+1. Winter Walk Evidence Batch 2 (only if explicitly approved)
 2. Forbidden-claim registry
 3. Repository-wide evidence integrity validator
 4. Additional schemas only as explicitly approved
@@ -100,6 +112,8 @@ Await Bora's next approved task. Likely candidates:
 
 Do not begin:
 
+* Winter Walk Batch 2 without explicit approval;
+* claim creation from Batch 1 evidence without explicit approval;
 * job scraping;
 * job-board integrations;
 * Google Sheets integration;
@@ -117,4 +131,4 @@ These begin only after the governed workbench is complete and the first implemen
 
 ## Next Approved Task
 
-None assigned. Claim Validation milestone is closed. Await explicit approval for the next implementation task.
+None assigned. Winter Walk Evidence Repository v1 Batch 1 is closed. Await explicit approval for the next implementation task.

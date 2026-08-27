@@ -1,0 +1,25 @@
+{
+  "evidence_id": "WW_DATA_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "Workbook A Apps Script publishes static sanitized OP rollup values to Workbook B Haku_OP_Progress_Rollup and Internal_Support_Report through publishTrustedOutputs_() when publishAllowed is true, and that function uses backup-and-restore on write failure. In the inspected Boston 2027 Workbook A export, Import_Audit_Log import IMP_001 has Validation_Status \"Failed quality gate\" and Publish_Status \"Held - quality gate failed; prior trusted outputs preserved\".",
+  "capabilities": [
+    "data validation",
+    "fail-closed publishing",
+    "cross-workbook data push"
+  ],
+  "technologies": [
+    "Google Apps Script",
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "CODES-UP TO DATE.txt; WW OP Support System - Workbook A (Boston 2027).xlsx",
+  "source_location": "CODES-UP TO DATE.txt — caller gate quality.publishAllowed ? publishTrustedOutputs_(...); function publishTrustedOutputs_(); Workbook A Import_Audit_Log row IMP_001 (Validation_Status, Publish_Status); Workbook A Drive_Import_Log Status/Error_Detail columns (same export)",
+  "safe_for_external_use": true,
+  "notes": "Import log notes Historical_Data_Mode = Yes for IMP_001. Log event is a single recorded import, not proof of continuous production use. Drive_Import_Log status counts in limitations were recomputed from this Workbook A export and describe reliability of backup/restore behavior only, not business performance.",
+  "limitations": [
+    "Does not prove continuous live production use",
+    "Does not prove current Boston 2027 workbook contains populated live rollup data",
+    "In the same Workbook A export, Drive_Import_Log Status values show 20 of 43 logged run entries as Held with publication failed and rollback incomplete due to protected-cell errors. This record therefore proves the implemented backup/restore mechanism and a recorded held import (IMP_001), but does not establish that backup-and-restore consistently completes successfully in practice. The 20/43 figure is a log reliability count from Drive_Import_Log, not a business-performance metric."
+  ],
+  "workflow_stage": "validation"
+}

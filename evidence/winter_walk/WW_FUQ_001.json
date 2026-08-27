@@ -1,0 +1,23 @@
+{
+  "evidence_id": "WW_FUQ_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "Workbook B Apps Script function fuq_run() stamps new rows into Follow_Up_Queue based on six Haku Recovery Playbook triggers (TRG_LOW_RAISED, TRG_LOW_WALKERS, TRG_LOW_PER_WALKER, TRG_ZERO_DOLLAR, TRG_CLOSE_TO_GOAL, TRG_DATA_STALE) and explicitly does not create Gmail drafts, send emails, or populate live recipients.",
+  "capabilities": [
+    "workflow automation",
+    "trigger-based queue generation"
+  ],
+  "technologies": [
+    "Google Apps Script",
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "CODES-UP TO DATE.txt",
+  "source_location": "FollowUpQueueGenerator section — function fuq_run(); scope comments (writes only new Follow_Up_Queue rows; no Gmail drafts or sends)",
+  "safe_for_external_use": true,
+  "notes": "Boston 2027 Workbook B export has empty Follow_Up_Queue data rows in the handoff snapshot.",
+  "limitations": [
+    "Does not prove queue generation ran in the current Boston 2027 handoff export",
+    "Does not prove daily Meag use"
+  ],
+  "workflow_stage": "build"
+}

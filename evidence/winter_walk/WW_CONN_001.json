@@ -1,0 +1,24 @@
+{
+  "evidence_id": "WW_CONN_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "Workbook B Apps Script Evidence Connector function srConn_run() imports self-report form responses into Evidence_Log using Self_Report_Question_Map and Self_Report_Mapping, then runs Approval Sync through shared function aSync_runCore_.",
+  "capabilities": [
+    "workflow automation",
+    "evidence ingestion",
+    "form-to-log mapping"
+  ],
+  "technologies": [
+    "Google Apps Script",
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "CODES-UP TO DATE.txt",
+  "source_location": "Evidence Connector section — file header and function srConn_run(); constants SRCONN_QUESTION_MAP_SHEET, SRCONN_ANSWER_MAP_SHEET, SRCONN_EVIDENCE_LOG_SHEET; automatic sync via aSync_runCore_",
+  "safe_for_external_use": true,
+  "notes": "Boston 2027 Workbook B export has empty Evidence_Connector_Log in the handoff snapshot. This record cites implemented code only.",
+  "limitations": [
+    "Does not prove connector runs occurred in the current Boston 2027 handoff export",
+    "Does not prove daily production use"
+  ],
+  "workflow_stage": "build"
+}

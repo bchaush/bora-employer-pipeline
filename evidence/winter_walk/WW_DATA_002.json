@@ -1,0 +1,25 @@
+{
+  "evidence_id": "WW_DATA_002",
+  "experience_id": "EXP_WW_001",
+  "fact": "Workbook A Apps Script includes function driveImport_run() for Drive-folder CSV intake. The inspected Boston 2027 Workbook A export Drive_Import_Log contains 43 logged run entries with Status values including \"Success - Published\", \"Failed - unexpected error\", and \"Held - waiting on matching file (incomplete pair)\".",
+  "capabilities": [
+    "data ingestion",
+    "automated import logging"
+  ],
+  "technologies": [
+    "Google Apps Script",
+    "Google Drive",
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "CODES-UP TO DATE.txt; WW OP Support System - Workbook A (Boston 2027).xlsx",
+  "source_location": "CODES-UP TO DATE.txt — function driveImport_run(); Workbook A Drive_Import_Log tab (43 nonempty Run_ID rows, Status column)",
+  "safe_for_external_use": true,
+  "notes": "Stale header comment elsewhere in the same code file says Drive folder ingest is Phase 2 not built; driveImport_run() and populated Drive_Import_Log in the workbook export supersede that comment for implementation evidence.",
+  "limitations": [
+    "Does not prove continuous live production use",
+    "Log entries are historical runs in this export, not proof of current operational cadence",
+    "Drive_Import_Log demonstrates automated intake attempts and detection/logging of Success, Held, and Failed states; it does not establish a consistently successful production ingestion pipeline"
+  ],
+  "workflow_stage": "build"
+}

@@ -1,0 +1,22 @@
+{
+  "evidence_id": "WW_CTRL_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "In the inspected Boston 2027 Workbook B export, Settings_Controls records Test_Mode_On_Off = On and Live_Followups_Allowed = No.",
+  "capabilities": [
+    "safety controls",
+    "controlled rollout configuration"
+  ],
+  "technologies": [
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "WW OP Support System - Workbook B (Boston 2027).xlsx",
+  "source_location": "Settings_Controls tab — Field_Name rows Test_Mode_On_Off (Value: On) and Live_Followups_Allowed (Value: No)",
+  "safe_for_external_use": true,
+  "notes": "Snapshot from the 2026-08-23 workbook export provided for extraction. Settings may change after export.",
+  "limitations": [
+    "Reflects this export snapshot only",
+    "Does not prove daily Meag use or completed handoff"
+  ],
+  "workflow_stage": "deployment"
+}

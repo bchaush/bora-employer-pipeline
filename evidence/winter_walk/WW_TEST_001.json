@@ -1,0 +1,36 @@
+{
+  "evidence_id": "WW_TEST_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "The inspected Boston 2027 Workbook B Pilot_Results tab records ten pilot test rows — PILOT_A_2026 PA_01 through PA_08 and PILOT_B_TECH_2026 PB_TECH_01 and PILOT_B_INTERNAL_2026 PB_DRY_01 — each with Pass_Fail = PASS.",
+  "capabilities": [
+    "UAT",
+    "functional and regression testing",
+    "test documentation"
+  ],
+  "technologies": [
+    "Google Sheets"
+  ],
+  "evidence_state": "OBSERVED",
+  "original_source": "WW OP Support System - Workbook B (Boston 2027).xlsx",
+  "source_location": "Pilot_Results tab — rows PILOT_A_2026 PA_01–PA_08; PILOT_B_TECH_2026 PB_TECH_01; PILOT_B_INTERNAL_2026 PB_DRY_01 (Pass_Fail column)",
+  "safe_for_external_use": true,
+  "notes": "Pilot items include import validation, PII absence check, Last_Good preservation, 432-row applicability cross-check, Gmail-to-Drive workflow, and self-report dry run. Recorded results only.",
+  "limitations": [
+    "Records tests performed and logged in this workbook export",
+    "Not measured business impact",
+    "Not proof of ongoing production use or daily Meag use"
+  ],
+  "workflow_stage": "UAT",
+  "tests": [
+    "PILOT_A_2026 PA_01 Valid Haku import",
+    "PILOT_A_2026 PA_02 Wrong-file/header rejection",
+    "PILOT_A_2026 PA_03 No PII in Workbook B",
+    "PILOT_A_2026 PA_04 Refresh without formula editing",
+    "PILOT_A_2026 PA_05 Applicability denominator correct per OP",
+    "PILOT_A_2026 PA_06 Adoption Matrix stable when sorted/filtered",
+    "PILOT_A_2026 PA_07 Internal Support Report loads correctly",
+    "PILOT_A_2026 PA_08 Last_Good Rollup preserved when validation fails",
+    "PILOT_B_TECH_2026 PB_TECH_01 Gmail-to-Drive evidence workflow",
+    "PILOT_B_INTERNAL_2026 PB_DRY_01 Internal 3-OP self-report and approval dry run"
+  ]
+}

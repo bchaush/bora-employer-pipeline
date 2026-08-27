@@ -1,0 +1,22 @@
+{
+  "evidence_id": "WW_ADOPT_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "In the inspected Boston 2027 Workbook B export, Adoption_Matrix contains 432 rows with nonempty Adoption_Key values.",
+  "capabilities": [
+    "adoption tracking structure"
+  ],
+  "technologies": [
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "WW OP Support System - Workbook B (Boston 2027).xlsx",
+  "source_location": "Adoption_Matrix tab — 432 nonempty Adoption_Key rows",
+  "safe_for_external_use": true,
+  "notes": "Static full OP×Rec grid per locked blueprint correction. Row count matches Applicability_Map in the same export.",
+  "limitations": [
+    "Describes grid structure only",
+    "Not proof of adoption levels or outcomes",
+    "Reflects this export snapshot only"
+  ],
+  "workflow_stage": "build"
+}

@@ -1,0 +1,22 @@
+{
+  "evidence_id": "WW_MAP_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "In the inspected Boston 2027 Workbook B export, Applicability_Map contains 432 rows with nonempty Applicability_Key values; OP_Master_List shows 24 Active OPs and Recommendation_Library shows 18 Active recommendations.",
+  "capabilities": [
+    "structured applicability tracking"
+  ],
+  "technologies": [
+    "Google Sheets"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "WW OP Support System - Workbook B (Boston 2027).xlsx",
+  "source_location": "Applicability_Map tab (432 nonempty Applicability_Key rows); OP_Master_List tab (Active_Status = Active count 24 of 26 OP rows); Recommendation_Library tab (Active_Status = Active count 18 of 22 Rec rows)",
+  "safe_for_external_use": true,
+  "notes": "432 equals 24 active OPs × 18 active recommendations in this export. This is grid structure only.",
+  "limitations": [
+    "Describes configured grid structure only",
+    "Not an adoption metric or business outcome",
+    "Reflects this export snapshot only"
+  ],
+  "workflow_stage": "build"
+}

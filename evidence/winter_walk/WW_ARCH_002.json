@@ -1,0 +1,22 @@
+{
+  "evidence_id": "WW_ARCH_002",
+  "experience_id": "EXP_WW_001",
+  "fact": "The locked Winter Walk Master Blueprint specifies a two-workbook architecture: Workbook A (Haku Secure Data Vault) stores raw Haku exports and PII and computes sanitized aggregate summaries; Workbook B (OP Support Operating System) holds aggregate non-PII tracking, evidence, reporting, and follow-up tabs.",
+  "capabilities": [
+    "systems architecture",
+    "data boundary design"
+  ],
+  "technologies": [
+    "Google Sheets"
+  ],
+  "evidence_state": "SUPPORTED",
+  "original_source": "WinterWalk_Master_Blueprint.docx",
+  "source_location": "Section 3 Architecture Overview — \"Two workbooks\" (Workbook A: Haku Secure Data Vault; Workbook B: OP Support Operating System)",
+  "safe_for_external_use": true,
+  "notes": "Boston 2027 workbook exports inspected separately contain tab sets consistent with this design, but this record cites the locked blueprint only.",
+  "limitations": [
+    "Does not prove both workbooks are populated with live campaign data",
+    "Does not prove completed organizational handoff"
+  ],
+  "workflow_stage": "requirements"
+}
