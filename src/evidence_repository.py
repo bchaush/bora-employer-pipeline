@@ -23,6 +23,7 @@ from typing import Any, Mapping, Optional
 
 from experience_repository import (
     DEFAULT_EXPERIENCE_ROOT,
+    ValidatedExperienceRepository,
     validate_experience_repository,
 )
 from schema_validation import build_draft202012_validator
@@ -32,10 +33,12 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EVIDENCE_ROOT = ROOT / "evidence"
 EVIDENCE_SCHEMA_PATH = ROOT / "schemas" / "evidence.schema.json"
 
-# Authoritative Evidence Repository validation enforces Experience references.
+# Authoritative success only: Experience Registry valid AND all references resolve.
 EXPERIENCE_REFERENCE_STATUS = "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
+EXPERIENCE_REFERENCE_NOT_CHECKED = "EXPERIENCE_REFERENCE_NOT_CHECKED"
+EXPERIENCE_REFERENCE_CHECK_FAILED = "EXPERIENCE_REFERENCE_CHECK_FAILED"
 
-# Alias for result field continuity; prefer EXPERIENCE_REFERENCE_STATUS.
+# Alias for continuity with earlier milestone wording on the authoritative path.
 EXPERIENCE_REGISTRY_STATUS = EXPERIENCE_REFERENCE_STATUS
 
 
@@ -70,14 +73,18 @@ def _error(code: str, **fields: Any) -> dict[str, Any]:
     return payload
 
 
-def _empty_result(*, records_checked: int = 0) -> dict[str, Any]:
+def _empty_result(
+    *,
+    records_checked: int = 0,
+    experience_registry_status: str = EXPERIENCE_REFERENCE_CHECK_FAILED,
+) -> dict[str, Any]:
     return {
         "valid": False,
         "records_checked": records_checked,
         "index": None,
         "errors": [],
         "discovered_paths": [],
-        "experience_registry_status": EXPERIENCE_REFERENCE_STATUS,
+        "experience_registry_status": experience_registry_status,
     }
 
 
@@ -108,40 +115,95 @@ def _relative_posix(path: Path, evidence_root: Path) -> str:
         return path.resolve().as_posix()
 
 
+def _accept_validated_experience_result(
+    experience_result: Any,
+) -> tuple[Optional[Mapping[str, Any]], list[dict[str, Any]]]:
+    """Accept only a validator-issued ValidatedExperienceRepository that is valid."""
+    if not isinstance(experience_result, ValidatedExperienceRepository):
+        return None, [
+            _error(
+                "EXPERIENCE_REGISTRY_INVALID",
+                detail=(
+                    "experience_result must be a ValidatedExperienceRepository "
+                    "issued by validate_experience_repository; "
+                    f"got {type(experience_result).__name__}"
+                ),
+            )
+        ]
+
+    if not experience_result._is_validator_issued():
+        return None, [
+            _error(
+                "EXPERIENCE_REGISTRY_INVALID",
+                detail=(
+                    "experience_result is not a validator-issued "
+                    "ValidatedExperienceRepository"
+                ),
+            )
+        ]
+
+    if experience_result["valid"] is not True:
+        return None, [
+            _error(
+                "EXPERIENCE_REGISTRY_INVALID",
+                detail=(
+                    "supplied Experience validation result is not valid; "
+                    "cannot build a trusted Evidence index"
+                ),
+                experience_errors=list(experience_result.errors),
+            )
+        ]
+
+    if experience_result.errors:
+        return None, [
+            _error(
+                "EXPERIENCE_REGISTRY_INVALID",
+                detail=(
+                    "supplied Experience validation result reports errors; "
+                    "cannot build a trusted Evidence index"
+                ),
+                experience_errors=list(experience_result.errors),
+            )
+        ]
+
+    index = experience_result.index
+    if not isinstance(index, Mapping):
+        return None, [
+            _error(
+                "EXPERIENCE_REGISTRY_INVALID",
+                detail=(
+                    "supplied Experience validation result has no usable trusted "
+                    "index mapping"
+                ),
+            )
+        ]
+
+    return index, []
+
+
 def _resolve_trusted_experience_index(
     *,
     experience_root: Optional[Path],
-    experience_index: Optional[Mapping[str, Any]],
+    experience_result: Optional[ValidatedExperienceRepository],
     experience_schema_path: Optional[Path],
 ) -> tuple[Optional[Mapping[str, Any]], list[dict[str, Any]]]:
     """Return (trusted_index, errors).
 
     trusted_index is None when the Experience Registry cannot be trusted.
     """
-    if experience_index is not None:
-        if not isinstance(experience_index, Mapping):
-            return None, [
-                _error(
-                    "EXPERIENCE_REGISTRY_INVALID",
-                    detail=(
-                        "experience_index must be a mapping of experience_id to "
-                        "experience record (trusted index); "
-                        f"got {type(experience_index).__name__}"
-                    ),
-                )
-            ]
-        return experience_index, []
+    if experience_result is not None:
+        return _accept_validated_experience_result(experience_result)
 
     root = (
         Path(experience_root)
         if experience_root is not None
         else DEFAULT_EXPERIENCE_ROOT
     )
-    experience_result = validate_experience_repository(
+    validated = validate_experience_repository(
         root,
         schema_path=experience_schema_path,
     )
-    if not experience_result["valid"]:
+    if validated["valid"] is not True:
         return None, [
             _error(
                 "EXPERIENCE_REGISTRY_INVALID",
@@ -150,10 +212,10 @@ def _resolve_trusted_experience_index(
                     "Experience Registry is missing or structurally invalid; "
                     "cannot build a trusted Evidence index"
                 ),
-                experience_errors=experience_result["errors"],
+                experience_errors=list(validated.errors),
             )
         ]
-    return experience_result["index"], []
+    return validated.index, []
 
 
 def validate_evidence_repository_structure(
@@ -166,6 +228,9 @@ def validate_evidence_repository_structure(
     Explicit lower-level path for isolating structural invariants.
     NOT the authoritative production gate.
 
+    ``experience_registry_status`` is always
+    ``EXPERIENCE_REFERENCE_NOT_CHECKED``.
+
     Authoritative validation with Experience_ID referential integrity:
     ``validate_evidence_repository``.
     """
@@ -174,6 +239,7 @@ def validate_evidence_repository_structure(
         schema_path=schema_path,
         experience_index_for_references=None,
         enforce_experience_references=False,
+        experience_registry_status=EXPERIENCE_REFERENCE_NOT_CHECKED,
     )
 
 
@@ -182,17 +248,23 @@ def validate_evidence_repository(
     *,
     schema_path: Optional[Path] = None,
     experience_root: Optional[Path] = None,
-    experience_index: Optional[Mapping[str, Any]] = None,
+    experience_result: Optional[ValidatedExperienceRepository] = None,
     experience_schema_path: Optional[Path] = None,
 ) -> dict[str, Any]:
     """Validate the Evidence Repository with Experience_ID referential integrity.
 
     Authoritative path:
-    1. Obtain a trusted Experience index (validate Experience Registry, or use a
-       caller-supplied trusted ``experience_index``).
+    1. Obtain a trusted Experience index by either:
+       - validating the Experience Registry at ``experience_root`` (default
+         ``experiences/``), or
+       - accepting a ``ValidatedExperienceRepository`` issued by
+         ``validate_experience_repository`` (batching/reuse).
     2. Validate evidence structure.
     3. Require every evidence ``experience_id`` to exist in the trusted Experience
        index.
+
+    A raw Mapping / hand-built dict is never accepted as a trusted Experience
+    index. Spoofed ``{"valid": True, "index": ...}`` objects are rejected.
 
     An existing readable empty evidence root is structurally valid when the
     Experience Registry is trusted: ``valid=True``, ``records_checked=0``,
@@ -201,17 +273,19 @@ def validate_evidence_repository(
     If the Experience Registry is unavailable/invalid, fails closed with
     ``EXPERIENCE_REGISTRY_INVALID`` (not per-record ``EXPERIENCE_ID_NOT_FOUND``).
 
-    Returns:
-    - valid, records_checked, index, errors, discovered_paths
-    - experience_registry_status: EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED
+    ``experience_registry_status`` is ``EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED``
+    only when validation succeeds with references checked. Failures use
+    ``EXPERIENCE_REFERENCE_CHECK_FAILED``.
     """
     trusted_experience_index, experience_errors = _resolve_trusted_experience_index(
         experience_root=experience_root,
-        experience_index=experience_index,
+        experience_result=experience_result,
         experience_schema_path=experience_schema_path,
     )
     if experience_errors:
-        result = _empty_result()
+        result = _empty_result(
+            experience_registry_status=EXPERIENCE_REFERENCE_CHECK_FAILED,
+        )
         root = Path(evidence_root) if evidence_root is not None else DEFAULT_EVIDENCE_ROOT
         if root.exists() and root.is_dir():
             files = discover_evidence_files(root)
@@ -225,6 +299,7 @@ def validate_evidence_repository(
         schema_path=schema_path,
         experience_index_for_references=trusted_experience_index,
         enforce_experience_references=True,
+        experience_registry_status=EXPERIENCE_REFERENCE_STATUS,
     )
 
 
@@ -234,13 +309,23 @@ def _validate_evidence_repository_impl(
     schema_path: Optional[Path],
     experience_index_for_references: Optional[Mapping[str, Any]],
     enforce_experience_references: bool,
+    experience_registry_status: str,
 ) -> dict[str, Any]:
     root = Path(evidence_root) if evidence_root is not None else DEFAULT_EVIDENCE_ROOT
     schema = Path(schema_path) if schema_path is not None else EVIDENCE_SCHEMA_PATH
 
-    result = _empty_result()
+    # Start with the intended success status for this path; downgrade on failure
+    # for authoritative runs so ENFORCED is never advertised on error.
+    initial_status = experience_registry_status
+    if enforce_experience_references:
+        failure_status = EXPERIENCE_REFERENCE_CHECK_FAILED
+    else:
+        failure_status = EXPERIENCE_REFERENCE_NOT_CHECKED
+
+    result = _empty_result(experience_registry_status=initial_status)
 
     if not root.exists():
+        result["experience_registry_status"] = failure_status
         result["errors"].append(
             _error(
                 "EVIDENCE_ROOT_MISSING",
@@ -251,6 +336,7 @@ def _validate_evidence_repository_impl(
         return result
 
     if not root.is_dir():
+        result["experience_registry_status"] = failure_status
         result["errors"].append(
             _error(
                 "EVIDENCE_ROOT_NOT_DIRECTORY",
@@ -396,6 +482,7 @@ def _validate_evidence_repository_impl(
     if result["errors"]:
         result["valid"] = False
         result["index"] = None
+        result["experience_registry_status"] = failure_status
         return result
 
     ordered_index = {
@@ -404,6 +491,8 @@ def _validate_evidence_repository_impl(
     }
     result["valid"] = True
     result["index"] = ordered_index
+    # Structure-only keeps NOT_CHECKED; authoritative success keeps ENFORCED.
+    result["experience_registry_status"] = experience_registry_status
     return result
 
 
@@ -412,7 +501,7 @@ def load_validated_evidence_repository(
     *,
     schema_path: Optional[Path] = None,
     experience_root: Optional[Path] = None,
-    experience_index: Optional[Mapping[str, Any]] = None,
+    experience_result: Optional[ValidatedExperienceRepository] = None,
     experience_schema_path: Optional[Path] = None,
 ) -> dict[str, Any]:
     """Alias for validate_evidence_repository (authoritative load + validate)."""
@@ -420,6 +509,6 @@ def load_validated_evidence_repository(
         evidence_root,
         schema_path=schema_path,
         experience_root=experience_root,
-        experience_index=experience_index,
+        experience_result=experience_result,
         experience_schema_path=experience_schema_path,
     )

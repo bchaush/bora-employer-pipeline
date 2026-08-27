@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Experience Registry trust-boundary hardening
+
+**Reason**
+
+Claude Code audit returned `MINIMAL_EXPERIENCE_REGISTRY_AUDIT_FAIL` with two blockers: arbitrary raw Experience-index injection, and structure-only Evidence validation falsely advertising `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`.
+
+**Changed**
+
+* `validate_experience_repository` now returns opaque `ValidatedExperienceRepository` (validator-issued only; public construction rejected).
+* Removed public `experience_index=` bypass from Evidence validation; accept only `experience_result=` as validator-issued type, or load/validate Experience Registry via `experience_root=`.
+* Structure-only Evidence path reports `EXPERIENCE_REFERENCE_NOT_CHECKED`.
+* Authoritative failure reports `EXPERIENCE_REFERENCE_CHECK_FAILED` (never ENFORCED on failure).
+* Tests: removed hand-built FIXTURE_EXPERIENCE_INDEX; structural vs authoritative paths made explicit; added trust-boundary adversarial suite.
+* Milestone remains **IMPLEMENTED — PENDING CLAUDE CODE RECHECK** (not CLOSED).
+* No claims; no claim-scoped semantic change; Experience schema/record and committed Evidence JSON unchanged.
+
+**Affected Areas**
+
+* `src/experience_repository.py`
+* `src/evidence_repository.py`
+* `tests/evidence_repository_test.py`
+* `tests/evidence_experience_reference_test.py`
+* `tests/experience_trust_boundary_test.py` (new)
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Status**
+
+IMPLEMENTED — PENDING CLAUDE CODE RECHECK (not CLOSED; not pushed)
+
+---
+
 ## 2026-08-26 — Minimal Experience Registry v1 (IMPLEMENTED — PENDING CLAUDE CODE AUDIT)
 
 **Reason**

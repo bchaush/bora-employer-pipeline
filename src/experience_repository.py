@@ -26,6 +26,86 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EXPERIENCE_ROOT = ROOT / "experiences"
 EXPERIENCE_SCHEMA_PATH = ROOT / "schemas" / "experience.schema.json"
 
+# Private minting token: only validate_experience_repository may create trusted
+# ValidatedExperienceRepository instances. Callers cannot forge trust by building
+# a plain dict that looks like a valid result.
+_VALIDATED_EXPERIENCE_TRUST_TOKEN = object()
+
+
+class ValidatedExperienceRepository:
+    """Opaque Experience Registry validation result.
+
+    Produced only by ``validate_experience_repository`` /
+    ``load_validated_experience_repository``.
+
+    Public construction is rejected. A plain Mapping/`dict` is never treated as
+    an equivalent trusted result by Evidence Repository validation.
+    """
+
+    __slots__ = ("_payload", "_trust_token")
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        raise TypeError(
+            "ValidatedExperienceRepository cannot be constructed directly; "
+            "call validate_experience_repository(...) instead"
+        )
+
+    @classmethod
+    def _create(cls, payload: Mapping[str, Any]) -> "ValidatedExperienceRepository":
+        obj = object.__new__(cls)
+        object.__setattr__(obj, "_payload", dict(payload))
+        object.__setattr__(obj, "_trust_token", _VALIDATED_EXPERIENCE_TRUST_TOKEN)
+        return obj
+
+    def _is_validator_issued(self) -> bool:
+        return (
+            getattr(self, "_trust_token", None) is _VALIDATED_EXPERIENCE_TRUST_TOKEN
+        )
+
+    def __getitem__(self, key: str) -> Any:
+        return self._payload[key]
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return self._payload.get(key, default)
+
+    def keys(self):
+        return self._payload.keys()
+
+    def items(self):
+        return self._payload.items()
+
+    def values(self):
+        return self._payload.values()
+
+    def __contains__(self, key: object) -> bool:
+        return key in self._payload
+
+    def __iter__(self):
+        return iter(self._payload)
+
+    def __len__(self) -> int:
+        return len(self._payload)
+
+    @property
+    def valid(self) -> bool:
+        return bool(self._payload.get("valid") is True)
+
+    @property
+    def index(self) -> Optional[Mapping[str, Any]]:
+        index = self._payload.get("index")
+        if index is None:
+            return None
+        if not isinstance(index, Mapping):
+            return None
+        return index
+
+    @property
+    def errors(self) -> list[dict[str, Any]]:
+        errors = self._payload.get("errors")
+        if isinstance(errors, list):
+            return errors
+        return []
+
 
 class DuplicateJsonKeyError(ValueError):
     """Raised when a JSON object contains a repeated key (no last-key-wins)."""
@@ -99,14 +179,14 @@ def validate_experience_repository(
     experience_root: Optional[Path] = None,
     *,
     schema_path: Optional[Path] = None,
-) -> dict[str, Any]:
+) -> ValidatedExperienceRepository:
     """Validate the complete Experience Registry and build a trusted index.
 
     An existing readable empty experience root is structurally valid: it returns
     ``valid=True``, ``records_checked=0``, and an empty trusted ``index={}``.
     Application-level sufficiency (non-empty registry) is enforced separately.
 
-    Returns a mapping with:
+    Returns a ``ValidatedExperienceRepository`` (opaque trusted result) with:
     - valid: True only when every discovered file passes all invariants
     - records_checked: number of discovered JSON files
     - index: experience_id -> record when valid; otherwise None
@@ -130,7 +210,7 @@ def validate_experience_repository(
                 detail="experience root directory does not exist",
             )
         )
-        return result
+        return ValidatedExperienceRepository._create(result)
 
     if not root.is_dir():
         result["errors"].append(
@@ -140,7 +220,7 @@ def validate_experience_repository(
                 detail="experience root path exists but is not a directory",
             )
         )
-        return result
+        return ValidatedExperienceRepository._create(result)
 
     files = discover_experience_files(root)
     result["records_checked"] = len(files)
@@ -254,7 +334,7 @@ def validate_experience_repository(
     if result["errors"]:
         result["valid"] = False
         result["index"] = None
-        return result
+        return ValidatedExperienceRepository._create(result)
 
     ordered_index = {
         experience_id: provisional_index[experience_id]
@@ -262,14 +342,14 @@ def validate_experience_repository(
     }
     result["valid"] = True
     result["index"] = ordered_index
-    return result
+    return ValidatedExperienceRepository._create(result)
 
 
 def load_validated_experience_repository(
     experience_root: Optional[Path] = None,
     *,
     schema_path: Optional[Path] = None,
-) -> dict[str, Any]:
+) -> ValidatedExperienceRepository:
     """Alias for validate_experience_repository (load + validate + index)."""
     return validate_experience_repository(
         experience_root,

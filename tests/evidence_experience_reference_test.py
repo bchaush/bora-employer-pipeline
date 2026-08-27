@@ -18,6 +18,7 @@ if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
 from evidence_repository import (  # noqa: E402
+    EXPERIENCE_REFERENCE_CHECK_FAILED,
     EXPERIENCE_REFERENCE_STATUS,
     validate_evidence_repository,
 )
@@ -164,6 +165,10 @@ with tempfile.TemporaryDirectory() as tmp:
     assert_false(
         "EXPERIENCE_ID_NOT_FOUND" in error_codes(result),
         "registry invalidity should not be reported as per-record EXPERIENCE_ID_NOT_FOUND",
+    )
+    assert_true(
+        result["experience_registry_status"] == EXPERIENCE_REFERENCE_CHECK_FAILED,
+        "invalid registry must not advertise ENFORCED",
     )
 print("REF PASS 3: invalid Experience Registry blocks Evidence trusted index.")
 

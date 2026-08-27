@@ -14,9 +14,13 @@ Winter Walk Evidence Repository v1 Batch 1 = **CLOSED** (12 evidence records com
 
 Repository-Level Evidence Integrity v1 = **CLOSED**.
 
-Minimal Experience Registry v1 = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT** (not CLOSED).
+Minimal Experience Registry v1 = **IMPLEMENTED — PENDING CLAUDE CODE RECHECK** (not CLOSED).
 
-Runtime behavior: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`.
+Claude audit found two trust-boundary blockers; both fixed in follow-up hardening (opaque `ValidatedExperienceRepository`; structure-only status corrected).
+
+Runtime behavior on authoritative success: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`.
+
+Structure-only path reports: `EXPERIENCE_REFERENCE_NOT_CHECKED`.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
@@ -85,19 +89,18 @@ No production engine yet.
 
   * `schemas/experience.schema.json`.
   * Canonical record `experiences/EXP_WW_001.json` (`ORGANIZATIONAL_ENGAGEMENT`).
-  * `src/experience_repository.py` — Experience Registry integrity (discovery, parse, duplicate-key rejection, schema, uniqueness, filename/ID match, fail-closed trusted index, empty-root policy).
-  * Authoritative `validate_evidence_repository()` requires trusted Experience index; missing references → `EXPERIENCE_ID_NOT_FOUND`; invalid/unavailable registry → `EXPERIENCE_REGISTRY_INVALID` (truthful causality).
-  * Explicit non-authoritative structure-only path: `validate_evidence_repository_structure()`.
-  * Behavior status: **`EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`**.
-  * Historical note: prior open item was `EXPERIENCE_REGISTRY_DECISION_REQUIRED` (now resolved by this implementation; not erased from history).
-  * Milestone status: **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+  * `src/experience_repository.py` — Experience Registry integrity; returns opaque `ValidatedExperienceRepository` issued only by the validator.
+  * Authoritative `validate_evidence_repository()` requires validator-issued Experience results or loads/validates `experiences/` itself; raw Mapping indexes rejected.
+  * Structure-only path: `validate_evidence_repository_structure()` reports `EXPERIENCE_REFERENCE_NOT_CHECKED`.
+  * Authoritative success: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`; authoritative failure: `EXPERIENCE_REFERENCE_CHECK_FAILED`.
+  * Claude audit blockers (raw index injection; false structure-only ENFORCED status) fixed; status: **IMPLEMENTED — PENDING CLAUDE CODE RECHECK**.
   * No reusable claims; `NO_CLAIM_SCOPED_SEMANTIC_CHANGE`.
 
 ## Current Task
 
-`MINIMAL_EXPERIENCE_REGISTRY_V1` = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+`MINIMAL_EXPERIENCE_REGISTRY_V1` = **IMPLEMENTED — PENDING CLAUDE CODE RECHECK**.
 
-Awaiting ChatGPT review and Claude Code independent audit. Do not mark CLOSED until audits complete.
+Awaiting Claude Code recheck of the trust-boundary fixes. Do not mark CLOSED until recheck completes.
 
 ## Not Built Yet
 
@@ -149,17 +152,16 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. ChatGPT review of Minimal Experience Registry v1 (do not push to main until reviewed).
-2. Claude Code independent audit of Experience Registry + Evidence referential wiring.
-3. Close `MINIMAL_EXPERIENCE_REGISTRY_V1` only after audit PASS.
-4. Only then consider first reusable claims (explicit approval required).
-5. Additional Experience IDs only when evidence or approved architecture requires them.
+1. Claude Code recheck of Experience trust-boundary hardenings.
+2. Close `MINIMAL_EXPERIENCE_REGISTRY_V1` only after recheck PASS (do not push until approved).
+3. Only then consider first reusable claims (explicit approval required).
+4. Additional Experience IDs only when evidence or approved architecture requires them.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Experience Registry CLOSED before Claude Code audit;
+* marking Experience Registry CLOSED before Claude Code recheck;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
 * claim creation without explicit approval;
@@ -178,4 +180,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Claude Code audit / closeout of `MINIMAL_EXPERIENCE_REGISTRY_V1` (not CLOSED yet).
+Claude Code recheck / closeout of `MINIMAL_EXPERIENCE_REGISTRY_V1` (not CLOSED yet).
