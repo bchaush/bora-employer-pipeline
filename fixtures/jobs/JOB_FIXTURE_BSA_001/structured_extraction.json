@@ -20,7 +20,7 @@
     {
       "requirement_id": "REQ_BSA_002",
       "job_id": "PLACEHOLDER",
-      "text": "Experience with workflow or business-process mapping",
+      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
       "category": "PROCESS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -28,7 +28,7 @@
       "experience_level": null,
       "domain": "Business Process",
       "relevance": "HIGH",
-      "source_text": "Experience with workflow or business-process mapping",
+      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping",
       "source_location": "Minimum qualifications (required)"
     },
     {

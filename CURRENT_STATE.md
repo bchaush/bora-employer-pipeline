@@ -138,13 +138,15 @@ No production engine yet.
   * Locked match vocabulary STRONG/SUPPORTED/PARTIAL/NONE/UNKNOWN with provenance; semantic traps enforced.
   * Synthetic BSA fixture under `fixtures/jobs/JOB_FIXTURE_BSA_001/`.
   * Experience/Evidence/Claim repositories unchanged.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+  * First Claude Code adversarial audit found semantic-overmatch, decision-routing, classification, and schema issues.
+  * Bounded remediation applied (not CLOSED): regulatory false-PARTIAL removed; capability-gated matching; role-family gate on APPLY paths; generalized mandatory HIGH/NONE blockers; seniority defense-in-depth; mixed-cue/HR-noise classification; nested `$ref` + positive-match provenance in schemas.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (remediated; awaiting second Claude re-audit).
 
 ## Current Task
 
 `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-Awaiting independent Claude Code adversarial audit. Do not mark CLOSED yet. Do not begin résumé generation.
+First Claude audit findings remediated locally. Awaiting second independent Claude Code adversarial audit. Do not mark CLOSED yet. Do not begin résumé generation. Do not push until audit clears.
 
 ## Not Built Yet
 
@@ -190,8 +192,8 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Independent Claude Code adversarial audit of Job Analysis v1 first vertical slice.
-2. Close Job Analysis v1 only after audit + any required hardening.
+1. Second independent Claude Code adversarial audit of Job Analysis v1 (post-remediation).
+2. Close Job Analysis v1 only after re-audit clears + any further required hardening.
 3. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
 
 ## Do Not Start Yet
@@ -209,4 +211,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Claude Code adversarial audit of `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` (not CLOSED yet).
+Second Claude Code adversarial re-audit of remediated `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` (not CLOSED yet).

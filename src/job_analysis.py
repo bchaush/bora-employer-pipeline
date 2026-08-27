@@ -227,6 +227,7 @@ def analyze_job(
         unknowns=unknowns,
         seniority=normalized.get("seniority"),
         role_family=normalized.get("role_family"),
+        role=role,
         jd_text=jd_text,
     )
 

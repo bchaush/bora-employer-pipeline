@@ -19,6 +19,51 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Harden first job analysis slice (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+First Claude Code adversarial audit of `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` found semantic-overmatch, decision-routing, classification, and schema issues. Apply the smallest bounded remediation without redesign, résumé generation, or Claim/Evidence/Experience mutation.
+
+**Changed**
+
+* Regulatory false PARTIAL removed: Winter Walk software-control evidence no longer supports U.S. regulatory / SEC / SOX requirements; `REQ_BSA_006` → NONE with current repository.
+* Matching hardened to capability-gated alignment; generic lexical overlap alone cannot produce STRONG/SUPPORTED/PARTIAL.
+* Role-family gate enforced on PRIORITY_APPLY / APPLY / EFFICIENT_APPLY; unsupported families route WATCH/REJECT.
+* Core mandatory HIGH + NONE generalized as hard blocker beyond Salesforce/GCP/ML keyword lists.
+* Seniority defense-in-depth from role title + raw JD head (conservative `lead`).
+* Classification: mixed mandatory/preferred clauses → UNCLEAR; HR/culture “must” noise → UNCLEAR; `ideal candidate` preferred cue.
+* `job_analysis_result.schema.json` nested `$ref` to requirement + evidence_match schemas; local schema registry for `$ref` resolution.
+* `evidence_match.schema.json` requires provenance for positive match results (Python check retained).
+* BSA fixture REQ_BSA_002 wording aligned to supported workflow-automation / approval-sync claim capability (no process-mapping false positive).
+* Adversarial tests expanded; Experience/Evidence/Claim JSON unchanged.
+* Status remains **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED; awaiting second Claude re-audit).
+
+**Affected Areas**
+
+* `src/requirement_match.py`, `src/job_decision.py`, `src/requirement_normalize.py`, `src/job_analysis.py`, `src/schema_validation.py`
+* `schemas/evidence_match.schema.json`, `schemas/job_analysis_result.schema.json`
+* `fixtures/jobs/JOB_FIXTURE_BSA_001/`
+* `tests/job_analysis_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* V1 fails closed on ambiguous relevance (NONE/UNKNOWN preferred over overclaim).
+* Capability tags are a small explicit set for Winter Walk + known traps — not a general ontology.
+* Fixture REQ_BSA_002 adjusted so happy-path BSA still exercises supported capabilities after process-mapping trap.
+
+**Tests / Verification**
+
+* All prior suites + `job_analysis_test.py` (including remediation adversarial cases) — PASS
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT (remediated; pending re-audit)
+
+---
+
 ## 2026-08-27 — Job Analysis v1 first vertical slice (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

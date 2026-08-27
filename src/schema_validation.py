@@ -5,18 +5,25 @@ tests and future production code cannot accidentally validate with a plain
 FormatChecker() and silently skip job-url enforcement on job records.
 
 URL acceptance rules remain defined only in job_url_format.py.
+
+Local schema $ref resolution uses a registry of schemas under schemas/.
 """
 
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Union
 
 from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
 from job_url_format import build_job_format_checker
 
+
+ROOT = Path(__file__).resolve().parents[1]
+SCHEMAS_DIR = ROOT / "schemas"
 
 SchemaInput = Union[Mapping[str, Any], Path, str]
 
@@ -35,6 +42,27 @@ def load_draft202012_schema(schema: SchemaInput) -> dict[str, Any]:
             f"JSON Schema at {path} must be an object, got {type(loaded).__name__}."
         )
     return loaded
+
+
+@lru_cache(maxsize=1)
+def build_local_schema_registry() -> Registry:
+    """Register every schema under schemas/ by its canonical $id."""
+    registry: Registry = Registry()
+    if not SCHEMAS_DIR.is_dir():
+        return registry
+
+    for path in sorted(SCHEMAS_DIR.glob("*.json")):
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(loaded, dict):
+            continue
+        schema_id = loaded.get("$id")
+        if not isinstance(schema_id, str) or not schema_id.strip():
+            continue
+        registry = registry.with_resource(
+            schema_id,
+            Resource.from_contents(loaded),
+        )
+    return registry
 
 
 def build_draft202012_validator(
@@ -59,4 +87,5 @@ def build_draft202012_validator(
     return Draft202012Validator(
         schema_obj,
         format_checker=build_job_format_checker(),
+        registry=build_local_schema_registry(),
     )

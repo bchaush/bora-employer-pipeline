@@ -23,12 +23,20 @@ _MANDATORY_CUES = re.compile(
     re.IGNORECASE,
 )
 _PREFERRED_CUES = re.compile(
-    r"\b(?:preferred|nice to have|bonus|plus|optional|ideally)\b",
+    r"\b(?:preferred|nice to have|bonus|plus|optional|ideally|"
+    r"ideal candidate)\b",
     re.IGNORECASE,
 )
 _NOISE_CUES = re.compile(
     r"\b(?:competitive benefits|equal opportunity|eeo|fast[- ]paced|"
-    r"team player|self[- ]starter|passion for| thrives in)\b",
+    r"team player|self[- ]starter|passion for|thrives in|"
+    r"culture fit|positive attitude)\b",
+    re.IGNORECASE,
+)
+_SUBSTANTIVE_CUES = re.compile(
+    r"\b(?:sql|python|java|salesforce|degree|bachelor|master|phd|"
+    r"years?|experience|certif|cloud|aws|azure|analyst|engineer|"
+    r"uat|csv|regulatory|security clearance|citizen)\b",
     re.IGNORECASE,
 )
 
@@ -39,22 +47,49 @@ def _error(code: str, **fields: Any) -> dict[str, Any]:
     return payload
 
 
+def _split_clauses(text: str) -> list[str]:
+    parts = re.split(r"[;\n]|(?<=\.)\s+", text)
+    return [part.strip() for part in parts if part and part.strip()]
+
+
 def classify_importance_from_source(
     source_text: str,
     *,
     proposed: str | None = None,
+    category: str | None = None,
 ) -> str:
     """Conservative importance classification from source wording.
 
-    Preference cues win over mandatory cues when both appear
-    (e.g. \"Preferred: must be comfortable with Excel\").
-    Ambiguous marketing language remains UNCLEAR.
+    Mixed mandatory+preferred clauses about different credentials/skills
+    return UNCLEAR rather than silently choosing PREFERRED.
+    HR/culture noise remains UNCLEAR even when prefixed with \"must\".
     """
     text = source_text if isinstance(source_text, str) else ""
-    if _NOISE_CUES.search(text) and not (
-        _MANDATORY_CUES.search(text) or _PREFERRED_CUES.search(text)
-    ):
+
+    if category == "HR_NOISE":
         return "UNCLEAR"
+
+    # Noise-dominant statements (culture/HR) stay UNCLEAR even with "must".
+    if _NOISE_CUES.search(text) and not _SUBSTANTIVE_CUES.search(text):
+        return "UNCLEAR"
+
+    clauses = _split_clauses(text)
+    if len(clauses) >= 2:
+        clause_labels: list[str] = []
+        for clause in clauses:
+            has_pref = bool(_PREFERRED_CUES.search(clause))
+            has_mand = bool(_MANDATORY_CUES.search(clause))
+            if has_pref and has_mand:
+                clause_labels.append("MIXED")
+            elif has_pref:
+                clause_labels.append("PREFERRED")
+            elif has_mand:
+                clause_labels.append("MANDATORY")
+            else:
+                clause_labels.append("OTHER")
+        unique = {label for label in clause_labels if label in {"MANDATORY", "PREFERRED"}}
+        if "MIXED" in clause_labels or unique == {"MANDATORY", "PREFERRED"}:
+            return "UNCLEAR"
 
     has_pref = bool(_PREFERRED_CUES.search(text))
     has_mand = bool(_MANDATORY_CUES.search(text))
@@ -62,9 +97,7 @@ def classify_importance_from_source(
     if has_pref and not has_mand:
         return "PREFERRED"
     if has_pref and has_mand:
-        # Explicit preferred section language dominates.
-        if re.search(r"\bpreferred\b", text, re.IGNORECASE):
-            return "PREFERRED"
+        # Same-clause mix without clean split → UNCLEAR.
         return "UNCLEAR"
     if has_mand:
         return "MANDATORY"
@@ -79,16 +112,7 @@ def normalize_structured_requirements(
     job_id: str,
     structured_extraction: Any,
 ) -> dict[str, Any]:
-    """Validate and normalize a structured requirement extraction payload.
-
-    Expected shape:
-      {
-        "requirements": [ {requirement fields...}, ... ],
-        "role_family": str|null,
-        "seniority": str|null,
-        "extraction_version": str (optional)
-      }
-    """
+    """Validate and normalize a structured requirement extraction payload."""
     result: dict[str, Any] = {
         "valid": False,
         "job_id": job_id,
@@ -185,13 +209,16 @@ def normalize_structured_requirements(
             )
             continue
 
+        category = requirement.get("category")
         if isinstance(source_text, str):
             requirement["importance"] = classify_importance_from_source(
                 source_text,
                 proposed=proposed if isinstance(proposed, str) else None,
+                category=category if isinstance(category, str) else None,
             )
+        elif category == "HR_NOISE":
+            requirement["importance"] = "UNCLEAR"
 
-        # Empty technology must be a list.
         if requirement.get("technology") is None:
             requirement["technology"] = []
 
@@ -206,8 +233,6 @@ def normalize_structured_requirements(
             )
             continue
 
-        # Drop pure HR noise that classifiers marked UNCLEAR with LOW relevance
-        # only when explicitly tagged as noise category.
         if (
             requirement.get("category") == "HR_NOISE"
             and requirement.get("importance") == "UNCLEAR"
@@ -224,7 +249,6 @@ def normalize_structured_requirements(
         result["requirements"] = []
         return result
 
-    # Stable order by requirement_id.
     normalized.sort(key=lambda item: item["requirement_id"])
     result["requirements"] = normalized
     result["valid"] = True

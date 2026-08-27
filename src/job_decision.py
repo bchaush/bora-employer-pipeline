@@ -1,6 +1,6 @@
 """Bounded lane/decision routing for Job Analysis v1.
 
-Explainable from hard blockers, mandatory coverage, and gaps.
+Explainable from hard blockers, mandatory coverage, role-family fit, and gaps.
 Does not emit hire-probability percentages.
 """
 
@@ -8,6 +8,16 @@ from __future__ import annotations
 
 import re
 from typing import Any, Mapping, Sequence
+
+
+SUPPORTED_ROLE_FAMILY_TOKENS = (
+    "business systems",
+    "implementation",
+    "data operations",
+    "business process",
+    "digital solutions",
+    "technical operations",
+)
 
 
 def _req_blob(requirement: Mapping[str, Any]) -> str:
@@ -20,36 +30,64 @@ def _req_blob(requirement: Mapping[str, Any]) -> str:
     return " ".join(parts).casefold()
 
 
+def detect_seniority_signals(*, role: str | None, jd_text: str, seniority: str | None) -> list[str]:
+    """Defense-in-depth seniority detection from extraction + raw title/JD."""
+    signals: list[str] = []
+    sen = (seniority or "").casefold()
+    title = (role or "").casefold()
+    jd = jd_text.casefold() if isinstance(jd_text, str) else ""
+
+    if any(
+        token in sen
+        for token in ("senior", "staff", "principal", "director", "manager")
+    ):
+        signals.append(f"extracted seniority indicates advanced level: {seniority}")
+
+    if re.search(r"\b(senior|staff|principal|director)\b", title):
+        signals.append(f"role title indicates advanced seniority: {role}")
+
+    # Conservative 'lead' handling: only when clearly a title/role qualifier.
+    if re.search(
+        r"\blead\s+(business|systems|analyst|engineer|architect|developer)\b",
+        title,
+    ) or re.search(r"\b(lead\s+business\s+systems|business\s+systems\s+lead)\b", title):
+        signals.append(f"role title indicates lead-level seniority: {role}")
+
+    # Raw JD title-like lines (first ~400 chars) for mislabeled extraction.
+    head = jd[:400]
+    if re.search(
+        r"\b(senior|staff|principal|director)\s+"
+        r"(business\s+systems|analyst|engineer|architect|manager)\b",
+        head,
+    ):
+        signals.append("raw JD title language indicates advanced seniority")
+
+    if re.search(r"\b(5\+|7\+|10\+|eight|ten)\s*\+?\s*years?\b", jd) or re.search(
+        r"\b(5|7|8|10)\+?\s*years?\b", jd
+    ):
+        if signals or any(
+            token in sen for token in ("senior", "staff", "principal", "lead")
+        ):
+            signals.append("senior years-of-experience requirement present")
+
+    return signals
+
+
 def detect_hard_blockers(
     *,
     requirements: Sequence[Mapping[str, Any]],
     matches: Sequence[Mapping[str, Any]],
     seniority: str | None,
+    role: str | None,
     jd_text: str,
 ) -> list[str]:
     """Return human-readable hard blockers present in the analyzed role."""
     blockers: list[str] = []
     jd = jd_text.casefold() if isinstance(jd_text, str) else ""
-    sen = (seniority or "").casefold()
 
-    if any(
-        token in sen
-        for token in ("senior", "staff", "principal", "lead", "director", "manager")
-    ):
-        blockers.append(f"Seniority signal indicates advanced level: {seniority}")
-
-    if re.search(r"\b(5\+|7\+|10\+|eight|ten)\s*\+?\s*years?\b", jd) or re.search(
-        r"\b(5|7|8|10)\+?\s*years?\b", jd
-    ):
-        # Only treat as blocker when seniority also advanced or experience_level high.
-        if any(
-            token in sen for token in ("senior", "staff", "principal", "lead")
-        ) or any(
-            isinstance(r.get("experience_level"), str)
-            and re.search(r"\b([5-9]|1[0-9])\+?\s*years?\b", r["experience_level"], re.I)
-            for r in requirements
-        ):
-            blockers.append("Senior years-of-experience requirement present")
+    blockers.extend(
+        detect_seniority_signals(role=role, jd_text=jd_text, seniority=seniority)
+    )
 
     if re.search(
         r"\b(us\s+citizen|u\.s\.\s+citizen|security clearance|secret clearance|"
@@ -65,28 +103,42 @@ def detect_hard_blockers(
     for requirement in requirements:
         if requirement.get("importance") != "MANDATORY":
             continue
-        if requirement.get("relevance") not in {"HIGH", "MEDIUM"}:
+        if requirement.get("relevance") != "HIGH":
             continue
-        blob = _req_blob(requirement)
         req_id = requirement.get("requirement_id")
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
         result = match.get("result") if isinstance(match, Mapping) else None
+        if result != "NONE":
+            continue
 
+        blob = _req_blob(requirement)
+        # Platform / SWE / ML specifics (retain explicit messaging).
         if re.search(
             r"\b(production\s+ml|machine\s+learning|deep\s+learning|"
             r"software\s+engineer|backend\s+engineer)\b",
             blob,
-        ) and result in {None, "NONE", "UNKNOWN"}:
+        ):
             blockers.append(
-                f"Unsupported deep SWE/ML mandatory requirement: {req_id}"
+                f"Unsupported deep SWE/ML mandatory HIGH requirement: {req_id}"
             )
+            continue
+        if re.search(r"\b(salesforce|google\s+cloud|gcp)\b", blob):
+            blockers.append(
+                f"Unsupported core platform specialization (mandatory HIGH): {req_id}"
+            )
+            continue
 
-        if re.search(r"\b(salesforce|google\s+cloud|gcp)\b", blob) and result == "NONE":
-            blockers.append(
-                f"Unsupported core platform specialization (mandatory): {req_id}"
-            )
+        # Generalized core mandatory HIGH / NONE blocker.
+        blockers.append(
+            f"Unsupported core mandatory HIGH requirement: {req_id}"
+        )
 
     return blockers
+
+
+def role_family_fit(role_family: str | None) -> bool:
+    family = (role_family or "").casefold()
+    return any(token in family for token in SUPPORTED_ROLE_FAMILY_TOKENS)
 
 
 def decide_lane_and_decision(
@@ -97,6 +149,7 @@ def decide_lane_and_decision(
     unknowns: Sequence[str],
     seniority: str | None,
     role_family: str | None,
+    role: str | None,
     jd_text: str,
 ) -> dict[str, Any]:
     """Compute lane, decision, and rationale from structured analysis facts."""
@@ -104,15 +157,14 @@ def decide_lane_and_decision(
         requirements=requirements,
         matches=matches,
         seniority=seniority,
+        role=role,
         jd_text=jd_text,
     )
     if blockers:
         return {
             "lane": "LANE_0_REJECT",
             "decision": "REJECT",
-            "decision_rationale": (
-                "Hard blocker(s): " + "; ".join(blockers)
-            ),
+            "decision_rationale": "Hard blocker(s): " + "; ".join(blockers),
             "hard_blockers": blockers,
         }
 
@@ -134,6 +186,7 @@ def decide_lane_and_decision(
     strong_or_supported = 0
     partial = 0
     none = 0
+    high_none = 0
     for requirement in mandatory:
         req_id = requirement.get("requirement_id")
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
@@ -144,6 +197,8 @@ def decide_lane_and_decision(
             partial += 1
         elif result == "NONE":
             none += 1
+            if requirement.get("relevance") == "HIGH":
+                high_none += 1
 
     preferred_missing = 0
     for requirement in preferred:
@@ -153,20 +208,41 @@ def decide_lane_and_decision(
         if result in {"NONE", "UNKNOWN"}:
             preferred_missing += 1
 
-    family = (role_family or "").casefold()
-    family_fit = any(
-        token in family
-        for token in (
-            "business systems",
-            "implementation",
-            "data operations",
-            "business process",
-            "digital solutions",
-            "technical operations",
-        )
-    )
-
+    family_fit = role_family_fit(role_family)
     unclear_count = sum(1 for r in requirements if r.get("importance") == "UNCLEAR")
+
+    # Any core mandatory HIGH gap blocks positive apply routing.
+    if high_none >= 1:
+        return {
+            "lane": "LANE_0_REJECT",
+            "decision": "REJECT",
+            "decision_rationale": (
+                "At least one core mandatory HIGH requirement has NONE coverage "
+                f"(high_none={high_none})."
+            ),
+            "hard_blockers": [],
+        }
+
+    if not family_fit:
+        if none >= 1 or strong_or_supported == 0:
+            return {
+                "lane": "LANE_0_REJECT",
+                "decision": "REJECT",
+                "decision_rationale": (
+                    f"Role family {role_family!r} is outside supported/adjacent "
+                    "families and lacks sufficient transferable coverage."
+                ),
+                "hard_blockers": [],
+            }
+        return {
+            "lane": "WATCH",
+            "decision": "WATCH",
+            "decision_rationale": (
+                f"Role family {role_family!r} is outside supported/adjacent families; "
+                "not eligible for APPLY / EFFICIENT_APPLY / PRIORITY_APPLY."
+            ),
+            "hard_blockers": [],
+        }
 
     if none >= 2 and strong_or_supported == 0:
         return {
@@ -219,7 +295,7 @@ def decide_lane_and_decision(
             "hard_blockers": [],
         }
 
-    if strong_or_supported >= 1 and none <= 1:
+    if family_fit and strong_or_supported >= 1 and none == 0:
         return {
             "lane": "LANE_1_EFFICIENT_APPLY",
             "decision": "APPLY",

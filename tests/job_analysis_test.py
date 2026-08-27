@@ -179,15 +179,15 @@ print("PASS 4: senior-role reject.")
 
 
 # ---------------------------------------------------------------------------
-# 5. U.S.-regulatory semantic-transfer trap -> PARTIAL (not STRONG/NONE if transfer)
+# 5. U.S.-regulatory false PARTIAL removed -> NONE with current repository
 # ---------------------------------------------------------------------------
 us_reg = next(
     m for m in analysis["evidence_matches"] if m["requirement_id"] == "REQ_BSA_006"
 )
-assert_true(us_reg["result"] == "PARTIAL", f"expected PARTIAL, got {us_reg}")
-assert_true(us_reg.get("transfer_note") is not None, "PARTIAL must expose transfer_note")
-assert_false(us_reg["result"] == "STRONG", "must not upgrade to STRONG")
-print("PASS 5: U.S.-regulatory semantic-transfer trap -> PARTIAL.")
+assert_true(us_reg["result"] == "NONE", f"expected NONE, got {us_reg}")
+assert_true(us_reg["claim_ids"] == [], "regulatory NONE must have no claim provenance")
+assert_true(us_reg["evidence_ids"] == [], "regulatory NONE must have no evidence provenance")
+print("PASS 5: U.S.-regulatory requirement -> NONE (no Winter Walk false PARTIAL).")
 
 
 # ---------------------------------------------------------------------------
@@ -385,5 +385,271 @@ for match in analysis["evidence_matches"]:
     errs = list(match_validator.iter_errors(match))
     assert_true(not errs, f"match schema errors for {match}: {errs}")
 print("PASS 14: analysis + evidence_match schemas accept real outputs.")
+
+
+# ---------------------------------------------------------------------------
+# Remediation adversarial coverage
+# ---------------------------------------------------------------------------
+
+# R1/R2: generic control/audit wording cannot authorize regulatory expertise
+from requirement_match import match_requirement, load_reusable_claims  # noqa: E402
+
+reusable = load_reusable_claims(CLAIM_INDEX, EVIDENCE_INDEX)
+reg_req = {
+    "requirement_id": "REQ_REG_GENERIC",
+    "job_id": "JOB_X",
+    "text": "U.S. regulatory reporting and SOX controls experience",
+    "category": "DOMAIN",
+    "importance": "PREFERRED",
+    "seniority_implication": None,
+    "technology": [],
+    "experience_level": None,
+    "domain": "U.S. Regulatory Reporting",
+    "relevance": "MEDIUM",
+    "source_text": "Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)",
+    "source_location": "Preferred",
+}
+reg_match = match_requirement(
+    job_id="JOB_X",
+    requirement=reg_req,
+    reusable_claims=reusable,
+    evidence_index=EVIDENCE_INDEX,
+    match_index=0,
+)
+assert_true(reg_match["result"] == "NONE", reg_match)
+print("PASS R1: generic control/audit Winter Walk evidence cannot support regulatory expertise.")
+
+# R3: Product Management with stakeholder/process vocabulary cannot APPLY
+pm = {
+    "company": "Synthetic PM Co",
+    "role": "Product Manager",
+    "jd_text": "Product Manager role. Work with stakeholders and own product process.",
+    "fixture_key": "PM_OVERMATCH",
+    "structured_extraction": {
+        "role_family": "Product Management",
+        "seniority": "MID",
+        "requirements": [
+            {
+                "requirement_id": "REQ_PM_001",
+                "job_id": "PLACEHOLDER",
+                "text": "Partner with stakeholders to drive product process and requirements",
+                "category": "PM",
+                "importance": "MANDATORY",
+                "seniority_implication": None,
+                "technology": [],
+                "experience_level": None,
+                "domain": "Product",
+                "relevance": "HIGH",
+                "source_text": "Must partner with stakeholders to drive product process and requirements",
+                "source_location": "Requirements",
+            }
+        ],
+    },
+}
+pm_result = analyze_job(pm, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
+assert_true(pm_result["valid"] is True, pm_result["errors"])
+assert_true(
+    pm_result["analysis"]["decision"] not in {
+        "PRIORITY_APPLY",
+        "APPLY",
+        "EFFICIENT_APPLY",
+    },
+    pm_result["analysis"],
+)
+assert_true(
+    pm_result["analysis"]["evidence_matches"][0]["result"] in {"NONE", "UNKNOWN"},
+    pm_result["analysis"]["evidence_matches"][0],
+)
+print(
+    f"PASS R3: Product Management cannot APPLY "
+    f"(decision={pm_result['analysis']['decision']})."
+)
+
+# R4: generic lexical overlap alone cannot produce PARTIAL
+generic_req = {
+    "requirement_id": "REQ_GENERIC_WORDS",
+    "job_id": "JOB_X",
+    "text": "Strong stakeholder process workflow requirements validation data audit control experience",
+    "category": "GENERIC",
+    "importance": "MANDATORY",
+    "seniority_implication": None,
+    "technology": [],
+    "experience_level": None,
+    "domain": None,
+    "relevance": "HIGH",
+    "source_text": "Strong stakeholder process workflow requirements validation data audit control experience required",
+    "source_location": "Requirements",
+}
+generic_match = match_requirement(
+    job_id="JOB_X",
+    requirement=generic_req,
+    reusable_claims=reusable,
+    evidence_index=EVIDENCE_INDEX,
+    match_index=1,
+)
+assert_true(
+    generic_match["result"] in {"NONE", "UNKNOWN"},
+    f"generic words must not PARTIAL/STRONG: {generic_match}",
+)
+print("PASS R4: generic lexical overlap alone cannot produce PARTIAL.")
+
+# R5: one central mandatory HIGH NONE blocks positive apply despite minor positives
+core_none = copy.deepcopy(fixture)
+core_none["structured_extraction"]["requirements"].append(
+    {
+        "requirement_id": "REQ_PEOPLE_MGMT",
+        "job_id": "PLACEHOLDER",
+        "text": "Direct people-management experience leading a team of analysts",
+        "category": "LEADERSHIP",
+        "importance": "MANDATORY",
+        "seniority_implication": None,
+        "technology": [],
+        "experience_level": None,
+        "domain": None,
+        "relevance": "HIGH",
+        "source_text": "Direct people-management experience leading a team of analysts is required",
+        "source_location": "Minimum qualifications (required)",
+    }
+)
+core_result = analyze_job(
+    core_none,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+)
+assert_true(core_result["valid"] is True, core_result["errors"])
+people = next(
+    m
+    for m in core_result["analysis"]["evidence_matches"]
+    if m["requirement_id"] == "REQ_PEOPLE_MGMT"
+)
+assert_true(people["result"] == "NONE", people)
+assert_true(
+    core_result["analysis"]["decision"] not in {
+        "PRIORITY_APPLY",
+        "APPLY",
+        "EFFICIENT_APPLY",
+    },
+    core_result["analysis"],
+)
+print(
+    f"PASS R5: central mandatory HIGH NONE blocks apply "
+    f"(decision={core_result['analysis']['decision']})."
+)
+
+# R6: senior title in raw JD/title blocks even if extracted seniority is EARLY_CAREER
+mislabeled = copy.deepcopy(fixture)
+mislabeled["role"] = "Senior Business Systems Analyst"
+mislabeled["structured_extraction"]["seniority"] = "EARLY_CAREER"
+mislabeled["jd_text"] = (
+    "Senior Business Systems Analyst\n\n" + fixture["jd_text"]
+)
+mis_result = analyze_job(
+    mislabeled,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+)
+assert_true(mis_result["valid"] is True, mis_result["errors"])
+assert_true(
+    mis_result["analysis"]["decision"] == "REJECT",
+    mis_result["analysis"]["decision_rationale"],
+)
+print("PASS R6: senior title defense-in-depth blocks mislabeled EARLY_CAREER extraction.")
+
+# R7: Bachelor's required; Master's preferred -> UNCLEAR (not PREFERRED)
+assert_true(
+    classify_importance_from_source(
+        "Bachelor's degree required; Master's degree preferred."
+    )
+    == "UNCLEAR",
+    "mixed degree clauses must not become PREFERRED overall",
+)
+print("PASS R7: mixed degree clauses classify as UNCLEAR.")
+
+# R8: HR noise with must -> UNCLEAR
+assert_true(
+    classify_importance_from_source(
+        "Must be a self-starter and team player who thrives in a fast-paced environment."
+    )
+    == "UNCLEAR",
+    "HR noise with must must stay UNCLEAR",
+)
+print("PASS R8: HR noise prefixed with must stays UNCLEAR.")
+
+# R9: ideal candidate cue -> PREFERRED
+assert_true(
+    classify_importance_from_source(
+        "Ideal candidate has Salesforce administration experience"
+    )
+    == "PREFERRED",
+    "ideal candidate cue",
+)
+print("PASS R9: ideal candidate cue handled as PREFERRED.")
+
+# R10: positive match without provenance fails schema validation
+match_validator = build_draft202012_validator(
+    ROOT / "schemas" / "evidence_match.schema.json"
+)
+bad_match = {
+    "match_id": "MATCH_BAD",
+    "job_id": "JOB_X",
+    "requirement_id": "REQ_X",
+    "result": "SUPPORTED",
+    "evidence_ids": [],
+    "claim_ids": [],
+    "explanation": "should fail provenance",
+    "transfer_note": None,
+}
+assert_true(
+    list(match_validator.iter_errors(bad_match)),
+    "positive match without provenance must fail schema",
+)
+print("PASS R10: positive match without provenance fails schema validation.")
+
+# R11: top-level result schema rejects malformed nested requirement
+analysis_validator = build_draft202012_validator(
+    ROOT / "schemas" / "job_analysis_result.schema.json"
+)
+bad_analysis_req = copy.deepcopy(analysis)
+bad_analysis_req["requirements"] = [
+    {
+        "requirement_id": "REQ_BAD",
+        "job_id": analysis["job_id"],
+        "text": "x",
+        "category": "X",
+        "importance": "OPTIONAL",
+        "seniority_implication": None,
+        "technology": [],
+        "experience_level": None,
+        "domain": None,
+        "relevance": "HIGH",
+        "source_text": "x",
+        "source_location": "x",
+    }
+]
+assert_true(
+    list(analysis_validator.iter_errors(bad_analysis_req)),
+    "malformed nested requirement must fail top-level schema",
+)
+print("PASS R11: top-level schema rejects malformed nested requirement.")
+
+# R12: top-level result schema rejects malformed nested evidence match
+bad_analysis_match = copy.deepcopy(analysis)
+bad_analysis_match["evidence_matches"] = [
+    {
+        "match_id": "MATCH_BAD2",
+        "job_id": analysis["job_id"],
+        "requirement_id": "REQ_BSA_001",
+        "result": "STRONG",
+        "evidence_ids": [],
+        "claim_ids": [],
+        "explanation": "no provenance",
+        "transfer_note": None,
+    }
+]
+assert_true(
+    list(analysis_validator.iter_errors(bad_analysis_match)),
+    "malformed nested evidence match must fail top-level schema",
+)
+print("PASS R12: top-level schema rejects malformed nested evidence match.")
 
 print("PASS: job analysis vertical-slice tests completed successfully.")

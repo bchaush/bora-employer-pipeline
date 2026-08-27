@@ -9,14 +9,14 @@ and support user-acceptance testing with nontechnical stakeholders.
 
 Responsibilities
 - Elicit and document stakeholder requirements for internal workflow tools
-- Map existing business processes and translate them into implemented operating steps
+- Map stakeholder form inputs into structured evidence logs and keep approval status synchronized
 - Build and maintain reliable CSV / Drive-folder data intake with import logging
 - Support fail-closed operational controls for outbound follow-up communications
 - Facilitate UAT / pilot validation and document results for handoff
 
 Minimum qualifications (required)
 - Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow or business-process mapping
+- Experience with workflow automation and approval-synchronized evidence mapping
 - Hands-on data ingestion / validation work (CSV, spreadsheets, or similar)
 - Comfort documenting UAT or pilot test outcomes
 - Bachelor's degree or equivalent practical experience

@@ -28,11 +28,15 @@
     "seniority": { "type": ["string", "null"] },
     "requirements": {
       "type": "array",
-      "items": { "type": "object" }
+      "items": {
+        "$ref": "https://bora-employer-pipeline.local/schemas/requirement.schema.json"
+      }
     },
     "evidence_matches": {
       "type": "array",
-      "items": { "type": "object" }
+      "items": {
+        "$ref": "https://bora-employer-pipeline.local/schemas/evidence_match.schema.json"
+      }
     },
     "gaps": {
       "type": "array",
