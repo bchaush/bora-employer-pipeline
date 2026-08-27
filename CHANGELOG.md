@@ -19,6 +19,56 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Repository-Level Evidence Integrity v1 (IMPLEMENTED — PENDING CLAUDE CODE AUDIT)
+
+**Reason**
+
+Add the smallest deterministic repository-wide Evidence Repository integrity layer before reusable claims are created. This gate is deliberately separate from claim-scoped lineage validation.
+
+**Changed**
+
+* Added `src/evidence_repository.py`:
+  * recursive deterministic `*.json` discovery under `evidence/`;
+  * JSON parse integrity;
+  * canonical `schemas/evidence.schema.json` validation via shared `build_draft202012_validator`;
+  * global `evidence_id` uniqueness (no last-write-wins);
+  * filename stem ↔ `evidence_id` exact match;
+  * one-record-object-per-file shape enforcement;
+  * fail-closed trusted index (`index` is `None` when invalid).
+* Added `tests/evidence_repository_test.py` (PASS 1–10, 12; PASS 11 = existing claim suites).
+* Current committed Winter Walk Batch 1 (12 records) passes repository validation.
+* Claim-scoped validators unchanged (`NO CLAIM-SCOPED SEMANTIC CHANGE`).
+* Unresolved: `EXPERIENCE_REGISTRY_DECISION_REQUIRED` — no authoritative Experience Registry; do not invent one; `experience_id` remains schema non-empty string only.
+
+**Affected Areas**
+
+* `src/evidence_repository.py` (new)
+* `tests/evidence_repository_test.py` (new)
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Discovery convention v1: every `*.json` under the evidence root is a candidate record (no manifest). Non-record JSON in that tree will fail closed.
+* Experience referential integrity is intentionally not enforced until a registry is approved.
+* Milestone not CLOSED; Claude Code audit required.
+
+**Tests / Verification**
+
+* `tests/evidence_repository_test.py` — PASS
+* All 7 existing suites — PASS (no regression)
+* `git diff --check` — clean
+
+**Approved By**
+
+Implementation by Cursor; pending ChatGPT review and Claude Code audit
+
+**Status**
+
+IMPLEMENTED — PENDING CLAUDE CODE AUDIT (not CLOSED; not pushed pending ChatGPT review)
+
+---
+
 ## 2026-08-26 — AI/Tool Operating-Model Governance Sync (Blueprint v3.1)
 
 **Reason**

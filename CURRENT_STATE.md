@@ -14,7 +14,9 @@ Winter Walk Evidence Repository v1 Batch 1 = **CLOSED** (12 evidence records com
 
 No reusable claims created yet.
 
-Repository-Level Evidence Integrity = **NOT STARTED / NEXT**.
+Repository-Level Evidence Integrity v1 = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT** (not CLOSED).
+
+Unresolved: `EXPERIENCE_REGISTRY_DECISION_REQUIRED` (no authoritative Experience Registry yet; `experience_id` is schema string-only).
 
 No production engine yet.
 
@@ -68,14 +70,23 @@ No production engine yet.
   * All 12 records pass evidence schema validation; all 7 existing test suites pass.
   * No open Batch 1 findings.
   * No reusable claims created; schemas and validators unchanged by Batch 1.
+* Repository-Level Evidence Integrity v1 implemented (not CLOSED):
+
+  * `src/evidence_repository.py` + `tests/evidence_repository_test.py`.
+  * Separate repository-wide gate from claim-scoped validation; fail-closed trusted index.
+  * All 12 Winter Walk Batch 1 records pass repository integrity.
+  * Status: **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+  * Open: `EXPERIENCE_REGISTRY_DECISION_REQUIRED`.
 
 ## Current Task
 
-Next approved technical milestone: `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY` — **NOT STARTED**.
+`REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+
+Awaiting ChatGPT review, then Claude Code independent audit. Do not mark CLOSED until audits complete.
 
 ## Not Built Yet
 
-* Repository-wide evidence integrity validator (**NEXT**)
+* Experience Registry / `experience_id` referential integrity (blocked on `EXPERIENCE_REGISTRY_DECISION_REQUIRED`)
 * Winter Walk Evidence Batch 2+
 * Claims derived from Winter Walk evidence
 * Forbidden-claim registry implementation
@@ -111,7 +122,8 @@ Next approved technical milestone: `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY` — **N
 * JSON Schema gates reject malformed structured records.
 * Claim reusable-use requires schema + citation-scoped lineage + state compatibility + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
 * Semantic fabricated-outcome protection remains a later deterministic validator layer.
-* Repository-Level Evidence Integrity does **not** exist yet.
+* Repository-Level Evidence Integrity v1 exists as a separate gate from claim-scoped validation (`src/evidence_repository.py`); trusted index only when repository-valid.
+* `experience_id` referential integrity is **not** enforced until an Experience Registry is approved (`EXPERIENCE_REGISTRY_DECISION_REQUIRED`).
 
 ## Current Source of Truth
 
@@ -121,16 +133,18 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY` (next approved technical milestone; not started)
-2. Forbidden-claim registry (after or with evidence integrity, only if approved)
-3. Winter Walk Evidence Batch 2 (only if explicitly approved)
-4. Additional schemas only as explicitly approved
+1. ChatGPT review of Evidence Integrity v1 implementation (do not push to main until reviewed).
+2. Claude Code independent audit of Evidence Integrity v1.
+3. Resolve `EXPERIENCE_REGISTRY_DECISION_REQUIRED` only after an Experience Registry architecture is approved.
+4. Forbidden-claim registry (only if approved).
+5. Winter Walk Evidence Batch 2 / claim creation (only if explicitly approved).
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* Evidence Integrity until this governance closeout commit is complete and the next task is explicitly confirmed in-session if required;
+* marking Evidence Integrity CLOSED before Claude Code audit;
+* inventing an Experience Registry without approval;
 * Winter Walk Batch 2 without explicit approval;
 * claim creation from Batch 1 evidence without explicit approval;
 * job scraping;
@@ -146,8 +160,6 @@ Do not begin:
 * cloud infrastructure;
 * production API integrations.
 
-These begin only after the governed workbench is complete and the first implementation phase is approved.
-
 ## Next Approved Task
 
-`REPOSITORY_LEVEL_EVIDENCE_INTEGRITY` — approved as next technical milestone; **not implemented yet**.
+Closeout of `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` after ChatGPT + Claude Code review (not CLOSED yet).
