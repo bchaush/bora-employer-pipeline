@@ -16,7 +16,9 @@ Repository-Level Evidence Integrity v1 = **CLOSED**.
 
 Minimal Experience Registry v1 = **CLOSED**.
 
-Claim Bank v1 first Winter Walk reusable claims = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED).
+Claim Bank v1 first Winter Walk reusable claims = **IMPLEMENTED** (records present; not CLOSED).
+
+Claim Bank v1 required hardening = **IMPLEMENTED_PENDING_FINAL_AUDIT** (not CLOSED).
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
@@ -101,21 +103,28 @@ No production engine yet.
   * All 5: `valid_record=true`, `human_approval=false`, `reusable=false` (`NOT_HUMAN_APPROVED`) pending Bora approval.
   * Evidence lineage and evidence-state compatibility verified against trusted Winter Walk Evidence index.
   * No Evidence/Experience/schema/validator changes; no unsupported outcomes or semantic upgrades.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+  * Status: **IMPLEMENTED** (records present; Claim Bank not CLOSED).
+* Claim Bank v1 required hardening implemented (not CLOSED):
+
+  * Deterministic semantic boundary guard (`src/claim_semantic_guard.py`) wired into `validate_claim`; blocks known unsupported upgrades and fabricated quantified outcomes with `FORBIDDEN_SEMANTIC_PATTERN` (`valid_record=false`).
+  * Guard is evidence-relative (not a global keyword blacklist): phrases allowed only when cited Evidence support corpus supports them.
+  * Claim repository integrity (`src/claim_repository.py`): unique Claim_ID, filename↔ID match, schema, strict JSON, fail-closed index.
+  * Real five claim wordings / lineage / states / contexts / `human_approval=false` unchanged.
+  * Downstream requested-context consumption deferred until résumé/application consumer exists (self-conflict still enforced).
+  * Status: **IMPLEMENTED_PENDING_FINAL_AUDIT**.
 
 ## Current Task
 
-`CLAIM_BANK_V1_FIRST_REUSABLE_CLAIMS` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+`CLAIM_BANK_V1_REQUIRED_HARDENING` = **IMPLEMENTED_PENDING_FINAL_AUDIT**.
 
-Awaiting independent Claude Code adversarial audit and Bora human approval of claim records. Do not mark CLOSED yet.
+Awaiting final independent adversarial audit. Five claims remain `human_approval=false`. Do not mark Claim Bank v1 CLOSED yet.
 
 ## Not Built Yet
 
 * Bora human approval of `CLAIM_WW_001`–`CLAIM_WW_005` (`human_approval=true` / reusable gate)
-* Claim repository-level integrity validator (filename/ID uniqueness across `claims/`) — deferred
+* Downstream requested-context enforcement at résumé/application consumption time
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
-* Forbidden-claim registry implementation
-* Deterministic fabricated-outcome / metric validators
+* Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
 * Job ingestion
 * Resume patch generation / rendering / diff
@@ -135,8 +144,10 @@ Awaiting independent Claude Code adversarial audit and Bora human approval of cl
 * No PII should be stored in this repository unless explicitly designed and approved later.
 * No architectural dependency beyond the local repository has been approved.
 * JSON Schema gates reject malformed structured records.
-* Claim reusable-use requires schema + citation-scoped lineage + state compatibility + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
-* Semantic fabricated-outcome protection remains a later deterministic validator layer.
+* Claim reusable-use requires schema + citation-scoped lineage + state compatibility + semantic boundary guard + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
+* Bounded deterministic semantic guard rejects known unsupported upgrades and fabricated quantified outcomes (`FORBIDDEN_SEMANTIC_PATTERN`).
+* Claim repository identity integrity enforced (duplicate Claim_ID / filename mismatch fail closed).
+* Downstream requested-context enforcement intentionally deferred until a résumé/application consumer exists.
 * Provenance spine: Experience → Evidence → Claim (proposed) → (future) résumé module.
 * `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED` on authoritative Evidence Repository validation.
 * Experience Registry does not assert employment titles, dates, outcomes, or résumé content.
@@ -149,16 +160,17 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Independent Claude Code adversarial audit of Claim Bank v1 first Winter Walk claims.
+1. Final independent adversarial audit of Claim Bank v1 required hardening.
 2. Bora human approval of claim records (`human_approval`) before reusable use.
-3. Close Claim Bank v1 only after audit + approval decisions.
+3. Close Claim Bank v1 only after final audit + approval decisions.
 4. Additional Experience/Evidence/Claims only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Claim Bank v1 CLOSED before audit;
+* marking Claim Bank v1 CLOSED before final audit;
+* setting `human_approval=true` without Bora decision;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
@@ -168,4 +180,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Claude Code adversarial audit of `CLAIM_BANK_V1_FIRST_REUSABLE_CLAIMS` (not CLOSED yet).
+Final independent adversarial audit of `CLAIM_BANK_V1_REQUIRED_HARDENING` (not CLOSED yet).

@@ -4,12 +4,18 @@ Orchestrates, in order:
 1. claim schema validation
 2. lineage validation (claim_lineage) — cited Evidence_IDs only
 3. evidence-state compatibility (claim_state_validation) — cited only
-4. context-conflict check (allowed vs forbidden)
-5. reusability / approval gate
+4. semantic boundary guard (claim_semantic_guard) — cited Evidence only
+5. context-conflict check (allowed vs forbidden)
+6. reusability / approval gate
 
 Does not pre-validate the full evidence repository. Unrelated repository
 records do not invalidate a claim. Does not mutate records or invent
 fallback values.
+
+Downstream requested-context consumption (forcing use only inside
+allowed_contexts / outside forbidden_contexts at résumé render time) is
+intentionally deferred until a résumé/application consumer exists.
+Self-conflict of allowed ∩ forbidden remains enforced here.
 """
 
 from __future__ import annotations
@@ -17,7 +23,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Mapping
 
-from claim_lineage import EvidenceIndexInput, validate_claim_lineage
+from claim_lineage import (
+    EvidenceIndexInput,
+    normalize_evidence_index,
+    validate_claim_lineage,
+)
+from claim_semantic_guard import validate_claim_semantic_boundaries
 from claim_state_validation import validate_claim_evidence_state_compatibility
 from schema_validation import build_draft202012_validator
 
@@ -189,7 +200,38 @@ def validate_claim(
         result["state_valid"] = False
 
     # ------------------------------------------------------------------
-    # 4. CONTEXT CONFLICT (allowed ∩ forbidden)
+    # 4. SEMANTIC BOUNDARY GUARD (cited Evidence only)
+    # ------------------------------------------------------------------
+    cited_ids: list[str] = []
+    raw_ids = claim.get("evidence_ids")
+    if isinstance(raw_ids, list):
+        cited_ids = [item for item in raw_ids if isinstance(item, str)]
+
+    cited_index, _index_errors = normalize_evidence_index(
+        evidence_index,
+        cited_evidence_ids=cited_ids,
+    )
+    cited_records: list[Mapping[str, Any]] = []
+    if cited_index is not None:
+        for evidence_id in cited_ids:
+            record = cited_index.get(evidence_id)
+            if isinstance(record, Mapping):
+                cited_records.append(record)
+
+    semantic_errors = validate_claim_semantic_boundaries(claim, cited_records)
+    semantic_blocking: list[dict[str, Any]] = []
+    for semantic_error in semantic_errors:
+        code = semantic_error.get("code")
+        if code == "MALFORMED_CLAIM":
+            # Already reported in schema/malformed stage when applicable.
+            continue
+        semantic_blocking.append(dict(semantic_error))
+        result["errors"].append(dict(semantic_error))
+
+    semantic_valid = len(semantic_blocking) == 0
+
+    # ------------------------------------------------------------------
+    # 5. CONTEXT CONFLICT (allowed ∩ forbidden)
     # ------------------------------------------------------------------
     conflicting_contexts = _context_conflicts(claim)
     context_conflict = len(conflicting_contexts) > 0
@@ -206,14 +248,16 @@ def validate_claim(
         )
 
     # ------------------------------------------------------------------
-    # 5. REUSABILITY / APPROVAL GATE
+    # 6. REUSABILITY / APPROVAL GATE
     # ------------------------------------------------------------------
     # Context conflict blocks reusable use but does not erase an otherwise
-    # coherent archival/valid record.
+    # coherent archival/valid record. Semantic boundary failures invalidate
+    # the record (fail closed) and therefore block reusable use.
     result["valid_record"] = (
         result["schema_valid"]
         and result["lineage_valid"]
         and result["state_valid"]
+        and semantic_valid
     )
 
     if result["valid_record"]:

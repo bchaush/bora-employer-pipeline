@@ -19,6 +19,49 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Claim Bank v1 required hardening (IMPLEMENTED_PENDING_FINAL_AUDIT)
+
+**Reason**
+
+Close the production gap where schema/lineage/state-valid claims with `human_approval=true` could still reuse fabricated/forbidden wording, and add Claim Bank repository identity integrity.
+
+**Changed**
+
+* Added bounded deterministic semantic boundary guard (`src/claim_semantic_guard.py`); wired into unified `validate_claim`.
+* Known unsupported upgrades and fabricated quantified outcomes now fail with `FORBIDDEN_SEMANTIC_PATTERN` (`valid_record=false`, therefore `reusable=false`); `human_approval=true` cannot rescue them.
+* Guard is evidence-relative: phrases allowed only when cited Evidence support corpus supports them (not a global keyword blacklist).
+* Added Claim repository integrity (`src/claim_repository.py`): unique Claim_ID, filename↔ID, schema, strict JSON (no duplicate keys / last-write-wins), fail-closed trusted index.
+* Real five Winter Walk claims unchanged (wording, lineage, states, contexts, `human_approval=false`).
+* Downstream requested-context consumption intentionally deferred until résumé/application consumer exists; allowed/forbidden self-conflict remains enforced.
+* Status: **IMPLEMENTED_PENDING_FINAL_AUDIT** (Claim Bank not CLOSED; not pushed pending final audit).
+
+**Affected Areas**
+
+* `src/claim_semantic_guard.py` (new)
+* `src/claim_repository.py` (new)
+* `src/claim_validation.py`
+* `tests/claim_semantic_guard_test.py` (new)
+* `tests/claim_repository_test.py` (new)
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Semantic guard covers known high-risk patterns only; not general NLP truth verification.
+* Requested-context enforcement at consumption time remains deferred.
+
+**Tests / Verification**
+
+* New semantic + claim repository suites — PASS
+* Existing claim / Evidence / Experience / schema smoke suites — PASS
+* Real repositories: 1 Experience, 12 Evidence, 5 Claims; real claims `valid_record=true` / `reusable=false`
+
+**Status**
+
+IMPLEMENTED_PENDING_FINAL_AUDIT
+
+---
+
 ## 2026-08-26 — Claim Bank v1 first Winter Walk reusable claims (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**
