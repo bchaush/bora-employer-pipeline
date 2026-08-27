@@ -19,6 +19,33 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Minimal Experience Registry v1 CLOSED
+
+**Reason**
+
+Operationally close `MINIMAL_EXPERIENCE_REGISTRY_V1` after implementation (`0806a99`), trust-boundary hardening (`b9430b6`), and Claude Code final adversarial recheck (`CLAUDE_MINIMAL_EXPERIENCE_REGISTRY_FINAL_PASS`).
+
+**Changed**
+
+* Milestone status set to **CLOSED** in `CURRENT_STATE.md`.
+* Documented locked trust boundary: validator-issued `ValidatedExperienceRepository` only; raw `experience_index=` bypass removed.
+* Documented structure-only vs authoritative Evidence status separation (`EXPERIENCE_REFERENCE_NOT_CHECKED` vs `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`).
+* Documented preserved causal failures (`EXPERIENCE_REGISTRY_INVALID` vs `EXPERIENCE_ID_NOT_FOUND`).
+* Closure validation: all 11 suites PASS; real Experience count 1 (`EXP_WW_001`); real Evidence count 12 with referential integrity enforced.
+* No claim-scoped semantic change; no Evidence JSON changes; no Experience record/schema changes in this closure commit.
+* Ready as dependency for first reusable Claim Bank records (creation still requires explicit approval).
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-26 — Experience Registry trust-boundary hardening
 
 **Reason**

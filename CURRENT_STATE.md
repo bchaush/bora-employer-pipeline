@@ -14,13 +14,15 @@ Winter Walk Evidence Repository v1 Batch 1 = **CLOSED** (12 evidence records com
 
 Repository-Level Evidence Integrity v1 = **CLOSED**.
 
-Minimal Experience Registry v1 = **IMPLEMENTED — PENDING CLAUDE CODE RECHECK** (not CLOSED).
+Minimal Experience Registry v1 = **CLOSED**.
 
-Claude audit found two trust-boundary blockers; both fixed in follow-up hardening (opaque `ValidatedExperienceRepository`; structure-only status corrected).
+Claude final adversarial recheck: `CLAUDE_MINIMAL_EXPERIENCE_REGISTRY_FINAL_PASS`.
 
 Runtime behavior on authoritative success: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`.
 
 Structure-only path reports: `EXPERIENCE_REFERENCE_NOT_CHECKED`.
+
+Causal failures preserved: `EXPERIENCE_REGISTRY_INVALID` vs `EXPERIENCE_ID_NOT_FOUND`.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
@@ -85,28 +87,30 @@ No production engine yet.
   * Implementation commit `674784b`; hardening commit `09213b2`; closure commit `0dbc044`.
   * Independent Claude Code audit + required hardening + final recheck: `CLAUDE_EVIDENCE_INTEGRITY_FINAL_PASS`.
   * Deterministic Evidence Repository gate remains separate from claim-scoped validation.
-* Minimal Experience Registry v1 implemented (not CLOSED):
+* Minimal Experience Registry v1 closed:
 
-  * `schemas/experience.schema.json`.
-  * Canonical record `experiences/EXP_WW_001.json` (`ORGANIZATIONAL_ENGAGEMENT`).
-  * `src/experience_repository.py` — Experience Registry integrity; returns opaque `ValidatedExperienceRepository` issued only by the validator.
-  * Authoritative `validate_evidence_repository()` requires validator-issued Experience results or loads/validates `experiences/` itself; raw Mapping indexes rejected.
-  * Structure-only path: `validate_evidence_repository_structure()` reports `EXPERIENCE_REFERENCE_NOT_CHECKED`.
-  * Authoritative success: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`; authoritative failure: `EXPERIENCE_REFERENCE_CHECK_FAILED`.
-  * Claude audit blockers (raw index injection; false structure-only ENFORCED status) fixed; status: **IMPLEMENTED — PENDING CLAUDE CODE RECHECK**.
-  * No reusable claims; `NO_CLAIM_SCOPED_SEMANTIC_CHANGE`.
+  * Implementation commit `0806a99`; trust-boundary hardening `b9430b6`; closure commit follows.
+  * Claude final adversarial recheck: `CLAUDE_MINIMAL_EXPERIENCE_REGISTRY_FINAL_PASS`.
+  * `schemas/experience.schema.json` + canonical `experiences/EXP_WW_001.json` (`ORGANIZATIONAL_ENGAGEMENT`).
+  * Opaque validator-issued `ValidatedExperienceRepository`; raw `experience_index=` bypass removed.
+  * Authoritative Evidence validation enforces Experience references (`EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`).
+  * Structure-only Evidence path reports `EXPERIENCE_REFERENCE_NOT_CHECKED`.
+  * Causal failures: `EXPERIENCE_REGISTRY_INVALID` vs `EXPERIENCE_ID_NOT_FOUND`.
+  * All 11 test suites pass; 1 Experience + 12 Evidence records validate; Evidence JSON / Experience record / claim validators unchanged.
+  * Ready as dependency for first reusable Claim Bank records (explicit approval still required before claim creation).
+  * `NO_CLAIM_SCOPED_SEMANTIC_CHANGE`.
 
 ## Current Task
 
-`MINIMAL_EXPERIENCE_REGISTRY_V1` = **IMPLEMENTED — PENDING CLAUDE CODE RECHECK**.
+Next technical dependency: first reusable Claim Bank records — **NOT STARTED** (requires explicit approval).
 
-Awaiting Claude Code recheck of the trust-boundary fixes. Do not mark CLOSED until recheck completes.
+`MINIMAL_EXPERIENCE_REGISTRY_V1` is **CLOSED** and is the approved Experience → Evidence dependency for claim creation.
 
 ## Not Built Yet
 
+* Claims derived from Winter Walk evidence / Claim Bank v1 (**NEXT**; explicit approval required)
 * Additional Experience records (MarketMind, Market Empire/FCAT, LoanIQ, TELUS, Bulmarma, D Commerce, etc.)
 * Winter Walk Evidence Batch 2+
-* Claims derived from Winter Walk evidence
 * Forbidden-claim registry implementation
 * Deterministic fabricated-outcome / metric validators
 * Production pipeline engine
@@ -152,19 +156,18 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Claude Code recheck of Experience trust-boundary hardenings.
-2. Close `MINIMAL_EXPERIENCE_REGISTRY_V1` only after recheck PASS (do not push until approved).
-3. Only then consider first reusable claims (explicit approval required).
-4. Additional Experience IDs only when evidence or approved architecture requires them.
+1. First reusable Claim Bank records only after explicit approval (`CLAIM_BANK_V1` or equivalent).
+2. Additional Experience IDs only when evidence or approved architecture requires them.
+3. Forbidden-claim registry (only if approved).
+4. Winter Walk Evidence Batch 2 (only if explicitly approved).
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Experience Registry CLOSED before Claude Code recheck;
+* claim creation without explicit approval;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
-* claim creation without explicit approval;
 * job scraping;
 * job-board integrations;
 * Google Sheets integration;
@@ -180,4 +183,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Claude Code recheck / closeout of `MINIMAL_EXPERIENCE_REGISTRY_V1` (not CLOSED yet).
+First reusable Claim Bank records — **NOT STARTED**; requires explicit approval. Experience → Evidence spine is closed and ready as the dependency.
