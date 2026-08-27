@@ -99,6 +99,7 @@ REAL_CLAIM_IDS = [
     "CLAIM_WW_003",
     "CLAIM_WW_004",
     "CLAIM_WW_005",
+    "CLAIM_WW_006",
 ]
 
 

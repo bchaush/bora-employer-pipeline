@@ -1,0 +1,38 @@
+{
+  "claim_id": "CLAIM_WW_006",
+  "wording": "Analyzed and documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering data intake, evidence tracking, review, follow-up, and human approval.",
+  "evidence_ids": [
+    "WW_PROC_001"
+  ],
+  "evidence_state": "SUPPORTED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Process",
+    "Business Systems",
+    "Implementation",
+    "process mapping",
+    "workflow mapping",
+    "document business processes",
+    "map operational workflows",
+    "identify workflow stages/handoffs",
+    "current-state to controlled future-state workflow",
+    "workflow analysis"
+  ],
+  "forbidden_contexts": [
+    "BPMN expertise",
+    "formal enterprise process modeling",
+    "enterprise process reengineering leadership",
+    "Visio/Lucidchart process-diagram expertise",
+    "quantified process-improvement outcomes",
+    "organization-wide transformation leadership",
+    "Lean/Six Sigma certification or formal-framework expertise",
+    "automated process-mining / telemetry tools",
+    "Celonis",
+    "UiPath Process Mining"
+  ],
+  "human_approval": true,
+  "date": "2026-08-27",
+  "version": "1"
+}

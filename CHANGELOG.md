@@ -19,6 +19,41 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Implement P-2 process-mapping evidence model (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Resolve `P-2_EVIDENCE_MODEL_DEFERRED` for canonical capability `process_mapping` via one new Winter Walk Evidence record and one new Claim, with minimum matcher/test updates. ChatGPT evidence audit + Gemini `P2_CLAIM_SUPPORTED_AS_WRITTEN` review. Evidence/claim model only — no résumé generation.
+
+**Changed**
+
+* Added `WW_PROC_001` (`process_mapping`, `workflow analysis`) citing `WinterWalk_Master_Blueprint.docx`.
+* Added `CLAIM_WW_006` with bounded allowed/forbidden contexts; `human_approval=true` per Bora milestone authorization.
+* Matcher: removed P-2 NONE trap; expanded bounded process/workflow mapping patterns; added BPMN / Lean-Six-Sigma / process-mining traps.
+* `GT_PROCESS_MAP_P2` expected decision REJECT → APPLY (legitimate evidence-model change).
+* P-2 status: `P-2_EVIDENCE_MODEL_RESOLVED` (pending external audit).
+* Unrelated Batch 1 Evidence/Claims unchanged.
+
+**Affected Areas**
+
+* `evidence/winter_walk/WW_PROC_001.json`
+* `claims/winter_walk/CLAIM_WW_006.json`
+* `src/requirement_match.py`
+* `golden-tests/job_analysis/GT_PROCESS_MAP_P2/expected.json`
+* tests (repository counts, job analysis P2 adversarial, semantic guard)
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Full established suites + golden runner — PASS
+* Repository regression: 1 Experience / 13 Evidence / 6 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-27 — Close Job Analysis v1 Golden Set (CLOSED)
 
 **Reason**

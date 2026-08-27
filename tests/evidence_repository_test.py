@@ -45,6 +45,7 @@ EXPECTED_WW_IDS = [
     "WW_DATA_002",
     "WW_FUQ_001",
     "WW_MAP_001",
+    "WW_PROC_001",
     "WW_SYNC_001",
     "WW_TEST_001",
 ]
@@ -108,7 +109,7 @@ def write_temp_experience_root(base: Path, experience_id: str = "EXP_TEST_001") 
 # ---------------------------------------------------------------------------
 real = validate_evidence_repository(EVIDENCE_ROOT)
 assert_true(real["valid"] is True, "current Winter Walk evidence repository failed")
-assert_true(real["records_checked"] == 12, f"expected 12 records, got {real['records_checked']}")
+assert_true(real["records_checked"] == 13, f"expected 13 records, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_WW_IDS,
@@ -122,7 +123,7 @@ assert_true(
     EXPERIENCE_REGISTRY_STATUS == EXPERIENCE_REFERENCE_STATUS,
     "status alias drifted",
 )
-print("PASS 1 [AUTHORITATIVE]: current real Winter Walk evidence repository (12 records) passed.")
+print("PASS 1 [AUTHORITATIVE]: current real Winter Walk evidence repository (13 records) passed.")
 
 
 # ---------------------------------------------------------------------------

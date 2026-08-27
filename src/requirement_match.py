@@ -39,6 +39,7 @@ _CLAIM_CAPABILITIES: dict[str, frozenset[str]] = {
         }
     ),
     "CLAIM_WW_005": frozenset({"uat", "pilot_testing", "test_documentation"}),
+    "CLAIM_WW_006": frozenset({"process_mapping", "workflow_analysis"}),
 }
 
 # Bounded JD-anchor → existing canonical capability mappings only.
@@ -126,20 +127,61 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         ),
         frozenset({"workflow_automation"}),
     ),
-    # P-2 vocabulary recognized, but no approved Claim currently owns this tag.
-    # Keep patterns atomic so domain text like "Business Process" cannot false-fire.
+    # Process / workflow mapping — bounded; domain text like "Business Process"
+    # alone cannot false-fire without mapping/documentation verbs.
     (
         re.compile(
             r"\bprocess\s+map(?:ping)?\b|\bworkflow\s+map(?:ping)?\b|"
             r"\bbusiness[- ]process\s+map(?:ping)?\b|"
             r"\bmap(?:ping)?\s+existing\s+business\s+processes?\b|"
+            r"\bmap(?:ping)?\s+current[- ]state\s+workflows?\b|"
+            r"\bmap(?:ping)?\s+operational\s+handoffs?\b|"
             r"\bmap(?:ping)?\s+(?:as[- ]is|to[- ]be)\s+processes?\b|"
             r"\bmap(?:ping)?\s+workflows?\b|"
-            r"\bdocument(?:ing)?\s+(?:as[- ]is\s+|to[- ]be\s+)?"
+            r"\bcreate(?:ing)?\s+workflow\s+maps?\b|"
+            r"\bidentify(?:ing)?\s+process\s+steps?\s+and\s+bottlenecks?\b|"
+            r"\bdocument(?:ing)?\s+business\s+processes?\b|"
+            r"\bdocument(?:ing)?\s+(?:as[- ]is\s+|to[- ]be\s+|"
+            r"current[- ]state\s+and\s+future[- ]state\s+)?"
             r"(?:workflows?|business\s+processes?)\b",
             re.I,
         ),
         frozenset({"process_mapping"}),
+    ),
+    (
+        re.compile(
+            r"\bworkflow\s+analysis\b|"
+            r"\banalyz(?:e|ing)\s+(?:an\s+)?existing\s+workflow\b",
+            re.I,
+        ),
+        frozenset({"workflow_analysis"}),
+    ),
+    (
+        re.compile(
+            r"\bbpmn\b|\bbusiness\s+process\s+model(?:ing)?\s+notation\b|"
+            r"formal\s+enterprise\s+process\s+model(?:ing)?\b|"
+            r"enterprise\s+process\s+architect(?:ure)?\b|"
+            r"business[- ]process\s+modeling\s+certification",
+            re.I,
+        ),
+        frozenset({"bpmn_modeling"}),
+    ),
+    (
+        re.compile(
+            r"\bsix\s+sigma\b|\blean\s+(?:six\s+sigma|process\s+engineering)\b|"
+            r"lean\s+certification\b",
+            re.I,
+        ),
+        frozenset({"lean_six_sigma"}),
+    ),
+    (
+        re.compile(
+            r"\bcelonis\b|\bui\s*path\s+process\s+mining\b|"
+            r"process[- ]min(?:ing|e)\s+telemetry\b|"
+            r"automated\s+process\s+min(?:ing|e)\b",
+            re.I,
+        ),
+        frozenset({"process_mining_telemetry"}),
     ),
     (
         re.compile(
@@ -243,10 +285,22 @@ _NONE_TRAPS: tuple[tuple[str, frozenset[str], str], ...] = (
         "No approved Evidence/Claim supports people-management / team-leadership.",
     ),
     (
-        "process_mapping_unsupported",
-        frozenset({"process_mapping"}),
-        "No approved Claim establishes business-process / workflow mapping as a "
-        "reusable capability (P-2 evidence-model gap).",
+        "bpmn_modeling_unsupported",
+        frozenset({"bpmn_modeling"}),
+        "No approved Evidence/Claim supports BPMN / formal enterprise process "
+        "modeling expertise.",
+    ),
+    (
+        "lean_six_sigma_unsupported",
+        frozenset({"lean_six_sigma"}),
+        "No approved Evidence/Claim supports Lean / Six Sigma certification or "
+        "formal-framework expertise.",
+    ),
+    (
+        "process_mining_unsupported",
+        frozenset({"process_mining_telemetry"}),
+        "No approved Evidence/Claim supports automated process-mining / telemetry "
+        "platforms (e.g. Celonis, UiPath Process Mining).",
     ),
     (
         "cybersecurity_unsupported",

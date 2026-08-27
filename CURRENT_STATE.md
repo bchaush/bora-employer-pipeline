@@ -22,11 +22,13 @@ Job Analysis v1 first vertical slice = **CLOSED**.
 
 Job Analysis v1 Golden Set = **CLOSED**.
 
+P-2 process-mapping evidence model = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+
 Canonical Experience records: **1** (`EXP_WW_001`).
 
-Evidence records: **12** Winter Walk Batch 1.
+Evidence records: **13** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping).
 
-Claim records: **5** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_005`); `human_approval=true` (`valid_record=true`, `reusable=true`).
+Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
 
 No production engine yet.
 
@@ -157,16 +159,16 @@ No production engine yet.
   * Second Claude re-audit findings remediated: PRIORITY distinct-Claim breadth (anti requirement-splitting); expanded trusted synonym recall; Application Analyst / Application Support family tokens (Blueprint §6).
   * Final Claude residual findings remediated: N-1 synonym paraphrases (needs→requirements, structured/tabular ingest/load, validate pilot); N-2 plural `applications analyst`; N-3 Priority breadth assumption documented in code (no logic change).
   * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
-  * **P-2 remains deferred (evidence-model / `P-2_EVIDENCE_MODEL_DEFERRED`)**: process/workflow-mapping vocabulary may be recognized, but no approved Claim owns `process_mapping`; Claims/Evidence unchanged. Known deferred next-milestone issue — not solved by Golden Set closure.
-  * Claude final closure recheck: `CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`.
+  * **P-2 resolved in evidence model** (`P-2_EVIDENCE_MODEL_RESOLVED` pending external audit): `WW_PROC_001` + `CLAIM_WW_006` establish bounded `process_mapping` / `workflow_analysis` provenance; matcher consumes approved Claim; `GT_PROCESS_MAP_P2` now routes APPLY (not test weakening).
+  * Claude final pass recorded (`CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`).
   * No résumé-generation work begun.
   * Status: **CLOSED**.
 
 ## Current Task
 
-`JOB_ANALYSIS_V1_GOLDEN_SET` = **CLOSED**.
+`P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-Claude final pass recorded (`CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`). P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED` (not started). Do not begin résumé generation. Awaiting explicit next approved task.
+`JOB_ANALYSIS_V1_GOLDEN_SET` remains **CLOSED**. P-2 evidence-model gap resolved via `WW_PROC_001` / `CLAIM_WW_006`. Awaiting Claude external audit. Do not begin résumé generation. Do not push until audit clears.
 
 ## Not Built Yet
 
@@ -212,15 +214,14 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval for the next milestone (do not auto-start).
-2. Deferred P-2 (`P-2_EVIDENCE_MODEL_DEFERRED`) only when deliberately scheduled with Claim/Evidence review — not begun by this closure.
-3. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
+1. Claude Code adversarial audit of `P2_PROCESS_MAPPING_EVIDENCE_MODEL`.
+2. Await explicit approval for any next milestone (do not auto-start résumé generation).
+3. Additional Experience/Evidence/Claims only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* P-2 / process-mapping evidence-model work without explicit approval;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
@@ -231,4 +232,4 @@ Do not begin:
 
 ## Next Approved Task
 
-None started. Awaiting Bora’s explicit next approved task after `JOB_ANALYSIS_V1_GOLDEN_SET` closure.
+Claude Code adversarial audit of `P2_PROCESS_MAPPING_EVIDENCE_MODEL` (not CLOSED yet).

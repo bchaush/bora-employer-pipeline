@@ -1,29 +1,34 @@
 {
-  "purpose": "P-2 process mapping remains NONE without Claim/Evidence changes -> REJECT.",
+  "purpose": "P-2 resolved: process mapping has approved Claim provenance -> APPLY.",
   "role_family": "Business Process",
   "acceptable_decisions": [
-    "REJECT"
+    "APPLY"
   ],
   "forbidden_decisions": [
+    "REJECT",
     "PRIORITY_APPLY",
-    "APPLY",
     "EFFICIENT_APPLY"
   ],
   "key_matches": {
     "REQ_P2_MAP": {
-      "result": "NONE"
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
     }
   },
-  "expect_gap_substrings": [
-    "process"
-  ],
-  "require_hard_blockers": true,
+  "expect_gap_substrings": [],
+  "require_hard_blockers": false,
   "semantic_boundaries": [
-    "P-2 process mapping has no approved Claim capability provenance"
+    "process mapping supported via CLAIM_WW_006 / WW_PROC_001"
   ],
   "known_limitations": [
-    "P-2"
+    "NONE"
   ],
-  "notes": [],
+  "notes": [
+    "Expected decision changed from REJECT because P-2 evidence-model gap is resolved; not test weakening."
+  ],
   "fixture_id": "GT_PROCESS_MAP_P2"
 }

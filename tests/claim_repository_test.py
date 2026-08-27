@@ -28,6 +28,7 @@ EXPECTED_CLAIM_IDS = [
     "CLAIM_WW_003",
     "CLAIM_WW_004",
     "CLAIM_WW_005",
+    "CLAIM_WW_006",
 ]
 
 
@@ -72,17 +73,17 @@ def write_json(path: Path, payload) -> None:
 # ---------------------------------------------------------------------------
 real = validate_claim_repository(CLAIMS_ROOT)
 assert_true(real["valid"] is True, f"real claim repository failed: {real['errors']}")
-assert_true(real["records_checked"] == 5, f"expected 5 claims, got {real['records_checked']}")
+assert_true(real["records_checked"] == 6, f"expected 6 claims, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_CLAIM_IDS,
     f"unexpected Claim_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
-    len(discover_claim_files(CLAIMS_ROOT)) == 5,
-    "discover_claim_files should find 5 claim files",
+    len(discover_claim_files(CLAIMS_ROOT)) == 6,
+    "discover_claim_files should find 6 claim files",
 )
-print("PASS 1: valid real Winter Walk claim repository (5 records) passed.")
+print("PASS 1: valid real Winter Walk claim repository (6 records) passed.")
 
 
 # ---------------------------------------------------------------------------
@@ -179,7 +180,7 @@ for claim_id in EXPECTED_CLAIM_IDS:
         real["index"][claim_id]["claim_id"] == claim_id,
         f"index record claim_id mismatch for {claim_id}",
     )
-print("PASS 7: trusted index contains all five real Claim_IDs.")
+print("PASS 7: trusted index contains all six real Claim_IDs.")
 
 
 # ---------------------------------------------------------------------------
