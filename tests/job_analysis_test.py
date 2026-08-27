@@ -258,28 +258,41 @@ assert_true(
     classify_importance_from_source("Salesforce experience is preferred") == "PREFERRED",
     "preferred cue",
 )
-# P-1 bounded hardening: preferred, but not required
-assert_true(
-    classify_importance_from_source(
-        "Salesforce administration experience is preferred, but not required"
+# P-1 / R-1 clause-aware preferred-not-required
+p1_cases = [
+    ("3 years preferred but not required", "PREFERRED"),
+    ("Experience preferred, although not required", "PREFERRED"),
+    ("Preferred but not mandatory", "PREFERRED"),
+    ("Certification preferred; not required", "PREFERRED"),
+    (
+        "SQL preferred but not required; Python required",
+        "UNCLEAR",
+    ),
+    (
+        "Bachelor's required; Master's preferred but not required",
+        "UNCLEAR",
+    ),
+    (
+        "Salesforce preferred but not required for candidates with equivalent CRM experience",
+        "PREFERRED",
+    ),
+    (
+        "Bachelor's degree required; Master's degree preferred.",
+        "UNCLEAR",
+    ),
+]
+for text, expected in p1_cases:
+    got = classify_importance_from_source(text)
+    assert_true(
+        got == expected,
+        f"P-1/R-1 classify {text!r} -> {got!r}, expected {expected!r}",
     )
-    == "PREFERRED",
-    "P-1 preferred-but-not-required must be PREFERRED",
-)
-# Mixed degree clauses must remain UNCLEAR (not broken by P-1)
-assert_true(
-    classify_importance_from_source(
-        "Bachelor's degree required; Master's degree preferred."
-    )
-    == "UNCLEAR",
-    "mixed degree clauses must stay UNCLEAR after P-1",
-)
 # Mandatory cue
 assert_true(
     classify_importance_from_source("SQL skills are required") == "MANDATORY",
     "mandatory cue",
 )
-print("PASS 9: unclear requirement remains UNCLEAR; classification cues work (incl. P-1).")
+print("PASS 9: unclear + P-1/R-1 clause-aware classification variants.")
 
 
 # ---------------------------------------------------------------------------
@@ -667,5 +680,246 @@ assert_true(
     "malformed nested evidence match must fail top-level schema",
 )
 print("PASS R12: top-level schema rejects malformed nested evidence match.")
+
+
+# ---------------------------------------------------------------------------
+# Golden-set remediation adversarial coverage (R-2..R-7)
+# ---------------------------------------------------------------------------
+from requirement_match import infer_requirement_capabilities  # noqa: E402
+
+def _mini_req(text, **kwargs):
+    payload = {
+        "requirement_id": "REQ_TMP",
+        "job_id": "JOB_X",
+        "text": text,
+        "category": kwargs.get("category", "CORE"),
+        "importance": kwargs.get("importance", "MANDATORY"),
+        "seniority_implication": None,
+        "technology": kwargs.get("technology", []),
+        "experience_level": None,
+        "domain": kwargs.get("domain"),
+        "relevance": kwargs.get("relevance", "HIGH"),
+        "source_text": kwargs.get("source_text", text),
+        "source_location": "test",
+    }
+    return payload
+
+
+# Synonym recall (2+ variants) with provenance
+synonym_cases = [
+    ("Gather business requirements from stakeholders", "requirements_elicitation"),
+    ("Collect requirements and clarify scope", "requirements_elicitation"),
+    ("Import CSV datasets with validation logging", "data_ingestion"),
+    ("Ingest spreadsheet data feeds for recurring packages", "data_ingestion"),
+    ("Facilitate user acceptance testing and document outcomes", "uat"),
+    ("Run acceptance testing / pilot validation sessions", "uat"),
+    ("Support fail-closed outbound send controls", "fail_closed_controls"),
+    ("Maintain kill-switch controlled live email send gates", "fail_closed_controls"),
+]
+for text, needed in synonym_cases:
+    caps = infer_requirement_capabilities(_mini_req(text))
+    assert_true(
+        needed in caps,
+        f"synonym {text!r} missing capability {needed}: {caps}",
+    )
+    m = match_requirement(
+        job_id="JOB_X",
+        requirement=_mini_req(text),
+        reusable_claims=reusable,
+        evidence_index=EVIDENCE_INDEX,
+        match_index=0,
+    )
+    assert_true(
+        m["result"] in {"STRONG", "SUPPORTED"},
+        f"synonym {text!r} should positively match: {m}",
+    )
+    assert_true(
+        m["claim_ids"] or m["evidence_ids"],
+        f"synonym {text!r} missing provenance: {m}",
+    )
+print("PASS R13: supported capability synonym recall with provenance.")
+
+# Generic non-matches
+assert_true(
+    "requirements_elicitation"
+    not in infer_requirement_capabilities(
+        _mini_req("Strong stakeholder management and process ownership")
+    ),
+    "generic stakeholder management must not map to requirements elicitation",
+)
+assert_true(
+    not infer_requirement_capabilities(_mini_req("Broad data experience across teams"))
+    & {"data_ingestion", "csv_intake", "import_logging"},
+    "generic data experience must not map to ingestion",
+)
+print("PASS R14: generic stakeholder/data wording does not overmatch.")
+
+# Marketing workflow automation must not be STRONG workflow_automation
+mkt = match_requirement(
+    job_id="JOB_X",
+    requirement=_mini_req(
+        "Manage marketing workflow automation for nurture campaigns",
+        category="MARKETING",
+    ),
+    reusable_claims=reusable,
+    evidence_index=EVIDENCE_INDEX,
+    match_index=0,
+)
+assert_true(mkt["result"] == "NONE", f"marketing workflow automation: {mkt}")
+assert_true(
+    "workflow_automation"
+    not in infer_requirement_capabilities(
+        _mini_req("Manage marketing workflow automation for nurture campaigns")
+    ),
+    "bare marketing workflow automation must not infer workflow_automation",
+)
+print("PASS R15: marketing workflow automation does not gain STRONG.")
+
+# Process mapping still NONE (P-2 evidence-model gap)
+pmap = match_requirement(
+    job_id="JOB_X",
+    requirement=_mini_req(
+        "Map existing business processes and produce process maps",
+        category="PROCESS",
+        domain="Business Process",
+    ),
+    reusable_claims=reusable,
+    evidence_index=EVIDENCE_INDEX,
+    match_index=0,
+)
+assert_true(pmap["result"] == "NONE", pmap)
+print("PASS R16: process mapping remains NONE without Claim provenance (P-2).")
+
+# Trap variants still NONE
+for trap_text in [
+    "Hands-on SOX / SEC regulatory reporting packages",
+    "Enterprise QA engineering ownership",
+    "Google Cloud infrastructure engineering",
+    "Production MLOps model deployment",
+    "Workday administration specialization",
+    "Cybersecurity controls and SOC 2 ownership",
+]:
+    tm = match_requirement(
+        job_id="JOB_X",
+        requirement=_mini_req(trap_text),
+        reusable_claims=reusable,
+        evidence_index=EVIDENCE_INDEX,
+        match_index=0,
+    )
+    assert_true(tm["result"] == "NONE", f"trap {trap_text!r} -> {tm}")
+print("PASS R17: unsupported trap variants remain NONE.")
+
+# Routing calibration probes
+assert_true(analysis["decision"] == "PRIORITY_APPLY", analysis["decision"])
+print("PASS R18: exceptional BSA fixture routes PRIORITY_APPLY.")
+
+# Vague insufficient-information -> WATCH
+vague = {
+    "company": "Vague Co",
+    "role": "Operations Analyst",
+    "jd_text": "We are passionate. Thrive in ambiguity.",
+    "fixture_key": "UNIT_VAGUE",
+    "structured_extraction": {
+        "role_family": "Business Operations",
+        "seniority": "EARLY_CAREER",
+        "requirements": [
+            {
+                "requirement_id": "REQ_UV1",
+                "job_id": "PLACEHOLDER",
+                "text": "Self-starter who thrives in a fast-paced environment",
+                "category": "HR_NOISE",
+                "importance": "UNCLEAR",
+                "seniority_implication": None,
+                "technology": [],
+                "experience_level": None,
+                "domain": None,
+                "relevance": "LOW",
+                "source_text": "Must be a self-starter who thrives in a fast-paced environment",
+                "source_location": "About you",
+            },
+            {
+                "requirement_id": "REQ_UV2",
+                "job_id": "PLACEHOLDER",
+                "text": "Excited about process and impact",
+                "category": "CULTURE",
+                "importance": "UNCLEAR",
+                "seniority_implication": None,
+                "technology": [],
+                "experience_level": None,
+                "domain": None,
+                "relevance": "LOW",
+                "source_text": "Excited about process and impact",
+                "source_location": "About you",
+            },
+            {
+                "requirement_id": "REQ_UV3",
+                "job_id": "PLACEHOLDER",
+                "text": "Comfortable with vague priorities",
+                "category": "AMBIGUOUS",
+                "importance": "UNCLEAR",
+                "seniority_implication": None,
+                "technology": [],
+                "experience_level": None,
+                "domain": None,
+                "relevance": "MEDIUM",
+                "source_text": "Comfortable with vague priorities",
+                "source_location": "About you",
+            },
+        ],
+    },
+}
+vague_result = analyze_job(vague, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
+assert_true(vague_result["valid"] is True, vague_result["errors"])
+assert_true(
+    vague_result["analysis"]["decision"] == "WATCH",
+    vague_result["analysis"],
+)
+print("PASS R19: vague insufficient-information role -> WATCH.")
+
+# Confirmed mismatch still REJECT (already covered by PM / Salesforce); assert divergence
+assert_true(
+    pm_result["analysis"]["decision"] == "REJECT",
+    "well-specified unrelated PM must REJECT",
+)
+print("PASS R20: confirmed mismatch REJECT diverges from vague WATCH.")
+
+# Golden schema rejects catch-all decision lists
+golden_validator = build_draft202012_validator(
+    ROOT / "schemas" / "job_analysis_golden_case.schema.json"
+)
+catch_all = {
+    "fixture_id": "GT_CATCH_ALL",
+    "purpose": "bad",
+    "role_family": "Business Systems",
+    "acceptable_decisions": [
+        "PRIORITY_APPLY",
+        "APPLY",
+        "EFFICIENT_APPLY",
+        "WATCH",
+        "REJECT",
+        "UNDECIDED",
+    ],
+    "key_matches": {"REQ_X": {"result": "NONE"}},
+    "semantic_boundaries": ["x"],
+    "known_limitations": ["NONE"],
+}
+assert_true(
+    list(golden_validator.iter_errors(catch_all)),
+    "catch-all acceptable_decisions must fail schema",
+)
+empty_keys = {
+    "fixture_id": "GT_EMPTY_KEYS",
+    "purpose": "bad",
+    "role_family": "Business Systems",
+    "acceptable_decisions": ["APPLY"],
+    "key_matches": {},
+    "semantic_boundaries": ["x"],
+    "known_limitations": ["NONE"],
+}
+assert_true(
+    list(golden_validator.iter_errors(empty_keys)),
+    "empty key_matches must fail schema",
+)
+print("PASS R21: golden schema rejects meaningless catch-all / empty key_matches.")
 
 print("PASS: job analysis vertical-slice tests completed successfully.")

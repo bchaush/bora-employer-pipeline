@@ -4,6 +4,7 @@ Uses approved reusable claims and trusted Evidence records only.
 Applies bounded semantic-boundary traps and conservative capability gating.
 
 Generic lexical overlap alone cannot produce STRONG / SUPPORTED / PARTIAL.
+JD anchors map only to existing canonical capabilities (no dynamic ontology).
 """
 
 from __future__ import annotations
@@ -40,12 +41,15 @@ _CLAIM_CAPABILITIES: dict[str, frozenset[str]] = {
     "CLAIM_WW_005": frozenset({"uat", "pilot_testing", "test_documentation"}),
 }
 
-# Requirement → capability inference. Specific multi-token / domain patterns only.
+# Bounded JD-anchor → existing canonical capability mappings only.
 _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     (
         re.compile(
-            r"requirements?\s+(gather|elicitation|definition)|"
-            r"scope\s+boundar|clarifying\s+scope",
+            r"requirements?\s+(?:gather(?:ing)?|elicitation|definition|collection)|"
+            r"(?:gather|collect|clarify|document|elicit)(?:ing)?\s+"
+            r"(?:\w+\s+){0,2}requirements?|"
+            r"stakeholder\s+requirements?|business\s+requirements?|"
+            r"scope\s+boundar|clarify(?:ing)?\s+scope",
             re.I,
         ),
         frozenset({"requirements_elicitation", "scope_boundary"}),
@@ -61,30 +65,64 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     (
         re.compile(
             r"fail[- ]closed|kill\s+switch|live\s+(email\s+)?send|"
-            r"follow[- ]up\s+send\s+control",
+            r"follow[- ]up\s+send\s+control|controlled\s+(?:outbound\s+)?send",
             re.I,
         ),
         frozenset({"fail_closed_controls", "send_controls", "approval_gating"}),
     ),
     (
         re.compile(
-            r"\bcsv\b|drive[- ]folder|data\s+ingestion|import\s+log",
+            r"\bcsv\b|drive[- ]folder|"
+            r"data\s+ingestion|data\s+import|import(?:ing)?\s+data|"
+            r"ingest(?:ing)?\s+data|data\s+feeds?|spreadsheet\s+data\s+feeds?|"
+            r"file\s+import|csv\s+import|import\s+log|"
+            r"data\s+(?:intake|validation)\b",
             re.I,
         ),
         frozenset({"data_ingestion", "csv_intake", "import_logging"}),
     ),
     (
-        re.compile(r"\buat\b|pilot\s+test|pilot\s+result|test\s+documentation", re.I),
+        re.compile(
+            r"\buat\b|user\s+acceptance\s+test(?:ing)?|acceptance\s+testing|"
+            r"pilot\s+test(?:ing)?|pilot\s+validation|pilot\s+result|"
+            r"user\s+testing|test\s+documentation",
+            re.I,
+        ),
         frozenset({"uat", "pilot_testing", "test_documentation"}),
     ),
-    (
-        re.compile(r"workflow\s+automation|automated\s+workflow", re.I),
-        frozenset({"workflow_automation"}),
-    ),
+    # R-7: bare "workflow automation" is insufficient; require operational context.
     (
         re.compile(
-            r"process\s+map|workflow\s+map|business[- ]process\s+map|"
-            r"map(?:ping)?\s+existing\s+business\s+process",
+            r"(?:"
+            r"(?:workflow|process)\s+automation|"
+            r"automated\s+(?:workflow|process)"
+            r").{0,80}(?:"
+            r"evidence|approval|fail[- ]closed|controlled|operational|"
+            r"self[- ]report|reconcil|validated\s+data|import\s+log|"
+            r"data\s+(?:intake|ingestion|validation)"
+            r")"
+            r"|"
+            r"(?:"
+            r"evidence|approval|fail[- ]closed|controlled|operational|"
+            r"self[- ]report|reconcil|validated\s+data"
+            r").{0,80}(?:"
+            r"(?:workflow|process)\s+automation|automated\s+(?:workflow|process)"
+            r")",
+            re.I,
+        ),
+        frozenset({"workflow_automation"}),
+    ),
+    # P-2 vocabulary recognized, but no approved Claim currently owns this tag.
+    # Keep patterns atomic so domain text like "Business Process" cannot false-fire.
+    (
+        re.compile(
+            r"\bprocess\s+map(?:ping)?\b|\bworkflow\s+map(?:ping)?\b|"
+            r"\bbusiness[- ]process\s+map(?:ping)?\b|"
+            r"\bmap(?:ping)?\s+existing\s+business\s+processes?\b|"
+            r"\bmap(?:ping)?\s+(?:as[- ]is|to[- ]be)\s+processes?\b|"
+            r"\bmap(?:ping)?\s+workflows?\b|"
+            r"\bdocument(?:ing)?\s+(?:as[- ]is\s+|to[- ]be\s+)?"
+            r"(?:workflows?|business\s+processes?)\b",
             re.I,
         ),
         frozenset({"process_mapping"}),
@@ -102,12 +140,17 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         frozenset({"salesforce_administration"}),
     ),
     (
+        re.compile(r"\bworkday\b|\bservicenow\b|\bsnow\b", re.I),
+        frozenset({"enterprise_platform_specialization"}),
+    ),
+    (
         re.compile(r"\bgoogle\s+cloud\b|\bgcp\b|cloud\s+engineer", re.I),
         frozenset({"google_cloud_engineering"}),
     ),
     (
         re.compile(
-            r"production\s+ml|machine\s+learning|ml\s+engineer|deep\s+learning",
+            r"production\s+ml|machine\s+learning|ml\s+engineer|deep\s+learning|"
+            r"\bmlops\b|model\s+deploy",
             re.I,
         ),
         frozenset({"production_ml"}),
@@ -128,6 +171,22 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         ),
         frozenset({"people_management"}),
     ),
+    (
+        re.compile(
+            r"cybersecurity|security\s+controls?|soc\s*2|infosec|"
+            r"penetration\s+test",
+            re.I,
+        ),
+        frozenset({"cybersecurity_controls"}),
+    ),
+    (
+        re.compile(
+            r"marketing\s+(?:workflow\s+)?automation|marketing\s+campaign|"
+            r"paid\s+media|audience\s+funnel",
+            re.I,
+        ),
+        frozenset({"marketing_automation"}),
+    ),
 )
 
 # Forced NONE traps for known unsupported upgrades (no positive transfer).
@@ -136,6 +195,11 @@ _NONE_TRAPS: tuple[tuple[str, frozenset[str], str], ...] = (
         "salesforce_unsupported",
         frozenset({"salesforce_administration"}),
         "No approved Evidence/Claim supports Salesforce administration.",
+    ),
+    (
+        "enterprise_platform_unsupported",
+        frozenset({"enterprise_platform_specialization"}),
+        "No approved Evidence/Claim supports Workday/ServiceNow specialization.",
     ),
     (
         "google_cloud_vs_apps_script",
@@ -167,7 +231,18 @@ _NONE_TRAPS: tuple[tuple[str, frozenset[str], str], ...] = (
     (
         "process_mapping_unsupported",
         frozenset({"process_mapping"}),
-        "No approved Claim establishes business-process mapping as a reusable capability.",
+        "No approved Claim establishes business-process / workflow mapping as a "
+        "reusable capability (P-2 evidence-model gap).",
+    ),
+    (
+        "cybersecurity_unsupported",
+        frozenset({"cybersecurity_controls"}),
+        "No approved Evidence/Claim supports cybersecurity / infosec controls expertise.",
+    ),
+    (
+        "marketing_automation_unsupported",
+        frozenset({"marketing_automation"}),
+        "Marketing automation / paid-media work is outside approved Claim capabilities.",
     ),
 )
 
@@ -237,6 +312,7 @@ def match_requirement(
     """Produce one evidence-match record for a requirement."""
     req_id = str(requirement.get("requirement_id"))
     match_id = f"MATCH_{job_id}_{req_id}_{match_index:02d}"
+    req_text = str(requirement.get("text") or "")
     req_caps = infer_requirement_capabilities(requirement)
 
     # Forced NONE traps (including U.S. regulatory with current repository).
@@ -249,7 +325,10 @@ def match_requirement(
                 "result": "NONE",
                 "evidence_ids": [],
                 "claim_ids": [],
-                "explanation": f"[{rule_id}] {explanation}",
+                "explanation": (
+                    f"[{rule_id}] raw={req_text!r}; "
+                    f"canonical={sorted(req_caps)}; {explanation}"
+                ),
                 "transfer_note": None,
             }
 
@@ -264,7 +343,7 @@ def match_requirement(
             "evidence_ids": [],
             "claim_ids": [],
             "explanation": (
-                "No specific capability tags inferred for this requirement; "
+                f"raw={req_text!r}; No specific capability tags inferred; "
                 "refusing generic lexical overmatch."
             ),
             "transfer_note": None,
@@ -289,8 +368,8 @@ def match_requirement(
             "evidence_ids": [],
             "claim_ids": [],
             "explanation": (
-                "No approved Claim capability intersection for inferred requirement "
-                f"capabilities {sorted(req_caps)}."
+                f"raw={req_text!r}; canonical={sorted(req_caps)}; "
+                "No approved Claim capability intersection."
             ),
             "transfer_note": None,
         }
@@ -313,8 +392,8 @@ def match_requirement(
         result = "STRONG" if state in {"VERIFIED", "SUPPORTED"} else "SUPPORTED"
         transfer_note = None
         explanation = (
-            f"Capability alignment on {sorted(best_overlap)} via approved claim "
-            f"{claim_id}."
+            f"raw={req_text!r}; canonical={sorted(best_overlap)}; "
+            f"provenance claim={claim_id} evidence={evidence_ids}."
         )
     else:
         result = "PARTIAL"
@@ -323,8 +402,8 @@ def match_requirement(
             f"requested capabilities {sorted(req_caps)}."
         )
         explanation = (
-            f"PARTIAL capability overlap {sorted(best_overlap)}; missing "
-            f"{sorted(req_caps - claim_caps)}."
+            f"raw={req_text!r}; PARTIAL canonical overlap {sorted(best_overlap)}; "
+            f"missing {sorted(req_caps - claim_caps)}; claim={claim_id}."
         )
 
     if result in {"STRONG", "SUPPORTED", "PARTIAL"} and not (claim_ids or evidence_ids):

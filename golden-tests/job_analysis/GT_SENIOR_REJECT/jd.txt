@@ -2,7 +2,7 @@ Senior Business Systems Analyst — Apex Systems Guild (Synthetic Fixture)
 
 Requires 7+ years leading enterprise systems programs.
 
-Minimum qualifications (required)
+Required
 - 7+ years leading enterprise systems programs
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
+- Gather and clarify business requirements
+- Configure operational workflow automation with approval controls

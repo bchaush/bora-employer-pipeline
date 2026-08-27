@@ -7,7 +7,7 @@
     {
       "requirement_id": "REQ_CLOUD_GCP",
       "job_id": "PLACEHOLDER",
-      "text": "Exposure to Google Cloud infrastructure / GCP engineering",
+      "text": "Google Cloud / GCP infrastructure engineering experience",
       "category": "TECHNOLOGY",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -16,15 +16,15 @@
         "GCP"
       ],
       "experience_level": null,
-      "domain": "Cloud",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Exposure to Google Cloud infrastructure / GCP engineering is required",
+      "source_text": "Google Cloud / GCP infrastructure engineering experience is required",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_CLOUD_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Gather business requirements for internal tools",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -32,13 +32,13 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Gather business requirements for internal tools",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_CLOUD_UAT",
       "job_id": "PLACEHOLDER",
-      "text": "Comfort documenting UAT or pilot test outcomes",
+      "text": "Document user acceptance testing outcomes",
       "category": "TESTING",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -46,7 +46,7 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_text": "Document user acceptance testing outcomes",
       "source_location": "Minimum qualifications (required)"
     }
   ]

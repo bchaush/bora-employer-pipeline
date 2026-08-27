@@ -1,5 +1,5 @@
 {
-  "purpose": "Production ML / model deployment must REJECT; not equivalent to LLM API use.",
+  "purpose": "Production ML -> REJECT.",
   "role_family": "Machine Learning Engineering",
   "acceptable_decisions": [
     "REJECT"
@@ -12,17 +12,10 @@
   "key_matches": {
     "REQ_ML_PROD": {
       "result": "NONE"
-    },
-    "REQ_ML_DEPLOY": {
-      "result": "NONE",
-      "acceptable_results": [
-        "NONE",
-        "UNKNOWN"
-      ]
     }
   },
   "semantic_boundaries": [
-    "MarketMind/LLM API use is not production ML"
+    "LLM API use is not production ML"
   ],
   "known_limitations": [
     "NONE"

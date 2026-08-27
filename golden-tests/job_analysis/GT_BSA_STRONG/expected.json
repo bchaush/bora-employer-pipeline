@@ -1,16 +1,15 @@
 {
-  "purpose": "Strong early-career Business Systems fit with one preferred unsupported tool.",
+  "purpose": "Exceptional early-career BSA fit; trivial preferred SF gap must not remove Priority.",
   "role_family": "Business Systems",
   "acceptable_decisions": [
-    "PRIORITY_APPLY",
-    "APPLY",
-    "EFFICIENT_APPLY"
+    "PRIORITY_APPLY"
   ],
   "forbidden_decisions": [
-    "REJECT"
+    "REJECT",
+    "WATCH"
   ],
   "key_matches": {
-    "REQ_CORE_REQ": {
+    "REQ_BSA_REQ": {
       "result": "STRONG",
       "require_provenance": true,
       "acceptable_results": [
@@ -18,7 +17,7 @@
         "SUPPORTED"
       ]
     },
-    "REQ_CORE_WF": {
+    "REQ_BSA_DATA": {
       "result": "STRONG",
       "require_provenance": true,
       "acceptable_results": [
@@ -26,15 +25,7 @@
         "SUPPORTED"
       ]
     },
-    "REQ_CORE_DATA": {
-      "result": "STRONG",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
-    },
-    "REQ_CORE_UAT": {
+    "REQ_BSA_UAT": {
       "result": "SUPPORTED",
       "require_provenance": true,
       "acceptable_results": [
@@ -42,30 +33,19 @@
         "SUPPORTED"
       ]
     },
-    "REQ_CORE_CTRL": {
-      "result": "STRONG",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
-    },
-    "REQ_PREF_SF": {
+    "REQ_BSA_SF": {
       "result": "NONE"
     }
   },
   "expect_gap_substrings": [
     "Salesforce"
   ],
-  "require_hard_blockers": false,
   "semantic_boundaries": [
-    "preferred Salesforce gap must not auto-reject"
+    "non-material preferred gap does not remove PRIORITY_APPLY"
   ],
   "known_limitations": [
     "NONE"
   ],
-  "notes": [
-    "Positive routing expected for Business Systems family."
-  ],
+  "notes": [],
   "fixture_id": "GT_BSA_STRONG"
 }

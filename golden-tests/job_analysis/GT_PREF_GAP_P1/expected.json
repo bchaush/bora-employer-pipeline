@@ -1,23 +1,14 @@
 {
-  "purpose": "Preferred skill gap must not auto-reject; surfaces P-1 phrasing handling.",
+  "purpose": "Strong fit with material HIGH preferred Salesforce gap -> APPLY; P-1 phrasing.",
   "role_family": "Business Systems",
   "acceptable_decisions": [
-    "PRIORITY_APPLY",
-    "APPLY",
-    "EFFICIENT_APPLY"
+    "APPLY"
   ],
   "forbidden_decisions": [
+    "PRIORITY_APPLY",
     "REJECT"
   ],
   "key_matches": {
-    "REQ_CORE_REQ": {
-      "result": "STRONG",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
-    },
     "REQ_P1_SF": {
       "result": "NONE"
     }
@@ -29,14 +20,12 @@
     "Salesforce"
   ],
   "semantic_boundaries": [
-    "preferred gap does not auto-reject",
-    "P-1 preferred-but-not-required phrasing"
+    "material preferred gap downgrades Priority to APPLY",
+    "P-1 preferred-but-not-required remains PREFERRED"
   ],
   "known_limitations": [
     "NONE"
   ],
-  "notes": [
-    "P-1 bounded hardening: preferred, but not required -> PREFERRED."
-  ],
+  "notes": [],
   "fixture_id": "GT_PREF_GAP_P1"
 }

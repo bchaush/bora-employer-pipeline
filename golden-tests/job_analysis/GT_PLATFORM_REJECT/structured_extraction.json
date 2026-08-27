@@ -15,7 +15,7 @@
         "Salesforce"
       ],
       "experience_level": null,
-      "domain": "CRM",
+      "domain": null,
       "relevance": "HIGH",
       "source_text": "Salesforce administration experience is required",
       "source_location": "Minimum qualifications (required)"
@@ -23,7 +23,7 @@
     {
       "requirement_id": "REQ_PLAT_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Gather business requirements from operations stakeholders",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -31,13 +31,13 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Gather business requirements from operations stakeholders",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_PLAT_UAT",
       "job_id": "PLACEHOLDER",
-      "text": "Comfort documenting UAT or pilot test outcomes",
+      "text": "Document user acceptance testing outcomes",
       "category": "TESTING",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -45,7 +45,7 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_text": "Document user acceptance testing outcomes",
       "source_location": "Minimum qualifications (required)"
     }
   ]

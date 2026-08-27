@@ -1,5 +1,5 @@
 {
-  "purpose": "Mandatory GCP/cloud engineering must REJECT; Apps Script is not equivalent.",
+  "purpose": "Mandatory GCP -> REJECT.",
   "role_family": "Business Systems",
   "acceptable_decisions": [
     "REJECT"
@@ -14,9 +14,6 @@
       "result": "NONE"
     }
   },
-  "expect_gap_substrings": [
-    "Google Cloud"
-  ],
   "require_hard_blockers": true,
   "semantic_boundaries": [
     "Apps Script != Google Cloud engineering"

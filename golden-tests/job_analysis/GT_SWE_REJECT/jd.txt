@@ -1,10 +1,8 @@
 Bytebridge — Software Engineer (Synthetic Fixture)
 
-Substantive software engineering role. Generic overlap words such as
-requirements, testing, APIs, data, and stakeholders must not produce APPLY.
+Substantive software engineering. Shared vocabulary must not create APPLY.
 
-Minimum qualifications (required)
+Required
 - Build and maintain backend services and APIs as a software engineer
 - Write automated tests for production services
 - Partner with stakeholders on technical requirements definition
-- Work with data pipelines supporting application features

@@ -1,10 +1,8 @@
 {
-  "purpose": "Unrelated Analyst title must not APPLY via generic stakeholder/process vocabulary.",
+  "purpose": "Confirmed unrelated Analyst duties -> REJECT; marketing automation != STRONG.",
   "role_family": "Marketing Analytics",
   "acceptable_decisions": [
-    "REJECT",
-    "WATCH",
-    "UNDECIDED"
+    "REJECT"
   ],
   "forbidden_decisions": [
     "PRIORITY_APPLY",
@@ -19,7 +17,7 @@
         "UNKNOWN"
       ]
     },
-    "REQ_MKT_DASH": {
+    "REQ_MKT_WF": {
       "result": "NONE",
       "acceptable_results": [
         "NONE",
@@ -28,7 +26,8 @@
     }
   },
   "semantic_boundaries": [
-    "Analyst title alone is insufficient for APPLY"
+    "Analyst title insufficient",
+    "marketing workflow automation must not gain STRONG"
   ],
   "known_limitations": [
     "NONE"

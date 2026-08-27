@@ -27,23 +27,23 @@
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Media",
+      "domain": null,
       "relevance": "HIGH",
       "source_text": "Build marketing dashboards for campaign stakeholders is required",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_MKT_PROC",
+      "requirement_id": "REQ_MKT_WF",
       "job_id": "PLACEHOLDER",
-      "text": "Recommend media mix changes based on engagement process insights",
+      "text": "Manage marketing workflow automation for nurture campaigns",
       "category": "MARKETING",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
       "domain": null,
-      "relevance": "MEDIUM",
-      "source_text": "Recommend media mix changes based on engagement process insights is required",
+      "relevance": "HIGH",
+      "source_text": "Manage marketing workflow automation for nurture campaigns is required",
       "source_location": "Minimum qualifications (required)"
     }
   ]

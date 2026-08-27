@@ -27,7 +27,7 @@
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Software Engineering",
+      "domain": null,
       "relevance": "HIGH",
       "source_text": "Write automated tests for production services is required",
       "source_location": "Minimum qualifications (required)"
@@ -44,20 +44,6 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Partner with stakeholders on technical requirements definition is required",
-      "source_location": "Minimum qualifications (required)"
-    },
-    {
-      "requirement_id": "REQ_SWE_DATA",
-      "job_id": "PLACEHOLDER",
-      "text": "Work with data pipelines supporting application features",
-      "category": "DATA",
-      "importance": "MANDATORY",
-      "seniority_implication": null,
-      "technology": [],
-      "experience_level": null,
-      "domain": null,
-      "relevance": "MEDIUM",
-      "source_text": "Work with data pipelines supporting application features is required",
       "source_location": "Minimum qualifications (required)"
     }
   ]

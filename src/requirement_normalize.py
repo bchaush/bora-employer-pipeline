@@ -19,7 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIREMENT_SCHEMA_PATH = ROOT / "schemas" / "requirement.schema.json"
 
 _MANDATORY_CUES = re.compile(
-    r"\b(?:required|must|minimum|mandatory|need to|needs to|essential)\b",
+    r"\b(?:must|minimum|need to|needs to|essential)\b|"
+    r"(?<!not )\b(?:required|mandatory)\b",
     re.IGNORECASE,
 )
 _PREFERRED_CUES = re.compile(
@@ -27,10 +28,20 @@ _PREFERRED_CUES = re.compile(
     r"ideal candidate)\b",
     re.IGNORECASE,
 )
-# Explicit preferred + negated mandatory status (P-1 bounded hardening).
+# Clause-scoped preferred + negated mandatory status (P-1 / R-1).
 _PREFERRED_NOT_REQUIRED = re.compile(
-    r"\bpreferred\b(?:[\w\s,/+\-]{0,48}?)\bbut\s+not\s+required\b|"
-    r"\bnot\s+required\b(?:[\w\s,/+\-]{0,32}?)\bbut\b(?:[\w\s,/+\-]{0,16}?)\bpreferred\b",
+    r"\bpreferred\b(?:[\w\s,/+\-]{0,64}?)\b(?:"
+    r"but\s+not\s+required|"
+    r"although\s+not\s+required|"
+    r"though\s+not\s+required|"
+    r"but\s+not\s+mandatory|"
+    r"although\s+not\s+mandatory|"
+    r"though\s+not\s+mandatory"
+    r")\b"
+    r"|"
+    r"\bpreferred\b(?:[\w\s,/+\-]{0,24}?);\s*not\s+(?:required|mandatory)\b"
+    r"|"
+    r"\bnot\s+(?:required|mandatory)\b(?:[\w\s,/+\-]{0,32}?)\bbut\b(?:[\w\s,/+\-]{0,16}?)\bpreferred\b",
     re.IGNORECASE,
 )
 _NOISE_CUES = re.compile(
@@ -58,6 +69,21 @@ def _split_clauses(text: str) -> list[str]:
     return [part.strip() for part in parts if part and part.strip()]
 
 
+def _classify_clause(clause: str) -> str:
+    """Classify one clause. Preferred-not-required is PREFERRED at clause scope."""
+    if _PREFERRED_NOT_REQUIRED.search(clause):
+        return "PREFERRED"
+    has_pref = bool(_PREFERRED_CUES.search(clause))
+    has_mand = bool(_MANDATORY_CUES.search(clause))
+    if has_pref and has_mand:
+        return "MIXED"
+    if has_pref:
+        return "PREFERRED"
+    if has_mand:
+        return "MANDATORY"
+    return "OTHER"
+
+
 def classify_importance_from_source(
     source_text: str,
     *,
@@ -68,6 +94,7 @@ def classify_importance_from_source(
 
     Mixed mandatory+preferred clauses about different credentials/skills
     return UNCLEAR rather than silently choosing PREFERRED.
+    Preferred-not-required cues are evaluated per clause (R-1), not whole-text.
     HR/culture noise remains UNCLEAR even when prefixed with \"must\".
     """
     text = source_text if isinstance(source_text, str) else ""
@@ -79,35 +106,34 @@ def classify_importance_from_source(
     if _NOISE_CUES.search(text) and not _SUBSTANTIVE_CUES.search(text):
         return "UNCLEAR"
 
-    # "X preferred, but not required" is explicitly non-mandatory.
-    if _PREFERRED_NOT_REQUIRED.search(text):
-        return "PREFERRED"
-
     clauses = _split_clauses(text)
+    if not clauses:
+        clauses = [text]
+
     if len(clauses) >= 2:
-        clause_labels: list[str] = []
-        for clause in clauses:
-            has_pref = bool(_PREFERRED_CUES.search(clause))
-            has_mand = bool(_MANDATORY_CUES.search(clause))
-            if has_pref and has_mand:
-                clause_labels.append("MIXED")
-            elif has_pref:
-                clause_labels.append("PREFERRED")
-            elif has_mand:
-                clause_labels.append("MANDATORY")
-            else:
-                clause_labels.append("OTHER")
+        clause_labels = [_classify_clause(clause) for clause in clauses]
         unique = {label for label in clause_labels if label in {"MANDATORY", "PREFERRED"}}
         if "MIXED" in clause_labels or unique == {"MANDATORY", "PREFERRED"}:
             return "UNCLEAR"
+        if unique == {"PREFERRED"}:
+            return "PREFERRED"
+        if unique == {"MANDATORY"}:
+            return "MANDATORY"
+
+    # Single clause (or all OTHER).
+    label = _classify_clause(clauses[0] if len(clauses) == 1 else text)
+    if label == "PREFERRED":
+        return "PREFERRED"
+    if label == "MANDATORY":
+        return "MANDATORY"
+    if label == "MIXED":
+        return "UNCLEAR"
 
     has_pref = bool(_PREFERRED_CUES.search(text))
     has_mand = bool(_MANDATORY_CUES.search(text))
-
     if has_pref and not has_mand:
         return "PREFERRED"
     if has_pref and has_mand:
-        # Same-clause mix without clean split → UNCLEAR.
         return "UNCLEAR"
     if has_mand:
         return "MANDATORY"

@@ -21,7 +21,7 @@
     {
       "requirement_id": "REQ_P2_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Gather requirements and clarify scope boundaries",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -29,13 +29,13 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Gather requirements and clarify scope boundaries is required",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_P2_UAT",
       "job_id": "PLACEHOLDER",
-      "text": "Comfort documenting UAT or pilot test outcomes",
+      "text": "Document user acceptance testing outcomes",
       "category": "TESTING",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -43,7 +43,7 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_text": "Document user acceptance testing outcomes is required",
       "source_location": "Minimum qualifications (required)"
     }
   ]

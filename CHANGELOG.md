@@ -19,6 +19,45 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Harden job analysis golden set (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Claude Code Golden Set adversarial audit required R-1–R-7 remediation. Incorporate approved ChatGPT + Gemini V1 routing-policy clarification without redesign, Claim/Evidence mutation, or résumé generation.
+
+**Changed**
+
+* R-1: clause-aware preferred-not-required classification; compound mixed clauses stay UNCLEAR; `not required`/`not mandatory` no longer false-fire as mandatory cues.
+* R-2: bounded synonym recall for existing capabilities (requirements, ingestion/import, UAT/acceptance testing, fail-closed controls); explanations retain raw→canonical→provenance.
+* R-3: PRIORITY/APPLY/EFFICIENT calibration using material (HIGH) preferred gaps vs trivial gaps; Priority uncommon.
+* R-4: information-deficit → WATCH; confirmed mismatch → REJECT.
+* R-5: rewritten realistic Golden fixture wording; narrowed expected decisions.
+* R-6: golden schema `key_matches.minProperties`, `semantic_boundaries.minItems`, `acceptable_decisions.maxItems=2`.
+* R-7: bare `workflow automation` no longer yields STRONG without operational/evidence/approval context.
+* P-2 remains evidence-model deferred (vocabulary recognized; no Claim owns `process_mapping`; Claims/Evidence unchanged).
+* Status remains **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+
+**Affected Areas**
+
+* `src/requirement_normalize.py`, `src/requirement_match.py`, `src/job_decision.py`
+* `schemas/job_analysis_golden_case.schema.json`
+* `golden-tests/job_analysis/**`, `golden-tests/run_job_analysis_golden_set.py`
+* `scripts/generate_job_analysis_golden_fixtures.py`
+* `tests/job_analysis_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* All prior suites + `job_analysis_test.py` + golden runner — PASS
+* Routing coverage: PRIORITY_APPLY, APPLY, EFFICIENT_APPLY, WATCH, REJECT all observed
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT (remediated; pending re-audit)
+
+---
+
 ## 2026-08-27 — Add job analysis golden set (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

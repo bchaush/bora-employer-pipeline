@@ -1,25 +1,24 @@
-Harborline Internal Tools — Business Systems Analyst (Synthetic Fixture)
+Harborline Civic Systems — Business Systems Analyst (Synthetic Fixture)
 
-This is repository Golden Test data only. It is not a claim about a real employer.
+Repository Golden Test data only. Not a real employer vacancy.
 
-About the role
-Early-career Business Systems Analyst supporting internal operating workflows,
-requirements clarification, data intake quality, and UAT documentation with
-nontechnical stakeholders.
+We need an early-career analyst to improve internal tooling used by operations
+staff. You will sit with stakeholders, turn fuzzy asks into clear requirements,
+and help ship reliable spreadsheet/CSV intakes with documented acceptance checks.
 
-Responsibilities
-- Gather stakeholder requirements and clarify scope boundaries
-- Automate workflow handoffs and keep approval-synchronized evidence mapping current
-- Maintain CSV / Drive-folder intake with import logging
+What you will do
+- Meet with operations owners to gather and clarify business requirements
+- Help design controlled operational workflow automation with approval checkpoints
+- Own recurring CSV file imports and spreadsheet data feeds with intake validation
+- Keep outbound follow-up sends behind fail-closed / kill-switch style controls
+- Run user acceptance testing and write up pilot validation notes
+
+Required
+- Gather and clarify business requirements with nontechnical stakeholders
+- Experience with controlled operational workflow automation tied to approval gates
+- Hands-on CSV import / spreadsheet data-feed intake with validation
+- Document user acceptance testing or pilot validation outcomes
 - Support fail-closed controls for outbound operational communications
-- Document UAT / pilot outcomes
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
-
-Preferred qualifications
-- Salesforce administration experience
+Nice to have
+- Familiarity with Salesforce is a plus

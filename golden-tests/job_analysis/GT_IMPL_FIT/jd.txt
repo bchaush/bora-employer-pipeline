@@ -1,17 +1,13 @@
 Northbridge Delivery — Implementation Analyst (Synthetic Fixture)
 
-Early-career implementation role supporting customer requirements, CSV data
-import, configuration handoffs, UAT documentation, and troubleshooting of
-workflow automation issues.
+Customer implementation work: requirements, imports, acceptance testing, and
+controlled workflow setup. ServiceNow depth is preferred at HIGH relevance.
 
-Responsibilities
-- Elicit customer requirements and clarify scope boundaries
+Required
+- Elicit customer requirements and clarify scope before build
 - Import customer CSV datasets with import logging
-- Configure workflow automation and approval-synchronized evidence mapping
-- Document UAT / pilot results and support handoff troubleshooting
+- Configure operational workflow automation with approval controls
+- Lead user acceptance testing sessions and document outcomes
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Comfort documenting UAT or pilot test outcomes
+Preferred
+- ServiceNow configuration experience

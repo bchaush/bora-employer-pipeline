@@ -1,14 +1,14 @@
 Compliance Ops Desk — Business Systems Analyst (Synthetic Fixture)
 
-Strong core systems fit plus preferred U.S. regulatory / SEC / SOX familiarity.
-Current repository must not invent foreign regulatory background.
+Strong systems core. U.S. regulatory / SEC / SOX familiarity is a material preferred ask.
+Do not invent foreign regulatory background.
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
+Required
+- Clarify stakeholder requirements for internal controls tooling
+- Maintain controlled operational workflow automation with approval gates
+- Run CSV imports and data-feed validation for recurring packages
+- Document acceptance testing / pilot validation
+- Support fail-closed outbound communication controls
 
-Preferred qualifications
-- Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)
+Preferred
+- Hands-on U.S. regulatory reporting packages (SEC / SOX-style controls)

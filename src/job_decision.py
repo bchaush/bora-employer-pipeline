@@ -1,6 +1,7 @@
 """Bounded lane/decision routing for Job Analysis v1.
 
-Explainable from hard blockers, mandatory coverage, role-family fit, and gaps.
+Explainable from hard blockers, mandatory coverage, role-family fit,
+information sufficiency, and material preferred gaps.
 Does not emit hire-probability percentages.
 """
 
@@ -122,7 +123,10 @@ def detect_hard_blockers(
                 f"Unsupported deep SWE/ML mandatory HIGH requirement: {req_id}"
             )
             continue
-        if re.search(r"\b(salesforce|google\s+cloud|gcp)\b", blob):
+        if re.search(
+            r"\b(salesforce|google\s+cloud|gcp|workday|servicenow)\b",
+            blob,
+        ):
             blockers.append(
                 f"Unsupported core platform specialization (mandatory HIGH): {req_id}"
             )
@@ -139,6 +143,45 @@ def detect_hard_blockers(
 def role_family_fit(role_family: str | None) -> bool:
     family = (role_family or "").casefold()
     return any(token in family for token in SUPPORTED_ROLE_FAMILY_TOKENS)
+
+
+def is_information_deficit(
+    *,
+    requirements: Sequence[Mapping[str, Any]],
+    matches: Sequence[Mapping[str, Any]],
+) -> bool:
+    """True when the JD lacks enough substance to confirm fit or incompatibility.
+
+    INSUFFICIENT INFORMATION → WATCH (not REJECT).
+    """
+    substantive = [
+        r
+        for r in requirements
+        if r.get("importance") in {"MANDATORY", "PREFERRED"}
+        and r.get("relevance") in {"HIGH", "MEDIUM"}
+    ]
+    unclear = [r for r in requirements if r.get("importance") == "UNCLEAR"]
+    low = [r for r in requirements if r.get("relevance") == "LOW"]
+
+    if len(substantive) == 0:
+        return True
+
+    strongish = 0
+    for match in matches:
+        if match.get("result") in {"STRONG", "SUPPORTED", "PARTIAL"}:
+            strongish += 1
+
+    # Mostly noise / unclear with almost no substantive evaluable content.
+    if len(substantive) <= 1 and (len(unclear) + len(low)) >= max(2, len(substantive)):
+        if strongish == 0:
+            return True
+
+    if len(requirements) >= 3:
+        unclear_ratio = len(unclear) / len(requirements)
+        if unclear_ratio >= 0.5 and strongish == 0 and len(substantive) <= 2:
+            return True
+
+    return False
 
 
 def decide_lane_and_decision(
@@ -168,6 +211,18 @@ def decide_lane_and_decision(
             "hard_blockers": blockers,
         }
 
+    # Information deficit before unsupported-family reject (R-4).
+    if is_information_deficit(requirements=requirements, matches=matches):
+        return {
+            "lane": "WATCH",
+            "decision": "WATCH",
+            "decision_rationale": (
+                "Insufficient substantive JD information to confirm fit or "
+                "incompatibility; routing to WATCH."
+            ),
+            "hard_blockers": [],
+        }
+
     match_by_req = {
         m["requirement_id"]: m for m in matches if isinstance(m.get("requirement_id"), str)
     }
@@ -187,12 +242,15 @@ def decide_lane_and_decision(
     partial = 0
     none = 0
     high_none = 0
+    high_strong = 0
     for requirement in mandatory:
         req_id = requirement.get("requirement_id")
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
         result = match.get("result") if isinstance(match, Mapping) else "UNKNOWN"
         if result in {"STRONG", "SUPPORTED"}:
             strong_or_supported += 1
+            if requirement.get("relevance") == "HIGH":
+                high_strong += 1
         elif result == "PARTIAL":
             partial += 1
         elif result == "NONE":
@@ -200,13 +258,19 @@ def decide_lane_and_decision(
             if requirement.get("relevance") == "HIGH":
                 high_none += 1
 
-    preferred_missing = 0
+    # Material preferred gaps use HIGH relevance (policy: not every preferred gap).
+    material_preferred_missing = 0
+    nonmaterial_preferred_missing = 0
     for requirement in preferred:
         req_id = requirement.get("requirement_id")
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
         result = match.get("result") if isinstance(match, Mapping) else "UNKNOWN"
-        if result in {"NONE", "UNKNOWN"}:
-            preferred_missing += 1
+        if result not in {"NONE", "UNKNOWN"}:
+            continue
+        if requirement.get("relevance") == "HIGH":
+            material_preferred_missing += 1
+        else:
+            nonmaterial_preferred_missing += 1
 
     family_fit = role_family_fit(role_family)
     unclear_count = sum(1 for r in requirements if r.get("importance") == "UNCLEAR")
@@ -224,13 +288,14 @@ def decide_lane_and_decision(
         }
 
     if not family_fit:
-        if none >= 1 or strong_or_supported == 0:
+        # Confirmed bad fit: unsupported family PLUS substantive incompatible duties.
+        if none >= 1 or high_none >= 1 or (strong_or_supported == 0 and len(mandatory) >= 2):
             return {
                 "lane": "LANE_0_REJECT",
                 "decision": "REJECT",
                 "decision_rationale": (
                     f"Role family {role_family!r} is outside supported/adjacent "
-                    "families and lacks sufficient transferable coverage."
+                    "families with substantive incompatible or unsupported duties."
                 ),
                 "hard_blockers": [],
             }
@@ -266,43 +331,68 @@ def decide_lane_and_decision(
             "hard_blockers": [],
         }
 
+    # PRIORITY_APPLY: uncommon; exceptional alignment; no material preferred gap.
     if (
         family_fit
-        and strong_or_supported >= 2
+        and high_strong >= 4
         and none == 0
-        and partial <= 1
-        and preferred_missing <= 1
+        and partial == 0
+        and material_preferred_missing == 0
+        and strong_or_supported >= 4
     ):
         return {
             "lane": "LANE_2_PRIORITY_APPLY",
             "decision": "PRIORITY_APPLY",
             "decision_rationale": (
-                "Strong Business Systems/Implementation-family coverage with "
-                f"{strong_or_supported} STRONG/SUPPORTED mandatory matches and "
-                "no hard mandatory NONE gaps."
+                "Exceptional core mandatory HIGH alignment "
+                f"(high_strong={high_strong}) with no material preferred gaps."
             ),
             "hard_blockers": [],
         }
 
-    if family_fit and strong_or_supported >= 1 and none == 0 and preferred_missing >= 1:
-        return {
-            "lane": "LANE_1_EFFICIENT_APPLY",
-            "decision": "EFFICIENT_APPLY",
-            "decision_rationale": (
-                "Core mandatory coverage present; preferred skill(s) missing "
-                f"(preferred_missing={preferred_missing}) but role remains viable."
-            ),
-            "hard_blockers": [],
-        }
-
-    if family_fit and strong_or_supported >= 1 and none == 0:
+    # APPLY: strong core fit with a meaningful (material) preferred gap, or
+    # strong coverage that is not quite exceptional.
+    if family_fit and strong_or_supported >= 3 and none == 0 and material_preferred_missing >= 1:
         return {
             "lane": "LANE_1_EFFICIENT_APPLY",
             "decision": "APPLY",
             "decision_rationale": (
-                "Adequate mandatory coverage for an APPLY decision "
-                f"(strong_or_supported={strong_or_supported}, mandatory_none={none}, "
-                f"gaps={len(gaps)}, unknowns={len(unknowns)})."
+                "Strong core coverage with material preferred gap(s) "
+                f"(material_preferred_missing={material_preferred_missing}); "
+                "warrants normal deliberate tailoring."
+            ),
+            "hard_blockers": [],
+        }
+
+    if (
+        family_fit
+        and strong_or_supported >= 3
+        and none == 0
+        and material_preferred_missing == 0
+        and (partial >= 1 or high_strong < 4 or nonmaterial_preferred_missing >= 2)
+    ):
+        return {
+            "lane": "LANE_1_EFFICIENT_APPLY",
+            "decision": "APPLY",
+            "decision_rationale": (
+                "Good evidence alignment without exceptional Priority threshold "
+                f"(strong_or_supported={strong_or_supported}, high_strong={high_strong}, "
+                f"nonmaterial_preferred_missing={nonmaterial_preferred_missing})."
+            ),
+            "hard_blockers": [],
+        }
+
+    # EFFICIENT_APPLY: plausible, lower intensity / thinner coverage / several gaps.
+    if family_fit and strong_or_supported >= 1 and none == 0:
+        return {
+            "lane": "LANE_1_EFFICIENT_APPLY",
+            "decision": "EFFICIENT_APPLY",
+            "decision_rationale": (
+                "Plausible core eligibility with lower-intensity evidence alignment "
+                f"(strong_or_supported={strong_or_supported}, "
+                f"preferred_missing_total="
+                f"{material_preferred_missing + nonmaterial_preferred_missing}); "
+                "keep application cost low."
             ),
             "hard_blockers": [],
         }

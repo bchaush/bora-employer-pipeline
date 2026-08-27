@@ -1,8 +1,8 @@
 CRM Factory — Salesforce Business Systems Analyst (Synthetic Fixture)
 
-Salesforce administration is the central mandatory specialization for this role.
+Salesforce administration is the central mandatory specialization.
 
-Minimum qualifications (required)
+Required
 - Salesforce administration experience is required
-- Experience gathering requirements and clarifying scope boundaries
-- Comfort documenting UAT or pilot test outcomes
+- Gather business requirements from operations stakeholders
+- Document user acceptance testing outcomes

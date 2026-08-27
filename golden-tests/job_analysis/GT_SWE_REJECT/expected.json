@@ -1,5 +1,5 @@
 {
-  "purpose": "Software Engineering role must REJECT despite generic shared vocabulary.",
+  "purpose": "Software Engineering confirmed mismatch -> REJECT.",
   "role_family": "Software Engineering",
   "acceptable_decisions": [
     "REJECT"
@@ -19,7 +19,7 @@
     }
   },
   "semantic_boundaries": [
-    "generic lexical overlap cannot create APPLY for SWE"
+    "generic overlap cannot create APPLY for SWE"
   ],
   "known_limitations": [
     "NONE"

@@ -21,7 +21,7 @@
     {
       "requirement_id": "REQ_SEN_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Gather and clarify business requirements",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -29,13 +29,13 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Gather and clarify business requirements",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_SEN_WF",
       "job_id": "PLACEHOLDER",
-      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
+      "text": "Configure operational workflow automation with approval controls",
       "category": "PROCESS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -43,7 +43,7 @@
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping is required",
+      "source_text": "Configure operational workflow automation with approval controls",
       "source_location": "Minimum qualifications (required)"
     }
   ]

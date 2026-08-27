@@ -1,8 +1,8 @@
 Audience Pulse — Marketing Media Analyst (Synthetic Fixture)
 
-Title contains Analyst but work is unrelated marketing/media analytics.
+Well-specified unrelated marketing/media analytics role.
 
-Minimum qualifications (required)
+Required
 - Analyze paid media campaign performance and audience funnel metrics
 - Build marketing dashboards for campaign stakeholders
-- Recommend media mix changes based on engagement process insights
+- Manage marketing workflow automation for nurture campaigns

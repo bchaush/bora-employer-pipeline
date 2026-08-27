@@ -1,5 +1,5 @@
 {
-  "purpose": "Mandatory core platform specialization (Salesforce) must REJECT.",
+  "purpose": "Mandatory Salesforce specialization -> REJECT.",
   "role_family": "Business Systems",
   "acceptable_decisions": [
     "REJECT"
@@ -14,12 +14,9 @@
       "result": "NONE"
     }
   },
-  "expect_gap_substrings": [
-    "Salesforce"
-  ],
   "require_hard_blockers": true,
   "semantic_boundaries": [
-    "unsupported platform specialization blocks positive routing"
+    "unsupported platform specialization blocks apply"
   ],
   "known_limitations": [
     "NONE"

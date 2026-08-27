@@ -1,14 +1,13 @@
 Quality Bridge — Business Systems Analyst (Synthetic Fixture)
 
-Core systems fit. Enterprise QA engineering ownership is preferred only and
-must not be satisfied by Winter Walk UAT evidence.
+Core systems fit. Enterprise QA ownership is preferred and must stay NONE vs UAT.
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
+Required
+- Document requirements after stakeholder workshops
+- Operate controlled workflow automation with approval sync points
+- Validate CSV / file imports for production intakes
+- Run user acceptance testing and archive pilot notes
+- Keep fail-closed send controls healthy
 
-Preferred qualifications
-- Enterprise QA engineering ownership experience is a bonus
+Preferred
+- Enterprise QA engineering ownership experience

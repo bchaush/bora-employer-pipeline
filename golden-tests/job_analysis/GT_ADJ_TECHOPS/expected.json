@@ -1,13 +1,13 @@
 {
-  "purpose": "High-value adjacent Technical Operations family remains viable without exact-title dependence.",
+  "purpose": "Adjacent Technical Operations with thinner coverage -> EFFICIENT_APPLY.",
   "role_family": "Technical Operations",
   "acceptable_decisions": [
-    "PRIORITY_APPLY",
-    "APPLY",
-    "EFFICIENT_APPLY",
-    "WATCH"
+    "EFFICIENT_APPLY"
   ],
-  "forbidden_decisions": [],
+  "forbidden_decisions": [
+    "PRIORITY_APPLY",
+    "REJECT"
+  ],
   "key_matches": {
     "REQ_TO_CTRL": {
       "result": "STRONG",
@@ -24,32 +24,14 @@
         "STRONG",
         "SUPPORTED"
       ]
-    },
-    "REQ_TO_REQ": {
-      "result": "STRONG",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
-    },
-    "REQ_TO_UAT": {
-      "result": "SUPPORTED",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
     }
   },
   "semantic_boundaries": [
-    "adjacent family viability without exact title"
+    "adjacent family without exact title dependence"
   ],
   "known_limitations": [
     "NONE"
   ],
-  "notes": [
-    "WATCH allowed only if substantive coverage is insufficient; positive preferred."
-  ],
+  "notes": [],
   "fixture_id": "GT_ADJ_TECHOPS"
 }

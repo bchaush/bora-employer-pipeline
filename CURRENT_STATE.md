@@ -150,8 +150,10 @@ No production engine yet.
   * Runner: `golden-tests/run_job_analysis_golden_set.py`.
   * Families covered: Business Systems, Implementation, Data Operations, Business Process, Technical Operations, plus reject/trap families (SWE, ML, Marketing Analytics, Business Operations vague).
   * Semantic traps covered: U.S. regulatory NONE, UAT≠enterprise QA, Apps Script≠GCP, production ML, platform specialization, senior reject, generic lexical overlap / unrelated Analyst title, vague JD.
-  * **P-1 fixed** with bounded deterministic rule: `"preferred, but not required"` → `PREFERRED` (mixed degree clauses remain UNCLEAR).
-  * **P-2 remains deferred**: generic business process mapping → NONE / REJECT; Claims/Evidence unchanged.
+  * First Claude Golden audit: changes required (R-1–R-7). Gemini routing-policy review incorporated.
+  * Remediation: clause-aware P-1; capability synonym recall; PRIORITY/APPLY/EFFICIENT/WATCH/REJECT calibration; info-deficit → WATCH; realistic fixture wording; golden schema tightening; workflow-automation precision.
+  * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
+  * **P-2 remains deferred (evidence-model)**: process/workflow-mapping vocabulary may be recognized, but no approved Claim owns `process_mapping`; Claims/Evidence unchanged.
   * No résumé-generation work begun.
   * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
@@ -159,7 +161,7 @@ No production engine yet.
 
 `JOB_ANALYSIS_V1_GOLDEN_SET` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-First representative Golden Test set for the closed job-analysis engine (15 fixtures). Awaiting Claude Code adversarial audit. Do not mark CLOSED. Do not begin résumé generation. Do not push until audit clears.
+Claude Golden Set adversarial audit required R-1–R-7 remediation (Gemini policy review incorporated). Bounded remediation applied locally. Awaiting second Claude re-audit. Do not mark CLOSED. Do not begin résumé generation. Do not push until audit clears.
 
 ## Not Built Yet
 
@@ -205,9 +207,9 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Independent Claude Code adversarial audit of `JOB_ANALYSIS_V1_GOLDEN_SET`.
-2. Close Golden Set only after audit + any required hardening.
-3. Deferred P-2 (process-mapping evidence/claim semantics) only when deliberately scheduled.
+1. Second independent Claude Code adversarial audit of remediated `JOB_ANALYSIS_V1_GOLDEN_SET`.
+2. Close Golden Set only after re-audit clears + any further required hardening.
+3. Deferred P-2 (process-mapping Claim/Evidence semantics) only when deliberately scheduled.
 4. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
 
 ## Do Not Start Yet
@@ -225,4 +227,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Claude Code adversarial audit of `JOB_ANALYSIS_V1_GOLDEN_SET` (not CLOSED yet).
+Second Claude Code adversarial re-audit of remediated `JOB_ANALYSIS_V1_GOLDEN_SET` (not CLOSED yet).

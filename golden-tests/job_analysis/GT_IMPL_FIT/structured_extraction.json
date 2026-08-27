@@ -7,7 +7,7 @@
     {
       "requirement_id": "REQ_IMPL_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Elicit customer requirements and clarify scope before build",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -15,13 +15,13 @@
       "experience_level": null,
       "domain": "Implementation",
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Elicit customer requirements and clarify scope before build",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_IMPL_DATA",
       "job_id": "PLACEHOLDER",
-      "text": "Hands-on CSV / Drive-folder data ingestion with import logging",
+      "text": "Import customer CSV datasets with import logging",
       "category": "DATA",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -29,38 +29,54 @@
         "CSV"
       ],
       "experience_level": null,
-      "domain": "Data Migration",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+      "source_text": "Import customer CSV datasets with import logging",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_IMPL_WF",
       "job_id": "PLACEHOLDER",
-      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
+      "text": "Configure operational workflow automation with approval controls",
       "category": "CONFIGURATION",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Implementation",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping is required",
+      "source_text": "Configure operational workflow automation with approval controls",
       "source_location": "Minimum qualifications (required)"
     },
     {
       "requirement_id": "REQ_IMPL_UAT",
       "job_id": "PLACEHOLDER",
-      "text": "Comfort documenting UAT or pilot test outcomes",
+      "text": "Lead user acceptance testing sessions and document outcomes",
       "category": "TESTING",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "QA/UAT",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_text": "Lead user acceptance testing sessions and document outcomes",
       "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_IMPL_SNOW",
+      "job_id": "PLACEHOLDER",
+      "text": "ServiceNow configuration experience",
+      "category": "PLATFORM",
+      "importance": "PREFERRED",
+      "seniority_implication": null,
+      "technology": [
+        "ServiceNow"
+      ],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Preferred: ServiceNow configuration experience",
+      "source_location": "Preferred"
     }
   ]
 }

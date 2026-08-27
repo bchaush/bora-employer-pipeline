@@ -30,6 +30,7 @@
     "acceptable_decisions": {
       "type": "array",
       "minItems": 1,
+      "maxItems": 2,
       "uniqueItems": true,
       "items": {
         "type": "string",
@@ -41,7 +42,8 @@
           "REJECT",
           "UNDECIDED"
         ]
-      }
+      },
+      "description": "Narrow expected decision set. Broad catch-all lists are rejected."
     },
     "forbidden_decisions": {
       "type": "array",
@@ -61,6 +63,7 @@
     },
     "key_matches": {
       "type": "object",
+      "minProperties": 1,
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
@@ -109,10 +112,12 @@
     },
     "semantic_boundaries": {
       "type": "array",
+      "minItems": 1,
       "items": { "type": "string", "minLength": 1 }
     },
     "known_limitations": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "string",
         "enum": ["P-1", "P-2", "NONE"]

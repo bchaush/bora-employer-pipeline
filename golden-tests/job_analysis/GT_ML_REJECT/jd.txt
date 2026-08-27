@@ -1,9 +1,7 @@
 ModelYard — Machine Learning Engineer (Synthetic Fixture)
 
-Requires production ML systems and model deployment. LLM API experimentation
-is not equivalent.
+Production ML / model deployment required. LLM API experiments are not equivalent.
 
-Minimum qualifications (required)
+Required
 - Build production ML systems and machine learning pipelines
 - Deploy models to production ML infrastructure
-- Experience gathering requirements and clarifying scope boundaries

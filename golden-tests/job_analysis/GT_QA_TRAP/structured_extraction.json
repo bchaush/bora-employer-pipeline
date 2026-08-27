@@ -5,37 +5,37 @@
   "extraction_version": "golden_structured_v1",
   "requirements": [
     {
-      "requirement_id": "REQ_CORE_REQ",
+      "requirement_id": "REQ_QA_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Document requirements after stakeholder workshops",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Business Systems",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Document requirements after stakeholder workshops",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_WF",
+      "requirement_id": "REQ_QA_WF",
       "job_id": "PLACEHOLDER",
-      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
+      "text": "Operate controlled workflow automation with approval sync points",
       "category": "PROCESS",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Business Process",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping is required",
+      "source_text": "Operate controlled workflow automation with approval sync points",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_DATA",
+      "requirement_id": "REQ_QA_DATA",
       "job_id": "PLACEHOLDER",
-      "text": "Hands-on CSV / Drive-folder data ingestion with import logging",
+      "text": "Validate CSV / file imports for production intakes",
       "category": "DATA",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -43,37 +43,37 @@
         "CSV"
       ],
       "experience_level": null,
-      "domain": "Data Operations",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+      "source_text": "Validate CSV / file imports for production intakes",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_UAT",
+      "requirement_id": "REQ_QA_UAT",
       "job_id": "PLACEHOLDER",
-      "text": "Comfort documenting UAT or pilot test outcomes",
+      "text": "Run user acceptance testing and archive pilot notes",
       "category": "TESTING",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Implementation",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_text": "Run user acceptance testing and archive pilot notes",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_CTRL",
+      "requirement_id": "REQ_QA_CTRL",
       "job_id": "PLACEHOLDER",
-      "text": "Support fail-closed operational controls for outbound communications",
+      "text": "Keep fail-closed send controls healthy",
       "category": "CONTROLS",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Technical Operations",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Support fail-closed operational controls for outbound follow-up communications",
+      "source_text": "Keep fail-closed send controls healthy",
       "source_location": "Minimum qualifications (required)"
     },
     {
@@ -86,9 +86,9 @@
       "technology": [],
       "experience_level": null,
       "domain": null,
-      "relevance": "MEDIUM",
-      "source_text": "Enterprise QA engineering ownership experience is a bonus",
-      "source_location": "Preferred qualifications"
+      "relevance": "HIGH",
+      "source_text": "Preferred: Enterprise QA engineering ownership experience",
+      "source_location": "Preferred"
     }
   ]
 }

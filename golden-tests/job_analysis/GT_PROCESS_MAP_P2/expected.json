@@ -1,5 +1,5 @@
 {
-  "purpose": "Expose P-2: generic business process mapping fails closed to NONE; core mandatory HIGH NONE blocks positive apply.",
+  "purpose": "P-2 process mapping remains NONE without Claim/Evidence changes -> REJECT.",
   "role_family": "Business Process",
   "acceptable_decisions": [
     "REJECT"
@@ -12,22 +12,6 @@
   "key_matches": {
     "REQ_P2_MAP": {
       "result": "NONE"
-    },
-    "REQ_P2_REQ": {
-      "result": "STRONG",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
-    },
-    "REQ_P2_UAT": {
-      "result": "SUPPORTED",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
     }
   },
   "expect_gap_substrings": [
@@ -35,13 +19,11 @@
   ],
   "require_hard_blockers": true,
   "semantic_boundaries": [
-    "P-2 process mapping remains NONE without Claim/Evidence changes"
+    "P-2 process mapping has no approved Claim capability provenance"
   ],
   "known_limitations": [
     "P-2"
   ],
-  "notes": [
-    "Conservative REJECT is expected while P-2 remains deferred."
-  ],
+  "notes": [],
   "fixture_id": "GT_PROCESS_MAP_P2"
 }

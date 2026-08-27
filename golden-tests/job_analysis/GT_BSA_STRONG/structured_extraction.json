@@ -5,9 +5,9 @@
   "extraction_version": "golden_structured_v1",
   "requirements": [
     {
-      "requirement_id": "REQ_CORE_REQ",
+      "requirement_id": "REQ_BSA_REQ",
       "job_id": "PLACEHOLDER",
-      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "text": "Gather and clarify business requirements with nontechnical stakeholders",
       "category": "REQUIREMENTS",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -15,27 +15,27 @@
       "experience_level": null,
       "domain": "Business Systems",
       "relevance": "HIGH",
-      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_text": "Gather and clarify business requirements with nontechnical stakeholders",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_WF",
+      "requirement_id": "REQ_BSA_WF",
       "job_id": "PLACEHOLDER",
-      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
+      "text": "Experience with controlled operational workflow automation tied to approval gates",
       "category": "PROCESS",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Business Process",
+      "domain": "Operations",
       "relevance": "HIGH",
-      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping is required",
+      "source_text": "Experience with controlled operational workflow automation tied to approval gates",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_DATA",
+      "requirement_id": "REQ_BSA_DATA",
       "job_id": "PLACEHOLDER",
-      "text": "Hands-on CSV / Drive-folder data ingestion with import logging",
+      "text": "Hands-on CSV import / spreadsheet data-feed intake with validation",
       "category": "DATA",
       "importance": "MANDATORY",
       "seniority_implication": null,
@@ -45,41 +45,41 @@
       "experience_level": null,
       "domain": "Data Operations",
       "relevance": "HIGH",
-      "source_text": "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+      "source_text": "Hands-on CSV import / spreadsheet data-feed intake with validation",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_UAT",
+      "requirement_id": "REQ_BSA_UAT",
       "job_id": "PLACEHOLDER",
-      "text": "Comfort documenting UAT or pilot test outcomes",
+      "text": "Document user acceptance testing or pilot validation outcomes",
       "category": "TESTING",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Implementation",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_text": "Document user acceptance testing or pilot validation outcomes",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_CORE_CTRL",
+      "requirement_id": "REQ_BSA_CTRL",
       "job_id": "PLACEHOLDER",
-      "text": "Support fail-closed operational controls for outbound communications",
+      "text": "Support fail-closed controls for outbound operational communications",
       "category": "CONTROLS",
       "importance": "MANDATORY",
       "seniority_implication": null,
       "technology": [],
       "experience_level": null,
-      "domain": "Technical Operations",
+      "domain": null,
       "relevance": "HIGH",
-      "source_text": "Support fail-closed operational controls for outbound follow-up communications",
+      "source_text": "Support fail-closed controls for outbound operational communications",
       "source_location": "Minimum qualifications (required)"
     },
     {
-      "requirement_id": "REQ_PREF_SF",
+      "requirement_id": "REQ_BSA_SF",
       "job_id": "PLACEHOLDER",
-      "text": "Salesforce administration experience",
+      "text": "Familiarity with Salesforce",
       "category": "PLATFORM",
       "importance": "PREFERRED",
       "seniority_implication": null,
@@ -87,10 +87,10 @@
         "Salesforce"
       ],
       "experience_level": null,
-      "domain": "CRM",
+      "domain": null,
       "relevance": "MEDIUM",
-      "source_text": "Preferred qualifications: Salesforce administration experience",
-      "source_location": "Preferred qualifications"
+      "source_text": "Nice to have: Familiarity with Salesforce is a plus",
+      "source_location": "Nice to have"
     }
   ]
 }

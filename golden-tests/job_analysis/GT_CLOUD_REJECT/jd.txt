@@ -1,9 +1,8 @@
 Cloudrail Systems — Business Systems Analyst (Synthetic Fixture)
 
-Google Cloud infrastructure engineering is a core mandatory requirement.
-Apps Script evidence must not count as equivalent.
+GCP/cloud engineering is mandatory and core. Apps Script is not equivalent.
 
-Minimum qualifications (required)
-- Exposure to Google Cloud infrastructure / GCP engineering is required
-- Experience gathering requirements and clarifying scope boundaries
-- Comfort documenting UAT or pilot test outcomes
+Required
+- Google Cloud / GCP infrastructure engineering experience is required
+- Gather business requirements for internal tools
+- Document user acceptance testing outcomes

@@ -1,12 +1,12 @@
-"""One-shot generator for Job Analysis Golden fixtures. Not a runtime dependency."""
+"""One-shot generator for Job Analysis Golden fixtures (remediated wording)."""
 
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "golden-tests" / "job_analysis"
-ROOT.mkdir(parents=True, exist_ok=True)
 
 
 def req(
@@ -40,6 +40,8 @@ def req(
 
 def write_fixture(fid, role_title, role_family, seniority, jd, requirements, expected):
     d = ROOT / fid
+    if d.exists():
+        shutil.rmtree(d)
     d.mkdir(parents=True, exist_ok=True)
     (d / "jd.txt").write_text(jd.strip() + "\n", encoding="utf-8")
     extraction = {
@@ -60,242 +62,221 @@ def write_fixture(fid, role_title, role_family, seniority, jd, requirements, exp
     print("wrote", fid)
 
 
-CORE_REQS = [
-    req(
-        "REQ_CORE_REQ",
-        "Experience gathering requirements and clarifying scope boundaries",
-        "MANDATORY",
-        "HIGH",
-        "Experience gathering requirements and clarifying scope boundaries is required",
-        domain="Business Systems",
-        category="REQUIREMENTS",
-    ),
-    req(
-        "REQ_CORE_WF",
-        "Experience with workflow automation and approval-synchronized evidence mapping",
-        "MANDATORY",
-        "HIGH",
-        "Experience with workflow automation and approval-synchronized evidence mapping is required",
-        domain="Business Process",
-        category="PROCESS",
-    ),
-    req(
-        "REQ_CORE_DATA",
-        "Hands-on CSV / Drive-folder data ingestion with import logging",
-        "MANDATORY",
-        "HIGH",
-        "Hands-on CSV / Drive-folder data ingestion with import logging is required",
-        technology=["CSV"],
-        domain="Data Operations",
-        category="DATA",
-    ),
-    req(
-        "REQ_CORE_UAT",
-        "Comfort documenting UAT or pilot test outcomes",
-        "MANDATORY",
-        "HIGH",
-        "Comfort documenting UAT or pilot test outcomes is required",
-        domain="Implementation",
-        category="TESTING",
-    ),
-    req(
-        "REQ_CORE_CTRL",
-        "Support fail-closed operational controls for outbound communications",
-        "MANDATORY",
-        "HIGH",
-        "Support fail-closed operational controls for outbound follow-up communications",
-        domain="Technical Operations",
-        category="CONTROLS",
-    ),
-]
-
-
 def main() -> None:
+    ROOT.mkdir(parents=True, exist_ok=True)
+
+    # --- 1 PRIORITY: exceptional BSA, no material preferred gap ---
     write_fixture(
         "GT_BSA_STRONG",
         "Business Systems Analyst",
         "Business Systems",
         "EARLY_CAREER",
         """
-Harborline Internal Tools — Business Systems Analyst (Synthetic Fixture)
+Harborline Civic Systems — Business Systems Analyst (Synthetic Fixture)
 
-This is repository Golden Test data only. It is not a claim about a real employer.
+Repository Golden Test data only. Not a real employer vacancy.
 
-About the role
-Early-career Business Systems Analyst supporting internal operating workflows,
-requirements clarification, data intake quality, and UAT documentation with
-nontechnical stakeholders.
+We need an early-career analyst to improve internal tooling used by operations
+staff. You will sit with stakeholders, turn fuzzy asks into clear requirements,
+and help ship reliable spreadsheet/CSV intakes with documented acceptance checks.
 
-Responsibilities
-- Gather stakeholder requirements and clarify scope boundaries
-- Automate workflow handoffs and keep approval-synchronized evidence mapping current
-- Maintain CSV / Drive-folder intake with import logging
+What you will do
+- Meet with operations owners to gather and clarify business requirements
+- Help design controlled operational workflow automation with approval checkpoints
+- Own recurring CSV file imports and spreadsheet data feeds with intake validation
+- Keep outbound follow-up sends behind fail-closed / kill-switch style controls
+- Run user acceptance testing and write up pilot validation notes
+
+Required
+- Gather and clarify business requirements with nontechnical stakeholders
+- Experience with controlled operational workflow automation tied to approval gates
+- Hands-on CSV import / spreadsheet data-feed intake with validation
+- Document user acceptance testing or pilot validation outcomes
 - Support fail-closed controls for outbound operational communications
-- Document UAT / pilot outcomes
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
-
-Preferred qualifications
-- Salesforce administration experience
-""",
-        CORE_REQS
-        + [
-            req(
-                "REQ_PREF_SF",
-                "Salesforce administration experience",
-                "PREFERRED",
-                "MEDIUM",
-                "Preferred qualifications: Salesforce administration experience",
-                category="PLATFORM",
-                technology=["Salesforce"],
-                domain="CRM",
-                location="Preferred qualifications",
-            ),
-        ],
-        {
-            "purpose": "Strong early-career Business Systems fit with one preferred unsupported tool.",
-            "role_family": "Business Systems",
-            "acceptable_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "forbidden_decisions": ["REJECT"],
-            "key_matches": {
-                "REQ_CORE_REQ": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_CORE_WF": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_CORE_DATA": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_CORE_UAT": {
-                    "result": "SUPPORTED",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_CORE_CTRL": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_PREF_SF": {"result": "NONE"},
-            },
-            "expect_gap_substrings": ["Salesforce"],
-            "require_hard_blockers": False,
-            "semantic_boundaries": ["preferred Salesforce gap must not auto-reject"],
-            "known_limitations": ["NONE"],
-            "notes": ["Positive routing expected for Business Systems family."],
-        },
-    )
-
-    write_fixture(
-        "GT_IMPL_FIT",
-        "Implementation Analyst",
-        "Implementation",
-        "EARLY_CAREER",
-        """
-Northbridge Delivery — Implementation Analyst (Synthetic Fixture)
-
-Early-career implementation role supporting customer requirements, CSV data
-import, configuration handoffs, UAT documentation, and troubleshooting of
-workflow automation issues.
-
-Responsibilities
-- Elicit customer requirements and clarify scope boundaries
-- Import customer CSV datasets with import logging
-- Configure workflow automation and approval-synchronized evidence mapping
-- Document UAT / pilot results and support handoff troubleshooting
-
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Comfort documenting UAT or pilot test outcomes
+Nice to have
+- Familiarity with Salesforce is a plus
 """,
         [
             req(
-                "REQ_IMPL_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
+                "REQ_BSA_REQ",
+                "Gather and clarify business requirements with nontechnical stakeholders",
                 "MANDATORY",
                 "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries is required",
+                "Gather and clarify business requirements with nontechnical stakeholders",
                 category="REQUIREMENTS",
-                domain="Implementation",
+                domain="Business Systems",
             ),
             req(
-                "REQ_IMPL_DATA",
-                "Hands-on CSV / Drive-folder data ingestion with import logging",
+                "REQ_BSA_WF",
+                "Experience with controlled operational workflow automation tied to approval gates",
                 "MANDATORY",
                 "HIGH",
-                "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+                "Experience with controlled operational workflow automation tied to approval gates",
+                category="PROCESS",
+                domain="Operations",
+            ),
+            req(
+                "REQ_BSA_DATA",
+                "Hands-on CSV import / spreadsheet data-feed intake with validation",
+                "MANDATORY",
+                "HIGH",
+                "Hands-on CSV import / spreadsheet data-feed intake with validation",
                 category="DATA",
                 technology=["CSV"],
-                domain="Data Migration",
+                domain="Data Operations",
             ),
             req(
-                "REQ_IMPL_WF",
-                "Experience with workflow automation and approval-synchronized evidence mapping",
+                "REQ_BSA_UAT",
+                "Document user acceptance testing or pilot validation outcomes",
                 "MANDATORY",
                 "HIGH",
-                "Experience with workflow automation and approval-synchronized evidence mapping is required",
-                category="CONFIGURATION",
-                domain="Implementation",
-            ),
-            req(
-                "REQ_IMPL_UAT",
-                "Comfort documenting UAT or pilot test outcomes",
-                "MANDATORY",
-                "HIGH",
-                "Comfort documenting UAT or pilot test outcomes is required",
+                "Document user acceptance testing or pilot validation outcomes",
                 category="TESTING",
-                domain="QA/UAT",
+            ),
+            req(
+                "REQ_BSA_CTRL",
+                "Support fail-closed controls for outbound operational communications",
+                "MANDATORY",
+                "HIGH",
+                "Support fail-closed controls for outbound operational communications",
+                category="CONTROLS",
+            ),
+            req(
+                "REQ_BSA_SF",
+                "Familiarity with Salesforce",
+                "PREFERRED",
+                "MEDIUM",
+                "Nice to have: Familiarity with Salesforce is a plus",
+                category="PLATFORM",
+                technology=["Salesforce"],
+                location="Nice to have",
             ),
         ],
         {
-            "purpose": "Early-career Implementation Analyst fit using supported requirements/data/UAT evidence.",
-            "role_family": "Implementation",
-            "acceptable_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "forbidden_decisions": ["REJECT"],
+            "purpose": "Exceptional early-career BSA fit; trivial preferred SF gap must not remove Priority.",
+            "role_family": "Business Systems",
+            "acceptable_decisions": ["PRIORITY_APPLY"],
+            "forbidden_decisions": ["REJECT", "WATCH"],
             "key_matches": {
-                "REQ_IMPL_REQ": {
+                "REQ_BSA_REQ": {
                     "result": "STRONG",
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
                 },
-                "REQ_IMPL_DATA": {
+                "REQ_BSA_DATA": {
                     "result": "STRONG",
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
                 },
-                "REQ_IMPL_WF": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_IMPL_UAT": {
+                "REQ_BSA_UAT": {
                     "result": "SUPPORTED",
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
                 },
+                "REQ_BSA_SF": {"result": "NONE"},
             },
+            "expect_gap_substrings": ["Salesforce"],
             "semantic_boundaries": [
-                "implementation family remains viable without exact BSA title"
+                "non-material preferred gap does not remove PRIORITY_APPLY"
             ],
             "known_limitations": ["NONE"],
             "notes": [],
         },
     )
 
+    # --- 2 APPLY: strong + material preferred gap ---
+    write_fixture(
+        "GT_PREF_GAP_P1",
+        "Business Systems Analyst",
+        "Business Systems",
+        "EARLY_CAREER",
+        """
+Lumen Municipal Ops — Business Systems Analyst (Synthetic Fixture)
+
+Strong core systems fit. CRM platform depth is preferred, but not required.
+
+Required
+- Collect stakeholder requirements and document scope boundaries
+- Build controlled operational workflow automation with approval checkpoints
+- Import CSV / spreadsheet data feeds with logging and validation
+- Facilitate user acceptance testing and capture pilot results
+- Maintain fail-closed outbound send controls
+
+Preferred qualifications
+- Salesforce administration experience is preferred, but not required
+""",
+        [
+            req(
+                "REQ_P1_REQ",
+                "Collect stakeholder requirements and document scope boundaries",
+                "MANDATORY",
+                "HIGH",
+                "Collect stakeholder requirements and document scope boundaries",
+                category="REQUIREMENTS",
+            ),
+            req(
+                "REQ_P1_WF",
+                "Build controlled operational workflow automation with approval checkpoints",
+                "MANDATORY",
+                "HIGH",
+                "Build controlled operational workflow automation with approval checkpoints",
+                category="PROCESS",
+            ),
+            req(
+                "REQ_P1_DATA",
+                "Import CSV / spreadsheet data feeds with logging and validation",
+                "MANDATORY",
+                "HIGH",
+                "Import CSV / spreadsheet data feeds with logging and validation",
+                category="DATA",
+                technology=["CSV"],
+            ),
+            req(
+                "REQ_P1_UAT",
+                "Facilitate user acceptance testing and capture pilot results",
+                "MANDATORY",
+                "HIGH",
+                "Facilitate user acceptance testing and capture pilot results",
+                category="TESTING",
+            ),
+            req(
+                "REQ_P1_CTRL",
+                "Maintain fail-closed outbound send controls",
+                "MANDATORY",
+                "HIGH",
+                "Maintain fail-closed outbound send controls",
+                category="CONTROLS",
+            ),
+            req(
+                "REQ_P1_SF",
+                "Salesforce administration experience",
+                "PREFERRED",
+                "HIGH",
+                "Salesforce administration experience is preferred, but not required",
+                category="PLATFORM",
+                technology=["Salesforce"],
+                location="Preferred qualifications",
+            ),
+        ],
+        {
+            "purpose": "Strong fit with material HIGH preferred Salesforce gap -> APPLY; P-1 phrasing.",
+            "role_family": "Business Systems",
+            "acceptable_decisions": ["APPLY"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "REJECT"],
+            "key_matches": {"REQ_P1_SF": {"result": "NONE"}},
+            "expected_importance": {"REQ_P1_SF": "PREFERRED"},
+            "expect_gap_substrings": ["Salesforce"],
+            "semantic_boundaries": [
+                "material preferred gap downgrades Priority to APPLY",
+                "P-1 preferred-but-not-required remains PREFERRED",
+            ],
+            "known_limitations": ["NONE"],
+            "notes": [],
+        },
+    )
+
+    # --- 3 EFFICIENT: thinner Data Ops coverage ---
     write_fixture(
         "GT_DATAOPS_FIT",
         "Data Operations Analyst",
@@ -304,83 +285,63 @@ Minimum qualifications (required)
         """
 Civic Ledger Ops — Data Operations Analyst (Synthetic Fixture)
 
-Role emphasizing recurring CSV intake quality, import logging, spreadsheet
-validation, and operational reporting support. SQL is preferred only; do not
-invent SQL evidence.
+Focus on recurring intake quality. SQL is preferred only; do not invent SQL evidence.
 
-Responsibilities
-- Run recurring CSV / Drive-folder data ingestion with import logging
-- Validate spreadsheet intake quality before downstream use
-- Support operational reporting packages from cleaned intakes
-- Document pilot test / UAT checks for intake changes
+Required
+- Ingest spreadsheet data feeds and CSV imports with validation logging
+- Document pilot testing notes when intake rules change
 
-Minimum qualifications (required)
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Experience gathering requirements and clarifying scope boundaries for intake workflows
-- Comfort documenting UAT or pilot test outcomes for data-quality checks
-
-Preferred qualifications
+Preferred
 - SQL querying experience
+- Dashboarding experience
 """,
         [
             req(
                 "REQ_DO_DATA",
-                "Hands-on CSV / Drive-folder data ingestion with import logging",
+                "Ingest spreadsheet data feeds and CSV imports with validation logging",
                 "MANDATORY",
                 "HIGH",
-                "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+                "Ingest spreadsheet data feeds and CSV imports with validation logging",
                 category="DATA",
                 technology=["CSV"],
                 domain="Data Operations",
             ),
             req(
-                "REQ_DO_REQ",
-                "Experience gathering requirements and clarifying scope boundaries for intake workflows",
-                "MANDATORY",
-                "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries for intake workflows is required",
-                category="REQUIREMENTS",
-                domain="Data Operations",
-            ),
-            req(
                 "REQ_DO_UAT",
-                "Comfort documenting UAT or pilot test outcomes for data-quality checks",
+                "Document pilot testing notes when intake rules change",
                 "MANDATORY",
                 "HIGH",
-                "Comfort documenting UAT or pilot test outcomes for data-quality checks is required",
+                "Document pilot testing notes when intake rules change",
                 category="TESTING",
-                domain="Data Quality",
             ),
             req(
                 "REQ_DO_SQL",
                 "SQL querying experience",
                 "PREFERRED",
                 "MEDIUM",
-                "Preferred qualifications: SQL querying experience",
+                "Preferred: SQL querying experience",
                 category="TECHNOLOGY",
                 technology=["SQL"],
-                domain="Data Operations",
-                location="Preferred qualifications",
+                location="Preferred",
+            ),
+            req(
+                "REQ_DO_DASH",
+                "Dashboarding experience",
+                "PREFERRED",
+                "MEDIUM",
+                "Preferred: Dashboarding experience",
+                category="REPORTING",
+                location="Preferred",
             ),
         ],
         {
-            "purpose": "Data Operations fit grounded in CSV intake evidence; SQL preferred gap allowed.",
+            "purpose": "Plausible lower-intensity Data Ops fit -> EFFICIENT_APPLY.",
             "role_family": "Data Operations",
-            "acceptable_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "forbidden_decisions": ["REJECT"],
+            "acceptable_decisions": ["EFFICIENT_APPLY"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "REJECT"],
             "key_matches": {
                 "REQ_DO_DATA": {
                     "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_DO_REQ": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_DO_UAT": {
-                    "result": "SUPPORTED",
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
                 },
@@ -393,6 +354,94 @@ Preferred qualifications
         },
     )
 
+    # --- 4 Implementation APPLY-ish / good fit ---
+    write_fixture(
+        "GT_IMPL_FIT",
+        "Implementation Analyst",
+        "Implementation",
+        "EARLY_CAREER",
+        """
+Northbridge Delivery — Implementation Analyst (Synthetic Fixture)
+
+Customer implementation work: requirements, imports, acceptance testing, and
+controlled workflow setup. ServiceNow depth is preferred at HIGH relevance.
+
+Required
+- Elicit customer requirements and clarify scope before build
+- Import customer CSV datasets with import logging
+- Configure operational workflow automation with approval controls
+- Lead user acceptance testing sessions and document outcomes
+
+Preferred
+- ServiceNow configuration experience
+""",
+        [
+            req(
+                "REQ_IMPL_REQ",
+                "Elicit customer requirements and clarify scope before build",
+                "MANDATORY",
+                "HIGH",
+                "Elicit customer requirements and clarify scope before build",
+                category="REQUIREMENTS",
+                domain="Implementation",
+            ),
+            req(
+                "REQ_IMPL_DATA",
+                "Import customer CSV datasets with import logging",
+                "MANDATORY",
+                "HIGH",
+                "Import customer CSV datasets with import logging",
+                category="DATA",
+                technology=["CSV"],
+            ),
+            req(
+                "REQ_IMPL_WF",
+                "Configure operational workflow automation with approval controls",
+                "MANDATORY",
+                "HIGH",
+                "Configure operational workflow automation with approval controls",
+                category="CONFIGURATION",
+            ),
+            req(
+                "REQ_IMPL_UAT",
+                "Lead user acceptance testing sessions and document outcomes",
+                "MANDATORY",
+                "HIGH",
+                "Lead user acceptance testing sessions and document outcomes",
+                category="TESTING",
+            ),
+            req(
+                "REQ_IMPL_SNOW",
+                "ServiceNow configuration experience",
+                "PREFERRED",
+                "HIGH",
+                "Preferred: ServiceNow configuration experience",
+                category="PLATFORM",
+                technology=["ServiceNow"],
+                location="Preferred",
+            ),
+        ],
+        {
+            "purpose": "Implementation fit with material ServiceNow preferred gap -> APPLY.",
+            "role_family": "Implementation",
+            "acceptable_decisions": ["APPLY"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "REJECT"],
+            "key_matches": {
+                "REQ_IMPL_REQ": {
+                    "result": "STRONG",
+                    "require_provenance": True,
+                    "acceptable_results": ["STRONG", "SUPPORTED"],
+                },
+                "REQ_IMPL_SNOW": {"result": "NONE"},
+            },
+            "expect_gap_substrings": ["ServiceNow"],
+            "semantic_boundaries": ["ServiceNow specialization unsupported"],
+            "known_limitations": ["NONE"],
+            "notes": [],
+        },
+    )
+
+    # --- 5 P-2 process mapping ---
     write_fixture(
         "GT_PROCESS_MAP_P2",
         "Business Process Analyst",
@@ -401,14 +450,13 @@ Preferred qualifications
         """
 Process Studio — Business Process Analyst (Synthetic Fixture)
 
-Core mandatory work is generic business process mapping. This fixture exposes
-known P-2 safe-direction limitation: current Claims/Evidence do not authorize
-generic process-mapping capability.
+Core mandatory work is generic business process mapping. Exposes P-2
+evidence-model gap: vocabulary may be recognized, but no approved Claim owns it.
 
-Minimum qualifications (required)
+Required
 - Map existing business processes and produce process maps for stakeholder review
-- Experience gathering requirements and clarifying scope boundaries
-- Comfort documenting UAT or pilot test outcomes
+- Gather requirements and clarify scope boundaries
+- Document user acceptance testing outcomes
 """,
         [
             req(
@@ -422,109 +470,38 @@ Minimum qualifications (required)
             ),
             req(
                 "REQ_P2_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
+                "Gather requirements and clarify scope boundaries",
                 "MANDATORY",
                 "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries is required",
+                "Gather requirements and clarify scope boundaries is required",
                 category="REQUIREMENTS",
             ),
             req(
                 "REQ_P2_UAT",
-                "Comfort documenting UAT or pilot test outcomes",
+                "Document user acceptance testing outcomes",
                 "MANDATORY",
                 "HIGH",
-                "Comfort documenting UAT or pilot test outcomes is required",
+                "Document user acceptance testing outcomes is required",
                 category="TESTING",
             ),
         ],
         {
-            "purpose": "Expose P-2: generic business process mapping fails closed to NONE; core mandatory HIGH NONE blocks positive apply.",
+            "purpose": "P-2 process mapping remains NONE without Claim/Evidence changes -> REJECT.",
             "role_family": "Business Process",
             "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "key_matches": {
-                "REQ_P2_MAP": {"result": "NONE"},
-                "REQ_P2_REQ": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_P2_UAT": {
-                    "result": "SUPPORTED",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-            },
+            "key_matches": {"REQ_P2_MAP": {"result": "NONE"}},
             "expect_gap_substrings": ["process"],
             "require_hard_blockers": True,
             "semantic_boundaries": [
-                "P-2 process mapping remains NONE without Claim/Evidence changes"
+                "P-2 process mapping has no approved Claim capability provenance"
             ],
             "known_limitations": ["P-2"],
-            "notes": ["Conservative REJECT is expected while P-2 remains deferred."],
+            "notes": [],
         },
     )
 
-    write_fixture(
-        "GT_PREF_GAP_P1",
-        "Business Systems Analyst",
-        "Business Systems",
-        "EARLY_CAREER",
-        """
-Lumen Ops — Business Systems Analyst (Synthetic Fixture)
-
-Strong core Business Systems fit. Salesforce is preferred, but not required.
-
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
-
-Preferred qualifications
-- Salesforce administration experience is preferred, but not required
-""",
-        CORE_REQS
-        + [
-            req(
-                "REQ_P1_SF",
-                "Salesforce administration experience",
-                "PREFERRED",
-                "MEDIUM",
-                "Salesforce administration experience is preferred, but not required",
-                category="PLATFORM",
-                technology=["Salesforce"],
-                domain="CRM",
-                location="Preferred qualifications",
-            ),
-        ],
-        {
-            "purpose": "Preferred skill gap must not auto-reject; surfaces P-1 phrasing handling.",
-            "role_family": "Business Systems",
-            "acceptable_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "forbidden_decisions": ["REJECT"],
-            "key_matches": {
-                "REQ_CORE_REQ": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_P1_SF": {"result": "NONE"},
-            },
-            "expected_importance": {"REQ_P1_SF": "PREFERRED"},
-            "expect_gap_substrings": ["Salesforce"],
-            "semantic_boundaries": [
-                "preferred gap does not auto-reject",
-                "P-1 preferred-but-not-required phrasing",
-            ],
-            "known_limitations": ["NONE"],
-            "notes": [
-                "P-1 bounded hardening: preferred, but not required -> PREFERRED."
-            ],
-        },
-    )
-
+    # --- 6 Platform reject ---
     write_fixture(
         "GT_PLATFORM_REJECT",
         "Salesforce Business Systems Analyst",
@@ -533,12 +510,12 @@ Preferred qualifications
         """
 CRM Factory — Salesforce Business Systems Analyst (Synthetic Fixture)
 
-Salesforce administration is the central mandatory specialization for this role.
+Salesforce administration is the central mandatory specialization.
 
-Minimum qualifications (required)
+Required
 - Salesforce administration experience is required
-- Experience gathering requirements and clarifying scope boundaries
-- Comfort documenting UAT or pilot test outcomes
+- Gather business requirements from operations stakeholders
+- Document user acceptance testing outcomes
 """,
         [
             req(
@@ -549,41 +526,38 @@ Minimum qualifications (required)
                 "Salesforce administration experience is required",
                 category="PLATFORM",
                 technology=["Salesforce"],
-                domain="CRM",
             ),
             req(
                 "REQ_PLAT_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
+                "Gather business requirements from operations stakeholders",
                 "MANDATORY",
                 "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries is required",
+                "Gather business requirements from operations stakeholders",
                 category="REQUIREMENTS",
             ),
             req(
                 "REQ_PLAT_UAT",
-                "Comfort documenting UAT or pilot test outcomes",
+                "Document user acceptance testing outcomes",
                 "MANDATORY",
                 "HIGH",
-                "Comfort documenting UAT or pilot test outcomes is required",
+                "Document user acceptance testing outcomes",
                 category="TESTING",
             ),
         ],
         {
-            "purpose": "Mandatory core platform specialization (Salesforce) must REJECT.",
+            "purpose": "Mandatory Salesforce specialization -> REJECT.",
             "role_family": "Business Systems",
             "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
             "key_matches": {"REQ_PLAT_SF": {"result": "NONE"}},
-            "expect_gap_substrings": ["Salesforce"],
             "require_hard_blockers": True,
-            "semantic_boundaries": [
-                "unsupported platform specialization blocks positive routing"
-            ],
+            "semantic_boundaries": ["unsupported platform specialization blocks apply"],
             "known_limitations": ["NONE"],
             "notes": [],
         },
     )
 
+    # --- 7 Senior reject ---
     write_fixture(
         "GT_SENIOR_REJECT",
         "Senior Business Systems Analyst",
@@ -594,10 +568,10 @@ Senior Business Systems Analyst — Apex Systems Guild (Synthetic Fixture)
 
 Requires 7+ years leading enterprise systems programs.
 
-Minimum qualifications (required)
+Required
 - 7+ years leading enterprise systems programs
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
+- Gather and clarify business requirements
+- Configure operational workflow automation with approval controls
 """,
         [
             req(
@@ -612,23 +586,23 @@ Minimum qualifications (required)
             ),
             req(
                 "REQ_SEN_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
+                "Gather and clarify business requirements",
                 "MANDATORY",
                 "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries is required",
+                "Gather and clarify business requirements",
                 category="REQUIREMENTS",
             ),
             req(
                 "REQ_SEN_WF",
-                "Experience with workflow automation and approval-synchronized evidence mapping",
+                "Configure operational workflow automation with approval controls",
                 "MANDATORY",
                 "HIGH",
-                "Experience with workflow automation and approval-synchronized evidence mapping is required",
+                "Configure operational workflow automation with approval controls",
                 category="PROCESS",
             ),
         ],
         {
-            "purpose": "Clearly senior title/experience must REJECT.",
+            "purpose": "Senior title/experience -> REJECT.",
             "role_family": "Business Systems",
             "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
@@ -637,7 +611,7 @@ Minimum qualifications (required)
                     "result": "STRONG",
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
+                }
             },
             "require_hard_blockers": True,
             "semantic_boundaries": ["seniority defense-in-depth"],
@@ -646,6 +620,7 @@ Minimum qualifications (required)
         },
     )
 
+    # --- 8 SWE reject ---
     write_fixture(
         "GT_SWE_REJECT",
         "Software Engineer",
@@ -654,14 +629,12 @@ Minimum qualifications (required)
         """
 Bytebridge — Software Engineer (Synthetic Fixture)
 
-Substantive software engineering role. Generic overlap words such as
-requirements, testing, APIs, data, and stakeholders must not produce APPLY.
+Substantive software engineering. Shared vocabulary must not create APPLY.
 
-Minimum qualifications (required)
+Required
 - Build and maintain backend services and APIs as a software engineer
 - Write automated tests for production services
 - Partner with stakeholders on technical requirements definition
-- Work with data pipelines supporting application features
 """,
         [
             req(
@@ -680,7 +653,6 @@ Minimum qualifications (required)
                 "HIGH",
                 "Write automated tests for production services is required",
                 category="TESTING",
-                domain="Software Engineering",
             ),
             req(
                 "REQ_SWE_REQ",
@@ -690,34 +662,22 @@ Minimum qualifications (required)
                 "Partner with stakeholders on technical requirements definition is required",
                 category="REQUIREMENTS",
             ),
-            req(
-                "REQ_SWE_DATA",
-                "Work with data pipelines supporting application features",
-                "MANDATORY",
-                "MEDIUM",
-                "Work with data pipelines supporting application features is required",
-                category="DATA",
-            ),
         ],
         {
-            "purpose": "Software Engineering role must REJECT despite generic shared vocabulary.",
+            "purpose": "Software Engineering confirmed mismatch -> REJECT.",
             "role_family": "Software Engineering",
             "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
             "key_matches": {
-                "REQ_SWE_CORE": {
-                    "result": "NONE",
-                    "acceptable_results": ["NONE", "UNKNOWN"],
-                },
+                "REQ_SWE_CORE": {"result": "NONE", "acceptable_results": ["NONE", "UNKNOWN"]}
             },
-            "semantic_boundaries": [
-                "generic lexical overlap cannot create APPLY for SWE"
-            ],
+            "semantic_boundaries": ["generic overlap cannot create APPLY for SWE"],
             "known_limitations": ["NONE"],
             "notes": [],
         },
     )
 
+    # --- 9 ML reject ---
     write_fixture(
         "GT_ML_REJECT",
         "Machine Learning Engineer",
@@ -726,13 +686,11 @@ Minimum qualifications (required)
         """
 ModelYard — Machine Learning Engineer (Synthetic Fixture)
 
-Requires production ML systems and model deployment. LLM API experimentation
-is not equivalent.
+Production ML / model deployment required. LLM API experiments are not equivalent.
 
-Minimum qualifications (required)
+Required
 - Build production ML systems and machine learning pipelines
 - Deploy models to production ML infrastructure
-- Experience gathering requirements and clarifying scope boundaries
 """,
         [
             req(
@@ -743,7 +701,6 @@ Minimum qualifications (required)
                 "Build production ML systems and machine learning pipelines is required",
                 category="ML",
                 technology=["Python"],
-                domain="Machine Learning",
             ),
             req(
                 "REQ_ML_DEPLOY",
@@ -752,35 +709,21 @@ Minimum qualifications (required)
                 "HIGH",
                 "Deploy models to production ML infrastructure is required",
                 category="ML",
-                domain="Machine Learning",
-            ),
-            req(
-                "REQ_ML_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
-                "MANDATORY",
-                "MEDIUM",
-                "Experience gathering requirements and clarifying scope boundaries is required",
-                category="REQUIREMENTS",
             ),
         ],
         {
-            "purpose": "Production ML / model deployment must REJECT; not equivalent to LLM API use.",
+            "purpose": "Production ML -> REJECT.",
             "role_family": "Machine Learning Engineering",
             "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "key_matches": {
-                "REQ_ML_PROD": {"result": "NONE"},
-                "REQ_ML_DEPLOY": {
-                    "result": "NONE",
-                    "acceptable_results": ["NONE", "UNKNOWN"],
-                },
-            },
-            "semantic_boundaries": ["MarketMind/LLM API use is not production ML"],
+            "key_matches": {"REQ_ML_PROD": {"result": "NONE"}},
+            "semantic_boundaries": ["LLM API use is not production ML"],
             "known_limitations": ["NONE"],
             "notes": [],
         },
     )
 
+    # --- 10 Regulatory trap -> APPLY (material HIGH preferred) ---
     write_fixture(
         "GT_REGULATORY_TRAP",
         "Business Systems Analyst",
@@ -789,54 +732,88 @@ Minimum qualifications (required)
         """
 Compliance Ops Desk — Business Systems Analyst (Synthetic Fixture)
 
-Strong core systems fit plus preferred U.S. regulatory / SEC / SOX familiarity.
-Current repository must not invent foreign regulatory background.
+Strong systems core. U.S. regulatory / SEC / SOX familiarity is a material preferred ask.
+Do not invent foreign regulatory background.
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
+Required
+- Clarify stakeholder requirements for internal controls tooling
+- Maintain controlled operational workflow automation with approval gates
+- Run CSV imports and data-feed validation for recurring packages
+- Document acceptance testing / pilot validation
+- Support fail-closed outbound communication controls
 
-Preferred qualifications
-- Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)
+Preferred
+- Hands-on U.S. regulatory reporting packages (SEC / SOX-style controls)
 """,
-        CORE_REQS
-        + [
+        [
+            req(
+                "REQ_REG_REQ",
+                "Clarify stakeholder requirements for internal controls tooling",
+                "MANDATORY",
+                "HIGH",
+                "Clarify stakeholder requirements for internal controls tooling",
+                category="REQUIREMENTS",
+            ),
+            req(
+                "REQ_REG_WF",
+                "Maintain controlled operational workflow automation with approval gates",
+                "MANDATORY",
+                "HIGH",
+                "Maintain controlled operational workflow automation with approval gates",
+                category="PROCESS",
+            ),
+            req(
+                "REQ_REG_DATA",
+                "Run CSV imports and data-feed validation for recurring packages",
+                "MANDATORY",
+                "HIGH",
+                "Run CSV imports and data-feed validation for recurring packages",
+                category="DATA",
+                technology=["CSV"],
+            ),
+            req(
+                "REQ_REG_UAT",
+                "Document acceptance testing / pilot validation",
+                "MANDATORY",
+                "HIGH",
+                "Document acceptance testing / pilot validation",
+                category="TESTING",
+            ),
+            req(
+                "REQ_REG_CTRL",
+                "Support fail-closed outbound communication controls",
+                "MANDATORY",
+                "HIGH",
+                "Support fail-closed outbound communication controls",
+                category="CONTROLS",
+            ),
             req(
                 "REQ_REG_US",
-                "Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)",
+                "Hands-on U.S. regulatory reporting packages (SEC / SOX-style controls)",
                 "PREFERRED",
-                "MEDIUM",
-                "Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)",
+                "HIGH",
+                "Preferred: Hands-on U.S. regulatory reporting packages (SEC / SOX-style controls)",
                 category="DOMAIN",
                 domain="U.S. Regulatory Reporting",
-                location="Preferred qualifications",
+                location="Preferred",
             ),
         ],
         {
-            "purpose": "U.S. regulatory requirement must be NONE with current trusted repository.",
+            "purpose": "U.S. regulatory preferred HIGH = NONE; strong core -> APPLY not Priority.",
             "role_family": "Business Systems",
-            "acceptable_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "forbidden_decisions": ["REJECT"],
-            "key_matches": {
-                "REQ_REG_US": {"result": "NONE"},
-                "REQ_CORE_CTRL": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-            },
+            "acceptable_decisions": ["APPLY"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "REJECT"],
+            "key_matches": {"REQ_REG_US": {"result": "NONE"}},
             "expect_gap_substrings": ["regulatory"],
             "semantic_boundaries": [
-                "Winter Walk software controls are not U.S. regulatory expertise"
+                "software controls are not U.S. regulatory expertise"
             ],
             "known_limitations": ["NONE"],
             "notes": [],
         },
     )
 
+    # --- 11 QA trap ---
     write_fixture(
         "GT_QA_TRAP",
         "Business Systems Analyst",
@@ -845,38 +822,77 @@ Preferred qualifications
         """
 Quality Bridge — Business Systems Analyst (Synthetic Fixture)
 
-Core systems fit. Enterprise QA engineering ownership is preferred only and
-must not be satisfied by Winter Walk UAT evidence.
+Core systems fit. Enterprise QA ownership is preferred and must stay NONE vs UAT.
 
-Minimum qualifications (required)
-- Experience gathering requirements and clarifying scope boundaries
-- Experience with workflow automation and approval-synchronized evidence mapping
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Comfort documenting UAT or pilot test outcomes
-- Support fail-closed operational controls for outbound follow-up communications
+Required
+- Document requirements after stakeholder workshops
+- Operate controlled workflow automation with approval sync points
+- Validate CSV / file imports for production intakes
+- Run user acceptance testing and archive pilot notes
+- Keep fail-closed send controls healthy
 
-Preferred qualifications
-- Enterprise QA engineering ownership experience is a bonus
+Preferred
+- Enterprise QA engineering ownership experience
 """,
-        CORE_REQS
-        + [
+        [
+            req(
+                "REQ_QA_REQ",
+                "Document requirements after stakeholder workshops",
+                "MANDATORY",
+                "HIGH",
+                "Document requirements after stakeholder workshops",
+                category="REQUIREMENTS",
+            ),
+            req(
+                "REQ_QA_WF",
+                "Operate controlled workflow automation with approval sync points",
+                "MANDATORY",
+                "HIGH",
+                "Operate controlled workflow automation with approval sync points",
+                category="PROCESS",
+            ),
+            req(
+                "REQ_QA_DATA",
+                "Validate CSV / file imports for production intakes",
+                "MANDATORY",
+                "HIGH",
+                "Validate CSV / file imports for production intakes",
+                category="DATA",
+                technology=["CSV"],
+            ),
+            req(
+                "REQ_QA_UAT",
+                "Run user acceptance testing and archive pilot notes",
+                "MANDATORY",
+                "HIGH",
+                "Run user acceptance testing and archive pilot notes",
+                category="TESTING",
+            ),
+            req(
+                "REQ_QA_CTRL",
+                "Keep fail-closed send controls healthy",
+                "MANDATORY",
+                "HIGH",
+                "Keep fail-closed send controls healthy",
+                category="CONTROLS",
+            ),
             req(
                 "REQ_QA_ENT",
                 "Enterprise QA engineering ownership experience",
                 "PREFERRED",
-                "MEDIUM",
-                "Enterprise QA engineering ownership experience is a bonus",
+                "HIGH",
+                "Preferred: Enterprise QA engineering ownership experience",
                 category="QA",
-                location="Preferred qualifications",
+                location="Preferred",
             ),
         ],
         {
-            "purpose": "Enterprise QA ownership must remain NONE; UAT is not equivalent.",
+            "purpose": "Enterprise QA preferred HIGH = NONE; UAT supported; APPLY.",
             "role_family": "Business Systems",
-            "acceptable_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "forbidden_decisions": ["REJECT"],
+            "acceptable_decisions": ["APPLY"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "REJECT"],
             "key_matches": {
-                "REQ_CORE_UAT": {
+                "REQ_QA_UAT": {
                     "result": "SUPPORTED",
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
@@ -890,6 +906,7 @@ Preferred qualifications
         },
     )
 
+    # --- 12 Cloud reject ---
     write_fixture(
         "GT_CLOUD_REJECT",
         "Business Systems Analyst",
@@ -898,49 +915,46 @@ Preferred qualifications
         """
 Cloudrail Systems — Business Systems Analyst (Synthetic Fixture)
 
-Google Cloud infrastructure engineering is a core mandatory requirement.
-Apps Script evidence must not count as equivalent.
+GCP/cloud engineering is mandatory and core. Apps Script is not equivalent.
 
-Minimum qualifications (required)
-- Exposure to Google Cloud infrastructure / GCP engineering is required
-- Experience gathering requirements and clarifying scope boundaries
-- Comfort documenting UAT or pilot test outcomes
+Required
+- Google Cloud / GCP infrastructure engineering experience is required
+- Gather business requirements for internal tools
+- Document user acceptance testing outcomes
 """,
         [
             req(
                 "REQ_CLOUD_GCP",
-                "Exposure to Google Cloud infrastructure / GCP engineering",
+                "Google Cloud / GCP infrastructure engineering experience",
                 "MANDATORY",
                 "HIGH",
-                "Exposure to Google Cloud infrastructure / GCP engineering is required",
+                "Google Cloud / GCP infrastructure engineering experience is required",
                 category="TECHNOLOGY",
                 technology=["Google Cloud", "GCP"],
-                domain="Cloud",
             ),
             req(
                 "REQ_CLOUD_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
+                "Gather business requirements for internal tools",
                 "MANDATORY",
                 "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries is required",
+                "Gather business requirements for internal tools",
                 category="REQUIREMENTS",
             ),
             req(
                 "REQ_CLOUD_UAT",
-                "Comfort documenting UAT or pilot test outcomes",
+                "Document user acceptance testing outcomes",
                 "MANDATORY",
                 "HIGH",
-                "Comfort documenting UAT or pilot test outcomes is required",
+                "Document user acceptance testing outcomes",
                 category="TESTING",
             ),
         ],
         {
-            "purpose": "Mandatory GCP/cloud engineering must REJECT; Apps Script is not equivalent.",
+            "purpose": "Mandatory GCP -> REJECT.",
             "role_family": "Business Systems",
             "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
             "key_matches": {"REQ_CLOUD_GCP": {"result": "NONE"}},
-            "expect_gap_substrings": ["Google Cloud"],
             "require_hard_blockers": True,
             "semantic_boundaries": ["Apps Script != Google Cloud engineering"],
             "known_limitations": ["NONE"],
@@ -948,6 +962,7 @@ Minimum qualifications (required)
         },
     )
 
+    # --- 13 Adjacent TechOps EFFICIENT (thinner) ---
     write_fixture(
         "GT_ADJ_TECHOPS",
         "Technical Operations Analyst",
@@ -956,61 +971,50 @@ Minimum qualifications (required)
         """
 Signal Desk — Technical Operations Analyst (Synthetic Fixture)
 
-Adjacent Blueprint family. Viable through substantive requirements, not exact
-Business Systems title dependence.
+Adjacent family. Viable via duties, not exact BSA title. Lower-intensity coverage.
 
-Minimum qualifications (required)
-- Support fail-closed operational controls for outbound follow-up communications
-- Hands-on CSV / Drive-folder data ingestion with import logging
-- Experience gathering requirements and clarifying scope boundaries
-- Comfort documenting UAT or pilot test outcomes
+Required
+- Support fail-closed controls for outbound operational messages
+- Keep CSV intake imports logging reliably
+
+Preferred
+- Light SQL comfort
 """,
         [
             req(
                 "REQ_TO_CTRL",
-                "Support fail-closed operational controls for outbound follow-up communications",
+                "Support fail-closed controls for outbound operational messages",
                 "MANDATORY",
                 "HIGH",
-                "Support fail-closed operational controls for outbound follow-up communications is required",
+                "Support fail-closed controls for outbound operational messages",
                 category="CONTROLS",
                 domain="Technical Operations",
             ),
             req(
                 "REQ_TO_DATA",
-                "Hands-on CSV / Drive-folder data ingestion with import logging",
+                "Keep CSV intake imports logging reliably",
                 "MANDATORY",
                 "HIGH",
-                "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+                "Keep CSV intake imports logging reliably",
                 category="DATA",
                 technology=["CSV"],
             ),
             req(
-                "REQ_TO_REQ",
-                "Experience gathering requirements and clarifying scope boundaries",
-                "MANDATORY",
-                "HIGH",
-                "Experience gathering requirements and clarifying scope boundaries is required",
-                category="REQUIREMENTS",
-            ),
-            req(
-                "REQ_TO_UAT",
-                "Comfort documenting UAT or pilot test outcomes",
-                "MANDATORY",
-                "HIGH",
-                "Comfort documenting UAT or pilot test outcomes is required",
-                category="TESTING",
+                "REQ_TO_SQL",
+                "Light SQL comfort",
+                "PREFERRED",
+                "MEDIUM",
+                "Preferred: Light SQL comfort",
+                category="TECHNOLOGY",
+                technology=["SQL"],
+                location="Preferred",
             ),
         ],
         {
-            "purpose": "High-value adjacent Technical Operations family remains viable without exact-title dependence.",
+            "purpose": "Adjacent Technical Operations with thinner coverage -> EFFICIENT_APPLY.",
             "role_family": "Technical Operations",
-            "acceptable_decisions": [
-                "PRIORITY_APPLY",
-                "APPLY",
-                "EFFICIENT_APPLY",
-                "WATCH",
-            ],
-            "forbidden_decisions": [],
+            "acceptable_decisions": ["EFFICIENT_APPLY"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "REJECT"],
             "key_matches": {
                 "REQ_TO_CTRL": {
                     "result": "STRONG",
@@ -1022,25 +1026,14 @@ Minimum qualifications (required)
                     "require_provenance": True,
                     "acceptable_results": ["STRONG", "SUPPORTED"],
                 },
-                "REQ_TO_REQ": {
-                    "result": "STRONG",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
-                "REQ_TO_UAT": {
-                    "result": "SUPPORTED",
-                    "require_provenance": True,
-                    "acceptable_results": ["STRONG", "SUPPORTED"],
-                },
             },
-            "semantic_boundaries": ["adjacent family viability without exact title"],
+            "semantic_boundaries": ["adjacent family without exact title dependence"],
             "known_limitations": ["NONE"],
-            "notes": [
-                "WATCH allowed only if substantive coverage is insufficient; positive preferred."
-            ],
+            "notes": [],
         },
     )
 
+    # --- 14 Unrelated Analyst REJECT ---
     write_fixture(
         "GT_UNRELATED_ANALYST",
         "Marketing Media Analyst",
@@ -1049,12 +1042,12 @@ Minimum qualifications (required)
         """
 Audience Pulse — Marketing Media Analyst (Synthetic Fixture)
 
-Title contains Analyst but work is unrelated marketing/media analytics.
+Well-specified unrelated marketing/media analytics role.
 
-Minimum qualifications (required)
+Required
 - Analyze paid media campaign performance and audience funnel metrics
 - Build marketing dashboards for campaign stakeholders
-- Recommend media mix changes based on engagement process insights
+- Manage marketing workflow automation for nurture campaigns
 """,
         [
             req(
@@ -1073,38 +1066,35 @@ Minimum qualifications (required)
                 "HIGH",
                 "Build marketing dashboards for campaign stakeholders is required",
                 category="MARKETING",
-                domain="Media",
             ),
             req(
-                "REQ_MKT_PROC",
-                "Recommend media mix changes based on engagement process insights",
+                "REQ_MKT_WF",
+                "Manage marketing workflow automation for nurture campaigns",
                 "MANDATORY",
-                "MEDIUM",
-                "Recommend media mix changes based on engagement process insights is required",
+                "HIGH",
+                "Manage marketing workflow automation for nurture campaigns is required",
                 category="MARKETING",
             ),
         ],
         {
-            "purpose": "Unrelated Analyst title must not APPLY via generic stakeholder/process vocabulary.",
+            "purpose": "Confirmed unrelated Analyst duties -> REJECT; marketing automation != STRONG.",
             "role_family": "Marketing Analytics",
-            "acceptable_decisions": ["REJECT", "WATCH", "UNDECIDED"],
+            "acceptable_decisions": ["REJECT"],
             "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
             "key_matches": {
-                "REQ_MKT_MEDIA": {
-                    "result": "NONE",
-                    "acceptable_results": ["NONE", "UNKNOWN"],
-                },
-                "REQ_MKT_DASH": {
-                    "result": "NONE",
-                    "acceptable_results": ["NONE", "UNKNOWN"],
-                },
+                "REQ_MKT_MEDIA": {"result": "NONE", "acceptable_results": ["NONE", "UNKNOWN"]},
+                "REQ_MKT_WF": {"result": "NONE", "acceptable_results": ["NONE", "UNKNOWN"]},
             },
-            "semantic_boundaries": ["Analyst title alone is insufficient for APPLY"],
+            "semantic_boundaries": [
+                "Analyst title insufficient",
+                "marketing workflow automation must not gain STRONG",
+            ],
             "known_limitations": ["NONE"],
             "notes": [],
         },
     )
 
+    # --- 15 Vague -> WATCH ---
     write_fixture(
         "GT_VAGUE_JD",
         "Operations Analyst",
@@ -1113,8 +1103,7 @@ Minimum qualifications (required)
         """
 Horizon Collective — Operations Analyst (Synthetic Fixture)
 
-We are a passionate, fast-paced team building the future of collaborative work.
-Ideal teammates thrive in ambiguity, love stakeholders, and bring positive energy.
+Passionate fast-paced team. Vague aspirational prose with little evaluable substance.
 
 About you
 - Self-starter who thrives in a fast-paced environment
@@ -1163,27 +1152,18 @@ Nice to have
             ),
         ],
         {
-            "purpose": "Vague aspirational JD must keep UNCLEAR/UNKNOWN visible; no manufactured certainty.",
+            "purpose": "Information deficit vague JD -> WATCH (not REJECT).",
             "role_family": "Business Operations",
-            "acceptable_decisions": ["WATCH", "UNDECIDED", "REJECT"],
-            "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
+            "acceptable_decisions": ["WATCH"],
+            "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY", "REJECT"],
             "key_matches": {
-                "REQ_V_AMBIG": {
-                    "result": "NONE",
-                    "acceptable_results": ["NONE", "UNKNOWN"],
-                },
-                "REQ_V_TOOLS": {
-                    "result": "NONE",
-                    "acceptable_results": ["NONE", "UNKNOWN"],
-                },
+                "REQ_V_AMBIG": {"result": "NONE", "acceptable_results": ["NONE", "UNKNOWN"]}
             },
             "semantic_boundaries": [
-                "do not manufacture certainty from vague JD prose"
+                "insufficient information routes to WATCH not REJECT"
             ],
             "known_limitations": ["NONE"],
-            "notes": [
-                "HR noise may be skipped; remaining ambiguity must not become positive apply."
-            ],
+            "notes": [],
         },
     )
 
