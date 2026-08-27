@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.0**
+**Final Locked Blueprint v3.1**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -11,7 +11,8 @@
 This is the **strategic, product, reliability, AI-agent, implementation,
 and coding source of truth** for the Bora Employer Pipeline OS.
 
-All future build chats, Cursor sessions, Gemini sessions, ChatGPT
+All future build chats, Cursor sessions, Claude Code review sessions,
+ChatGPT sessions, occasional Gemini strategic/research second-opinion
 sessions, scripts, schemas, prompts, tests, and changes must begin from
 this document.
 
@@ -1526,21 +1527,41 @@ This prevents one bad automation from creating 50 bad external records.
 
 **54. TOOL ARCHITECTURE — LOCKED**
 
-Core system:
+Core operating model:
 
-**CHATGPT + CURSOR + GEMINI**
+**CHATGPT + CURSOR + CLAUDE CODE**
 
-Claude products are:
+* ChatGPT = primary architect, research, reasoning, sequencing, and final decision guidance;
+* Cursor = primary builder;
+* Claude Code = independent coding/evidence reviewer, milestone auditor, and harder-code escalation.
 
-**OPTIONAL SECONDARY REVIEW ONLY.**
+Gemini is:
 
-The system must remain fully operable if Claude usage is unavailable.
+**NOT part of the coding execution or coding-review loop.**
+
+Gemini may be used only occasionally for non-coding strategic, directional, or research second opinions when genuinely useful.
+
+No runtime or production workflow may depend on agreement from multiple models.
+
+Deterministic validators remain the real enforcement layer.
+
+Evidence wins over model opinion.
+
+Bora retains consequential approval.
+
+The system must remain fully operable if Claude Code or Gemini is unavailable.
 
 **55. CHATGPT — PRIMARY ARCHITECT & RESEARCH ENGINE**
 
 ChatGPT is the main intelligence layer for:
 
 - system architecture;
+
+- research;
+
+- reasoning;
+
+- sequencing;
 
 - evidence reasoning;
 
@@ -1561,6 +1582,8 @@ ChatGPT is the main intelligence layer for:
 - ambiguity resolution;
 
 - debugging plans;
+
+- final decision guidance;
 
 - final quality decisions.
 
@@ -1621,73 +1644,80 @@ Cursor supports version-controlled Project Rules under .cursor/rules and
 project-level AGENTS.md, specifically for persistent repository
 instructions.
 
-**57. GEMINI — SECOND CORE AI / VERIFIER**
+**57. GEMINI — OCCASIONAL NON-CODING SECOND OPINION ONLY**
 
-Gemini has two roles.
+Gemini is not a coding executor, coding reviewer, builder backup, or
+required verifier in the implementation loop.
 
-**ROLE A — SECOND-OPINION VERIFIER**
+Use Gemini only occasionally when a non-coding second opinion is
+genuinely useful, for example:
 
-For:
+- strategic direction;
 
-- unsupported-claim detection;
+- market or research framing;
 
-- evidence mismatch;
+- high-level product/priority tradeoffs;
 
-- adversarial résumé review;
+- non-coding research second opinions.
 
-- rule conflicts;
+Do not use Gemini as:
 
-- test-case critique;
+- primary architect;
 
-- code reasoning;
+- primary builder;
 
-- alternate implementation review.
+- independent coding reviewer;
 
-**ROLE B — BACKUP RESEARCH/BUILD ASSISTANT**
+- independent evidence repository auditor;
 
-If ChatGPT or Cursor is unavailable/limited, Gemini can perform bounded
-tasks.
+- backup coding/build agent;
 
-Gemini should not silently become a second primary architect.
+- required second reviewer for code, schemas, validators, or evidence records.
 
-Gemini CLI supports persistent project context through GEMINI.md,
-including hierarchical instructions and imported shared files.
+Gemini should not silently become a second primary architect or enter
+the coding execution/review loop.
 
-**58. CLAUDE / COWORK / CLAUDE CODE — OPTIONAL ONLY**
+If Gemini CLI is used for occasional strategic/research sessions,
+GEMINI.md may provide non-coding project context and must point back to
+BLUEPRINT.md.
 
-Claude is no longer required for any core workflow.
+**58. CLAUDE CODE — INDEPENDENT CODING / EVIDENCE REVIEWER**
 
-Use only when useful for:
+Claude Code is the independent coding and evidence reviewer.
 
-- independent double-check;
+Use Claude Code for:
 
-- difficult code review;
+- independent code review;
 
-- document/evidence review;
+- evidence-record and evidence-repository audits;
 
-- adversarial reasoning;
+- milestone audits;
 
-- resolving a disagreement;
+- harder-code escalation;
 
-- occasional second résumé audit.
+- adversarial review of implementation against Blueprint rules;
 
-Claude must not own:
+- resolving material coding/evidence disagreements as an independent
+  reviewer (not as a second primary builder).
 
-- core architecture;
+Claude Code must not become:
 
-- application database;
+- a second primary builder;
 
-- evidence database;
+- the primary architect;
 
-- primary résumé generation;
+- the owner of core architecture;
 
-- primary codebase;
+- the owner of the application or evidence database;
 
-- necessary daily operations.
+- a required runtime dependency.
 
-If Claude usage is exhausted:
+Cursor remains the only default primary coding agent.
 
-the system continues normally.
+If Claude Code is unavailable:
+
+the system continues normally; independent review may be deferred, but
+deterministic validators and Bora's approval gates still apply.
 
 **59. AI TEAM MODEL**
 
@@ -1695,19 +1725,22 @@ Default:
 
 **ChatGPT**
 
-Architect + research + job reasoning.
+Primary architect + research + reasoning + sequencing + final decision
+guidance.
 
 **Cursor**
 
-Builder + testing + integration.
+Primary builder + testing + integration.
+
+**Claude Code**
+
+Independent coding/evidence reviewer + milestone auditor + harder-code
+escalation.
 
 **Gemini**
 
-Independent verification + backup.
-
-**Claude**
-
-Optional extra reviewer.
+Occasional non-coding strategic / directional / research second opinion
+only.
 
 This is deliberately not:
 
@@ -1715,33 +1748,38 @@ four AIs all rewriting the same thing.
 
 **60. MODEL INDEPENDENCE**
 
-No core stage may require agreement from four models.
+No core stage may require agreement from multiple models.
 
 That destroys speed and raises cost.
 
 Default high-value flow:
 
-**GENERATE**
+**GENERATE / DECIDE**
 
 ChatGPT or designated reasoning component.
 
+**BUILD**
+
+Cursor.
+
 **VALIDATE**
 
-Code.
+Deterministic code / schemas / tests.
 
-**SECOND-LOOK WHEN NEEDED**
+**INDEPENDENT REVIEW WHEN NEEDED**
 
-Gemini.
+Claude Code for coding, evidence, and milestone audit.
 
-Claude:
+**OCCASIONAL NON-CODING SECOND OPINION**
 
-only for exceptions or periodic audit.
+Gemini only when genuinely useful.
 
-**61. WHEN GEMINI IS REQUIRED**
+**61. WHEN INDEPENDENT REVIEW IS REQUIRED**
 
-Do not Gemini-review every Efficient Apply résumé.
+Do not Gemini-review coding work or every Efficient Apply résumé.
 
-Use mandatory second-model review for:
+Use Claude Code independent review for high-value coding/evidence cases
+such as:
 
 - newly created claim;
 
@@ -1755,7 +1793,9 @@ Use mandatory second-model review for:
 
 - change to forbidden-claim rules;
 
-- Golden Test failure.
+- Golden Test failure;
+
+- material evidence-repository or milestone audit.
 
 Routine reused approved modules:
 
@@ -1763,25 +1803,25 @@ code validation is enough.
 
 This preserves speed.
 
-**62. WHEN CLAUDE IS USED**
+Gemini is not required for these coding/evidence cases.
+
+**62. WHEN GEMINI MAY BE USED**
 
 Examples:
 
-- ChatGPT and Gemini disagree materially;
+- strategic prioritization second opinion;
 
-- difficult architectural decision;
+- market or research framing;
 
-- monthly/random QA sample;
+- non-coding directional tradeoffs;
 
-- especially important application;
+- occasional research challenge outside the coding loop.
 
-- strange code behavior;
+Gemini is optional and non-coding.
 
-- independent evidence audit.
+Not a workflow dependency.
 
-Claude is escalation.
-
-Not workflow dependency.
+Not a coding verifier.
 
 **63. AI OUTPUT SCHEMA**
 
@@ -2006,18 +2046,22 @@ Run tests before declaring done.
 
 No silent architecture changes.
 
-**69. GEMINI.MD**
+**69. GEMINI.MD AND CLAUDE.MD**
 
-GEMINI.md should import or reference the same canonical rules.
+GEMINI.md provides non-coding project context for occasional Gemini
+strategic/research second-opinion sessions and must point back to
+BLUEPRINT.md.
 
-Gemini supports imports from other instruction files, so where practical
-avoid manually maintaining two divergent rule sets.
+CLAUDE.md, if present, provides short Claude Code reviewer/auditor
+instructions and must point back to BLUEPRINT.md.
+
+Where practical, avoid manually maintaining divergent rule sets.
 
 The goal:
 
 one rule source.
 
-Multiple agents.
+Multiple agents with distinct roles.
 
 **70. NO RULE DUPLICATION DRIFT**
 
@@ -2714,8 +2758,9 @@ Do not invent fallback content.
 
 **102. MODEL DISAGREEMENT**
 
-If ChatGPT says supported and Gemini says unsupported on a material new
-claim:
+If ChatGPT's guidance and Claude Code's independent coding/evidence
+review disagree materially on a new claim, implementation, or audit
+finding:
 
 **HOLD.**
 
@@ -2725,11 +2770,17 @@ Options:
 
 - Bora decides;
 
-- Claude optional tie-break/reviewer.
+- request a narrower Claude Code re-review against specific evidence/rules.
 
-Claude does not automatically win.
+Claude Code does not automatically win.
 
 Evidence wins.
+
+Deterministic validators win over model opinion where they apply.
+
+An occasional Gemini non-coding strategic second opinion does not
+resolve coding/evidence disputes and must not be treated as coding-review
+authority.
 
 **103. FOLLOW-UP ENGINE**
 
@@ -3123,11 +3174,13 @@ Use ChatGPT for:
 
 Then pass bounded implementation task to Cursor.
 
-**120. GEMINI BUILD PROCESS**
+**120. CLAUDE CODE REVIEW PROCESS**
 
-Use Gemini primarily after implementation:
+Use Claude Code primarily after implementation or at milestones:
 
-“Try to break this.”
+“Independent coding review of this diff.”
+
+“Audit these evidence records against Blueprint truth rules.”
 
 “Find evidence leakage.”
 
@@ -3135,25 +3188,35 @@ Use Gemini primarily after implementation:
 
 “Find contradictions against Blueprint.”
 
-“Review this diff.”
+“Harder-code escalation on this failing validation/design conflict.”
 
 Not:
 
 “Rebuild the entire architecture your way.”
 
-**121. CLAUDE BUILD PROCESS**
+“Become a second primary builder.”
 
-Use sparingly.
+**121. GEMINI SECOND-OPINION PROCESS**
 
-Examples:
+Use Gemini only occasionally for non-coding work, for example:
 
-“Independent audit of these 10 outputs.”
+“Second opinion on strategic priority tradeoffs.”
 
-“Review this difficult architecture decision.”
+“Challenge this market/research framing.”
 
-“Find flaws ChatGPT and Gemini may both have missed.”
+“Directional review outside the coding loop.”
 
-System cannot depend on it.
+Not:
+
+“Review this coding diff.”
+
+“Audit these evidence JSON records as coding verifier.”
+
+“Act as backup builder.”
+
+“Rebuild the entire architecture your way.”
+
+System cannot depend on Gemini.
 
 **122. PERIODIC MULTI-MODEL AUDIT**
 
@@ -3163,17 +3226,20 @@ every major milestone or periodically:
 
 select random outputs.
 
-ChatGPT → primary.
+ChatGPT → primary reasoning/decision guidance.
 
-Gemini → adversarial.
+Claude Code → independent coding/evidence audit.
 
-Claude → occasional third audit.
+Gemini → occasional non-coding strategic/research second opinion only
+when useful.
 
 Compare.
 
 Record discrepancies.
 
 Improve rules if a generalizable failure appears.
+
+No stage may require agreement from all models.
 
 **123. HARD PRODUCT RULES**
 
@@ -3294,9 +3360,9 @@ help Bora get hired.
 
 **Code constrains.**
 
-**Gemini challenges.**
+**Claude Code independently reviews coding and evidence when needed.**
 
-**Claude may audit.**
+**Gemini may occasionally challenge non-coding strategy/research.**
 
 **Bora decides.**
 
@@ -3332,10 +3398,15 @@ outcomes, company facts, sources, immigration conclusions or hiring
 probabilities. UNKNOWN stays UNKNOWN. Preserve evidence provenance and
 forbidden-claim boundaries. AI may propose semantic decisions;
 deterministic code must enforce invariants. ChatGPT is the primary
-architecture/research/reasoning agent, Cursor is the primary software
-builder, Gemini is the primary independent verifier/backup, and Claude
-is optional escalation/audit only. The complete system must remain
-operable without Claude. Never weaken validation, Golden Tests,
+architecture/research/reasoning/sequencing and final-decision-guidance
+agent; Cursor is the primary software builder; Claude Code is the
+independent coding/evidence reviewer, milestone auditor, and harder-code
+escalation path; Gemini is used only occasionally for non-coding
+strategic, directional, or research second opinions and is not part of
+the coding execution or coding-review loop. No runtime workflow may
+depend on multi-model agreement. Evidence wins over model opinion. Bora
+retains consequential approval. The complete system must remain operable
+without Claude Code or Gemini. Never weaken validation, Golden Tests,
 provenance, human approval gates or safety rules merely to increase
 throughput. Never silently change architecture. If a locked rule blocks
 implementation, return ARCHITECTURE_DECISION_REQUIRED with the conflict

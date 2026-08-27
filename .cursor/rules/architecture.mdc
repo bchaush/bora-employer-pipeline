@@ -98,14 +98,16 @@ Material decisions must be represented in repository files such as:
 
 Preserve the locked agent model:
 
-* ChatGPT: primary architecture, research, reasoning, and quality decisions;
-* Cursor: primary implementation agent;
-* Gemini: independent verifier and backup;
-* Claude: optional escalation/review only.
+* ChatGPT: primary architecture, research, reasoning, sequencing, and final decision guidance;
+* Cursor: primary builder / implementation agent;
+* Claude Code: independent coding/evidence reviewer, milestone auditor, and harder-code escalation;
+* Gemini: occasional non-coding strategic, directional, or research second opinion only — not part of the coding execution or coding-review loop.
 
 Do not create a workflow that requires agreement from multiple models for routine operations.
 
-Do not make any optional model a core runtime dependency.
+Do not make Claude Code or Gemini a core runtime dependency.
+
+Deterministic validators remain the real enforcement layer. Evidence wins over model opinion. Bora retains consequential approval.
 
 ## Deterministic Boundary
 

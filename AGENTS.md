@@ -19,6 +19,13 @@ BLUEPRINT.md is the strategic, product, reliability, implementation, and coding 
 - Do not weaken reliability rules for speed.
 - If a materially better approach is discovered: surface risks/tradeoffs and wait for explicit approval from Bora before modifying code.
 
+## Locked AI / Tool Roles
+- **ChatGPT**: primary architect, research, reasoning, sequencing, and final decision guidance.
+- **Cursor**: primary builder.
+- **Claude Code**: independent coding/evidence reviewer, milestone auditor, and harder-code escalation (not a second primary builder).
+- **Gemini**: occasional non-coding strategic/directional/research second opinion only; not part of the coding execution or coding-review loop.
+- No runtime workflow may depend on multi-model agreement. Deterministic validators enforce invariants. Evidence wins over model opinion. Bora retains consequential approval.
+
 ## Truth Rules
 Never invent or infer a factual claim merely to improve job fit. Unknown information must remain unknown.
 - Do NOT fabricate: work experience, technologies, metrics, employment dates, titles, immigration/OPT facts, employer details, sponsorship facts, or résumé claims.

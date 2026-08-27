@@ -19,6 +19,54 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — AI/Tool Operating-Model Governance Sync (Blueprint v3.1)
+
+**Reason**
+
+Bora explicitly approved a correction to the project's AI/tool operating model so future sessions do not inherit contradictory Gemini/Claude role instructions. ChatGPT review approved Blueprint version bump v3.0 → v3.1 and retention of `CLAUDE.md`.
+
+**Changed**
+
+* Locked Blueprint version updated to **v3.1**.
+* Synchronized locked roles across `BLUEPRINT.md`, `AGENTS.md`, `.cursor/rules/architecture.mdc`, `GEMINI.md`, `CURRENT_STATE.md`, and `CLAUDE.md`.
+* **ChatGPT** = primary architect / research / reasoning / sequencing / final decision guidance.
+* **Cursor** = primary builder.
+* **Claude Code** = independent coding/evidence reviewer, milestone auditor, and harder-code escalation (not a second primary builder).
+* **Gemini** = occasional non-coding strategic / directional / research second opinion only; removed from the coding execution/coding-review loop and backup-builder role.
+* Preserved: no multi-model runtime dependency; deterministic validators enforce; evidence wins; Bora decides.
+* No production architecture change and no evidence-semantics change.
+* Next technical milestone remains `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY` (not started).
+
+**Affected Areas**
+
+* `BLUEPRINT.md`
+* `AGENTS.md`
+* `.cursor/rules/architecture.mdc`
+* `GEMINI.md`
+* `CLAUDE.md`
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Documentation/rules-only change. Does not alter schemas, validators, evidence, claims, or production code.
+* Creating `CLAUDE.md` follows the existing `GEMINI.md` model-instruction-file convention and points to `BLUEPRINT.md` rather than duplicating it.
+* Historical CHANGELOG entries describing the former Gemini/Claude architecture remain unchanged as historical records.
+
+**Tests / Verification**
+
+All 7 existing test suites pass (exit 0). Docs-only change.
+
+**Approved By**
+
+Bora; ChatGPT governance review
+
+**Status**
+
+Implemented — Blueprint v3.1 governance sync closed
+
+---
+
 ## 2026-08-26 — Winter Walk Evidence Repository v1 Batch 1 Closed
 
 **Reason**
