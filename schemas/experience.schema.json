@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/experience.schema.json",
+  "title": "Bora Employer Pipeline Experience Record",
+  "description": "Canonical identity record for one Experience_ID. Answers only whether the ID exists and what real experience it identifies. Does not store evidence facts, claim wording, résumé bullets, capabilities, technologies, dates, formal titles, or measured outcomes.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "experience_id",
+    "experience_name",
+    "experience_type",
+    "organization",
+    "source_of_truth"
+  ],
+
+  "properties": {
+    "experience_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent unique identifier for this experience."
+    },
+
+    "experience_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable human-readable identity label for the experience."
+    },
+
+    "experience_type": {
+      "type": "string",
+      "enum": [
+        "EMPLOYMENT",
+        "ORGANIZATIONAL_ENGAGEMENT",
+        "PERSONAL_PROJECT",
+        "EDUCATION",
+        "OTHER"
+      ],
+      "description": "Conservative relationship classification. Prefer ORGANIZATIONAL_ENGAGEMENT over EMPLOYMENT or PERSONAL_PROJECT when stronger employment/project classification is not yet authorized by source evidence."
+    },
+
+    "organization": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Organization or hosting entity associated with the experience identity. May equal experience_name when the experience is the organization/project brand."
+    },
+
+    "source_of_truth": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository-grounded provenance for this identity record itself (not a dump of evidence facts)."
+    },
+
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional identity clarifications or caveats. May be omitted. Must not assert unsupported title, dates, outcomes, or equivalence."
+    }
+  }
+}

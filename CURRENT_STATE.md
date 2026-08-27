@@ -14,13 +14,15 @@ Winter Walk Evidence Repository v1 Batch 1 = **CLOSED** (12 evidence records com
 
 Repository-Level Evidence Integrity v1 = **CLOSED**.
 
+Minimal Experience Registry v1 = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT** (not CLOSED).
+
+Runtime behavior: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`.
+
+Canonical Experience records: **1** (`EXP_WW_001`).
+
+Evidence records: **12** Winter Walk Batch 1 (all reference `EXP_WW_001`; byte-unchanged by this milestone).
+
 No reusable claims created yet.
-
-Experience Registry = **NEXT / NOT STARTED**.
-
-Unresolved (open architecture item, not part of Evidence Integrity closure):
-
-`EXPERIENCE_REGISTRY_DECISION_REQUIRED`
 
 No production engine yet.
 
@@ -76,24 +78,30 @@ No production engine yet.
   * No reusable claims created; schemas and validators unchanged by Batch 1.
 * Repository-Level Evidence Integrity v1 closed:
 
-  * Implementation commit `674784b`; hardening commit `09213b2`.
-  * Independent Claude Code audit + required hardening + final recheck: `CLAUDE_EVIDENCE_INTEGRITY_FINAL_PASS` (no blockers; no remaining required hardening).
-  * `src/evidence_repository.py` + `tests/evidence_repository_test.py`.
-  * Repository-wide gate remains separate from claim-scoped validation (`NO_CLAIM_SCOPED_SEMANTIC_CHANGE`).
-  * Current real Evidence Repository: **12** Winter Walk Batch 1 records; all 12 pass repository integrity; trusted index contains all 12 Evidence_IDs.
-  * Deterministically enforces: recursive deterministic evidence JSON discovery; JSON parse integrity; rejection of duplicate JSON object keys; canonical evidence-schema validation; global `Evidence_ID` uniqueness; filename stem ↔ `evidence_id` exact consistency; one canonical evidence record per JSON file; machine-readable error codes; fail-closed trusted index; missing-root failure; root-is-file failure; deliberate structurally-valid empty-root behavior (`valid=True`, `records_checked=0`, `index={}`).
-  * Experience referential integrity is **not** claimed; `EXPERIENCE_REGISTRY_DECISION_REQUIRED` remains OPEN and is explicitly **not** part of this closed milestone.
-  * No reusable claims created.
+  * Implementation commit `674784b`; hardening commit `09213b2`; closure commit `0dbc044`.
+  * Independent Claude Code audit + required hardening + final recheck: `CLAUDE_EVIDENCE_INTEGRITY_FINAL_PASS`.
+  * Deterministic Evidence Repository gate remains separate from claim-scoped validation.
+* Minimal Experience Registry v1 implemented (not CLOSED):
+
+  * `schemas/experience.schema.json`.
+  * Canonical record `experiences/EXP_WW_001.json` (`ORGANIZATIONAL_ENGAGEMENT`).
+  * `src/experience_repository.py` — Experience Registry integrity (discovery, parse, duplicate-key rejection, schema, uniqueness, filename/ID match, fail-closed trusted index, empty-root policy).
+  * Authoritative `validate_evidence_repository()` requires trusted Experience index; missing references → `EXPERIENCE_ID_NOT_FOUND`; invalid/unavailable registry → `EXPERIENCE_REGISTRY_INVALID` (truthful causality).
+  * Explicit non-authoritative structure-only path: `validate_evidence_repository_structure()`.
+  * Behavior status: **`EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`**.
+  * Historical note: prior open item was `EXPERIENCE_REGISTRY_DECISION_REQUIRED` (now resolved by this implementation; not erased from history).
+  * Milestone status: **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+  * No reusable claims; `NO_CLAIM_SCOPED_SEMANTIC_CHANGE`.
 
 ## Current Task
 
-Next technical dependency: `MINIMAL_EXPERIENCE_REGISTRY_V1` — **NOT STARTED**.
+`MINIMAL_EXPERIENCE_REGISTRY_V1` = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
 
-A canonical Experience reference source is required before `experience_id` referential integrity can be enforced. Architecture for that registry is **not** yet approved beyond that dependency.
+Awaiting ChatGPT review and Claude Code independent audit. Do not mark CLOSED until audits complete.
 
 ## Not Built Yet
 
-* `MINIMAL_EXPERIENCE_REGISTRY_V1` / `experience_id` referential integrity (**NEXT**; blocked on `EXPERIENCE_REGISTRY_DECISION_REQUIRED`)
+* Additional Experience records (MarketMind, Market Empire/FCAT, LoanIQ, TELUS, Bulmarma, D Commerce, etc.)
 * Winter Walk Evidence Batch 2+
 * Claims derived from Winter Walk evidence
 * Forbidden-claim registry implementation
@@ -129,8 +137,9 @@ A canonical Experience reference source is required before `experience_id` refer
 * JSON Schema gates reject malformed structured records.
 * Claim reusable-use requires schema + citation-scoped lineage + state compatibility + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
 * Semantic fabricated-outcome protection remains a later deterministic validator layer.
-* Repository-Level Evidence Integrity v1 is **CLOSED** and available as the repository-wide structural gate (`src/evidence_repository.py`).
-* `experience_id` referential integrity is **not** enforced until an Experience Registry is approved (`EXPERIENCE_REGISTRY_DECISION_REQUIRED`).
+* Provenance spine now has Experience identity + Evidence integrity with referential enforcement: Experience → Evidence → (future) Claim.
+* `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED` on authoritative Evidence Repository validation.
+* Experience Registry does not assert employment titles, dates, outcomes, or résumé content.
 
 ## Current Source of Truth
 
@@ -140,17 +149,20 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Decide and implement `MINIMAL_EXPERIENCE_REGISTRY_V1` only after architecture approval (resolves `EXPERIENCE_REGISTRY_DECISION_REQUIRED`).
-2. Forbidden-claim registry (only if approved).
-3. Winter Walk Evidence Batch 2 / claim creation (only if explicitly approved).
+1. ChatGPT review of Minimal Experience Registry v1 (do not push to main until reviewed).
+2. Claude Code independent audit of Experience Registry + Evidence referential wiring.
+3. Close `MINIMAL_EXPERIENCE_REGISTRY_V1` only after audit PASS.
+4. Only then consider first reusable claims (explicit approval required).
+5. Additional Experience IDs only when evidence or approved architecture requires them.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* inventing an Experience Registry without architecture approval;
+* marking Experience Registry CLOSED before Claude Code audit;
+* inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
-* claim creation from Batch 1 evidence without explicit approval;
+* claim creation without explicit approval;
 * job scraping;
 * job-board integrations;
 * Google Sheets integration;
@@ -166,13 +178,4 @@ Do not begin:
 
 ## Next Approved Task
 
-`MINIMAL_EXPERIENCE_REGISTRY_V1` — next technical dependency; **NOT STARTED**; architecture not yet approved beyond the need for a canonical Experience reference source.
-
-## Working Tree / Commit State (at Evidence Integrity closure)
-
-Closure documentation commit lands on `main` after:
-
-* `674784b` — Evidence Integrity v1 implementation
-* `09213b2` — Evidence Integrity hardening (duplicate JSON keys; empty-root policy)
-
-Pushed to `origin/main` as part of milestone closeout.
+Claude Code audit / closeout of `MINIMAL_EXPERIENCE_REGISTRY_V1` (not CLOSED yet).

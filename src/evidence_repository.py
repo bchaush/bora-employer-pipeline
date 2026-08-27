@@ -5,9 +5,14 @@ for downstream claim creation/retrieval.
 
 This is deliberately separate from claim-scoped lineage validation:
 - claim_lineage / claim_validation: cited Evidence_IDs for one claim;
-- this module: structural trustworthiness of the full evidence repository.
+- this module: structural trustworthiness of the full evidence repository
+  plus Experience_ID referential integrity against a trusted Experience index.
 
-No trusted index is returned when repository validation fails.
+Authority chain:
+
+Experience Repository -> Evidence Repository -> Claim-scoped validation
+
+No trusted evidence index is returned when repository validation fails.
 """
 
 from __future__ import annotations
@@ -16,6 +21,10 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Optional
 
+from experience_repository import (
+    DEFAULT_EXPERIENCE_ROOT,
+    validate_experience_repository,
+)
 from schema_validation import build_draft202012_validator
 
 
@@ -23,9 +32,11 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EVIDENCE_ROOT = ROOT / "evidence"
 EVIDENCE_SCHEMA_PATH = ROOT / "schemas" / "evidence.schema.json"
 
-# No authoritative Experience Registry exists yet. experience_id is only
-# schema-checked as a non-empty string until a registry is approved.
-EXPERIENCE_REGISTRY_STATUS = "EXPERIENCE_REGISTRY_DECISION_REQUIRED"
+# Authoritative Evidence Repository validation enforces Experience references.
+EXPERIENCE_REFERENCE_STATUS = "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
+
+# Alias for result field continuity; prefer EXPERIENCE_REFERENCE_STATUS.
+EXPERIENCE_REGISTRY_STATUS = EXPERIENCE_REFERENCE_STATUS
 
 
 class DuplicateJsonKeyError(ValueError):
@@ -66,7 +77,7 @@ def _empty_result(*, records_checked: int = 0) -> dict[str, Any]:
         "index": None,
         "errors": [],
         "discovered_paths": [],
-        "experience_registry_status": EXPERIENCE_REGISTRY_STATUS,
+        "experience_registry_status": EXPERIENCE_REFERENCE_STATUS,
     }
 
 
@@ -97,28 +108,133 @@ def _relative_posix(path: Path, evidence_root: Path) -> str:
         return path.resolve().as_posix()
 
 
-def validate_evidence_repository(
+def _resolve_trusted_experience_index(
+    *,
+    experience_root: Optional[Path],
+    experience_index: Optional[Mapping[str, Any]],
+    experience_schema_path: Optional[Path],
+) -> tuple[Optional[Mapping[str, Any]], list[dict[str, Any]]]:
+    """Return (trusted_index, errors).
+
+    trusted_index is None when the Experience Registry cannot be trusted.
+    """
+    if experience_index is not None:
+        if not isinstance(experience_index, Mapping):
+            return None, [
+                _error(
+                    "EXPERIENCE_REGISTRY_INVALID",
+                    detail=(
+                        "experience_index must be a mapping of experience_id to "
+                        "experience record (trusted index); "
+                        f"got {type(experience_index).__name__}"
+                    ),
+                )
+            ]
+        return experience_index, []
+
+    root = (
+        Path(experience_root)
+        if experience_root is not None
+        else DEFAULT_EXPERIENCE_ROOT
+    )
+    experience_result = validate_experience_repository(
+        root,
+        schema_path=experience_schema_path,
+    )
+    if not experience_result["valid"]:
+        return None, [
+            _error(
+                "EXPERIENCE_REGISTRY_INVALID",
+                path=str(root),
+                detail=(
+                    "Experience Registry is missing or structurally invalid; "
+                    "cannot build a trusted Evidence index"
+                ),
+                experience_errors=experience_result["errors"],
+            )
+        ]
+    return experience_result["index"], []
+
+
+def validate_evidence_repository_structure(
     evidence_root: Optional[Path] = None,
     *,
     schema_path: Optional[Path] = None,
 ) -> dict[str, Any]:
-    """Validate the complete Evidence Repository and build a trusted index.
+    """Validate Evidence Repository *structure only* (no Experience references).
 
-    An existing readable empty evidence root is structurally valid: it returns
-    ``valid=True``, ``records_checked=0``, and an empty trusted ``index={}``.
-    Non-empty / sufficiency requirements for a milestone or caller are enforced
-    separately, not by this generic structural validator.
+    Explicit lower-level path for isolating structural invariants.
+    NOT the authoritative production gate.
 
-    Returns a mapping with:
-    - valid: True only when every discovered file passes all invariants
-      (including the empty-repository case above)
-    - records_checked: number of discovered JSON files
-    - index: evidence_id -> record when valid; otherwise None
-    - errors: list of machine-readable error dicts
-    - discovered_paths: deterministic relative POSIX paths checked
-    - experience_registry_status: EXPERIENCE_REGISTRY_DECISION_REQUIRED
-      until an authoritative Experience Registry exists
+    Authoritative validation with Experience_ID referential integrity:
+    ``validate_evidence_repository``.
     """
+    return _validate_evidence_repository_impl(
+        evidence_root,
+        schema_path=schema_path,
+        experience_index_for_references=None,
+        enforce_experience_references=False,
+    )
+
+
+def validate_evidence_repository(
+    evidence_root: Optional[Path] = None,
+    *,
+    schema_path: Optional[Path] = None,
+    experience_root: Optional[Path] = None,
+    experience_index: Optional[Mapping[str, Any]] = None,
+    experience_schema_path: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Validate the Evidence Repository with Experience_ID referential integrity.
+
+    Authoritative path:
+    1. Obtain a trusted Experience index (validate Experience Registry, or use a
+       caller-supplied trusted ``experience_index``).
+    2. Validate evidence structure.
+    3. Require every evidence ``experience_id`` to exist in the trusted Experience
+       index.
+
+    An existing readable empty evidence root is structurally valid when the
+    Experience Registry is trusted: ``valid=True``, ``records_checked=0``,
+    ``index={}``. Non-empty sufficiency is enforced separately.
+
+    If the Experience Registry is unavailable/invalid, fails closed with
+    ``EXPERIENCE_REGISTRY_INVALID`` (not per-record ``EXPERIENCE_ID_NOT_FOUND``).
+
+    Returns:
+    - valid, records_checked, index, errors, discovered_paths
+    - experience_registry_status: EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED
+    """
+    trusted_experience_index, experience_errors = _resolve_trusted_experience_index(
+        experience_root=experience_root,
+        experience_index=experience_index,
+        experience_schema_path=experience_schema_path,
+    )
+    if experience_errors:
+        result = _empty_result()
+        root = Path(evidence_root) if evidence_root is not None else DEFAULT_EVIDENCE_ROOT
+        if root.exists() and root.is_dir():
+            files = discover_evidence_files(root)
+            result["records_checked"] = len(files)
+            result["discovered_paths"] = [_relative_posix(path, root) for path in files]
+        result["errors"].extend(experience_errors)
+        return result
+
+    return _validate_evidence_repository_impl(
+        evidence_root,
+        schema_path=schema_path,
+        experience_index_for_references=trusted_experience_index,
+        enforce_experience_references=True,
+    )
+
+
+def _validate_evidence_repository_impl(
+    evidence_root: Optional[Path],
+    *,
+    schema_path: Optional[Path],
+    experience_index_for_references: Optional[Mapping[str, Any]],
+    enforce_experience_references: bool,
+) -> dict[str, Any]:
     root = Path(evidence_root) if evidence_root is not None else DEFAULT_EVIDENCE_ROOT
     schema = Path(schema_path) if schema_path is not None else EVIDENCE_SCHEMA_PATH
 
@@ -150,7 +266,6 @@ def validate_evidence_repository(
 
     validator = build_draft202012_validator(schema)
     provisional_index: dict[str, Mapping[str, Any]] = {}
-    # Track first path for each evidence_id for duplicate reporting.
     first_path_by_id: dict[str, str] = {}
 
     for path in files:
@@ -218,11 +333,33 @@ def validate_evidence_repository(
                     details=schema_errors,
                 )
             )
-            # Continue collecting additional repository invariants where possible.
 
         evidence_id = loaded.get("evidence_id")
+        experience_id = loaded.get("experience_id")
+
+        if (
+            enforce_experience_references
+            and isinstance(experience_id, str)
+            and experience_id != ""
+            and experience_index_for_references is not None
+            and experience_id not in experience_index_for_references
+        ):
+            result["errors"].append(
+                _error(
+                    "EXPERIENCE_ID_NOT_FOUND",
+                    path=rel,
+                    evidence_id=evidence_id
+                    if isinstance(evidence_id, str) and evidence_id != ""
+                    else None,
+                    experience_id=experience_id,
+                    detail=(
+                        f"evidence.experience_id {experience_id!r} does not exist "
+                        "in the trusted Experience Registry"
+                    ),
+                )
+            )
+
         if not isinstance(evidence_id, str) or evidence_id == "":
-            # Schema invalid already covers this when schema ran; still no index entry.
             continue
 
         if evidence_id != stem:
@@ -254,9 +391,6 @@ def validate_evidence_repository(
             )
         else:
             first_path_by_id[evidence_id] = rel
-            # Only stage into provisional index when this file has no errors so far
-            # for this iteration; final index is returned only if result has zero
-            # errors overall.
             provisional_index[evidence_id] = loaded
 
     if result["errors"]:
@@ -264,7 +398,6 @@ def validate_evidence_repository(
         result["index"] = None
         return result
 
-    # Deterministic index key order for consumers that iterate keys.
     ordered_index = {
         evidence_id: provisional_index[evidence_id]
         for evidence_id in sorted(provisional_index.keys())
@@ -278,9 +411,15 @@ def load_validated_evidence_repository(
     evidence_root: Optional[Path] = None,
     *,
     schema_path: Optional[Path] = None,
+    experience_root: Optional[Path] = None,
+    experience_index: Optional[Mapping[str, Any]] = None,
+    experience_schema_path: Optional[Path] = None,
 ) -> dict[str, Any]:
-    """Alias for validate_evidence_repository (load + validate + index)."""
+    """Alias for validate_evidence_repository (authoritative load + validate)."""
     return validate_evidence_repository(
         evidence_root,
         schema_path=schema_path,
+        experience_root=experience_root,
+        experience_index=experience_index,
+        experience_schema_path=experience_schema_path,
     )

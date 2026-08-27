@@ -1,0 +1,8 @@
+{
+  "experience_id": "EXP_WW_001",
+  "experience_name": "Winter Walk",
+  "experience_type": "ORGANIZATIONAL_ENGAGEMENT",
+  "organization": "Winter Walk",
+  "source_of_truth": "BLUEPRINT.md (Winter Walk as primary organizational evidence); evidence/winter_walk/ Batch 1 records referencing EXP_WW_001",
+  "notes": "Canonical identity for the Winter Walk engagement represented by the current Winter Walk evidence records."
+}

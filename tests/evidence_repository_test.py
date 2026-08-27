@@ -16,9 +16,11 @@ if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
 from evidence_repository import (  # noqa: E402
+    EXPERIENCE_REFERENCE_STATUS,
     EXPERIENCE_REGISTRY_STATUS,
     discover_evidence_files,
     validate_evidence_repository,
+    validate_evidence_repository_structure,
 )
 
 
@@ -36,6 +38,18 @@ EXPECTED_WW_IDS = [
     "WW_SYNC_001",
     "WW_TEST_001",
 ]
+
+# Trusted fixture Experience index for synthetic evidence records that cite
+# EXP_TEST_001 (authoritative Evidence validation requires Experience lookup).
+FIXTURE_EXPERIENCE_INDEX = {
+    "EXP_TEST_001": {
+        "experience_id": "EXP_TEST_001",
+        "experience_name": "Synthetic Test Experience",
+        "experience_type": "OTHER",
+        "organization": "Synthetic Org",
+        "source_of_truth": "tests/evidence_repository_test.py",
+    }
+}
 
 
 def assert_true(condition: bool, message: str) -> None:
@@ -75,8 +89,12 @@ def error_codes(result: dict) -> list[str]:
     return [error["code"] for error in result["errors"]]
 
 
+def validate_with_fixture(root: Path) -> dict:
+    return validate_evidence_repository(root, experience_index=FIXTURE_EXPERIENCE_INDEX)
+
+
 # ---------------------------------------------------------------------------
-# PASS 1 — Current real repository
+# PASS 1 — Current real repository (authoritative path + real Experience Registry)
 # ---------------------------------------------------------------------------
 real = validate_evidence_repository(EVIDENCE_ROOT)
 assert_true(real["valid"] is True, "current Winter Walk evidence repository failed")
@@ -87,8 +105,12 @@ assert_true(
     f"unexpected Evidence_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
-    real["experience_registry_status"] == EXPERIENCE_REGISTRY_STATUS,
+    real["experience_registry_status"] == EXPERIENCE_REFERENCE_STATUS,
     "experience registry status mismatch",
+)
+assert_true(
+    EXPERIENCE_REGISTRY_STATUS == EXPERIENCE_REFERENCE_STATUS,
+    "status alias drifted",
 )
 print("PASS 1: current real Winter Walk evidence repository (12 records) passed.")
 
@@ -100,7 +122,7 @@ with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
     write_json(root / "WW_DUP_001.json", make_valid_record("WW_DUP_001"))
     write_json(root / "subdir" / "WW_DUP_001.json", make_valid_record("WW_DUP_001"))
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "duplicate Evidence_ID was accepted")
     assert_true(result["index"] is None, "trusted index returned despite duplicate ID")
     assert_true(
@@ -116,7 +138,7 @@ print("PASS 2: duplicate Evidence_ID failed closed.")
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
     write_json(root / "WW_FAKE_001.json", make_valid_record("WW_FAKE_002"))
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "filename/ID mismatch was accepted")
     assert_true(result["index"] is None, "trusted index returned despite mismatch")
     assert_true(
@@ -134,7 +156,7 @@ with tempfile.TemporaryDirectory() as tmp:
     bad = make_valid_record("WW_STATE_001")
     bad["evidence_state"] = "PROBABLE"
     write_json(root / "WW_STATE_001.json", bad)
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "PROBABLE evidence_state was accepted")
     assert_true(result["index"] is None, "trusted index returned for schema-invalid state")
     assert_true(
@@ -152,7 +174,7 @@ with tempfile.TemporaryDirectory() as tmp:
     bad = make_valid_record("WW_MISS_001")
     del bad["fact"]
     write_json(root / "WW_MISS_001.json", bad)
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "missing required field was accepted")
     assert_true(result["index"] is None, "trusted index returned for missing field")
     assert_true(
@@ -170,7 +192,7 @@ with tempfile.TemporaryDirectory() as tmp:
     bad = make_valid_record("WW_EXTRA_001")
     bad["invented_field"] = "should_be_rejected"
     write_json(root / "WW_EXTRA_001.json", bad)
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "additionalProperties violation was accepted")
     assert_true(result["index"] is None, "trusted index returned for extra property")
     assert_true(
@@ -186,7 +208,7 @@ print("PASS 6: additional forbidden property failed closed.")
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
     write_json(root / "WW_BADJSON_001.json", '{"evidence_id": "WW_BADJSON_001",')
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "malformed JSON was accepted")
     assert_true(result["index"] is None, "trusted index returned for malformed JSON")
     assert_true(
@@ -206,7 +228,7 @@ print("PASS 7: malformed JSON failed closed with file identity.")
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
     write_json(root / "WW_ARRAY_001.json", [])
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "array root was accepted")
     assert_true(result["index"] is None, "trusted index returned for non-object root")
     assert_true(
@@ -221,11 +243,10 @@ print("PASS 8: non-object JSON root failed closed.")
 # ---------------------------------------------------------------------------
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
-    # Create in reverse alphabetical order to stress filesystem creation order.
     for evidence_id in ["WW_Z_001", "WW_M_001", "WW_A_001"]:
         write_json(root / f"{evidence_id}.json", make_valid_record(evidence_id))
-    first = validate_evidence_repository(root)
-    second = validate_evidence_repository(root)
+    first = validate_with_fixture(root)
+    second = validate_with_fixture(root)
     assert_true(first["valid"] and second["valid"], "deterministic fixture failed validation")
     assert_true(
         list(first["index"].keys()) == ["WW_A_001", "WW_M_001", "WW_Z_001"],
@@ -258,7 +279,7 @@ with tempfile.TemporaryDirectory() as tmp:
     bad = make_valid_record("WW_BAD_001")
     bad["evidence_state"] = "PROBABLE"
     write_json(root / "WW_BAD_001.json", bad)
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "mixed valid/invalid repository was accepted")
     assert_true(result["records_checked"] == 12, "expected 12 discovered files")
     assert_true(
@@ -275,29 +296,29 @@ print("PASS 10: fail-closed — no partial trusted index.")
 # ---------------------------------------------------------------------------
 # PASS 11 — Existing claim validators remain unchanged
 # ---------------------------------------------------------------------------
-# Executed separately by the milestone runner (all 7 existing suites).
 print("PASS 11: deferred to existing claim validation suites (run separately).")
 
 
 # ---------------------------------------------------------------------------
-# PASS 12 — Experience reference boundary (no fake registry)
+# PASS 12 — Experience reference integrity is enforced (authoritative path)
 # ---------------------------------------------------------------------------
 assert_true(
-    EXPERIENCE_REGISTRY_STATUS == "EXPERIENCE_REGISTRY_DECISION_REQUIRED",
-    "experience registry status constant drifted",
+    EXPERIENCE_REFERENCE_STATUS == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
+    "experience reference status constant drifted",
 )
 assert_true(
-    real["experience_registry_status"] == "EXPERIENCE_REGISTRY_DECISION_REQUIRED",
-    "repository validator falsely claims experience referential integrity",
+    real["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
+    "authoritative Evidence validation does not report Experience reference integrity",
 )
-# Valid repository must not invent experience-registry errors.
-assert_false(
-    any(code.startswith("EXPERIENCE_") and code != EXPERIENCE_REGISTRY_STATUS for code in error_codes(real)),
-    "unexpected experience integrity errors without registry",
+# Structure-only path remains available and must not pretend to be authoritative.
+structure_only = validate_evidence_repository_structure(EVIDENCE_ROOT)
+assert_true(
+    structure_only["valid"] is True,
+    "structure-only validation unexpectedly failed on real evidence",
 )
 print(
-    "PASS 12: experience referential integrity NOT pretended; "
-    "EXPERIENCE_REGISTRY_DECISION_REQUIRED surfaced."
+    "PASS 12: EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED on authoritative path; "
+    "structure-only path remains explicit."
 )
 
 
@@ -306,7 +327,6 @@ print(
 # ---------------------------------------------------------------------------
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
-    # Raw text required: Python dicts cannot preserve duplicate keys.
     duplicate_state_json = """{
   "evidence_id": "WW_DUPKEY_001",
   "experience_id": "EXP_TEST_001",
@@ -322,7 +342,7 @@ with tempfile.TemporaryDirectory() as tmp:
 }
 """
     write_json(root / "WW_DUPKEY_001.json", duplicate_state_json)
-    result = validate_evidence_repository(root)
+    result = validate_with_fixture(root)
     assert_false(result["valid"], "duplicate JSON key was accepted")
     assert_true(result["index"] is None, "trusted index returned despite duplicate JSON key")
     assert_true(
@@ -342,11 +362,11 @@ print("PASS 13: duplicate JSON object key failed closed (non-identity field).")
 
 
 # ---------------------------------------------------------------------------
-# PASS 14 — Empty evidence root is structurally valid
+# PASS 14 — Empty evidence root is structurally valid (with trusted Experience)
 # ---------------------------------------------------------------------------
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
-    result = validate_evidence_repository(root)
+    result = validate_evidence_repository(root, experience_index={})
     assert_true(result["valid"] is True, "empty evidence root was not structurally valid")
     assert_true(result["records_checked"] == 0, "empty root should check zero records")
     assert_true(result["index"] == {}, f"expected empty trusted index, got {result['index']!r}")

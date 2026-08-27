@@ -19,6 +19,59 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Minimal Experience Registry v1 (IMPLEMENTED — PENDING CLAUDE CODE AUDIT)
+
+**Reason**
+
+Resolve `EXPERIENCE_REGISTRY_DECISION_REQUIRED` with the smallest canonical Experience identity source and wire Evidence → Experience referential integrity before reusable claims.
+
+**Changed**
+
+* Added `schemas/experience.schema.json` (Draft 2020-12; `additionalProperties: false`).
+* Added canonical `experiences/EXP_WW_001.json` (`ORGANIZATIONAL_ENGAGEMENT`; identity only).
+* Added `src/experience_repository.py` (repository integrity parallel to Evidence).
+* Updated `src/evidence_repository.py` so authoritative validation requires a trusted Experience index; missing IDs → `EXPERIENCE_ID_NOT_FOUND`; invalid registry → `EXPERIENCE_REGISTRY_INVALID`.
+* Explicit structure-only path retained: `validate_evidence_repository_structure`.
+* Status: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED` (implemented repository behavior).
+* Milestone: **IMPLEMENTED — PENDING CLAUDE CODE AUDIT** (not CLOSED).
+* No claims created; claim validators untouched (`NO_CLAIM_SCOPED_SEMANTIC_CHANGE`).
+* No additional Experience IDs beyond `EXP_WW_001`.
+
+**Affected Areas**
+
+* `schemas/experience.schema.json`
+* `experiences/EXP_WW_001.json`
+* `src/experience_repository.py`
+* `src/evidence_repository.py`
+* `tests/experience_repository_test.py`
+* `tests/evidence_experience_reference_test.py`
+* `tests/evidence_repository_test.py`
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Small intentional duplication between experience and evidence repository validators (no mega-framework yet).
+* Winter Walk classified as `ORGANIZATIONAL_ENGAGEMENT`, not employment or project subtype.
+
+**Tests / Verification**
+
+* Experience registry suite — PASS
+* Evidence referential suite — PASS
+* Evidence repository suite — PASS
+* All 7 prior suites — PASS
+* Real Experience count 1; real Evidence count 12; both trusted indexes produced
+
+**Approved By**
+
+Architecture approved by ChatGPT review; implementation by Cursor; pending Claude Code audit
+
+**Status**
+
+IMPLEMENTED — PENDING CLAUDE CODE AUDIT (not CLOSED; not pushed pending ChatGPT review)
+
+---
+
 ## 2026-08-26 — Repository-Level Evidence Integrity v1 CLOSED
 
 **Reason**
