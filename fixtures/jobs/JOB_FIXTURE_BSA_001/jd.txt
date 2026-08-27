@@ -1,0 +1,34 @@
+Northbridge Civic Ops — Business Systems Analyst (Synthetic Fixture)
+
+This is repository test data only. It is not a claim about a real employer.
+
+About the role
+We are hiring an early-career Business Systems Analyst to help implement internal
+operating workflows across Google Workspace tools, improve data intake quality,
+and support user-acceptance testing with nontechnical stakeholders.
+
+Responsibilities
+- Elicit and document stakeholder requirements for internal workflow tools
+- Map existing business processes and translate them into implemented operating steps
+- Build and maintain reliable CSV / Drive-folder data intake with import logging
+- Support fail-closed operational controls for outbound follow-up communications
+- Facilitate UAT / pilot validation and document results for handoff
+
+Minimum qualifications (required)
+- Experience gathering requirements and clarifying scope boundaries
+- Experience with workflow or business-process mapping
+- Hands-on data ingestion / validation work (CSV, spreadsheets, or similar)
+- Comfort documenting UAT or pilot test outcomes
+- Bachelor's degree or equivalent practical experience
+
+Preferred qualifications
+- Salesforce administration experience
+- Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)
+
+Also desired
+- Exposure to Google Cloud infrastructure is a plus
+- Enterprise QA engineering ownership experience is a bonus
+
+Nice to have marketing language
+- Team player who thrives in a fast-paced environment
+- Competitive benefits and equal opportunity employer

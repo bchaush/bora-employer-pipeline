@@ -18,6 +18,8 @@ Minimal Experience Registry v1 = **CLOSED**.
 
 Claim Bank v1 first Winter Walk reusable claims = **CLOSED**.
 
+Job Analysis v1 first vertical slice = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED).
+
 Canonical Experience records: **1** (`EXP_WW_001`).
 
 Evidence records: **12** Winter Walk Batch 1.
@@ -128,21 +130,32 @@ No production engine yet.
   * Downstream requested-context enforcement remains deferred until a résumé/application consumer exists.
   * Claim Repository result-type sealing remains deferred (no downstream sealed consumer yet).
   * Status: **CLOSED**.
+* Job Analysis v1 first vertical slice implemented (not CLOSED):
+
+  * `analyze_job()` orchestration: structured extraction → requirement normalize/classify → Evidence/Claim match → gaps/unknowns → lane/decision.
+  * New schemas: `evidence_match.schema.json`, `job_analysis_result.schema.json`.
+  * AI boundary: requires `structured_extraction` (no paid model API; no fake free-form JD parser).
+  * Locked match vocabulary STRONG/SUPPORTED/PARTIAL/NONE/UNKNOWN with provenance; semantic traps enforced.
+  * Synthetic BSA fixture under `fixtures/jobs/JOB_FIXTURE_BSA_001/`.
+  * Experience/Evidence/Claim repositories unchanged.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
 ## Current Task
 
-`CLAIM_BANK_V1_FIRST_REUSABLE_CLAIMS` = **CLOSED**.
+`JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-Next work requires explicit approval. Do not begin résumé generation or job analysis without a new milestone.
+Awaiting independent Claude Code adversarial audit. Do not mark CLOSED yet. Do not begin résumé generation.
 
 ## Not Built Yet
 
+* Paid/model-backed requirement extraction provider
 * Downstream requested-context enforcement at résumé/application consumption time
 * Claim Repository result-type sealing (deferred; no sealed downstream consumer yet)
+* Full OPT/immigration scoring inside job analysis
+* Batch job discovery / 20 Golden Tests set
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
-* Job ingestion
 * Resume patch generation / rendering / diff
 * Networking research
 * Google Workspace / external integrations
@@ -177,21 +190,23 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval for the next milestone (do not start résumé modules or job analysis automatically).
-2. Additional Experience/Evidence/Claims only when explicitly approved.
-3. When a résumé/application consumer exists, implement requested-context enforcement.
+1. Independent Claude Code adversarial audit of Job Analysis v1 first vertical slice.
+2. Close Job Analysis v1 only after audit + any required hardening.
+3. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* résumé modules / resume generation without a new approved milestone;
+* marking Job Analysis v1 CLOSED before audit;
+* résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
+* paid model provider wiring without approval;
 * job scraping;
 * Google Sheets / Gmail / LinkedIn automation;
 * MCP / database / cloud infrastructure.
 
 ## Next Approved Task
 
-None yet. Claim Bank v1 is CLOSED. Wait for Bora's next explicit milestone instruction.
+Claude Code adversarial audit of `JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` (not CLOSED yet).

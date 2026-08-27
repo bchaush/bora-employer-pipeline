@@ -19,6 +19,49 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Job Analysis v1 first vertical slice (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Build the smallest trustworthy first `analyze_job` pipeline: structured requirement extraction boundary, Evidence/Claim matching, gaps/unknowns, and inspectable lane/decision — without résumé generation or paid model APIs.
+
+**Changed**
+
+* Added `schemas/evidence_match.schema.json` and `schemas/job_analysis_result.schema.json`.
+* Added `src/job_analysis.py`, `job_id.py`, `requirement_normalize.py`, `requirement_match.py`, `job_decision.py`.
+* Added synthetic BSA fixture `fixtures/jobs/JOB_FIXTURE_BSA_001/`.
+* Added `tests/job_analysis_test.py` covering fit, preferred gaps, Salesforce reject, senior reject, U.S. regulatory PARTIAL, UAT≠QA, Apps Script≠Google Cloud, production ML, UNCLEAR, missing Evidence, schema/duplicate failures.
+* Experience / Evidence / Claim records unchanged.
+* Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED; not pushed pending audit).
+
+**Affected Areas**
+
+* `schemas/evidence_match.schema.json` (new)
+* `schemas/job_analysis_result.schema.json` (new)
+* `src/job_*.py`, `src/requirement_*.py` (new)
+* `fixtures/jobs/JOB_FIXTURE_BSA_001/` (new)
+* `tests/job_analysis_test.py` (new)
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Matching is bounded/deterministic lexical+trap logic over approved Claims/Evidence — not general NLP.
+* Structured extraction must be supplied; live model extraction deferred.
+* Full immigration/company scoring and résumé patch not in this slice.
+
+**Tests / Verification**
+
+* Prior 13 suites — PASS
+* `job_analysis_test.py` — PASS
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-27 — Claim Bank v1 approval closure (CLOSED)
 
 **Reason**

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/evidence_match.schema.json",
+  "title": "Bora Employer Pipeline Evidence Match Record",
+  "description": "Structured mapping from one job requirement to Evidence_ID and/or Claim_ID provenance with a locked match result. Positive matches require provenance. Partial transfer must remain explicit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "match_id",
+    "job_id",
+    "requirement_id",
+    "result",
+    "evidence_ids",
+    "claim_ids",
+    "explanation"
+  ],
+  "properties": {
+    "match_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirement_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "result": {
+      "type": "string",
+      "enum": ["STRONG", "SUPPORTED", "PARTIAL", "NONE", "UNKNOWN"]
+    },
+    "evidence_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "claim_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "explanation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transfer_note": {
+      "type": ["string", "null"],
+      "description": "Explicit transfer boundary when result is PARTIAL. Null otherwise."
+    }
+  }
+}
