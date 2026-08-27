@@ -1,0 +1,25 @@
+{
+  "claim_id": "CLAIM_WW_002",
+  "wording": "Implemented fail-closed follow-up send controls that block live email sending when a master kill switch is on, test mode is on, or live follow-ups are not allowed, before per-row Follow_Up_Queue eligibility is evaluated.",
+  "evidence_ids": [
+    "WW_CTRL_001",
+    "WW_CTRL_002"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Technical Operations",
+    "Implementation"
+  ],
+  "forbidden_contexts": [
+    "enterprise software architecture",
+    "production email marketing platform ownership",
+    "continuous production operations proof"
+  ],
+  "human_approval": false,
+  "date": "2026-08-26",
+  "version": "1"
+}

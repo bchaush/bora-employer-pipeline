@@ -16,19 +16,13 @@ Repository-Level Evidence Integrity v1 = **CLOSED**.
 
 Minimal Experience Registry v1 = **CLOSED**.
 
-Claude final adversarial recheck: `CLAUDE_MINIMAL_EXPERIENCE_REGISTRY_FINAL_PASS`.
-
-Runtime behavior on authoritative success: `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED`.
-
-Structure-only path reports: `EXPERIENCE_REFERENCE_NOT_CHECKED`.
-
-Causal failures preserved: `EXPERIENCE_REGISTRY_INVALID` vs `EXPERIENCE_ID_NOT_FOUND`.
+Claim Bank v1 first Winter Walk reusable claims = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED).
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
-Evidence records: **12** Winter Walk Batch 1 (all reference `EXP_WW_001`; byte-unchanged by this milestone).
+Evidence records: **12** Winter Walk Batch 1.
 
-No reusable claims created yet.
+Claim records: **5** Winter Walk proposed claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_005`); `human_approval=false` pending Bora approval (`valid_record=true`, `reusable=false`).
 
 No production engine yet.
 
@@ -99,35 +93,34 @@ No production engine yet.
   * All 11 test suites pass; 1 Experience + 12 Evidence records validate; Evidence JSON / Experience record / claim validators unchanged.
   * Ready as dependency for first reusable Claim Bank records (explicit approval still required before claim creation).
   * `NO_CLAIM_SCOPED_SEMANTIC_CHANGE`.
+* Claim Bank v1 first Winter Walk reusable claims implemented (not CLOSED):
+
+  * 5 proposed claim records: `claims/winter_walk/CLAIM_WW_001.json` … `CLAIM_WW_005.json`.
+  * Distinct capabilities: scope/requirements, fail-closed send controls, Drive CSV intake logging, form-to-evidence + approval sync, pilot/UAT documentation.
+  * Existing claim schema + lineage + state + unified validators used; no new claim-repository validator (deferred; file uniqueness manual for v1).
+  * All 5: `valid_record=true`, `human_approval=false`, `reusable=false` (`NOT_HUMAN_APPROVED`) pending Bora approval.
+  * Evidence lineage and evidence-state compatibility verified against trusted Winter Walk Evidence index.
+  * No Evidence/Experience/schema/validator changes; no unsupported outcomes or semantic upgrades.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
 ## Current Task
 
-Next technical dependency: first reusable Claim Bank records — **NOT STARTED** (requires explicit approval).
+`CLAIM_BANK_V1_FIRST_REUSABLE_CLAIMS` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-`MINIMAL_EXPERIENCE_REGISTRY_V1` is **CLOSED** and is the approved Experience → Evidence dependency for claim creation.
+Awaiting independent Claude Code adversarial audit and Bora human approval of claim records. Do not mark CLOSED yet.
 
 ## Not Built Yet
 
-* Claims derived from Winter Walk evidence / Claim Bank v1 (**NEXT**; explicit approval required)
-* Additional Experience records (MarketMind, Market Empire/FCAT, LoanIQ, TELUS, Bulmarma, D Commerce, etc.)
-* Winter Walk Evidence Batch 2+
+* Bora human approval of `CLAIM_WW_001`–`CLAIM_WW_005` (`human_approval=true` / reusable gate)
+* Claim repository-level integrity validator (filename/ID uniqueness across `claims/`) — deferred
+* Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Forbidden-claim registry implementation
 * Deterministic fabricated-outcome / metric validators
 * Production pipeline engine
 * Job ingestion
-* Job deduplication
-* Role verification workflow
-* Job requirement extraction
-* OPT/work-authorization screening
-* Evidence matching
-* Fit routing
-* Resume patch generation
-* Resume rendering
-* Resume diff review
+* Resume patch generation / rendering / diff
 * Networking research
-* Application tracking
-* Google Workspace integration
-* External job-source integrations
+* Google Workspace / external integrations
 * Automated monitoring
 
 ## Current Safety State
@@ -136,7 +129,7 @@ Next technical dependency: first reusable Claim Bank records — **NOT STARTED**
 * No external integrations are connected.
 * No job applications can be submitted automatically.
 * No resume-generation pipeline exists yet.
-* No reusable claims exist yet; Batch 1 evidence alone does not authorize resume wording.
+* No reusable claims exist yet until Bora sets `human_approval=true` on Claim Bank records; proposed Winter Walk claims are valid records only.
 * Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No runtime workflow depends on multi-model agreement; deterministic validators enforce invariants; evidence wins over model opinion; Bora retains consequential approval.
 * No PII should be stored in this repository unless explicitly designed and approved later.
@@ -144,7 +137,7 @@ Next technical dependency: first reusable Claim Bank records — **NOT STARTED**
 * JSON Schema gates reject malformed structured records.
 * Claim reusable-use requires schema + citation-scoped lineage + state compatibility + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
 * Semantic fabricated-outcome protection remains a later deterministic validator layer.
-* Provenance spine now has Experience identity + Evidence integrity with referential enforcement: Experience → Evidence → (future) Claim.
+* Provenance spine: Experience → Evidence → Claim (proposed) → (future) résumé module.
 * `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED` on authoritative Evidence Repository validation.
 * Experience Registry does not assert employment titles, dates, outcomes, or résumé content.
 
@@ -156,31 +149,23 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. First reusable Claim Bank records only after explicit approval (`CLAIM_BANK_V1` or equivalent).
-2. Additional Experience IDs only when evidence or approved architecture requires them.
-3. Forbidden-claim registry (only if approved).
-4. Winter Walk Evidence Batch 2 (only if explicitly approved).
+1. Independent Claude Code adversarial audit of Claim Bank v1 first Winter Walk claims.
+2. Bora human approval of claim records (`human_approval`) before reusable use.
+3. Close Claim Bank v1 only after audit + approval decisions.
+4. Additional Experience/Evidence/Claims only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* claim creation without explicit approval;
+* marking Claim Bank v1 CLOSED before audit;
+* résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
 * job scraping;
-* job-board integrations;
-* Google Sheets integration;
-* Gmail integration;
-* resume tailoring;
-* AI job scoring;
-* application automation;
-* LinkedIn automation;
-* MCP configuration;
-* database selection;
-* cloud infrastructure;
-* production API integrations.
+* Google Sheets / Gmail / LinkedIn automation;
+* MCP / database / cloud infrastructure.
 
 ## Next Approved Task
 
-First reusable Claim Bank records — **NOT STARTED**; requires explicit approval. Experience → Evidence spine is closed and ready as the dependency.
+Claude Code adversarial audit of `CLAIM_BANK_V1_FIRST_REUSABLE_CLAIMS` (not CLOSED yet).

@@ -1,0 +1,27 @@
+{
+  "claim_id": "CLAIM_WW_004",
+  "wording": "Automated mapping of self-report form responses into an Evidence_Log and synchronized approved evidence updates into an Adoption_Matrix with approval-sync audit logging.",
+  "evidence_ids": [
+    "WW_CONN_001",
+    "WW_SYNC_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Business Process",
+    "Implementation",
+    "Data Operations"
+  ],
+  "forbidden_contexts": [
+    "enterprise software architecture",
+    "production ML",
+    "organization-wide change management",
+    "continuous daily production use proof"
+  ],
+  "human_approval": false,
+  "date": "2026-08-26",
+  "version": "1"
+}

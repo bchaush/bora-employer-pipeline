@@ -1,0 +1,24 @@
+{
+  "claim_id": "CLAIM_WW_001",
+  "wording": "Defined the Winter Walk OP Recommendation Adoption & Support System as an internal Google Workspace operating tool and documented explicit scope boundaries excluding CRM, public dashboard, partner ranking, AI auto-sending, and causal fundraising-impact modeling.",
+  "evidence_ids": [
+    "WW_ARCH_001"
+  ],
+  "evidence_state": "SUPPORTED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Implementation"
+  ],
+  "forbidden_contexts": [
+    "enterprise SaaS platform",
+    "enterprise software architecture",
+    "causal fundraising impact",
+    "CRM product ownership"
+  ],
+  "human_approval": false,
+  "date": "2026-08-26",
+  "version": "1"
+}

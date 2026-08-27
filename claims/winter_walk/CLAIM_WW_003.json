@@ -1,0 +1,24 @@
+{
+  "claim_id": "CLAIM_WW_003",
+  "wording": "Built Drive-folder CSV intake into Workbook A with automated import logging that records Success, Held, and Failed run statuses.",
+  "evidence_ids": [
+    "WW_DATA_002"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Data Operations",
+    "Business Systems",
+    "Implementation"
+  ],
+  "forbidden_contexts": [
+    "Google Cloud Engineering",
+    "enterprise data platform architecture",
+    "continuously successful production ingestion pipeline"
+  ],
+  "human_approval": false,
+  "date": "2026-08-26",
+  "version": "1"
+}

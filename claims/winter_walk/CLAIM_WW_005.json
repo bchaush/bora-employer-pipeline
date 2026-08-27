@@ -1,0 +1,25 @@
+{
+  "claim_id": "CLAIM_WW_005",
+  "wording": "Documented Winter Walk Workbook B pilot and UAT results, including ten pilot test rows recorded as PASS in Pilot_Results for import validation, PII absence checks, applicability cross-checks, and related functional scenarios.",
+  "evidence_ids": [
+    "WW_TEST_001"
+  ],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Implementation",
+    "Technical Operations",
+    "Business Systems"
+  ],
+  "forbidden_contexts": [
+    "enterprise QA ownership",
+    "enterprise software architecture",
+    "measured business impact",
+    "continuous production operations proof"
+  ],
+  "human_approval": false,
+  "date": "2026-08-26",
+  "version": "1"
+}

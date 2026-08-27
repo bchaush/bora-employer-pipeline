@@ -19,6 +19,45 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Claim Bank v1 first Winter Walk reusable claims (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Create the smallest trustworthy first set of Winter Walk Claim Bank records using the existing claim schema/validators against the trusted Winter Walk Evidence Repository.
+
+**Changed**
+
+* Added 5 proposed claims under `claims/winter_walk/`: `CLAIM_WW_001`–`CLAIM_WW_005`.
+* Capabilities covered: scope/requirements boundaries; fail-closed send controls; Drive CSV intake logging; form-to-evidence + approval sync; pilot/UAT documentation.
+* Used existing claim schema + lineage + state + unified `validate_claim` (no new validators; no claim-repository integrity module yet).
+* All claims: lineage and evidence-state compatible; `human_approval=false` → `valid_record=true`, `reusable=false` pending Bora approval.
+* No Evidence/Experience/schema/claim-validator changes.
+* Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED; not pushed pending review/audit).
+
+**Affected Areas**
+
+* `claims/winter_walk/*.json` (new)
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Claim repository-level uniqueness/filename integrity is deferred (file-level uniqueness for these 5 IDs only).
+* Semantic anti-equivalence is enforced by wording discipline + forbidden_contexts, not a separate forbidden-claim registry yet.
+* Claims are not reusable until Bora sets `human_approval=true`.
+
+**Tests / Verification**
+
+* Claim suites (schema, lineage, state, unified) — PASS
+* Per-claim `validate_claim` against trusted Evidence index — valid_record PASS; reusable false as designed
+* Adversarial: missing Evidence_ID, UNKNOWN/CONTRADICTED/incompatible state, schema-invalid — fail closed
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-26 — Minimal Experience Registry v1 CLOSED
 
 **Reason**
