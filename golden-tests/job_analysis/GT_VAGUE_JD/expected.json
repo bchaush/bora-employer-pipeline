@@ -1,0 +1,40 @@
+{
+  "purpose": "Vague aspirational JD must keep UNCLEAR/UNKNOWN visible; no manufactured certainty.",
+  "role_family": "Business Operations",
+  "acceptable_decisions": [
+    "WATCH",
+    "UNDECIDED",
+    "REJECT"
+  ],
+  "forbidden_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "key_matches": {
+    "REQ_V_AMBIG": {
+      "result": "NONE",
+      "acceptable_results": [
+        "NONE",
+        "UNKNOWN"
+      ]
+    },
+    "REQ_V_TOOLS": {
+      "result": "NONE",
+      "acceptable_results": [
+        "NONE",
+        "UNKNOWN"
+      ]
+    }
+  },
+  "semantic_boundaries": [
+    "do not manufacture certainty from vague JD prose"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [
+    "HR noise may be skipped; remaining ambiguity must not become positive apply."
+  ],
+  "fixture_id": "GT_VAGUE_JD"
+}

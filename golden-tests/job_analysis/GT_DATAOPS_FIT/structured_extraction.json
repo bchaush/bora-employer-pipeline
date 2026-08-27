@@ -1,0 +1,68 @@
+{
+  "_role_title": "Data Operations Analyst",
+  "role_family": "Data Operations",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_DO_DATA",
+      "job_id": "PLACEHOLDER",
+      "text": "Hands-on CSV / Drive-folder data ingestion with import logging",
+      "category": "DATA",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [
+        "CSV"
+      ],
+      "experience_level": null,
+      "domain": "Data Operations",
+      "relevance": "HIGH",
+      "source_text": "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_DO_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries for intake workflows",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Data Operations",
+      "relevance": "HIGH",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries for intake workflows is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_DO_UAT",
+      "job_id": "PLACEHOLDER",
+      "text": "Comfort documenting UAT or pilot test outcomes for data-quality checks",
+      "category": "TESTING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Data Quality",
+      "relevance": "HIGH",
+      "source_text": "Comfort documenting UAT or pilot test outcomes for data-quality checks is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_DO_SQL",
+      "job_id": "PLACEHOLDER",
+      "text": "SQL querying experience",
+      "category": "TECHNOLOGY",
+      "importance": "PREFERRED",
+      "seniority_implication": null,
+      "technology": [
+        "SQL"
+      ],
+      "experience_level": null,
+      "domain": "Data Operations",
+      "relevance": "MEDIUM",
+      "source_text": "Preferred qualifications: SQL querying experience",
+      "source_location": "Preferred qualifications"
+    }
+  ]
+}

@@ -27,6 +27,12 @@ _PREFERRED_CUES = re.compile(
     r"ideal candidate)\b",
     re.IGNORECASE,
 )
+# Explicit preferred + negated mandatory status (P-1 bounded hardening).
+_PREFERRED_NOT_REQUIRED = re.compile(
+    r"\bpreferred\b(?:[\w\s,/+\-]{0,48}?)\bbut\s+not\s+required\b|"
+    r"\bnot\s+required\b(?:[\w\s,/+\-]{0,32}?)\bbut\b(?:[\w\s,/+\-]{0,16}?)\bpreferred\b",
+    re.IGNORECASE,
+)
 _NOISE_CUES = re.compile(
     r"\b(?:competitive benefits|equal opportunity|eeo|fast[- ]paced|"
     r"team player|self[- ]starter|passion for|thrives in|"
@@ -72,6 +78,10 @@ def classify_importance_from_source(
     # Noise-dominant statements (culture/HR) stay UNCLEAR even with "must".
     if _NOISE_CUES.search(text) and not _SUBSTANTIVE_CUES.search(text):
         return "UNCLEAR"
+
+    # "X preferred, but not required" is explicitly non-mandatory.
+    if _PREFERRED_NOT_REQUIRED.search(text):
+        return "PREFERRED"
 
     clauses = _split_clauses(text)
     if len(clauses) >= 2:

@@ -1,0 +1,50 @@
+{
+  "_role_title": "Marketing Media Analyst",
+  "role_family": "Marketing Analytics",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_MKT_MEDIA",
+      "job_id": "PLACEHOLDER",
+      "text": "Analyze paid media campaign performance and audience funnel metrics",
+      "category": "MARKETING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Media",
+      "relevance": "HIGH",
+      "source_text": "Analyze paid media campaign performance and audience funnel metrics is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_MKT_DASH",
+      "job_id": "PLACEHOLDER",
+      "text": "Build marketing dashboards for campaign stakeholders",
+      "category": "MARKETING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Media",
+      "relevance": "HIGH",
+      "source_text": "Build marketing dashboards for campaign stakeholders is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_MKT_PROC",
+      "job_id": "PLACEHOLDER",
+      "text": "Recommend media mix changes based on engagement process insights",
+      "category": "MARKETING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "MEDIUM",
+      "source_text": "Recommend media mix changes based on engagement process insights is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "_role_title": "Machine Learning Engineer",
+  "role_family": "Machine Learning Engineering",
+  "seniority": "MID",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_ML_PROD",
+      "job_id": "PLACEHOLDER",
+      "text": "Build production ML systems and machine learning pipelines",
+      "category": "ML",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [
+        "Python"
+      ],
+      "experience_level": null,
+      "domain": "Machine Learning",
+      "relevance": "HIGH",
+      "source_text": "Build production ML systems and machine learning pipelines is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_ML_DEPLOY",
+      "job_id": "PLACEHOLDER",
+      "text": "Deploy models to production ML infrastructure",
+      "category": "ML",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Machine Learning",
+      "relevance": "HIGH",
+      "source_text": "Deploy models to production ML infrastructure is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_ML_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "MEDIUM",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}

@@ -139,17 +139,27 @@ No production engine yet.
   * Implementation commit: `b1a7302`. Remediation commit: `69df92f`.
   * First Claude Code adversarial audit: changes required (semantic-overmatch, decision-routing, classification, schema).
   * Second Claude Code adversarial audit: `CLAUDE_JOB_ANALYSIS_V1_FINAL_PASS`.
-  * Deferred hardening (safe-direction; not fixed at closure):
-    * **P-1** — `"X preferred, but not required"` currently classifies as `UNCLEAR` rather than `PREFERRED`.
+  * Deferred hardening at closure (safe-direction):
+    * **P-1** — was `UNCLEAR` for `"X preferred, but not required"` at slice closure; **bounded fix landed in Golden Set milestone**.
     * **P-2** — generic `"business process mapping"` fails conservatively to `NONE` until evidence/claim semantics are reviewed deliberately (Claims/Evidence unchanged).
   * Experience/Evidence/Claim repositories unchanged; no résumé generation begun.
   * Status: **CLOSED**.
+* Job Analysis v1 Golden Set implemented (not CLOSED):
+
+  * 15 synthetic Golden fixtures under `golden-tests/job_analysis/` with structured `expected.json` validated by `schemas/job_analysis_golden_case.schema.json`.
+  * Runner: `golden-tests/run_job_analysis_golden_set.py`.
+  * Families covered: Business Systems, Implementation, Data Operations, Business Process, Technical Operations, plus reject/trap families (SWE, ML, Marketing Analytics, Business Operations vague).
+  * Semantic traps covered: U.S. regulatory NONE, UAT≠enterprise QA, Apps Script≠GCP, production ML, platform specialization, senior reject, generic lexical overlap / unrelated Analyst title, vague JD.
+  * **P-1 fixed** with bounded deterministic rule: `"preferred, but not required"` → `PREFERRED` (mixed degree clauses remain UNCLEAR).
+  * **P-2 remains deferred**: generic business process mapping → NONE / REJECT; Claims/Evidence unchanged.
+  * No résumé-generation work begun.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
 ## Current Task
 
-`JOB_ANALYSIS_V1_FIRST_VERTICAL_SLICE` = **CLOSED**.
+`JOB_ANALYSIS_V1_GOLDEN_SET` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-No next milestone started. Do not begin résumé generation until explicitly approved.
+First representative Golden Test set for the closed job-analysis engine (15 fixtures). Awaiting Claude Code adversarial audit. Do not mark CLOSED. Do not begin résumé generation. Do not push until audit clears.
 
 ## Not Built Yet
 
@@ -157,7 +167,7 @@ No next milestone started. Do not begin résumé generation until explicitly app
 * Downstream requested-context enforcement at résumé/application consumption time
 * Claim Repository result-type sealing (deferred; no sealed downstream consumer yet)
 * Full OPT/immigration scoring inside job analysis
-* Batch job discovery / 20 Golden Tests set
+* Full long-term 20+ Golden Test expansion beyond the first 15-fixture set
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
@@ -195,14 +205,16 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval before starting the next milestone.
-2. Deferred job-analysis hardening P-1 / P-2 only when deliberately scheduled (no overclaiming).
-3. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
+1. Independent Claude Code adversarial audit of `JOB_ANALYSIS_V1_GOLDEN_SET`.
+2. Close Golden Set only after audit + any required hardening.
+3. Deferred P-2 (process-mapping evidence/claim semantics) only when deliberately scheduled.
+4. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
+* marking Job Analysis Golden Set CLOSED before audit;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
@@ -213,4 +225,4 @@ Do not begin:
 
 ## Next Approved Task
 
-None started. Await Bora’s explicit next-milestone instruction.
+Claude Code adversarial audit of `JOB_ANALYSIS_V1_GOLDEN_SET` (not CLOSED yet).

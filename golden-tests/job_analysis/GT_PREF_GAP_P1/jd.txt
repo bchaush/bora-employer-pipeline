@@ -1,0 +1,13 @@
+Lumen Ops — Business Systems Analyst (Synthetic Fixture)
+
+Strong core Business Systems fit. Salesforce is preferred, but not required.
+
+Minimum qualifications (required)
+- Experience gathering requirements and clarifying scope boundaries
+- Experience with workflow automation and approval-synchronized evidence mapping
+- Hands-on CSV / Drive-folder data ingestion with import logging
+- Comfort documenting UAT or pilot test outcomes
+- Support fail-closed operational controls for outbound follow-up communications
+
+Preferred qualifications
+- Salesforce administration experience is preferred, but not required

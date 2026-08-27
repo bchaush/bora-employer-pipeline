@@ -1,0 +1,29 @@
+{
+  "purpose": "Mandatory core platform specialization (Salesforce) must REJECT.",
+  "role_family": "Business Systems",
+  "acceptable_decisions": [
+    "REJECT"
+  ],
+  "forbidden_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "key_matches": {
+    "REQ_PLAT_SF": {
+      "result": "NONE"
+    }
+  },
+  "expect_gap_substrings": [
+    "Salesforce"
+  ],
+  "require_hard_blockers": true,
+  "semantic_boundaries": [
+    "unsupported platform specialization blocks positive routing"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [],
+  "fixture_id": "GT_PLATFORM_REJECT"
+}

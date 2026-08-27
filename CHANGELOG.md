@@ -19,6 +19,49 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Add job analysis golden set (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Build the first representative Golden Test set for the closed job-analysis engine to validate generalization across Bora’s real target job universe before résumé generation depends on it.
+
+**Changed**
+
+* Added 15 synthetic Golden fixtures under `golden-tests/job_analysis/` with structured `expected.json`.
+* Added `schemas/job_analysis_golden_case.schema.json` and runner `golden-tests/run_job_analysis_golden_set.py`.
+* Added fixture generator `scripts/generate_job_analysis_golden_fixtures.py` (maintenance aid).
+* Bounded P-1 hardening: `"preferred, but not required"` → `PREFERRED` without breaking mixed mandatory/preferred degree clauses.
+* P-2 remains deferred and is explicitly exposed by `GT_PROCESS_MAP_P2` (Claims/Evidence unchanged).
+* Experience / Evidence / Claim repositories unchanged; no résumé generation begun.
+* Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED; not pushed pending audit).
+
+**Affected Areas**
+
+* `golden-tests/`
+* `schemas/job_analysis_golden_case.schema.json`
+* `scripts/generate_job_analysis_golden_fixtures.py`
+* `src/requirement_normalize.py` (P-1 only)
+* `tests/job_analysis_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* First Golden Set is 15 fixtures (not full long-term 20+ Blueprint expansion).
+* P-2 continues to fail closed until deliberate Evidence/Claim review.
+* Golden expectations encode Blueprint-aligned behavior, not arbitrary current drift.
+
+**Tests / Verification**
+
+* All prior suites + `job_analysis_test.py` — PASS
+* `golden-tests/run_job_analysis_golden_set.py` — PASS (15/15)
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-27 — Close first job analysis vertical slice (CLOSED)
 
 **Reason**

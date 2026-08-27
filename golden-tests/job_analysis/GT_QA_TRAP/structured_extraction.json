@@ -1,0 +1,94 @@
+{
+  "_role_title": "Business Systems Analyst",
+  "role_family": "Business Systems",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_CORE_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Business Systems",
+      "relevance": "HIGH",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_CORE_WF",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
+      "category": "PROCESS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Business Process",
+      "relevance": "HIGH",
+      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_CORE_DATA",
+      "job_id": "PLACEHOLDER",
+      "text": "Hands-on CSV / Drive-folder data ingestion with import logging",
+      "category": "DATA",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [
+        "CSV"
+      ],
+      "experience_level": null,
+      "domain": "Data Operations",
+      "relevance": "HIGH",
+      "source_text": "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_CORE_UAT",
+      "job_id": "PLACEHOLDER",
+      "text": "Comfort documenting UAT or pilot test outcomes",
+      "category": "TESTING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Implementation",
+      "relevance": "HIGH",
+      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_CORE_CTRL",
+      "job_id": "PLACEHOLDER",
+      "text": "Support fail-closed operational controls for outbound communications",
+      "category": "CONTROLS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Technical Operations",
+      "relevance": "HIGH",
+      "source_text": "Support fail-closed operational controls for outbound follow-up communications",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_QA_ENT",
+      "job_id": "PLACEHOLDER",
+      "text": "Enterprise QA engineering ownership experience",
+      "category": "QA",
+      "importance": "PREFERRED",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "MEDIUM",
+      "source_text": "Enterprise QA engineering ownership experience is a bonus",
+      "source_location": "Preferred qualifications"
+    }
+  ]
+}

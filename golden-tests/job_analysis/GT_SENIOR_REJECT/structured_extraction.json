@@ -1,0 +1,50 @@
+{
+  "_role_title": "Senior Business Systems Analyst",
+  "role_family": "Business Systems",
+  "seniority": "SENIOR",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_SEN_YEARS",
+      "job_id": "PLACEHOLDER",
+      "text": "7+ years leading enterprise systems programs",
+      "category": "SENIORITY",
+      "importance": "MANDATORY",
+      "seniority_implication": "SENIOR",
+      "technology": [],
+      "experience_level": "7+ years",
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Requires 7+ years leading enterprise systems programs",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_SEN_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_SEN_WF",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience with workflow automation and approval-synchronized evidence mapping",
+      "category": "PROCESS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Experience with workflow automation and approval-synchronized evidence mapping is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}

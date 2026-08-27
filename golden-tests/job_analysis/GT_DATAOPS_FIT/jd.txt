@@ -1,0 +1,19 @@
+Civic Ledger Ops — Data Operations Analyst (Synthetic Fixture)
+
+Role emphasizing recurring CSV intake quality, import logging, spreadsheet
+validation, and operational reporting support. SQL is preferred only; do not
+invent SQL evidence.
+
+Responsibilities
+- Run recurring CSV / Drive-folder data ingestion with import logging
+- Validate spreadsheet intake quality before downstream use
+- Support operational reporting packages from cleaned intakes
+- Document pilot test / UAT checks for intake changes
+
+Minimum qualifications (required)
+- Hands-on CSV / Drive-folder data ingestion with import logging
+- Experience gathering requirements and clarifying scope boundaries for intake workflows
+- Comfort documenting UAT or pilot test outcomes for data-quality checks
+
+Preferred qualifications
+- SQL querying experience

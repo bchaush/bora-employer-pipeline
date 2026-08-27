@@ -1,0 +1,36 @@
+{
+  "purpose": "U.S. regulatory requirement must be NONE with current trusted repository.",
+  "role_family": "Business Systems",
+  "acceptable_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "forbidden_decisions": [
+    "REJECT"
+  ],
+  "key_matches": {
+    "REQ_REG_US": {
+      "result": "NONE"
+    },
+    "REQ_CORE_CTRL": {
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    }
+  },
+  "expect_gap_substrings": [
+    "regulatory"
+  ],
+  "semantic_boundaries": [
+    "Winter Walk software controls are not U.S. regulatory expertise"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [],
+  "fixture_id": "GT_REGULATORY_TRAP"
+}

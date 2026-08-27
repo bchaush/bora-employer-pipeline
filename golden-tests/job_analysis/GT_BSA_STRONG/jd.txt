@@ -1,0 +1,25 @@
+Harborline Internal Tools — Business Systems Analyst (Synthetic Fixture)
+
+This is repository Golden Test data only. It is not a claim about a real employer.
+
+About the role
+Early-career Business Systems Analyst supporting internal operating workflows,
+requirements clarification, data intake quality, and UAT documentation with
+nontechnical stakeholders.
+
+Responsibilities
+- Gather stakeholder requirements and clarify scope boundaries
+- Automate workflow handoffs and keep approval-synchronized evidence mapping current
+- Maintain CSV / Drive-folder intake with import logging
+- Support fail-closed controls for outbound operational communications
+- Document UAT / pilot outcomes
+
+Minimum qualifications (required)
+- Experience gathering requirements and clarifying scope boundaries
+- Experience with workflow automation and approval-synchronized evidence mapping
+- Hands-on CSV / Drive-folder data ingestion with import logging
+- Comfort documenting UAT or pilot test outcomes
+- Support fail-closed operational controls for outbound follow-up communications
+
+Preferred qualifications
+- Salesforce administration experience

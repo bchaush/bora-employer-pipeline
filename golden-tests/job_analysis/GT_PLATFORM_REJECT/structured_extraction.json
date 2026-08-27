@@ -1,0 +1,52 @@
+{
+  "_role_title": "Salesforce Business Systems Analyst",
+  "role_family": "Business Systems",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_PLAT_SF",
+      "job_id": "PLACEHOLDER",
+      "text": "Salesforce administration experience",
+      "category": "PLATFORM",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [
+        "Salesforce"
+      ],
+      "experience_level": null,
+      "domain": "CRM",
+      "relevance": "HIGH",
+      "source_text": "Salesforce administration experience is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_PLAT_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_PLAT_UAT",
+      "job_id": "PLACEHOLDER",
+      "text": "Comfort documenting UAT or pilot test outcomes",
+      "category": "TESTING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}

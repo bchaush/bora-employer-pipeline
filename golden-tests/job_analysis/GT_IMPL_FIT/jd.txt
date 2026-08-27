@@ -1,0 +1,17 @@
+Northbridge Delivery — Implementation Analyst (Synthetic Fixture)
+
+Early-career implementation role supporting customer requirements, CSV data
+import, configuration handoffs, UAT documentation, and troubleshooting of
+workflow automation issues.
+
+Responsibilities
+- Elicit customer requirements and clarify scope boundaries
+- Import customer CSV datasets with import logging
+- Configure workflow automation and approval-synchronized evidence mapping
+- Document UAT / pilot results and support handoff troubleshooting
+
+Minimum qualifications (required)
+- Experience gathering requirements and clarifying scope boundaries
+- Hands-on CSV / Drive-folder data ingestion with import logging
+- Experience with workflow automation and approval-synchronized evidence mapping
+- Comfort documenting UAT or pilot test outcomes

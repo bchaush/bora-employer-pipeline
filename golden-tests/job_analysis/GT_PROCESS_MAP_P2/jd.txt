@@ -1,0 +1,10 @@
+Process Studio — Business Process Analyst (Synthetic Fixture)
+
+Core mandatory work is generic business process mapping. This fixture exposes
+known P-2 safe-direction limitation: current Claims/Evidence do not authorize
+generic process-mapping capability.
+
+Minimum qualifications (required)
+- Map existing business processes and produce process maps for stakeholder review
+- Experience gathering requirements and clarifying scope boundaries
+- Comfort documenting UAT or pilot test outcomes

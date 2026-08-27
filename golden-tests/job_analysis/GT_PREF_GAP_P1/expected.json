@@ -1,0 +1,42 @@
+{
+  "purpose": "Preferred skill gap must not auto-reject; surfaces P-1 phrasing handling.",
+  "role_family": "Business Systems",
+  "acceptable_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "forbidden_decisions": [
+    "REJECT"
+  ],
+  "key_matches": {
+    "REQ_CORE_REQ": {
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    },
+    "REQ_P1_SF": {
+      "result": "NONE"
+    }
+  },
+  "expected_importance": {
+    "REQ_P1_SF": "PREFERRED"
+  },
+  "expect_gap_substrings": [
+    "Salesforce"
+  ],
+  "semantic_boundaries": [
+    "preferred gap does not auto-reject",
+    "P-1 preferred-but-not-required phrasing"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [
+    "P-1 bounded hardening: preferred, but not required -> PREFERRED."
+  ],
+  "fixture_id": "GT_PREF_GAP_P1"
+}

@@ -1,0 +1,31 @@
+{
+  "purpose": "Clearly senior title/experience must REJECT.",
+  "role_family": "Business Systems",
+  "acceptable_decisions": [
+    "REJECT"
+  ],
+  "forbidden_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "key_matches": {
+    "REQ_SEN_REQ": {
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    }
+  },
+  "require_hard_blockers": true,
+  "semantic_boundaries": [
+    "seniority defense-in-depth"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [],
+  "fixture_id": "GT_SENIOR_REJECT"
+}

@@ -258,12 +258,28 @@ assert_true(
     classify_importance_from_source("Salesforce experience is preferred") == "PREFERRED",
     "preferred cue",
 )
+# P-1 bounded hardening: preferred, but not required
+assert_true(
+    classify_importance_from_source(
+        "Salesforce administration experience is preferred, but not required"
+    )
+    == "PREFERRED",
+    "P-1 preferred-but-not-required must be PREFERRED",
+)
+# Mixed degree clauses must remain UNCLEAR (not broken by P-1)
+assert_true(
+    classify_importance_from_source(
+        "Bachelor's degree required; Master's degree preferred."
+    )
+    == "UNCLEAR",
+    "mixed degree clauses must stay UNCLEAR after P-1",
+)
 # Mandatory cue
 assert_true(
     classify_importance_from_source("SQL skills are required") == "MANDATORY",
     "mandatory cue",
 )
-print("PASS 9: unclear requirement remains UNCLEAR; classification cues work.")
+print("PASS 9: unclear requirement remains UNCLEAR; classification cues work (incl. P-1).")
 
 
 # ---------------------------------------------------------------------------

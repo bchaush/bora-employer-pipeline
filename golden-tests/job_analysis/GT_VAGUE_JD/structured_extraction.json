@@ -1,0 +1,64 @@
+{
+  "_role_title": "Operations Analyst",
+  "role_family": "Business Operations",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_V_NOISE",
+      "job_id": "PLACEHOLDER",
+      "text": "Self-starter who thrives in a fast-paced environment",
+      "category": "HR_NOISE",
+      "importance": "UNCLEAR",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "LOW",
+      "source_text": "Must be a self-starter and team player who thrives in a fast-paced environment",
+      "source_location": "About you"
+    },
+    {
+      "requirement_id": "REQ_V_VAGUE",
+      "job_id": "PLACEHOLDER",
+      "text": "Excited about process, data, and making an impact",
+      "category": "CULTURE",
+      "importance": "UNCLEAR",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "LOW",
+      "source_text": "Excited about process, data, and making an impact",
+      "source_location": "About you"
+    },
+    {
+      "requirement_id": "REQ_V_AMBIG",
+      "job_id": "PLACEHOLDER",
+      "text": "Comfortable with vague priorities and evolving scope",
+      "category": "AMBIGUOUS",
+      "importance": "UNCLEAR",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "MEDIUM",
+      "source_text": "Comfortable with vague priorities and evolving scope",
+      "source_location": "About you"
+    },
+    {
+      "requirement_id": "REQ_V_TOOLS",
+      "job_id": "PLACEHOLDER",
+      "text": "Some exposure to modern tools",
+      "category": "TOOLS",
+      "importance": "PREFERRED",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "LOW",
+      "source_text": "Nice to have: some exposure to modern tools",
+      "source_location": "Nice to have"
+    }
+  ]
+}

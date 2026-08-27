@@ -1,0 +1,10 @@
+Signal Desk — Technical Operations Analyst (Synthetic Fixture)
+
+Adjacent Blueprint family. Viable through substantive requirements, not exact
+Business Systems title dependence.
+
+Minimum qualifications (required)
+- Support fail-closed operational controls for outbound follow-up communications
+- Hands-on CSV / Drive-folder data ingestion with import logging
+- Experience gathering requirements and clarifying scope boundaries
+- Comfort documenting UAT or pilot test outcomes

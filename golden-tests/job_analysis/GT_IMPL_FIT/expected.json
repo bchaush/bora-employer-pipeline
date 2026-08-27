@@ -1,0 +1,54 @@
+{
+  "purpose": "Early-career Implementation Analyst fit using supported requirements/data/UAT evidence.",
+  "role_family": "Implementation",
+  "acceptable_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "forbidden_decisions": [
+    "REJECT"
+  ],
+  "key_matches": {
+    "REQ_IMPL_REQ": {
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    },
+    "REQ_IMPL_DATA": {
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    },
+    "REQ_IMPL_WF": {
+      "result": "STRONG",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    },
+    "REQ_IMPL_UAT": {
+      "result": "SUPPORTED",
+      "require_provenance": true,
+      "acceptable_results": [
+        "STRONG",
+        "SUPPORTED"
+      ]
+    }
+  },
+  "semantic_boundaries": [
+    "implementation family remains viable without exact BSA title"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [],
+  "fixture_id": "GT_IMPL_FIT"
+}

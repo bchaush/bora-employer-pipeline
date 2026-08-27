@@ -1,0 +1,53 @@
+{
+  "_role_title": "Business Systems Analyst",
+  "role_family": "Business Systems",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_CLOUD_GCP",
+      "job_id": "PLACEHOLDER",
+      "text": "Exposure to Google Cloud infrastructure / GCP engineering",
+      "category": "TECHNOLOGY",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [
+        "Google Cloud",
+        "GCP"
+      ],
+      "experience_level": null,
+      "domain": "Cloud",
+      "relevance": "HIGH",
+      "source_text": "Exposure to Google Cloud infrastructure / GCP engineering is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_CLOUD_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_CLOUD_UAT",
+      "job_id": "PLACEHOLDER",
+      "text": "Comfort documenting UAT or pilot test outcomes",
+      "category": "TESTING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}

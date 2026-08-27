@@ -1,0 +1,66 @@
+{
+  "_role_title": "Technical Operations Analyst",
+  "role_family": "Technical Operations",
+  "seniority": "EARLY_CAREER",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_TO_CTRL",
+      "job_id": "PLACEHOLDER",
+      "text": "Support fail-closed operational controls for outbound follow-up communications",
+      "category": "CONTROLS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Technical Operations",
+      "relevance": "HIGH",
+      "source_text": "Support fail-closed operational controls for outbound follow-up communications is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_TO_DATA",
+      "job_id": "PLACEHOLDER",
+      "text": "Hands-on CSV / Drive-folder data ingestion with import logging",
+      "category": "DATA",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [
+        "CSV"
+      ],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Hands-on CSV / Drive-folder data ingestion with import logging is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_TO_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Experience gathering requirements and clarifying scope boundaries",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Experience gathering requirements and clarifying scope boundaries is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_TO_UAT",
+      "job_id": "PLACEHOLDER",
+      "text": "Comfort documenting UAT or pilot test outcomes",
+      "category": "TESTING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "Comfort documenting UAT or pilot test outcomes is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}

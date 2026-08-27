@@ -1,0 +1,29 @@
+{
+  "purpose": "Software Engineering role must REJECT despite generic shared vocabulary.",
+  "role_family": "Software Engineering",
+  "acceptable_decisions": [
+    "REJECT"
+  ],
+  "forbidden_decisions": [
+    "PRIORITY_APPLY",
+    "APPLY",
+    "EFFICIENT_APPLY"
+  ],
+  "key_matches": {
+    "REQ_SWE_CORE": {
+      "result": "NONE",
+      "acceptable_results": [
+        "NONE",
+        "UNKNOWN"
+      ]
+    }
+  },
+  "semantic_boundaries": [
+    "generic lexical overlap cannot create APPLY for SWE"
+  ],
+  "known_limitations": [
+    "NONE"
+  ],
+  "notes": [],
+  "fixture_id": "GT_SWE_REJECT"
+}

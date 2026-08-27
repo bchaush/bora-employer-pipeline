@@ -1,0 +1,64 @@
+{
+  "_role_title": "Software Engineer",
+  "role_family": "Software Engineering",
+  "seniority": "MID",
+  "extraction_version": "golden_structured_v1",
+  "requirements": [
+    {
+      "requirement_id": "REQ_SWE_CORE",
+      "job_id": "PLACEHOLDER",
+      "text": "Build and maintain backend services and APIs as a software engineer",
+      "category": "SWE",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Software Engineering",
+      "relevance": "HIGH",
+      "source_text": "Build and maintain backend services and APIs as a software engineer is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_SWE_TEST",
+      "job_id": "PLACEHOLDER",
+      "text": "Write automated tests for production services",
+      "category": "TESTING",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": "Software Engineering",
+      "relevance": "HIGH",
+      "source_text": "Write automated tests for production services is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_SWE_REQ",
+      "job_id": "PLACEHOLDER",
+      "text": "Partner with stakeholders on technical requirements definition",
+      "category": "REQUIREMENTS",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "MEDIUM",
+      "source_text": "Partner with stakeholders on technical requirements definition is required",
+      "source_location": "Minimum qualifications (required)"
+    },
+    {
+      "requirement_id": "REQ_SWE_DATA",
+      "job_id": "PLACEHOLDER",
+      "text": "Work with data pipelines supporting application features",
+      "category": "DATA",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "MEDIUM",
+      "source_text": "Work with data pipelines supporting application features is required",
+      "source_location": "Minimum qualifications (required)"
+    }
+  ]
+}
