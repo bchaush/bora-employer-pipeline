@@ -19,6 +19,44 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Claim Bank v1 final semantic hardening (IMPLEMENTED_PENDING_RECHECK)
+
+**Reason**
+
+Close Claude-identified semantic-guard blockers: negation/limitation leakage, unrelated-number outcome leakage, and trivial wording/formatting variant bypasses.
+
+**Changed**
+
+* Evidence phrase matches now require non-negated local context before counting as positive support.
+* Quantified outcomes require number + matching outcome-category cues in Evidence (bare unrelated numbers fail).
+* Normalization: lowercase, hyphen→space, whitespace collapse; expanded bounded equivalent forms for enterprise SaaS/architecture, production ML, enterprise QA families.
+* Real five Winter Walk claims unchanged; still pending Bora approval.
+* Claim Repository unchanged and remains valid.
+* Status: **IMPLEMENTED_PENDING_RECHECK** (Claim Bank not CLOSED; not pushed).
+
+**Affected Areas**
+
+* `src/claim_semantic_guard.py`
+* `tests/claim_semantic_guard_test.py`
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Guard remains bounded pattern-based, not general NLP.
+* Prefer fail-closed overaccept of material overclaims; genuine positive Evidence can still authorize matching wording.
+
+**Tests / Verification**
+
+* All 13 established suites — PASS
+* Negation six, unrelated-number, variant, original six, positive-support, real five regressions — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_RECHECK
+
+---
+
 ## 2026-08-26 — Claim Bank v1 required hardening (IMPLEMENTED_PENDING_FINAL_AUDIT)
 
 **Reason**

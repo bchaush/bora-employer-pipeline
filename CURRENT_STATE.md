@@ -18,7 +18,9 @@ Minimal Experience Registry v1 = **CLOSED**.
 
 Claim Bank v1 first Winter Walk reusable claims = **IMPLEMENTED** (records present; not CLOSED).
 
-Claim Bank v1 required hardening = **IMPLEMENTED_PENDING_FINAL_AUDIT** (not CLOSED).
+Claim Bank v1 required hardening = **IMPLEMENTED** (semantic+repository hardening present; not CLOSED).
+
+Claim Bank v1 final semantic hardening = **IMPLEMENTED_PENDING_RECHECK** (not CLOSED).
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
@@ -111,13 +113,21 @@ No production engine yet.
   * Claim repository integrity (`src/claim_repository.py`): unique Claim_ID, filename↔ID match, schema, strict JSON, fail-closed index.
   * Real five claim wordings / lineage / states / contexts / `human_approval=false` unchanged.
   * Downstream requested-context consumption deferred until résumé/application consumer exists (self-conflict still enforced).
-  * Status: **IMPLEMENTED_PENDING_FINAL_AUDIT**.
+  * Status: **IMPLEMENTED** (Claim Bank not CLOSED).
+* Claim Bank v1 final semantic hardening implemented (not CLOSED):
+
+  * Negation/limitation leakage fixed: Evidence matches count as support only outside explicit negated/excluded local windows.
+  * Quantified-outcome context leakage fixed: numbers must appear near matching outcome-category language (bare unrelated numbers do not authorize).
+  * Trivial wording/formatting variant normalization added (lowercase, hyphen→space, bounded equivalent forms).
+  * Real five Winter Walk claims unchanged; still `human_approval=false` / `reusable=false`.
+  * Claim Repository remains valid (5 records; no module refactor).
+  * Status: **IMPLEMENTED_PENDING_RECHECK**.
 
 ## Current Task
 
-`CLAIM_BANK_V1_REQUIRED_HARDENING` = **IMPLEMENTED_PENDING_FINAL_AUDIT**.
+`CLAIM_BANK_V1_FINAL_SEMANTIC_HARDENING` = **IMPLEMENTED_PENDING_RECHECK**.
 
-Awaiting final independent adversarial audit. Five claims remain `human_approval=false`. Do not mark Claim Bank v1 CLOSED yet.
+Awaiting final external adversarial recheck. Five claims remain `human_approval=false`. Do not mark Claim Bank v1 CLOSED yet.
 
 ## Not Built Yet
 
@@ -146,6 +156,7 @@ Awaiting final independent adversarial audit. Five claims remain `human_approval
 * JSON Schema gates reject malformed structured records.
 * Claim reusable-use requires schema + citation-scoped lineage + state compatibility + semantic boundary guard + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
 * Bounded deterministic semantic guard rejects known unsupported upgrades and fabricated quantified outcomes (`FORBIDDEN_SEMANTIC_PATTERN`).
+* Semantic support requires positive (non-negated) Evidence context; unrelated bare numbers cannot authorize quantified outcomes.
 * Claim repository identity integrity enforced (duplicate Claim_ID / filename mismatch fail closed).
 * Downstream requested-context enforcement intentionally deferred until a résumé/application consumer exists.
 * Provenance spine: Experience → Evidence → Claim (proposed) → (future) résumé module.
@@ -160,16 +171,16 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Final independent adversarial audit of Claim Bank v1 required hardening.
+1. Final independent adversarial recheck of Claim Bank v1 final semantic hardening.
 2. Bora human approval of claim records (`human_approval`) before reusable use.
-3. Close Claim Bank v1 only after final audit + approval decisions.
+3. Close Claim Bank v1 only after final recheck + approval decisions.
 4. Additional Experience/Evidence/Claims only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Claim Bank v1 CLOSED before final audit;
+* marking Claim Bank v1 CLOSED before final recheck;
 * setting `human_approval=true` without Bora decision;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
@@ -180,4 +191,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Final independent adversarial audit of `CLAIM_BANK_V1_REQUIRED_HARDENING` (not CLOSED yet).
+Final independent adversarial recheck of `CLAIM_BANK_V1_FINAL_SEMANTIC_HARDENING` (not CLOSED yet).
