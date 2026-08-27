@@ -301,4 +301,57 @@ print(
 )
 
 
+# ---------------------------------------------------------------------------
+# PASS 13 — Duplicate JSON object key (non-identity field; raw text fixture)
+# ---------------------------------------------------------------------------
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    # Raw text required: Python dicts cannot preserve duplicate keys.
+    duplicate_state_json = """{
+  "evidence_id": "WW_DUPKEY_001",
+  "experience_id": "EXP_TEST_001",
+  "fact": "Synthetic record with duplicate evidence_state key.",
+  "capabilities": ["data analysis"],
+  "technologies": ["SQL"],
+  "evidence_state": "CONTRADICTED",
+  "evidence_state": "VERIFIED",
+  "original_source": "synthetic-fixture://evidence/WW_DUPKEY_001",
+  "source_location": "tests/evidence_repository_test.py",
+  "safe_for_external_use": false,
+  "notes": null
+}
+"""
+    write_json(root / "WW_DUPKEY_001.json", duplicate_state_json)
+    result = validate_evidence_repository(root)
+    assert_false(result["valid"], "duplicate JSON key was accepted")
+    assert_true(result["index"] is None, "trusted index returned despite duplicate JSON key")
+    assert_true(
+        "EVIDENCE_JSON_DUPLICATE_KEY" in error_codes(result),
+        f"missing EVIDENCE_JSON_DUPLICATE_KEY: {result['errors']}",
+    )
+    assert_true(
+        any(
+            error.get("code") == "EVIDENCE_JSON_DUPLICATE_KEY"
+            and error.get("key") == "evidence_state"
+            and error.get("path") == "WW_DUPKEY_001.json"
+            for error in result["errors"]
+        ),
+        f"duplicate key/path not identified: {result['errors']}",
+    )
+print("PASS 13: duplicate JSON object key failed closed (non-identity field).")
+
+
+# ---------------------------------------------------------------------------
+# PASS 14 — Empty evidence root is structurally valid
+# ---------------------------------------------------------------------------
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    result = validate_evidence_repository(root)
+    assert_true(result["valid"] is True, "empty evidence root was not structurally valid")
+    assert_true(result["records_checked"] == 0, "empty root should check zero records")
+    assert_true(result["index"] == {}, f"expected empty trusted index, got {result['index']!r}")
+    assert_true(result["errors"] == [], f"unexpected errors for empty root: {result['errors']}")
+print("PASS 14: empty evidence repository policy locked (valid, zero records, empty index).")
+
+
 print("PASS: evidence repository integrity tests completed successfully.")

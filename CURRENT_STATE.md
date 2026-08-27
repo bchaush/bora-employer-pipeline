@@ -14,7 +14,9 @@ Winter Walk Evidence Repository v1 Batch 1 = **CLOSED** (12 evidence records com
 
 No reusable claims created yet.
 
-Repository-Level Evidence Integrity v1 = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT** (not CLOSED).
+Repository-Level Evidence Integrity v1 = **IMPLEMENTED — PENDING FINAL CLAUDE CODE RECHECK** (not CLOSED).
+
+Claude audit: `EVIDENCE_INTEGRITY_AUDIT_PASS_WITH_REQUIRED_HARDENING` (no blockers; 2 hardenings implemented).
 
 Unresolved: `EXPERIENCE_REGISTRY_DECISION_REQUIRED` (no authoritative Experience Registry yet; `experience_id` is schema string-only).
 
@@ -75,14 +77,18 @@ No production engine yet.
   * `src/evidence_repository.py` + `tests/evidence_repository_test.py`.
   * Separate repository-wide gate from claim-scoped validation; fail-closed trusted index.
   * All 12 Winter Walk Batch 1 records pass repository integrity.
-  * Status: **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+  * Claude audit passed with two required hardenings; both implemented:
+    * reject duplicate JSON object keys (`EVIDENCE_JSON_DUPLICATE_KEY`);
+    * empty evidence root locked as structurally valid (`valid=True`, `records_checked=0`, `index={}`).
+  * Status: **IMPLEMENTED — PENDING FINAL CLAUDE CODE RECHECK**.
   * Open: `EXPERIENCE_REGISTRY_DECISION_REQUIRED`.
+  * No reusable claims exist yet.
 
 ## Current Task
 
-`REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` = **IMPLEMENTED — PENDING CLAUDE CODE AUDIT**.
+`REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` = **IMPLEMENTED — PENDING FINAL CLAUDE CODE RECHECK**.
 
-Awaiting ChatGPT review, then Claude Code independent audit. Do not mark CLOSED until audits complete.
+Awaiting Claude Code recheck of the two hardenings. Do not mark CLOSED until recheck completes.
 
 ## Not Built Yet
 
@@ -122,7 +128,7 @@ Awaiting ChatGPT review, then Claude Code independent audit. Do not mark CLOSED 
 * JSON Schema gates reject malformed structured records.
 * Claim reusable-use requires schema + citation-scoped lineage + state compatibility + human approval + non-UNKNOWN/non-CONTRADICTED state + no context conflict.
 * Semantic fabricated-outcome protection remains a later deterministic validator layer.
-* Repository-Level Evidence Integrity v1 exists as a separate gate from claim-scoped validation (`src/evidence_repository.py`); trusted index only when repository-valid.
+* Repository-Level Evidence Integrity v1 exists as a separate gate from claim-scoped validation (`src/evidence_repository.py`); trusted index only when repository-valid; duplicate JSON keys rejected; empty root structurally valid.
 * `experience_id` referential integrity is **not** enforced until an Experience Registry is approved (`EXPERIENCE_REGISTRY_DECISION_REQUIRED`).
 
 ## Current Source of Truth
@@ -133,8 +139,8 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. ChatGPT review of Evidence Integrity v1 implementation (do not push to main until reviewed).
-2. Claude Code independent audit of Evidence Integrity v1.
+1. Claude Code recheck of Evidence Integrity hardenings (duplicate JSON keys; empty-root policy).
+2. Close Evidence Integrity only after recheck pass (do not push until approved).
 3. Resolve `EXPERIENCE_REGISTRY_DECISION_REQUIRED` only after an Experience Registry architecture is approved.
 4. Forbidden-claim registry (only if approved).
 5. Winter Walk Evidence Batch 2 / claim creation (only if explicitly approved).
@@ -143,7 +149,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 Do not begin:
 
-* marking Evidence Integrity CLOSED before Claude Code audit;
+* marking Evidence Integrity CLOSED before final Claude Code recheck;
 * inventing an Experience Registry without approval;
 * Winter Walk Batch 2 without explicit approval;
 * claim creation from Batch 1 evidence without explicit approval;
@@ -162,4 +168,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Closeout of `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` after ChatGPT + Claude Code review (not CLOSED yet).
+Final Claude Code recheck / closeout of `REPOSITORY_LEVEL_EVIDENCE_INTEGRITY_V1` (not CLOSED yet).

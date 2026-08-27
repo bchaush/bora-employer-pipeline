@@ -19,6 +19,48 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-26 — Evidence Integrity v1 hardening (duplicate JSON keys + empty-root policy)
+
+**Reason**
+
+Claude Code audit returned `EVIDENCE_INTEGRITY_AUDIT_PASS_WITH_REQUIRED_HARDENING` with no blockers and exactly two required hardenings before closure.
+
+**Changed**
+
+* Reject duplicate JSON object keys during evidence load via `object_pairs_hook` (`EVIDENCE_JSON_DUPLICATE_KEY`; fail closed; no last-key-wins).
+* Document and lock empty evidence-root policy: structurally valid with `records_checked=0` and `index={}`; non-empty sufficiency remains a separate caller/milestone concern.
+* Tests: PASS 13 (duplicate non-identity key via raw JSON text); PASS 14 (empty TemporaryDirectory).
+* Milestone remains **PENDING FINAL CLAUDE CODE RECHECK** (not CLOSED).
+* `EXPERIENCE_REGISTRY_DECISION_REQUIRED` unchanged; no claims created; claim validators untouched.
+
+**Affected Areas**
+
+* `src/evidence_repository.py`
+* `tests/evidence_repository_test.py`
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Duplicate-key detection applies to every JSON object in the file (including nested objects), which is the intended fail-closed integrity behavior.
+* Empty-root structural validity must not be confused with application-level evidence sufficiency.
+
+**Tests / Verification**
+
+* `tests/evidence_repository_test.py` — PASS (including PASS 13–14)
+* All 7 existing suites — PASS
+* `git diff --check` — clean
+
+**Approved By**
+
+Hardening scope approved via Claude audit + ChatGPT implementation instruction; pending Claude recheck
+
+**Status**
+
+IMPLEMENTED — PENDING FINAL CLAUDE CODE RECHECK (not CLOSED; not pushed)
+
+---
+
 ## 2026-08-26 — Repository-Level Evidence Integrity v1 (IMPLEMENTED — PENDING CLAUDE CODE AUDIT)
 
 **Reason**

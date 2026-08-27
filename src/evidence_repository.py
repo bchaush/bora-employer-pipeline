@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Mapping, Optional
 
 from schema_validation import build_draft202012_validator
 
@@ -26,6 +26,31 @@ EVIDENCE_SCHEMA_PATH = ROOT / "schemas" / "evidence.schema.json"
 # No authoritative Experience Registry exists yet. experience_id is only
 # schema-checked as a non-empty string until a registry is approved.
 EXPERIENCE_REGISTRY_STATUS = "EXPERIENCE_REGISTRY_DECISION_REQUIRED"
+
+
+class DuplicateJsonKeyError(ValueError):
+    """Raised when a JSON object contains a repeated key (no last-key-wins)."""
+
+    def __init__(self, key: str) -> None:
+        self.key = key
+        super().__init__(f"duplicate JSON object key: {key!r}")
+
+
+def _object_pairs_no_duplicates(
+    pairs: list[tuple[str, Any]],
+) -> dict[str, Any]:
+    """Build a dict from JSON object pairs; fail closed on duplicate keys."""
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise DuplicateJsonKeyError(key)
+        result[key] = value
+    return result
+
+
+def _loads_strict_json(text: str) -> Any:
+    """Parse JSON without silently resolving duplicate object keys."""
+    return json.loads(text, object_pairs_hook=_object_pairs_no_duplicates)
 
 
 def _error(code: str, **fields: Any) -> dict[str, Any]:
@@ -79,8 +104,14 @@ def validate_evidence_repository(
 ) -> dict[str, Any]:
     """Validate the complete Evidence Repository and build a trusted index.
 
+    An existing readable empty evidence root is structurally valid: it returns
+    ``valid=True``, ``records_checked=0``, and an empty trusted ``index={}``.
+    Non-empty / sufficiency requirements for a milestone or caller are enforced
+    separately, not by this generic structural validator.
+
     Returns a mapping with:
     - valid: True only when every discovered file passes all invariants
+      (including the empty-repository case above)
     - records_checked: number of discovered JSON files
     - index: evidence_id -> record when valid; otherwise None
     - errors: list of machine-readable error dicts
@@ -139,7 +170,17 @@ def validate_evidence_repository(
             continue
 
         try:
-            loaded = json.loads(text)
+            loaded = _loads_strict_json(text)
+        except DuplicateJsonKeyError as exc:
+            result["errors"].append(
+                _error(
+                    "EVIDENCE_JSON_DUPLICATE_KEY",
+                    path=rel,
+                    key=exc.key,
+                    detail=f"duplicate JSON object key {exc.key!r}; no last-key-wins",
+                )
+            )
+            continue
         except json.JSONDecodeError as exc:
             result["errors"].append(
                 _error(
