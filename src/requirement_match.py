@@ -46,9 +46,10 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     (
         re.compile(
             r"requirements?\s+(?:gather(?:ing)?|elicitation|definition|collection)|"
-            r"(?:gather|collect|clarify|document|elicit)(?:ing)?\s+"
-            r"(?:\w+\s+){0,2}requirements?|"
-            r"stakeholder\s+requirements?|business\s+requirements?|"
+            r"(?:gather|collect|clarify|document|elicit|translate)(?:ing)?\s+"
+            r"(?:\w+\s+){0,3}(?:requirements?|needs?)\b|"
+            r"(?:stakeholder|business)\s+requirements?\b|"
+            r"(?:stakeholder|business)\s+needs?\s+into\s+documented\s+requirements?\b|"
             r"scope\s+boundar|clarify(?:ing)?\s+scope",
             re.I,
         ),
@@ -75,8 +76,13 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             r"\bcsv\b|drive[- ]folder|"
             r"data\s+ingestion|data\s+import|import(?:ing)?\s+data|"
             r"ingest(?:ing)?\s+data|data\s+feeds?|spreadsheet\s+data\s+feeds?|"
-            r"file\s+import|csv\s+import|import\s+log|"
-            r"data\s+(?:intake|validation)\b",
+            r"spreadsheet\s+feeds?|file\s+import|csv\s+import|import\s+log|"
+            r"data\s+(?:intake|validation)\b|"
+            r"load(?:ing)?\s+(?:\w+\s+){0,3}(?:spreadsheet|csv|file|data)\s+feeds?|"
+            r"import(?:ing)?\s+(?:\w+\s+){0,3}(?:operational\s+)?files?\b|"
+            r"ingest(?:ing)?\s+(?:\w+\s+){0,3}(?:tabular\s+)?(?:source\s+)?data\b|"
+            r"consolidat(?:e|ing)\s+(?:incoming\s+)?datasets?\b|"
+            r"incoming\s+datasets?\b",
             re.I,
         ),
         frozenset({"data_ingestion", "csv_intake", "import_logging"}),
@@ -84,6 +90,7 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     (
         re.compile(
             r"\buat\b|user\s+acceptance\s+test(?:ing)?|acceptance\s+testing|"
+            r"acceptance[- ]test(?:ing|s| cycles)?|"
             r"pilot\s+test(?:ing)?|pilot\s+validation|pilot\s+result|"
             r"user\s+testing|test\s+documentation",
             re.I,

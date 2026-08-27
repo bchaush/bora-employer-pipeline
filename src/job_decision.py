@@ -18,6 +18,9 @@ SUPPORTED_ROLE_FAMILY_TOKENS = (
     "business process",
     "digital solutions",
     "technical operations",
+    # Blueprint §6 primary targets — multi-word tokens only (not bare "application").
+    "application analyst",
+    "application support",
 )
 
 
@@ -140,9 +143,17 @@ def detect_hard_blockers(
     return blockers
 
 
-def role_family_fit(role_family: str | None) -> bool:
-    family = (role_family or "").casefold()
-    return any(token in family for token in SUPPORTED_ROLE_FAMILY_TOKENS)
+def role_family_fit(role_family: str | None, role: str | None = None) -> bool:
+    """True when extracted family or role title matches a supported multi-word token."""
+    candidates = [
+        (role_family or "").casefold(),
+        (role or "").casefold(),
+    ]
+    return any(
+        token in text
+        for text in candidates
+        for token in SUPPORTED_ROLE_FAMILY_TOKENS
+    )
 
 
 def is_information_deficit(
@@ -243,6 +254,9 @@ def decide_lane_and_decision(
     none = 0
     high_none = 0
     high_strong = 0
+    # Distinct Claim provenance for HIGH mandatory STRONG/SUPPORTED matches.
+    # Prevents PRIORITY gaming via requirement splitting against one claim.
+    distinct_high_claims: set[str] = set()
     for requirement in mandatory:
         req_id = requirement.get("requirement_id")
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
@@ -251,12 +265,18 @@ def decide_lane_and_decision(
             strong_or_supported += 1
             if requirement.get("relevance") == "HIGH":
                 high_strong += 1
+                if isinstance(match, Mapping):
+                    for claim_id in match.get("claim_ids") or []:
+                        if isinstance(claim_id, str) and claim_id.strip():
+                            distinct_high_claims.add(claim_id)
         elif result == "PARTIAL":
             partial += 1
         elif result == "NONE":
             none += 1
             if requirement.get("relevance") == "HIGH":
                 high_none += 1
+
+    distinct_high_claim_count = len(distinct_high_claims)
 
     # Material preferred gaps use HIGH relevance (policy: not every preferred gap).
     material_preferred_missing = 0
@@ -272,7 +292,7 @@ def decide_lane_and_decision(
         else:
             nonmaterial_preferred_missing += 1
 
-    family_fit = role_family_fit(role_family)
+    family_fit = role_family_fit(role_family, role=role)
     unclear_count = sum(1 for r in requirements if r.get("importance") == "UNCLEAR")
 
     # Any core mandatory HIGH gap blocks positive apply routing.
@@ -331,10 +351,11 @@ def decide_lane_and_decision(
             "hard_blockers": [],
         }
 
-    # PRIORITY_APPLY: uncommon; exceptional alignment; no material preferred gap.
+    # PRIORITY_APPLY: uncommon; exceptional breadth of distinct Claim provenance
+    # (not raw requirement-row count). Duplicate splits of one claim do not qualify.
     if (
         family_fit
-        and high_strong >= 4
+        and distinct_high_claim_count >= 4
         and none == 0
         and partial == 0
         and material_preferred_missing == 0
@@ -344,8 +365,9 @@ def decide_lane_and_decision(
             "lane": "LANE_2_PRIORITY_APPLY",
             "decision": "PRIORITY_APPLY",
             "decision_rationale": (
-                "Exceptional core mandatory HIGH alignment "
-                f"(high_strong={high_strong}) with no material preferred gaps."
+                "Exceptional core mandatory HIGH alignment across distinct Claim "
+                f"provenance (distinct_high_claims={distinct_high_claim_count}, "
+                f"high_strong={high_strong}) with no material preferred gaps."
             ),
             "hard_blockers": [],
         }
@@ -369,14 +391,19 @@ def decide_lane_and_decision(
         and strong_or_supported >= 3
         and none == 0
         and material_preferred_missing == 0
-        and (partial >= 1 or high_strong < 4 or nonmaterial_preferred_missing >= 2)
+        and (
+            partial >= 1
+            or distinct_high_claim_count < 4
+            or nonmaterial_preferred_missing >= 2
+        )
     ):
         return {
             "lane": "LANE_1_EFFICIENT_APPLY",
             "decision": "APPLY",
             "decision_rationale": (
-                "Good evidence alignment without exceptional Priority threshold "
-                f"(strong_or_supported={strong_or_supported}, high_strong={high_strong}, "
+                "Good evidence alignment without exceptional Priority breadth "
+                f"(strong_or_supported={strong_or_supported}, "
+                f"distinct_high_claims={distinct_high_claim_count}, "
                 f"nonmaterial_preferred_missing={nonmaterial_preferred_missing})."
             ),
             "hard_blockers": [],

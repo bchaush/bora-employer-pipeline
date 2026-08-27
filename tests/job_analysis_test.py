@@ -922,4 +922,222 @@ assert_true(
 )
 print("PASS R21: golden schema rejects meaningless catch-all / empty key_matches.")
 
+
+# ---------------------------------------------------------------------------
+# Second Claude re-audit remediation (T-1 / T-2 / T-3)
+# ---------------------------------------------------------------------------
+
+# T-1: four near-duplicate HIGH requirements supported by one claim ≠ PRIORITY
+dup_job = {
+    "company": "Duplicate Split Co",
+    "role": "Business Systems Analyst",
+    "jd_text": "Business Systems Analyst role with duplicated requirements wording.",
+    "fixture_key": "UNIT_PRIORITY_SPLIT",
+    "structured_extraction": {
+        "role_family": "Business Systems",
+        "seniority": "EARLY_CAREER",
+        "requirements": [
+            {
+                "requirement_id": f"REQ_DUP_{i:02d}",
+                "job_id": "PLACEHOLDER",
+                "text": text,
+                "category": "REQUIREMENTS",
+                "importance": "MANDATORY",
+                "seniority_implication": None,
+                "technology": [],
+                "experience_level": None,
+                "domain": "Business Systems",
+                "relevance": "HIGH",
+                "source_text": text,
+                "source_location": "Required",
+            }
+            for i, text in enumerate(
+                [
+                    "Gather business requirements from stakeholders",
+                    "Collect requirements and clarify scope boundaries",
+                    "Document requirements after stakeholder workshops",
+                    "Elicit stakeholder requirements for internal tools",
+                ],
+                start=1,
+            )
+        ],
+    },
+}
+dup_result = analyze_job(dup_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
+assert_true(dup_result["valid"] is True, dup_result["errors"])
+assert_true(
+    dup_result["analysis"]["decision"] != "PRIORITY_APPLY",
+    f"duplicate single-claim splits must not PRIORITY: {dup_result['analysis']}",
+)
+dup_claims = {
+    cid
+    for m in dup_result["analysis"]["evidence_matches"]
+    for cid in (m.get("claim_ids") or [])
+}
+assert_true(
+    dup_claims <= {"CLAIM_WW_001"},
+    f"expected only CLAIM_WW_001 provenance, got {dup_claims}",
+)
+print(
+    f"PASS T1a: requirement-splitting gaming blocked "
+    f"(decision={dup_result['analysis']['decision']})."
+)
+
+# T-1b: genuine diverse HIGH support can still PRIORITY (BSA fixture)
+assert_true(analysis["decision"] == "PRIORITY_APPLY", analysis["decision"])
+diverse_claims = {
+    cid
+    for m in analysis["evidence_matches"]
+    if m["result"] in {"STRONG", "SUPPORTED"}
+    for cid in (m.get("claim_ids") or [])
+}
+assert_true(
+    len(diverse_claims) >= 4,
+    f"BSA PRIORITY should rest on distinct claims, got {diverse_claims}",
+)
+print(
+    f"PASS T1b: genuine diverse PRIORITY retained "
+    f"(distinct_claims={sorted(diverse_claims)})."
+)
+
+# T-2: new synonym positives
+new_synonyms = [
+    "Gather business needs from internal teams",
+    "Translate stakeholder needs into documented requirements",
+    "Load recurring spreadsheet feeds from partner systems",
+    "Import operational files from partner teams",
+    "Ingest tabular source data for reporting",
+    "Consolidate incoming datasets from multiple sources",
+    "Support acceptance-test cycles for new releases",
+]
+for text in new_synonyms:
+    m = match_requirement(
+        job_id="JOB_X",
+        requirement=_mini_req(text),
+        reusable_claims=reusable,
+        evidence_index=EVIDENCE_INDEX,
+        match_index=0,
+    )
+    assert_true(
+        m["result"] in {"STRONG", "SUPPORTED"},
+        f"T-2 synonym should match positively: {text!r} -> {m}",
+    )
+    assert_true(m["claim_ids"] or m["evidence_ids"], f"missing provenance: {m}")
+print("PASS T2a: expanded synonym recall with provenance.")
+
+# T-2 negatives / precision guards
+for text in [
+    "Strong stakeholder management and cross-functional collaboration",
+    "Work with data across teams",
+    "Analyze data for insights",
+    "Manage information and approvals",
+    "Enterprise QA strategy ownership",
+    "Software quality engineering leadership",
+    "Automated regression architecture ownership",
+    "Marketing campaign workflow ownership",
+    "Cybersecurity controls administration",
+    "Cloud administration for production clusters",
+    "MLOps model deployment ownership",
+]:
+    caps = infer_requirement_capabilities(_mini_req(text))
+    # May map to explicit NONE traps, but must not invent positive WW capabilities
+    # except trap tags.
+    positive_ww = caps & {
+        "requirements_elicitation",
+        "scope_boundary",
+        "data_ingestion",
+        "csv_intake",
+        "import_logging",
+        "uat",
+        "pilot_testing",
+        "test_documentation",
+        "fail_closed_controls",
+        "workflow_automation",
+        "form_to_evidence_mapping",
+        "approval_sync",
+    }
+    assert_true(
+        not positive_ww,
+        f"overreach positive caps for {text!r}: {positive_ww}",
+    )
+    m = match_requirement(
+        job_id="JOB_X",
+        requirement=_mini_req(text),
+        reusable_claims=reusable,
+        evidence_index=EVIDENCE_INDEX,
+        match_index=0,
+    )
+    assert_true(
+        m["result"] in {"NONE", "UNKNOWN"},
+        f"precision guard failed for {text!r}: {m}",
+    )
+print("PASS T2b: generic/overreach negatives remain non-positive.")
+
+# T-3: Application Analyst family recognition with strong duties
+app_core = [
+    (
+        "REQ_APP_REQ",
+        "Gather business requirements from operations stakeholders",
+    ),
+    (
+        "REQ_APP_DATA",
+        "Import CSV datasets with import logging",
+    ),
+    (
+        "REQ_APP_UAT",
+        "Document user acceptance testing outcomes",
+    ),
+    (
+        "REQ_APP_CTRL",
+        "Support fail-closed outbound send controls",
+    ),
+    (
+        "REQ_APP_WF",
+        "Configure operational workflow automation with approval controls",
+    ),
+]
+for family, title in [
+    ("Application Analyst", "Application Analyst"),
+    ("Application Support", "Application Support Analyst"),
+    ("Business Systems", "Business Systems Analyst"),
+    ("Implementation", "Implementation Analyst"),
+]:
+    app_job = {
+        "company": f"Family Co {family}",
+        "role": title,
+        "jd_text": f"{title} supporting internal applications.",
+        "fixture_key": f"UNIT_FAMILY_{family.replace(' ', '_').upper()}",
+        "structured_extraction": {
+            "role_family": family,
+            "seniority": "EARLY_CAREER",
+            "requirements": [
+                {
+                    "requirement_id": rid,
+                    "job_id": "PLACEHOLDER",
+                    "text": text,
+                    "category": "CORE",
+                    "importance": "MANDATORY",
+                    "seniority_implication": None,
+                    "technology": ["CSV"] if "CSV" in text else [],
+                    "experience_level": None,
+                    "domain": family,
+                    "relevance": "HIGH",
+                    "source_text": text,
+                    "source_location": "Required",
+                }
+                for rid, text in app_core
+            ],
+        },
+    }
+    app_result = analyze_job(
+        app_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
+    )
+    assert_true(app_result["valid"] is True, app_result["errors"])
+    assert_true(
+        app_result["analysis"]["decision"]
+        in {"PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"},
+        f"{family}/{title} disadvantaged: {app_result['analysis']}",
+    )
+print("PASS T3: Application Analyst / Support families viable with strong duties.")
+
 print("PASS: job analysis vertical-slice tests completed successfully.")

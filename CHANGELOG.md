@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Remediate Golden Set T-1/T-2/T-3 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Second Claude Code adversarial audit returned `CLAUDE_JOB_ANALYSIS_GOLDEN_SET_CHANGES_REQUIRED` for PRIORITY requirement-splitting gaming, synonym recall gaps, and missing Application Analyst family recognition. Apply smallest bounded remediation. Do not resolve P-2 via Claim/Evidence invention.
+
+**Changed**
+
+* T-1: PRIORITY_APPLY now requires ≥4 distinct HIGH-mandatory Claim provenance IDs (not raw requirement-row count); duplicate splits of one claim cannot game Priority.
+* T-2: bounded synonym expansions for requirements/needs, data load/import/ingest/consolidate, acceptance-test cycles; precision guards retained.
+* T-3: `application analyst` / `application support` added to supported role-family tokens (Blueprint §6); bare `application` not supported.
+* P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED` (Claims/Evidence unchanged).
+* Status remains **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+
+**Affected Areas**
+
+* `src/job_decision.py`, `src/requirement_match.py`
+* `tests/job_analysis_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* All prior suites + golden runner — PASS
+* New T-1/T-2/T-3 adversarial cases — PASS
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT (remediated; pending re-audit)
+
+---
+
 ## 2026-08-27 — Harden job analysis golden set (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**
