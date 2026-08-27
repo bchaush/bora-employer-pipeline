@@ -18,8 +18,9 @@ SUPPORTED_ROLE_FAMILY_TOKENS = (
     "business process",
     "digital solutions",
     "technical operations",
-    # Blueprint §6 primary targets — multi-word tokens only (not bare "application").
+    # Blueprint §6 primary targets — multi-word tokens only (not bare application/s).
     "application analyst",
+    "applications analyst",
     "application support",
 )
 
@@ -353,6 +354,11 @@ def decide_lane_and_decision(
 
     # PRIORITY_APPLY: uncommon; exceptional breadth of distinct Claim provenance
     # (not raw requirement-row count). Duplicate splits of one claim do not qualify.
+    #
+    # Assumption (N-3): with the current approved Claim Bank, Claim IDs are a
+    # usable proxy for distinct capability breadth because CLAIM_WW_001–005 have
+    # non-overlapping capability ownership. If future overlapping claims appear,
+    # this proxy may need revisit — do not invent that behavior preemptively.
     if (
         family_fit
         and distinct_high_claim_count >= 4

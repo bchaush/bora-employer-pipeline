@@ -46,10 +46,14 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     (
         re.compile(
             r"requirements?\s+(?:gather(?:ing)?|elicitation|definition|collection)|"
-            r"(?:gather|collect|clarify|document|elicit|translate)(?:ing)?\s+"
-            r"(?:\w+\s+){0,3}(?:requirements?|needs?)\b|"
+            r"(?:gather|collect|clarify|document|elicit|translate|capture|turn|"
+            r"convert)(?:ing)?\s+(?:\w+\s+){0,3}(?:requirements?|needs?)\b|"
+            r"(?:turn|translate|capture|convert)(?:ing)?\s+"
+            r"(?:\w+\s+){0,2}(?:user|stakeholder|business)\s+needs?\s+"
+            r"(?:into\s+)?(?:functional\s+)?requirements?\b|"
             r"(?:stakeholder|business)\s+requirements?\b|"
             r"(?:stakeholder|business)\s+needs?\s+into\s+documented\s+requirements?\b|"
+            r"clarify(?:ing)?\s+(?:\w+\s+){0,4}(?:requirements?|needs?|scope|changes?)\b|"
             r"scope\s+boundar|clarify(?:ing)?\s+scope",
             re.I,
         ),
@@ -78,10 +82,12 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             r"ingest(?:ing)?\s+data|data\s+feeds?|spreadsheet\s+data\s+feeds?|"
             r"spreadsheet\s+feeds?|file\s+import|csv\s+import|import\s+log|"
             r"data\s+(?:intake|validation)\b|"
-            r"load(?:ing)?\s+(?:\w+\s+){0,3}(?:spreadsheet|csv|file|data)\s+feeds?|"
-            r"import(?:ing)?\s+(?:\w+\s+){0,3}(?:operational\s+)?files?\b|"
-            r"ingest(?:ing)?\s+(?:\w+\s+){0,3}(?:tabular\s+)?(?:source\s+)?data\b|"
-            r"consolidat(?:e|ing)\s+(?:incoming\s+)?datasets?\b|"
+            r"(?:ingest|load|import)(?:ing)?\s+"
+            r"(?:\w+\s+){0,4}"
+            r"(?:structured\s+|tabular\s+|source\s+|operational\s+|incoming\s+|recurring\s+)?"
+            r"(?:data|files?|datasets?|feeds?|csv|spreadsheets?)\b|"
+            r"consolidat(?:e|ing)\s+(?:\w+\s+){0,3}"
+            r"(?:incoming\s+)?(?:data|files?|datasets?|feeds?)\b|"
             r"incoming\s+datasets?\b",
             re.I,
         ),
@@ -92,6 +98,7 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             r"\buat\b|user\s+acceptance\s+test(?:ing)?|acceptance\s+testing|"
             r"acceptance[- ]test(?:ing|s| cycles)?|"
             r"pilot\s+test(?:ing)?|pilot\s+validation|pilot\s+result|"
+            r"validat(?:e|ing)\s+(?:a\s+)?pilot\b|"
             r"user\s+testing|test\s+documentation",
             re.I,
         ),

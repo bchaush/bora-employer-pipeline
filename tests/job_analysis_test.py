@@ -1140,4 +1140,171 @@ for family, title in [
     )
 print("PASS T3: Application Analyst / Support families viable with strong duties.")
 
+
+# ---------------------------------------------------------------------------
+# Final Claude re-audit residual findings (N-1 / N-2)
+# ---------------------------------------------------------------------------
+n1_pos = [
+    "Turn user needs into functional requirements",
+    "Capture stakeholder needs for a new workflow",
+    "Clarify requested workflow changes with users",
+    "Ingest structured source files",
+    "Load tabular data from partner exports",
+    "Validate a pilot with business users",
+]
+for text in n1_pos:
+    m = match_requirement(
+        job_id="JOB_X",
+        requirement=_mini_req(text),
+        reusable_claims=reusable,
+        evidence_index=EVIDENCE_INDEX,
+        match_index=0,
+    )
+    assert_true(
+        m["result"] in {"STRONG", "SUPPORTED"},
+        f"N-1 positive failed for {text!r}: {m}",
+    )
+    assert_true(m["claim_ids"] or m["evidence_ids"], f"N-1 missing provenance: {m}")
+print("PASS N1a: residual synonym positives with provenance.")
+
+n1_neg = [
+    "understand user needs",
+    "review files",
+    "manage data",
+    "validation",
+    "work with spreadsheets",
+    "analyze datasets",
+    "Enterprise QA strategy ownership",
+    "Automated regression framework ownership",
+    "Software quality engineering",
+    "test automation architecture ownership",
+]
+for text in n1_neg:
+    caps = infer_requirement_capabilities(_mini_req(text))
+    positive_ww = caps & {
+        "requirements_elicitation",
+        "scope_boundary",
+        "data_ingestion",
+        "csv_intake",
+        "import_logging",
+        "uat",
+        "pilot_testing",
+        "test_documentation",
+        "fail_closed_controls",
+        "workflow_automation",
+        "form_to_evidence_mapping",
+        "approval_sync",
+    }
+    assert_true(not positive_ww, f"N-1 overreach for {text!r}: {positive_ww}")
+    m = match_requirement(
+        job_id="JOB_X",
+        requirement=_mini_req(text),
+        reusable_claims=reusable,
+        evidence_index=EVIDENCE_INDEX,
+        match_index=0,
+    )
+    assert_true(
+        m["result"] in {"NONE", "UNKNOWN"},
+        f"N-1 precision guard failed for {text!r}: {m}",
+    )
+print("PASS N1b: residual precision guards remain non-positive.")
+
+# N-2: Business Applications Analyst positive; SWE application titles reject
+ba_job = {
+    "company": "Apps Analyst Co",
+    "role": "Business Applications Analyst",
+    "jd_text": "Business Applications Analyst supporting internal apps.",
+    "fixture_key": "UNIT_BUSINESS_APPLICATIONS_ANALYST",
+    "structured_extraction": {
+        "role_family": "Business Applications Analyst",
+        "seniority": "EARLY_CAREER",
+        "requirements": [
+            {
+                "requirement_id": rid,
+                "job_id": "PLACEHOLDER",
+                "text": text,
+                "category": "CORE",
+                "importance": "MANDATORY",
+                "seniority_implication": None,
+                "technology": ["CSV"] if "CSV" in text else [],
+                "experience_level": None,
+                "domain": "Application Analyst",
+                "relevance": "HIGH",
+                "source_text": text,
+                "source_location": "Required",
+            }
+            for rid, text in app_core
+        ],
+    },
+}
+ba_result = analyze_job(ba_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
+assert_true(ba_result["valid"] is True, ba_result["errors"])
+assert_true(
+    ba_result["analysis"]["decision"]
+    in {"PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"},
+    ba_result["analysis"],
+)
+print(
+    f"PASS N2a: Business Applications Analyst positive "
+    f"(decision={ba_result['analysis']['decision']})."
+)
+
+for title, family in [
+    ("Application Developer", "Software Engineering"),
+    ("Mobile Application Engineer", "Software Engineering"),
+    ("Software Application Engineer", "Software Engineering"),
+]:
+    swe_app = {
+        "company": f"SWE App Co {title}",
+        "role": title,
+        "jd_text": f"{title} building production software services.",
+        "fixture_key": f"UNIT_SWE_APP_{title.replace(' ', '_').upper()}",
+        "structured_extraction": {
+            "role_family": family,
+            "seniority": "MID",
+            "requirements": [
+                {
+                    "requirement_id": "REQ_SWE_APP_CORE",
+                    "job_id": "PLACEHOLDER",
+                    "text": "Build and maintain backend services as a software engineer",
+                    "category": "SWE",
+                    "importance": "MANDATORY",
+                    "seniority_implication": None,
+                    "technology": [],
+                    "experience_level": None,
+                    "domain": "Software Engineering",
+                    "relevance": "HIGH",
+                    "source_text": (
+                        "Build and maintain backend services as a software engineer "
+                        "is required"
+                    ),
+                    "source_location": "Required",
+                },
+                {
+                    "requirement_id": "REQ_SWE_APP_TEST",
+                    "job_id": "PLACEHOLDER",
+                    "text": "Write automated tests for production services",
+                    "category": "TESTING",
+                    "importance": "MANDATORY",
+                    "seniority_implication": None,
+                    "technology": [],
+                    "experience_level": None,
+                    "domain": "Software Engineering",
+                    "relevance": "HIGH",
+                    "source_text": "Write automated tests for production services is required",
+                    "source_location": "Required",
+                },
+            ],
+        },
+    }
+    swe_result = analyze_job(
+        swe_app, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
+    )
+    assert_true(swe_result["valid"] is True, swe_result["errors"])
+    assert_true(
+        swe_result["analysis"]["decision"] == "REJECT",
+        f"{title} must REJECT: {swe_result['analysis']}",
+    )
+print("PASS N2b: Application Developer / Mobile / Software Application Engineer REJECT.")
+
 print("PASS: job analysis vertical-slice tests completed successfully.")

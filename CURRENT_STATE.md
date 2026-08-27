@@ -153,6 +153,7 @@ No production engine yet.
   * First Claude Golden audit: changes required (R-1–R-7). Gemini routing-policy review incorporated.
   * Remediation: clause-aware P-1; capability synonym recall; PRIORITY/APPLY/EFFICIENT/WATCH/REJECT calibration; info-deficit → WATCH; realistic fixture wording; golden schema tightening; workflow-automation precision.
   * Second Claude re-audit findings remediated: PRIORITY distinct-Claim breadth (anti requirement-splitting); expanded trusted synonym recall; Application Analyst / Application Support family tokens (Blueprint §6).
+  * Final Claude residual findings remediated: N-1 synonym paraphrases (needs→requirements, structured/tabular ingest/load, validate pilot); N-2 plural `applications analyst`; N-3 Priority breadth assumption documented in code (no logic change).
   * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
   * **P-2 remains deferred (evidence-model / `P-2_EVIDENCE_MODEL_DEFERRED`)**: process/workflow-mapping vocabulary may be recognized, but no approved Claim owns `process_mapping`; Claims/Evidence unchanged.
   * No résumé-generation work begun.
@@ -162,7 +163,7 @@ No production engine yet.
 
 `JOB_ANALYSIS_V1_GOLDEN_SET` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
-Second Claude Golden Set audit required T-1/T-2/T-3 remediation; bounded fix applied locally. P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED`. Awaiting Claude re-audit. Do not mark CLOSED. Do not begin résumé generation. Do not push until audit clears.
+Final Claude residual N-1/N-2 remediation applied. P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED`. Awaiting Claude re-audit clearance. Do not mark CLOSED. Do not begin résumé generation. Do not push until audit clears.
 
 ## Not Built Yet
 
@@ -208,7 +209,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Claude Code adversarial re-audit of T-1/T-2/T-3 remediated `JOB_ANALYSIS_V1_GOLDEN_SET`.
+1. Claude Code adversarial re-audit of N-1/N-2 residual remediation for `JOB_ANALYSIS_V1_GOLDEN_SET`.
 2. Close Golden Set only after re-audit clears + any further required hardening.
 3. Deferred P-2 (`P-2_EVIDENCE_MODEL_DEFERRED`) only when deliberately scheduled with Claim/Evidence review.
 4. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.

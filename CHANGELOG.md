@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Remediate Golden Set residual N-1/N-2 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Claude Code FINAL re-audit returned `CLAUDE_JOB_ANALYSIS_GOLDEN_SET_CHANGES_REQUIRED` for residual synonym recall (N-1) and plural Business Applications Analyst family naming (N-2). Apply smallest bounded remediation. Do not resolve P-2. Do not redesign Priority logic (N-3 documented only).
+
+**Changed**
+
+* N-1: bounded paraphrases for turn/capture needs→requirements, clarify workflow changes with users, ingest/load structured/tabular source files/data, validate-a-pilot UAT context; precision guards retained.
+* N-2: `applications analyst` token (plural) for Business Applications Analyst; bare application/applications still unsupported.
+* N-3: code comment only — distinct Claim IDs proxy capability breadth under current non-overlapping Claim Bank.
+* P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED`.
+* Status remains **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+
+**Affected Areas**
+
+* `src/requirement_match.py`, `src/job_decision.py`
+* `tests/job_analysis_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* All prior suites + golden runner — PASS
+* New N-1/N-2 adversarial cases — PASS
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT (remediated; pending re-audit)
+
+---
+
 ## 2026-08-27 — Remediate Golden Set T-1/T-2/T-3 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**
