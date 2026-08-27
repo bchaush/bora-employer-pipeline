@@ -19,6 +19,35 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Close Job Analysis v1 Golden Set (CLOSED)
+
+**Reason**
+
+Claude Code final closure recheck returned `CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`. Operationally close `JOB_ANALYSIS_V1_GOLDEN_SET` without redesign, matching changes, Claim/Evidence mutation, P-2 resolution, or résumé generation.
+
+**Changed**
+
+* Status → **CLOSED**.
+* Recorded audit trail: add `0dfd80b`; harden `e707ff6`; T-1/T-2/T-3 remediate `d10e2e4`; N-1/N-2 remediate `a496415`; Claude final pass `CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`.
+* **P-2** remains explicitly deferred as `P-2_EVIDENCE_MODEL_DEFERRED` (known next-milestone issue; not solved).
+* Documentation-only closure; no matcher/decision/schema/code changes in this commit.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Full established suites + golden runner (15/15) — PASS
+* Repository regression: 1 Experience / 12 Evidence / 5 reusable Claims — PASS
+* No Experience / Evidence / Claim JSON changes
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-27 — Remediate Golden Set residual N-1/N-2 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

@@ -18,7 +18,9 @@ Minimal Experience Registry v1 = **CLOSED**.
 
 Claim Bank v1 first Winter Walk reusable claims = **CLOSED**.
 
-Job Analysis v1 first vertical slice = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED).
+Job Analysis v1 first vertical slice = **CLOSED**.
+
+Job Analysis v1 Golden Set = **CLOSED**.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
@@ -144,7 +146,7 @@ No production engine yet.
     * **P-2** — generic `"business process mapping"` fails conservatively to `NONE` until evidence/claim semantics are reviewed deliberately (Claims/Evidence unchanged).
   * Experience/Evidence/Claim repositories unchanged; no résumé generation begun.
   * Status: **CLOSED**.
-* Job Analysis v1 Golden Set implemented (not CLOSED):
+* Job Analysis v1 Golden Set (**CLOSED**):
 
   * 15 synthetic Golden fixtures under `golden-tests/job_analysis/` with structured `expected.json` validated by `schemas/job_analysis_golden_case.schema.json`.
   * Runner: `golden-tests/run_job_analysis_golden_set.py`.
@@ -155,15 +157,16 @@ No production engine yet.
   * Second Claude re-audit findings remediated: PRIORITY distinct-Claim breadth (anti requirement-splitting); expanded trusted synonym recall; Application Analyst / Application Support family tokens (Blueprint §6).
   * Final Claude residual findings remediated: N-1 synonym paraphrases (needs→requirements, structured/tabular ingest/load, validate pilot); N-2 plural `applications analyst`; N-3 Priority breadth assumption documented in code (no logic change).
   * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
-  * **P-2 remains deferred (evidence-model / `P-2_EVIDENCE_MODEL_DEFERRED`)**: process/workflow-mapping vocabulary may be recognized, but no approved Claim owns `process_mapping`; Claims/Evidence unchanged.
+  * **P-2 remains deferred (evidence-model / `P-2_EVIDENCE_MODEL_DEFERRED`)**: process/workflow-mapping vocabulary may be recognized, but no approved Claim owns `process_mapping`; Claims/Evidence unchanged. Known deferred next-milestone issue — not solved by Golden Set closure.
+  * Claude final closure recheck: `CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`.
   * No résumé-generation work begun.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`JOB_ANALYSIS_V1_GOLDEN_SET` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+`JOB_ANALYSIS_V1_GOLDEN_SET` = **CLOSED**.
 
-Final Claude residual N-1/N-2 remediation applied. P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED`. Awaiting Claude re-audit clearance. Do not mark CLOSED. Do not begin résumé generation. Do not push until audit clears.
+Claude final pass recorded (`CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`). P-2 remains `P-2_EVIDENCE_MODEL_DEFERRED` (not started). Do not begin résumé generation. Awaiting explicit next approved task.
 
 ## Not Built Yet
 
@@ -209,16 +212,15 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Claude Code adversarial re-audit of N-1/N-2 residual remediation for `JOB_ANALYSIS_V1_GOLDEN_SET`.
-2. Close Golden Set only after re-audit clears + any further required hardening.
-3. Deferred P-2 (`P-2_EVIDENCE_MODEL_DEFERRED`) only when deliberately scheduled with Claim/Evidence review.
-4. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
+1. Await explicit approval for the next milestone (do not auto-start).
+2. Deferred P-2 (`P-2_EVIDENCE_MODEL_DEFERRED`) only when deliberately scheduled with Claim/Evidence review — not begun by this closure.
+3. Additional Experience/Evidence/Claims or résumé modules only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Job Analysis Golden Set CLOSED before audit;
+* P-2 / process-mapping evidence-model work without explicit approval;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
@@ -229,4 +231,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Second Claude Code adversarial re-audit of remediated `JOB_ANALYSIS_V1_GOLDEN_SET` (not CLOSED yet).
+None started. Awaiting Bora’s explicit next approved task after `JOB_ANALYSIS_V1_GOLDEN_SET` closure.
