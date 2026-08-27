@@ -1,6 +1,6 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-08-26
+Updated: 2026-08-27
 
 ## Current Phase
 
@@ -16,17 +16,13 @@ Repository-Level Evidence Integrity v1 = **CLOSED**.
 
 Minimal Experience Registry v1 = **CLOSED**.
 
-Claim Bank v1 first Winter Walk reusable claims = **IMPLEMENTED** (records present; not CLOSED).
-
-Claim Bank v1 required hardening = **IMPLEMENTED** (semantic+repository hardening present; not CLOSED).
-
-Claim Bank v1 final semantic hardening = **IMPLEMENTED_PENDING_RECHECK** (not CLOSED).
+Claim Bank v1 first Winter Walk reusable claims = **CLOSED**.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
 Evidence records: **12** Winter Walk Batch 1.
 
-Claim records: **5** Winter Walk proposed claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_005`); `human_approval=false` pending Bora approval (`valid_record=true`, `reusable=false`).
+Claim records: **5** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_005`); `human_approval=true` (`valid_record=true`, `reusable=true`).
 
 No production engine yet.
 
@@ -121,18 +117,28 @@ No production engine yet.
   * Trivial wording/formatting variant normalization added (lowercase, hyphen→space, bounded equivalent forms).
   * Real five Winter Walk claims unchanged; still `human_approval=false` / `reusable=false`.
   * Claim Repository remains valid (5 records; no module refactor).
-  * Status: **IMPLEMENTED_PENDING_RECHECK**.
+  * Status: **IMPLEMENTED_PENDING_RECHECK** (superseded by closure below).
+* Claim Bank v1 approval closure (**CLOSED**):
+
+  * Bora explicitly approved `CLAIM_WW_001`–`CLAIM_WW_005` (`human_approval=true`).
+  * All five validate as `valid_record=true` / `reusable=true` against trusted Evidence index.
+  * Claim Repository integrity enforced (5 unique IDs; filename↔ID).
+  * Semantic guard final Claude adversarial recheck: `CLAUDE_CLAIM_BANK_V1_FINAL_PASS`.
+  * All 13 suites pass; Evidence/Experience unchanged; wording/lineage/states/contexts unchanged.
+  * Downstream requested-context enforcement remains deferred until a résumé/application consumer exists.
+  * Claim Repository result-type sealing remains deferred (no downstream sealed consumer yet).
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`CLAIM_BANK_V1_FINAL_SEMANTIC_HARDENING` = **IMPLEMENTED_PENDING_RECHECK**.
+`CLAIM_BANK_V1_FIRST_REUSABLE_CLAIMS` = **CLOSED**.
 
-Awaiting final external adversarial recheck. Five claims remain `human_approval=false`. Do not mark Claim Bank v1 CLOSED yet.
+Next work requires explicit approval. Do not begin résumé generation or job analysis without a new milestone.
 
 ## Not Built Yet
 
-* Bora human approval of `CLAIM_WW_001`–`CLAIM_WW_005` (`human_approval=true` / reusable gate)
 * Downstream requested-context enforcement at résumé/application consumption time
+* Claim Repository result-type sealing (deferred; no sealed downstream consumer yet)
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
@@ -148,7 +154,7 @@ Awaiting final external adversarial recheck. Five claims remain `human_approval=
 * No external integrations are connected.
 * No job applications can be submitted automatically.
 * No resume-generation pipeline exists yet.
-* No reusable claims exist yet until Bora sets `human_approval=true` on Claim Bank records; proposed Winter Walk claims are valid records only.
+* Five Winter Walk Claim Bank records are Bora-approved and reusable under production claim validation.
 * Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No runtime workflow depends on multi-model agreement; deterministic validators enforce invariants; evidence wins over model opinion; Bora retains consequential approval.
 * No PII should be stored in this repository unless explicitly designed and approved later.
@@ -159,7 +165,7 @@ Awaiting final external adversarial recheck. Five claims remain `human_approval=
 * Semantic support requires positive (non-negated) Evidence context; unrelated bare numbers cannot authorize quantified outcomes.
 * Claim repository identity integrity enforced (duplicate Claim_ID / filename mismatch fail closed).
 * Downstream requested-context enforcement intentionally deferred until a résumé/application consumer exists.
-* Provenance spine: Experience → Evidence → Claim (proposed) → (future) résumé module.
+* Provenance spine: Experience → Evidence → Claim (approved reusable) → (future) résumé module.
 * `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED` on authoritative Evidence Repository validation.
 * Experience Registry does not assert employment titles, dates, outcomes, or résumé content.
 
@@ -171,18 +177,15 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Final independent adversarial recheck of Claim Bank v1 final semantic hardening.
-2. Bora human approval of claim records (`human_approval`) before reusable use.
-3. Close Claim Bank v1 only after final recheck + approval decisions.
-4. Additional Experience/Evidence/Claims only when explicitly approved.
+1. Await explicit approval for the next milestone (do not start résumé modules or job analysis automatically).
+2. Additional Experience/Evidence/Claims only when explicitly approved.
+3. When a résumé/application consumer exists, implement requested-context enforcement.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* marking Claim Bank v1 CLOSED before final recheck;
-* setting `human_approval=true` without Bora decision;
-* résumé modules / resume generation;
+* résumé modules / resume generation without a new approved milestone;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
 * job scraping;
@@ -191,4 +194,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Final independent adversarial recheck of `CLAIM_BANK_V1_FINAL_SEMANTIC_HARDENING` (not CLOSED yet).
+None yet. Claim Bank v1 is CLOSED. Wait for Bora's next explicit milestone instruction.

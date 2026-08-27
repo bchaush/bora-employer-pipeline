@@ -18,7 +18,7 @@
     "enterprise data platform architecture",
     "continuously successful production ingestion pipeline"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-26",
   "version": "1"
 }

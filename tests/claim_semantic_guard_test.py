@@ -273,19 +273,19 @@ for claim_id, base_id, wording in unsupported_outcomes:
 
 for claim_id in REAL_CLAIM_IDS:
     claim = load_real_claim(claim_id)
-    assert_true(claim["human_approval"] is False, f"{claim_id} must remain unapproved")
+    assert_true(claim["human_approval"] is True, f"{claim_id} must be human-approved")
     result = validate_claim(claim, EVIDENCE_INDEX)
     assert_true(result["valid_record"] is True, f"{claim_id} should remain valid_record")
-    assert_false(result["reusable"], f"{claim_id} must remain non-reusable")
+    assert_true(result["reusable"] is True, f"{claim_id} must be reusable after approval")
     assert_true(
         "FORBIDDEN_SEMANTIC_PATTERN" not in error_codes(result),
         f"{claim_id} unexpectedly hit semantic guard: {result['errors']}",
     )
     assert_true(
-        any(w.get("code") == "NOT_HUMAN_APPROVED" for w in result["warnings"]),
-        f"{claim_id} missing NOT_HUMAN_APPROVED",
+        not any(w.get("code") == "NOT_HUMAN_APPROVED" for w in result["warnings"]),
+        f"{claim_id} must not warn NOT_HUMAN_APPROVED after approval",
     )
-    print(f"PASS 7: {claim_id} remains valid_record / not reusable.")
+    print(f"PASS 7: {claim_id} remains valid_record / reusable.")
 
 r_pilot = validate_claim(load_real_claim("CLAIM_WW_005"), EVIDENCE_INDEX)
 assert_true(r_pilot["valid_record"] is True, "ten pilot test rows claim must pass")

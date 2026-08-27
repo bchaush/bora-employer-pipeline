@@ -21,7 +21,7 @@
     "organization-wide change management",
     "continuous daily production use proof"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-26",
   "version": "1"
 }

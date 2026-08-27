@@ -19,6 +19,47 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-27 — Claim Bank v1 approval closure (CLOSED)
+
+**Reason**
+
+Bora explicitly approved the five existing Winter Walk Claim Bank records for reuse after Claude final pass (`CLAUDE_CLAIM_BANK_V1_FINAL_PASS`).
+
+**Changed**
+
+* `CLAIM_WW_001`–`CLAIM_WW_005`: `human_approval` false → true only.
+* All five validate `valid_record=true` / `reusable=true`.
+* Claim Repository remains valid (5 records).
+* Semantic guard hardening previously passed final Claude adversarial recheck.
+* All 13 suites pass.
+* Evidence/Experience unchanged; no wording/lineage/state/context changes.
+* Downstream requested-context enforcement remains deferred until a résumé/application consumer exists.
+* Claim Repository result-type sealing remains deferred.
+* Status: **CLOSED**.
+
+**Affected Areas**
+
+* `claims/winter_walk/CLAIM_WW_001.json` … `CLAIM_WW_005.json` (`human_approval` only)
+* `tests/claim_semantic_guard_test.py` (real-claim regression expectations synced to approved/reusable)
+* `CURRENT_STATE.md`
+* `CHANGELOG.md`
+
+**Risks / Tradeoffs**
+
+* Reusable claims are available for future résumé modules; no résumé consumer exists yet.
+
+**Tests / Verification**
+
+* Production `validate_claim` on all five — reusable PASS
+* Claim / Experience / Evidence repositories — PASS
+* All 13 suites — PASS
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-27 — Claim Bank v1 final semantic hardening (IMPLEMENTED_PENDING_RECHECK)
 
 **Reason**
