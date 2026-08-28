@@ -79,7 +79,9 @@ assert_true(evidence_result["valid"] is True, "evidence repository invalid")
 assert_true(len(evidence_result["index"]) == 26, "Evidence count must be 26 after MarketMind ingestion")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 6, "Claims count must remain 6")
+assert_true(claim_result["records_checked"] == 11, "claim repository must have 11 records")
+reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
+assert_true(len(reusable_claims) == 6, "reusable claim count must remain 6")
 
 identity_patch = {
     "patch_id": "PATCH_WW_CONTACT_NOOP",
@@ -162,7 +164,7 @@ for module in MASTER["modules"]:
 print("PASS F: six approved Winter Walk module wordings unchanged.")
 
 # G. Repository counts unchanged (verified above)
-print("PASS G: Experience = 1, Evidence = 14, reusable Claims = 6.")
+print("PASS G: Experience = 2, Evidence = 26, 11 Claims, 6 reusable Claims.")
 
 # H. Golden runner executed in full regression suite (not duplicated here)
 print("PASS H: Golden Set covered by full regression run.")

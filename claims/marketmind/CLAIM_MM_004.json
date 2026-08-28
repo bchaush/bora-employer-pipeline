@@ -1,0 +1,27 @@
+{
+  "claim_id": "CLAIM_MM_004",
+  "wording": "Implemented bounded operational controls: a 3.5-mile geofence, a local daily request counter (limit 50), and retry with degraded stub fallback when external Places or Census fetches fail.",
+  "evidence_ids": [
+    "MM_GEOFENCE_001",
+    "MM_RATELIMIT_001",
+    "MM_FALLBACK_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Implementation",
+    "Technical Operations"
+  ],
+  "forbidden_contexts": [
+    "classical circuit breaker",
+    "distributed reliability engineering",
+    "cloud-provider quota management",
+    "enterprise-scale reliability"
+  ],
+  "human_approval": false,
+  "date": "2026-08-28",
+  "version": "1"
+}

@@ -30,11 +30,13 @@ Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVID
 
 MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOSED**.
 
+MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW**.
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
-Evidence records: **26** — 14 Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata) plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; **Bora-approved Evidence only** — no Claims or résumé wording approved).
+Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
 
-Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
+Claim records: **11** total — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`; `human_approval=true`, `reusable=true`) plus 5 MarketMind draft claim candidates (`CLAIM_MM_001`–`CLAIM_MM_005`; `human_approval=false`, `reusable=false`).
 
 No production engine yet.
 
@@ -303,16 +305,46 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval before MarketMind Claim drafting, résumé modules, or job-specific tailoring.
-2. No next ingestion milestone started.
+1. Human review of five MarketMind Claim draft candidates before approval.
+2. Await explicit approval before résumé modules or job-specific tailoring.
 
 ## Do Not Start Yet
 
-Do not begin MarketMind Claim drafting, résumé modules, job-specific résumé generation, rendering/export, Market Empire/LoanIQ ingestion, or additional experience sections without explicit approval.
+Do not approve MarketMind Claims, create résumé modules, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval.
 
 ## Next Approved Task
 
-`MARKETMIND_EVIDENCE_EXTRACTION_V1` closed. No next milestone started.
+`MARKETMIND_CLAIM_DRAFTING_V1` implemented pending human review.
+
+---
+
+## 2026-08-28 — MarketMind Claim Drafting v1 (IMPLEMENTED — PENDING HUMAN REVIEW)
+
+**Reason**
+
+Draft the smallest useful set of reusable-claim candidates from Bora-approved MarketMind Evidence only.
+
+**Changed**
+
+* Added 5 MarketMind claim candidates under `claims/marketmind/` (`CLAIM_MM_001`–`CLAIM_MM_005`).
+* Added `tests/marketmind_claim_drafting_test.py`.
+* Updated claim-count regression checks (11 total claims; 6 reusable).
+
+**Not changed**
+
+* No Claim human approval; all MarketMind claims `human_approval=false`.
+* No résumé modules, patches, or master changes.
+* MarketMind Evidence, Experiences, Winter Walk Claims unchanged.
+
+**Verification**
+
+* 24/24 test suites — PASS
+* Golden runner (15/15) — PASS
+* Reusable Claims remain **6** (Winter Walk only)
+
+**Status**
+
+`MARKETMIND_CLAIM_DRAFTING_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW`
 
 ---
 

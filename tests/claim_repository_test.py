@@ -31,6 +31,16 @@ EXPECTED_CLAIM_IDS = [
     "CLAIM_WW_006",
 ]
 
+EXPECTED_MM_CLAIM_IDS = [
+    "CLAIM_MM_001",
+    "CLAIM_MM_002",
+    "CLAIM_MM_003",
+    "CLAIM_MM_004",
+    "CLAIM_MM_005",
+]
+
+EXPECTED_ALL_CLAIM_IDS = sorted(EXPECTED_CLAIM_IDS + EXPECTED_MM_CLAIM_IDS)
+
 
 def assert_true(condition: bool, message: str) -> None:
     if not condition:
@@ -73,17 +83,17 @@ def write_json(path: Path, payload) -> None:
 # ---------------------------------------------------------------------------
 real = validate_claim_repository(CLAIMS_ROOT)
 assert_true(real["valid"] is True, f"real claim repository failed: {real['errors']}")
-assert_true(real["records_checked"] == 6, f"expected 6 claims, got {real['records_checked']}")
+assert_true(real["records_checked"] == 11, f"expected 11 claims, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
-    sorted(real["index"].keys()) == EXPECTED_CLAIM_IDS,
+    sorted(real["index"].keys()) == EXPECTED_ALL_CLAIM_IDS,
     f"unexpected Claim_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
-    len(discover_claim_files(CLAIMS_ROOT)) == 6,
-    "discover_claim_files should find 6 claim files",
+    len(discover_claim_files(CLAIMS_ROOT)) == 11,
+    "discover_claim_files should find 11 claim files",
 )
-print("PASS 1: valid real Winter Walk claim repository (6 records) passed.")
+print("PASS 1: valid real claim repository (11 records: 6 Winter Walk + 5 MarketMind) passed.")
 
 
 # ---------------------------------------------------------------------------

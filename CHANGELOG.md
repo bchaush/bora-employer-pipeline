@@ -19,6 +19,34 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — MarketMind Claim Drafting v1 (IMPLEMENTED_PENDING_HUMAN_REVIEW)
+
+**Reason**
+
+Create a small set of evidence-backed MarketMind claim candidates for human review without approving reusable use.
+
+**Changed**
+
+* `claims/marketmind/CLAIM_MM_001.json` through `CLAIM_MM_005.json` — five draft claims (`human_approval=false`).
+* `tests/marketmind_claim_drafting_test.py`; claim-count regression updates.
+* `CURRENT_STATE.md`, `CHANGELOG.md`.
+
+**Affected Areas**
+
+* Claim bank (draft candidates only), integrity tests, milestone docs.
+
+**Tests / Verification**
+
+* Full established test suites (24) — PASS
+* Golden runner (15/15) — PASS
+* Reusable Claims remain 6; Evidence/Experience/master unchanged.
+
+**Status**
+
+IMPLEMENTED_PENDING_HUMAN_REVIEW
+
+---
+
 ## 2026-08-28 — Close MarketMind evidence extraction v1 (CLOSED)
 
 **Reason**

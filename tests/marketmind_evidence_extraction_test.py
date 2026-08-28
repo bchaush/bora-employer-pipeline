@@ -178,7 +178,9 @@ for evidence_id in MARKETMIND_EVIDENCE_IDS:
 
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 6, "reusable claim count must remain 6")
+assert_true(claim_result["records_checked"] == 11, "claim repository must have 11 records")
+reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
+assert_true(len(reusable_claims) == 6, "reusable claim count must remain 6")
 
 print("PASS 10: repository integrity — 2 Experience, 26 Evidence, 6 Claims.")
 

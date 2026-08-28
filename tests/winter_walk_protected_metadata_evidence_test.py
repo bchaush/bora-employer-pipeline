@@ -205,13 +205,15 @@ assert_true(
 print("PASS J: wording approval record remains valid.")
 
 
-# K. Claims remain unchanged (6 reusable, lineage untouched)
-assert_true(claim_result["records_checked"] == 6, "claim count must remain 6")
-for claim_id, claim in claim_result["index"].items():
+# K. Winter Walk reusable Claims remain unchanged (6 reusable, lineage untouched)
+assert_true(claim_result["records_checked"] == 11, "claim count must be 11 after MarketMind drafting")
+ww_claim_ids = [f"CLAIM_WW_{i:03d}" for i in range(1, 7)]
+for claim_id in ww_claim_ids:
+    claim = claim_result["index"][claim_id]
     assert_true(claim.get("human_approval") is True, f"{claim_id} human_approval")
     validated = validate_claim(claim, ev_result["index"])
     assert_true(validated.get("reusable") is True, f"{claim_id} reusable")
-print("PASS K: six reusable Claims unchanged.")
+print("PASS K: six reusable Winter Walk Claims unchanged.")
 
 
 # L. No derivative/export becomes allowed

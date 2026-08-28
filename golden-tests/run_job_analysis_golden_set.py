@@ -64,7 +64,7 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
         == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
     ):
         fail(f"Evidence regression failed: {ev}")
-    if not (cl.get("valid") is True and cl.get("records_checked") == 6):
+    if not (cl.get("valid") is True and cl.get("records_checked") == 11):
         fail(f"Claim regression failed: {cl}")
     reusable_count = sum(
         1 for claim in cl["index"].values() if claim.get("human_approval") is True
@@ -72,11 +72,16 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
     if reusable_count != 6:
         fail(f"expected 6 reusable claims, got {reusable_count}")
     for claim in cl["index"].values():
-        if claim.get("human_approval") is not True:
-            fail(f"{claim.get('claim_id')} must be approved/reusable gate")
+        claim_id = claim.get("claim_id", "")
+        if isinstance(claim_id, str) and claim_id.startswith("CLAIM_WW_"):
+            if claim.get("human_approval") is not True:
+                fail(f"{claim_id} must be approved/reusable gate")
+        elif isinstance(claim_id, str) and claim_id.startswith("CLAIM_MM_"):
+            if claim.get("human_approval") is not False:
+                fail(f"{claim_id} must remain unapproved draft")
     print(
         "PASS 0: repository regression "
-        "(2 Experience / 26 Evidence / 6 Claims reusable)."
+        "(2 Experience / 26 Evidence / 11 Claims / 6 reusable)."
     )
     return ev["index"], cl["index"]
 

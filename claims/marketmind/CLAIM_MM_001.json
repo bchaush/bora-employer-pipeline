@@ -1,0 +1,27 @@
+{
+  "claim_id": "CLAIM_MM_001",
+  "wording": "Built a Python/Streamlit preliminary market-screening prototype scoped to coffee shops, with documented limits that scores are screening heuristics and not validated predictors of business success.",
+  "evidence_ids": [
+    "MM_SCOPE_001",
+    "MM_BOUNDARY_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Implementation",
+    "Digital Solutions"
+  ],
+  "forbidden_contexts": [
+    "production platform",
+    "validated site-selection system",
+    "profitability forecasting",
+    "investment recommendation engine",
+    "enterprise analytics platform"
+  ],
+  "human_approval": false,
+  "date": "2026-08-28",
+  "version": "1"
+}

@@ -1,0 +1,25 @@
+{
+  "claim_id": "CLAIM_MM_005",
+  "wording": "Built an automated pytest validation suite covering the MarketMind screening pipeline.",
+  "evidence_ids": [
+    "MM_TEST_001"
+  ],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Implementation",
+    "Data Operations"
+  ],
+  "forbidden_contexts": [
+    "all tests passed",
+    "187 passing tests",
+    "production reliability proof",
+    "zero-defect test coverage"
+  ],
+  "human_approval": false,
+  "date": "2026-08-28",
+  "version": "1"
+}
