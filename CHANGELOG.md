@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close résumé architecture v1 (CLOSED)
+
+**Reason**
+
+Claude Code final independent adversarial re-audit returned `CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_PASS`. All originally blocking findings F1–F6 verified fixed. Operationally close `RESUME_ARCHITECTURE_V1` without redesign or new scope.
+
+**Changed**
+
+* Status → **CLOSED**.
+* Recorded audit trail: implement `1fbfa88`; remediate `c6ce4d2`; final pass `CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_PASS`.
+* Documented non-blocking **R1**: `validation_digest` is a stale/mutation-detection aid, not cryptographic tamper-proofing; export safety rests on full revalidation at approval.
+* Documentation-only closure commit.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* 16/16 established test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — PASS
+* No changes to `experiences/`, `evidence/`, or `claims/`
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-28 — Remediate résumé architecture v1 audit findings (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

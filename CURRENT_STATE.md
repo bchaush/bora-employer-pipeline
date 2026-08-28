@@ -24,6 +24,8 @@ Job Analysis v1 Golden Set = **CLOSED**.
 
 P-2 process-mapping evidence model (`P2_PROCESS_MAPPING_EVIDENCE_MODEL`) = **CLOSED**.
 
+Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) = **CLOSED**.
+
 Canonical Experience records: **1** (`EXP_WW_001`).
 
 Evidence records: **13** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping).
@@ -172,21 +174,32 @@ No production engine yet.
   * Evidence count: **13**. Reusable claims: **6** (`CLAIM_WW_001`–`CLAIM_WW_006`).
   * No résumé-generation work begun.
   * Status: **CLOSED**.
-* Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) (**IMPLEMENTED_PENDING_EXTERNAL_AUDIT**):
+* Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) (**CLOSED**):
 
   * Schemas: `resume_module`, `resume_immutable_contact`, `resume_master`, `resume_patch`, `resume_derivative`.
-  * Deterministic validators: lineage (`resume_lineage`), patch apply + immutable guard (`resume_patch_apply`), diff (`resume_diff`), prose style (`resume_style`), unified gate (`resume_validation`).
-  * Protected master vs derivative model; structured patch ops only; human review gate (`export_allowed=false` until approval).
+  * Deterministic validators: lineage (`resume_lineage`), patch apply + immutable guard (`resume_patch_apply`), diff (`resume_diff`), prose style (`resume_style`), semantic wording checks (`resume_semantic`), validation digest (`resume_digest`), unified gate (`resume_validation`).
+  * Architecture guarantees now closed:
+    * evidence/claim-backed résumé modules;
+    * protected master model;
+    * bounded derivative patching;
+    * immutable-history enforcement (contact, experience, education, module snapshots);
+    * end-to-end export approval revalidation (master + trusted indexes + explicit human approval);
+    * semantic-review gating (`NEEDS_SEMANTIC_REVIEW` for terminology substitution);
+    * style/provenance separation;
+    * duplicate-module protection;
+    * human approval before export.
   * Synthetic architecture fixture under `fixtures/resume_architecture/` (claim-backed; not Bora's résumé).
-  * Tests A–L in `tests/resume_architecture_test.py`; schema smoke in `tests/resume_schema_smoke_test.py`.
+  * Tests A–L + adversarial remediations in `tests/resume_architecture_test.py`; schema smoke in `tests/resume_schema_smoke_test.py`.
+  * Implementation commit `1fbfa88`; remediation commit `c6ce4d2`.
+  * Claude audits: findings `CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_FINDINGS` (remediated); final pass `CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_PASS`.
+  * **R1 (non-blocking):** `validation_digest` is a stale/mutation-detection aid for normal callers, not cryptographic tamper-proofing; export safety rests on full lineage, semantic, immutable, and schema revalidation at approval time.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
-  * Claude adversarial audit (`CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_FINDINGS`): remediation applied for export trust boundary, terminology semantic safeguards, extended immutability, patch integrity, and style/provenance classification.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (awaiting external re-audit; not CLOSED).
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`RESUME_ARCHITECTURE_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Claude audit remediation applied; awaiting external re-audit. Do not begin résumé generation or master résumé authoring unless explicitly approved.
+None active. `RESUME_ARCHITECTURE_V1` = **CLOSED**. Awaiting explicit approval for the next milestone. Do not begin master résumé authoring or job-specific résumé generation unless explicitly approved.
 
 ## Not Built Yet
 
@@ -208,7 +221,7 @@ No production engine yet.
 * No production application automation exists.
 * No external integrations are connected.
 * No job applications can be submitted automatically.
-* Résumé architecture v1 exists (schemas + validators + synthetic fixtures); no master résumé or export pipeline yet.
+* Résumé architecture v1 closed (schemas + validators + synthetic fixtures); no master résumé or export pipeline yet.
 * Six Winter Walk Claim Bank records are Bora-approved and reusable under production claim validation.
 * Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No runtime workflow depends on multi-model agreement; deterministic validators enforce invariants; evidence wins over model opinion; Bora retains consequential approval.
@@ -232,8 +245,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. External re-audit of `RESUME_ARCHITECTURE_V1` after Claude remediation (do not mark CLOSED until re-audit passes).
-2. Await explicit approval before master résumé authoring or job-specific résumé generation.
+1. Await explicit approval for the next milestone (do not auto-start master résumé authoring or job-specific résumé generation).
 
 ## Do Not Start Yet
 
@@ -241,4 +253,4 @@ Do not begin master résumé authoring, job-specific résumé generation, or ren
 
 ## Next Approved Task
 
-`RESUME_ARCHITECTURE_V1` remediated pending external re-audit. No next milestone started.
+None started.
