@@ -22,13 +22,13 @@ Job Analysis v1 first vertical slice = **CLOSED**.
 
 Job Analysis v1 Golden Set = **CLOSED**.
 
-P-2 process-mapping evidence model = **P-2_EVIDENCE_MODEL_RESOLVED** (CLAIM_WW_006 approved for reusable use).
+P-2 process-mapping evidence model = **P2_PROCESS_MAPPING_CLAIM_PENDING_REAPPROVAL**.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
 Evidence records: **13** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping).
 
-Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
+Claim records: **6** under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`). **5** reusable (`CLAIM_WW_001`–`CLAIM_WW_005`). `CLAIM_WW_006` corrected (`valid_record=true`) but `human_approval=false` (`reusable=false`) pending explicit Bora reapproval after wording fix.
 
 No production engine yet.
 
@@ -159,16 +159,15 @@ No production engine yet.
   * Second Claude re-audit findings remediated: PRIORITY distinct-Claim breadth (anti requirement-splitting); expanded trusted synonym recall; Application Analyst / Application Support family tokens (Blueprint §6).
   * Final Claude residual findings remediated: N-1 synonym paraphrases (needs→requirements, structured/tabular ingest/load, validate pilot); N-2 plural `applications analyst`; N-3 Priority breadth assumption documented in code (no logic change).
   * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
-  * **P-2 evidence model resolved**: `WW_PROC_001` + approved `CLAIM_WW_006` (`process_mapping`); Bora explicitly approved `CLAIM_WW_006` for reusable use (2026-08-28); matcher positive use enabled; `GT_PROCESS_MAP_P2` routes APPLY.
-  * Claude P-2 audit remediation applied (`CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_CHANGES_REQUIRED`).
+  * **P-2 claim wording remediated** (`P2_PROCESS_MAPPING_CLAIM_PENDING_REAPPROVAL`): Claude final recheck removed unsupported `data intake` from `CLAIM_WW_006`; prior approval invalidated; matcher positive use blocked until explicit Bora reapproval; `GT_PROCESS_MAP_P2` REJECT/NONE; P-2 not CLOSED.
   * No résumé-generation work begun.
-  * Status: **CLOSED**.
+  * Status: **CLOSED** (Golden Set only).
 
 ## Current Task
 
-`P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **P-2_EVIDENCE_MODEL_RESOLVED**.
+`P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **P2_PROCESS_MAPPING_CLAIM_PENDING_REAPPROVAL**.
 
-Bora explicitly approved `CLAIM_WW_006` for reusable use. Six reusable Winter Walk claims. Awaiting explicit next approved task. Do not begin résumé generation unless explicitly approved.
+`WW_PROC_001` unchanged. Corrected `CLAIM_WW_006` awaits explicit Bora reapproval. Blocker: `EXPLICIT_BORA_REAPPROVAL_REQUIRED`. Do not infer approval. Do not begin résumé generation.
 
 ## Not Built Yet
 
@@ -214,21 +213,19 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval for the next milestone (do not auto-start résumé generation).
-2. Additional Experience/Evidence/Claims only when explicitly approved.
+1. Bora explicit reapproval of corrected `CLAIM_WW_006` (`EXPLICIT_BORA_REAPPROVAL_REQUIRED`).
+2. After reapproval: matcher/Golden may legitimately update if routing changes.
+3. Do not begin résumé generation until explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
+* inferring `CLAIM_WW_006` reapproval from remediation direction;
 * résumé modules / resume generation;
-* inventing additional Experience IDs without evidence/ADR need;
-* Winter Walk Batch 2 without explicit approval;
-* paid model provider wiring without approval;
-* job scraping;
-* Google Sheets / Gmail / LinkedIn automation;
-* MCP / database / cloud infrastructure.
+* modifying `WW_PROC_001` without new evidence review;
+* Winter Walk Batch 2 without explicit approval.
 
 ## Next Approved Task
 
-None started. Awaiting Bora's explicit next approved task after P-2 resolution.
+Distinct Bora reapproval of corrected `CLAIM_WW_006` (not started).

@@ -19,6 +19,37 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Correct CLAIM_WW_006 evidence-bounded wording (P2_PROCESS_MAPPING_CLAIM_PENDING_REAPPROVAL)
+
+**Reason**
+
+Claude final P-2 closure recheck (`CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_CHANGES_REQUIRED`) found unsupported `data intake` in `CLAIM_WW_006` vs sole Evidence `WW_PROC_001`. Remove clause; reset approval; restore pending-approval Golden truth.
+
+**Changed**
+
+* `CLAIM_WW_006` wording: removed `data intake,` only; `human_approval` reset to false (prior approval invalidated).
+* `WW_PROC_001` unchanged.
+* Matcher logic unchanged; positive use blocked via reusable gate.
+* `GT_PROCESS_MAP_P2`: APPLY → REJECT / `REQ_P2_MAP=NONE`.
+* P-2 not CLOSED.
+
+**Affected Areas**
+
+* `claims/winter_walk/CLAIM_WW_006.json`
+* `golden-tests/job_analysis/GT_PROCESS_MAP_P2/expected.json`
+* tests, golden runner, `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Full established suites + golden runner — PASS
+* Repository: 1 Experience / 13 Evidence / 6 Claims (5 reusable) — PASS
+
+**Status**
+
+P2_PROCESS_MAPPING_CLAIM_PENDING_REAPPROVAL
+
+---
+
 ## 2026-08-28 — Approve CLAIM_WW_006 for reusable use (P-2_EVIDENCE_MODEL_RESOLVED)
 
 **Reason**

@@ -1,6 +1,6 @@
 {
   "claim_id": "CLAIM_WW_006",
-  "wording": "Documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering data intake, evidence tracking, review, follow-up, and human approval.",
+  "wording": "Documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering evidence tracking, review, follow-up, and human approval.",
   "evidence_ids": [
     "WW_PROC_001"
   ],
@@ -31,7 +31,7 @@
     "Celonis",
     "UiPath Process Mining"
   ],
-  "human_approval": true,
+  "human_approval": false,
   "date": "2026-08-28",
   "version": "1"
 }
