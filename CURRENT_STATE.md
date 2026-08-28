@@ -1,6 +1,6 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-08-27
+Updated: 2026-08-28
 
 ## Current Phase
 
@@ -172,10 +172,20 @@ No production engine yet.
   * Evidence count: **13**. Reusable claims: **6** (`CLAIM_WW_001`–`CLAIM_WW_006`).
   * No résumé-generation work begun.
   * Status: **CLOSED**.
+* Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) (**IMPLEMENTED_PENDING_EXTERNAL_AUDIT**):
+
+  * Schemas: `resume_module`, `resume_immutable_contact`, `resume_master`, `resume_patch`, `resume_derivative`.
+  * Deterministic validators: lineage (`resume_lineage`), patch apply + immutable guard (`resume_patch_apply`), diff (`resume_diff`), prose style (`resume_style`), unified gate (`resume_validation`).
+  * Protected master vs derivative model; structured patch ops only; human review gate (`export_allowed=false` until approval).
+  * Synthetic architecture fixture under `fixtures/resume_architecture/` (claim-backed; not Bora's résumé).
+  * Tests A–L in `tests/resume_architecture_test.py`; schema smoke in `tests/resume_schema_smoke_test.py`.
+  * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
+  * Experience/Evidence/Claim repository records unchanged.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (awaiting external audit; not CLOSED).
 
 ## Current Task
 
-None active. `P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **CLOSED**. Awaiting Bora's explicit next approved task. Do not begin résumé generation unless explicitly approved.
+`RESUME_ARCHITECTURE_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Awaiting external audit. Do not begin résumé generation or master résumé authoring unless explicitly approved.
 
 ## Not Built Yet
 
@@ -187,7 +197,7 @@ None active. `P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **CLOSED**. Awaiting Bora's e
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
-* Resume patch generation / rendering / diff
+* Master résumé authoring / job-specific résumé generation / rendering / export (DOCX/PDF)
 * Networking research
 * Google Workspace / external integrations
 * Automated monitoring
@@ -197,7 +207,7 @@ None active. `P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **CLOSED**. Awaiting Bora's e
 * No production application automation exists.
 * No external integrations are connected.
 * No job applications can be submitted automatically.
-* No resume-generation pipeline exists yet.
+* Résumé architecture v1 exists (schemas + validators + synthetic fixtures); no master résumé or export pipeline yet.
 * Six Winter Walk Claim Bank records are Bora-approved and reusable under production claim validation.
 * Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No runtime workflow depends on multi-model agreement; deterministic validators enforce invariants; evidence wins over model opinion; Bora retains consequential approval.
@@ -209,7 +219,7 @@ None active. `P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **CLOSED**. Awaiting Bora's e
 * Semantic support requires positive (non-negated) Evidence context; unrelated bare numbers cannot authorize quantified outcomes.
 * Claim repository identity integrity enforced (duplicate Claim_ID / filename mismatch fail closed).
 * Downstream requested-context enforcement intentionally deferred until a résumé/application consumer exists.
-* Provenance spine: Experience → Evidence → Claim (approved reusable) → (future) résumé module.
+* Provenance spine: Experience → Evidence → Claim (approved reusable) → résumé module (architecture) → controlled patch → validation → human review → (future) export.
 * `EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED` on authoritative Evidence Repository validation.
 * Experience Registry does not assert employment titles, dates, outcomes, or résumé content.
 
@@ -221,12 +231,13 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval for the next milestone (do not auto-start résumé generation).
+1. External audit of `RESUME_ARCHITECTURE_V1` (do not mark CLOSED until audit passes).
+2. Await explicit approval before master résumé authoring or job-specific résumé generation.
 
 ## Do Not Start Yet
 
-Do not begin résumé modules / resume generation without explicit approval.
+Do not begin master résumé authoring, job-specific résumé generation, or rendering/export without explicit approval.
 
 ## Next Approved Task
 
-None started.
+`RESUME_ARCHITECTURE_V1` implemented pending external audit. No next milestone started.

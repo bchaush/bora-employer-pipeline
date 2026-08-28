@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/resume_immutable_contact.schema.json",
+  "title": "Résumé Immutable Contact Block",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "email": { "type": ["string", "null"] },
+    "phone": { "type": ["string", "null"] },
+    "location": { "type": ["string", "null"] },
+    "linkedin": { "type": ["string", "null"] }
+  }
+}

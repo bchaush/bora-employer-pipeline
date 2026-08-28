@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/resume_module.schema.json",
+  "title": "Bora Employer Pipeline Resume Module",
+  "description": "Structured factual résumé module with Claim/Evidence lineage. Not freehand résumé prose.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_id",
+    "module_type",
+    "wording",
+    "claim_ids",
+    "evidence_ids",
+    "status"
+  ],
+  "properties": {
+    "module_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable module identifier within a master résumé."
+    },
+    "module_type": {
+      "type": "string",
+      "enum": [
+        "SUMMARY",
+        "BULLET",
+        "SKILLS_BLOCK",
+        "EXPERIENCE_HEADER",
+        "EDUCATION_ENTRY",
+        "PROJECT_BULLET"
+      ],
+      "description": "Module category. Factual bullets require Claim lineage."
+    },
+    "experience_id": {
+      "type": ["string", "null"],
+      "description": "Experience_ID when the module belongs to an experience section."
+    },
+    "claim_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Approved Claim_ID values supporting this module wording."
+    },
+    "evidence_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Derived Evidence lineage (from cited claims) for audit review."
+    },
+    "wording": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Approved module wording faithful to cited claims."
+    },
+    "approved_wording_variants": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Optional pre-approved alternate wordings for controlled substitution."
+    },
+    "allowed_role_families": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Role families where this module may appear."
+    },
+    "capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Optional capability tags represented (not JD keywords)."
+    },
+    "immutable_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "organization": { "type": "string" },
+        "formal_title": { "type": "string" },
+        "employment_category": { "type": "string" },
+        "date_range": { "type": "string" },
+        "location": { "type": "string" },
+        "degree_name": { "type": "string" },
+        "school_name": { "type": "string" },
+        "approved_metrics": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "approved_tools": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "description": "Protected historical fields associated with this module/section."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ACTIVE", "OPTIONAL", "ARCHIVED"],
+      "description": "Usability status within the master module bank."
+    }
+  }
+}

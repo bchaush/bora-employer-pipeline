@@ -1,0 +1,73 @@
+{
+  "master_id": "RESUME_MASTER_SYNTH_001",
+  "version": "1",
+  "protected": true,
+  "contact": {
+    "name": "Synthetic Fixture Applicant"
+  },
+  "education": [],
+  "modules": [
+    {
+      "module_id": "MOD_BULLET_WW_SCOPE",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_001"],
+      "evidence_ids": ["WW_ARCH_001"],
+      "wording": "Defined the Winter Walk OP Recommendation Adoption and Support System as an internal Google Workspace operating tool with explicit scope boundaries.",
+      "approved_wording_variants": [
+        "Documented scope boundaries for the Winter Walk OP Recommendation Adoption and Support System as an internal Google Workspace operating tool."
+      ],
+      "allowed_role_families": ["Business Systems", "Implementation"],
+      "capabilities": ["requirements definition", "system scope boundary"],
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_BULLET_WW_PROC",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_006"],
+      "evidence_ids": ["WW_PROC_001"],
+      "wording": "Documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering evidence tracking, review, follow-up, and human approval.",
+      "allowed_role_families": ["Business Process", "Business Systems"],
+      "capabilities": ["process_mapping"],
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_OPTIONAL_ARCHIVE",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_001"],
+      "evidence_ids": ["WW_ARCH_001"],
+      "wording": "Clarified non-goals for the Winter Walk internal operating tool, excluding CRM and public dashboard scope.",
+      "status": "OPTIONAL"
+    }
+  ],
+  "experience_sections": [
+    {
+      "section_id": "SEC_WW_001",
+      "experience_id": "EXP_WW_001",
+      "organization": "Winter Walk",
+      "formal_title": "SYNTHETIC_FIXTURE_ROLE",
+      "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+      "date_range": "2024 – Present",
+      "location": null,
+      "bullet_module_ids": [
+        "MOD_BULLET_WW_SCOPE",
+        "MOD_BULLET_WW_PROC",
+        "MOD_OPTIONAL_ARCHIVE"
+      ]
+    }
+  ],
+  "default_module_order": [
+    "MOD_BULLET_WW_SCOPE",
+    "MOD_BULLET_WW_PROC",
+    "MOD_OPTIONAL_ARCHIVE"
+  ],
+  "skills_order": [
+    "Google Workspace",
+    "process mapping",
+    "requirements definition"
+  ],
+  "date": "2026-08-28",
+  "notes": "Synthetic architecture fixture only. Not Bora's résumé."
+}

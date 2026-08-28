@@ -19,6 +19,41 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Implement résumé architecture v1 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Establish the smallest evidence-first résumé-generation architecture (schemas, validators, patch/diff model, human review gate) without authoring Bora's master résumé or job-specific outputs.
+
+**Changed**
+
+* Added résumé schemas: `resume_module`, `resume_immutable_contact`, `resume_master`, `resume_patch`, `resume_derivative`.
+* Added deterministic modules: `resume_lineage`, `resume_patch_apply`, `resume_diff`, `resume_style`, `resume_validation`.
+* Synthetic claim-backed fixture: `fixtures/resume_architecture/synthetic_master.json`.
+* Tests: `tests/resume_architecture_test.py` (A–L), `tests/resume_schema_smoke_test.py`.
+* Status → **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (not CLOSED).
+
+**Affected Areas**
+
+* `schemas/resume_*.schema.json`
+* `src/resume_*.py`
+* `fixtures/resume_architecture/`
+* `tests/resume_architecture_test.py`, `tests/resume_schema_smoke_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/resume_architecture_test.py` — PASS (A–L + human review gate)
+* `tests/resume_schema_smoke_test.py` — PASS
+* Full established suites (18) + golden runner (15/15) — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-28 — Close P-2 process-mapping evidence model (CLOSED)
 
 **Reason**

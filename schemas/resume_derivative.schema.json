@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/resume_derivative.schema.json",
+  "title": "Bora Employer Pipeline Résumé Derivative",
+  "description": "Role-specific résumé derivative derived from a protected master via structured patch.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "derivative_id",
+    "master_id",
+    "master_version",
+    "patch_id",
+    "module_order",
+    "included_module_ids",
+    "excluded_module_ids",
+    "skills_order",
+    "modules",
+    "experience_sections",
+    "contact",
+    "diff",
+    "review_status",
+    "export_allowed"
+  ],
+  "properties": {
+    "derivative_id": { "type": "string", "minLength": 1 },
+    "master_id": { "type": "string", "minLength": 1 },
+    "master_version": { "type": "string", "minLength": 1 },
+    "patch_id": { "type": "string", "minLength": 1 },
+    "job_id": { "type": ["string", "null"] },
+    "module_order": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "included_module_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "excluded_module_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "summary_module_id": { "type": ["string", "null"] },
+    "skills_order": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "modules": {
+      "type": "array",
+      "items": { "$ref": "resume_module.schema.json" }
+    },
+    "experience_sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "section_id",
+          "experience_id",
+          "organization",
+          "formal_title",
+          "date_range",
+          "bullet_module_ids"
+        ],
+        "properties": {
+          "section_id": { "type": "string", "minLength": 1 },
+          "experience_id": { "type": "string", "minLength": 1 },
+          "organization": { "type": "string", "minLength": 1 },
+          "formal_title": { "type": "string", "minLength": 1 },
+          "employment_category": { "type": ["string", "null"] },
+          "date_range": { "type": "string", "minLength": 1 },
+          "location": { "type": ["string", "null"] },
+          "bullet_module_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "contact": { "$ref": "resume_immutable_contact.schema.json" },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["education_id", "school_name", "degree_name"],
+        "properties": {
+          "education_id": { "type": "string", "minLength": 1 },
+          "school_name": { "type": "string", "minLength": 1 },
+          "degree_name": { "type": "string", "minLength": 1 },
+          "date_range": { "type": ["string", "null"] },
+          "location": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "diff": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["change_type", "target"],
+        "properties": {
+          "change_type": {
+            "type": "string",
+            "enum": [
+              "ADDED",
+              "REMOVED",
+              "REWORDED",
+              "REORDERED",
+              "UNCHANGED",
+              "GAP",
+              "WARNING"
+            ]
+          },
+          "target": { "type": "string", "minLength": 1 },
+          "detail": { "type": ["string", "null"] },
+          "before": { "type": ["string", "null"] },
+          "after": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "review_status": {
+      "type": "string",
+      "enum": ["DRAFT", "HUMAN_REVIEW_REQUIRED", "APPROVED_FOR_EXPORT"]
+    },
+    "export_allowed": {
+      "type": "boolean",
+      "description": "False until human review approves export."
+    },
+    "style_warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

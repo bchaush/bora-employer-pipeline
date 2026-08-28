@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/resume_patch.schema.json",
+  "title": "Bora Employer Pipeline Structured Résumé Patch",
+  "description": "Bounded tailoring operations. Not a freehand résumé rewrite.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["patch_id", "target_master_id", "operations"],
+  "properties": {
+    "patch_id": { "type": "string", "minLength": 1 },
+    "target_master_id": { "type": "string", "minLength": 1 },
+    "job_id": {
+      "type": ["string", "null"],
+      "description": "Optional Job_ID context for derivative tailoring."
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "module_id"],
+            "properties": {
+              "op": { "const": "INCLUDE_MODULE" },
+              "module_id": { "type": "string", "minLength": 1 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "module_id"],
+            "properties": {
+              "op": { "const": "EXCLUDE_MODULE" },
+              "module_id": { "type": "string", "minLength": 1 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "module_ids"],
+            "properties": {
+              "op": { "const": "REORDER_MODULES" },
+              "module_ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "section_id", "bullet_module_ids"],
+            "properties": {
+              "op": { "const": "REORDER_BULLETS" },
+              "section_id": { "type": "string", "minLength": 1 },
+              "bullet_module_ids": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "skills"],
+            "properties": {
+              "op": { "const": "REORDER_SKILLS" },
+              "skills": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "module_id"],
+            "properties": {
+              "op": { "const": "INCLUDE_SUMMARY" },
+              "module_id": { "type": "string", "minLength": 1 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op"],
+            "properties": {
+              "op": { "const": "EXCLUDE_SUMMARY" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "module_id", "variant_index"],
+            "properties": {
+              "op": { "const": "SELECT_WORDING_VARIANT" },
+              "module_id": { "type": "string", "minLength": 1 },
+              "variant_index": { "type": "integer", "minimum": 0 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "module_id", "from_term", "to_term"],
+            "properties": {
+              "op": { "const": "TERMINOLOGY_SUBSTITUTE" },
+              "module_id": { "type": "string", "minLength": 1 },
+              "from_term": { "type": "string", "minLength": 1 },
+              "to_term": { "type": "string", "minLength": 1 }
+            }
+          }
+        ]
+      }
+    },
+    "notes": { "type": ["string", "null"] }
+  }
+}
