@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close MarketMind evidence extraction v1 (CLOSED)
+
+**Reason**
+
+Claude final adversarial audit `CLAUDE_MARKETMIND_EVIDENCE_EXTRACTION_V1_FINAL_PASS` independently verified MarketMind evidence extraction. Bora explicitly approved all 12 MarketMind Evidence records. Operational closure of evidence-extraction milestone.
+
+**Changed**
+
+* Status → **CLOSED** for `MARKETMIND_EVIDENCE_EXTRACTION_V1`.
+* Milestone chain recorded: implementation `0ff4885`.
+* Bora human approval recorded for `MM_SCOPE_001`–`MM_AUTHOR_001` (Evidence only; no Claims or résumé wording approved).
+* `MM_TEST_001` historical observation preserved; later `187/187 PASS` re-run noted as later verification only.
+* **I-1 (non-blocking):** `immutable_snapshot` sentinel coverage remains future work; not implemented.
+* Documentation-only closure; no code, Evidence, Claim, Experience, or résumé content changes.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Pre-closure: 23/23 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 2 Experience / 26 Evidence / 6 reusable Claims — unchanged
+* Winter Walk records, six approved Claims, protected master — unchanged
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-28 — MarketMind Evidence Extraction v1 (IMPLEMENTED_PENDING_HUMAN_REVIEW)
 
 **Reason**

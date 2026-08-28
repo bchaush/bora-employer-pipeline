@@ -28,9 +28,11 @@ Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) = **CLOSED**.
 
 Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) = **CLOSED**.
 
+MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOSED**.
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
-Evidence records: **26** — 14 Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata) plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`).
+Evidence records: **26** — 14 Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata) plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; **Bora-approved Evidence only** — no Claims or résumé wording approved).
 
 Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
 
@@ -301,16 +303,67 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Human review of MarketMind Evidence records before Claim drafting.
-2. Await explicit approval before job-specific tailoring or additional experience sections.
+1. Await explicit approval before MarketMind Claim drafting, résumé modules, or job-specific tailoring.
+2. No next ingestion milestone started.
 
 ## Do Not Start Yet
 
-Do not begin MarketMind Claim drafting, résumé modules, job-specific résumé generation, rendering/export, or additional experience sections without explicit approval.
+Do not begin MarketMind Claim drafting, résumé modules, job-specific résumé generation, rendering/export, Market Empire/LoanIQ ingestion, or additional experience sections without explicit approval.
 
 ## Next Approved Task
 
-`MARKETMIND_EVIDENCE_EXTRACTION_V1` — implemented pending human review.
+`MARKETMIND_EVIDENCE_EXTRACTION_V1` closed. No next milestone started.
+
+---
+
+## 2026-08-28 — MarketMind Evidence Extraction v1 (**CLOSED**)
+
+**Reason**
+
+Claude final adversarial audit `CLAUDE_MARKETMIND_EVIDENCE_EXTRACTION_V1_FINAL_PASS` independently verified MarketMind evidence extraction. Bora explicitly approved all 12 MarketMind Evidence records. Operational closure of evidence-extraction milestone.
+
+**Implementation**
+
+* Commit `0ff4885` — `feat: ingest MarketMind primary evidence`.
+* `experiences/EXP_MM_001.json` (`PERSONAL_PROJECT`; identity only).
+* 12 MarketMind Evidence records under `evidence/marketmind/` (`MM_SCOPE_001`–`MM_AUTHOR_001`).
+
+**Human approval (Evidence only)**
+
+Bora approval statement (2026-08-28):
+
+> I approve the 12 MarketMind Evidence records MM_SCOPE_001 through MM_AUTHOR_001 as accurate, bounded factual evidence for this project. This approval does not approve any résumé wording or reusable Claim.
+
+Approval scope: **Evidence records only**. No reusable MarketMind Claims approved. No résumé modules, bullets, or job-specific wording approved.
+
+**Claude verdict**
+
+`CLAUDE_MARKETMIND_EVIDENCE_EXTRACTION_V1_FINAL_PASS` — no blocking findings.
+
+**Preserved boundaries**
+
+* `MM_TEST_001` retains dated single-run observation (35 modules; 187 collected; 186 passed / 1 failed on 2026-08-28). Later external re-run `187/187 PASS` acknowledged as later verification only; does not rewrite `MM_TEST_001`.
+* `MM_DEPLOY_001` remains dated liveness observation, not production deployment.
+* `MM_AUTHOR_001` remains GitHub contributor observation only.
+* No employer/client/sponsor/dates/business outcomes invented.
+* **I-1 (non-blocking):** résumé protected-metadata `immutable_snapshot` sentinel coverage remains future work; not implemented.
+
+**Not changed at closure**
+
+* No code, Evidence, Claim, Experience, or résumé content changes.
+* Winter Walk Experience/Evidence/Claims unchanged.
+* Protected résumé master unchanged.
+* External MarketMind project unchanged.
+
+**Verification**
+
+* 23/23 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 2 Experience / 26 Evidence / 6 reusable Claims
+
+**Status**
+
+`MARKETMIND_EVIDENCE_EXTRACTION_V1` = **CLOSED**
 
 ---
 
@@ -341,5 +394,5 @@ Ingest MarketMind AI as an evidence-controlled project using only facts supporte
 
 **Status**
 
-`MARKETMIND_EVIDENCE_EXTRACTION_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW`
+`MARKETMIND_EVIDENCE_EXTRACTION_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW` (superseded by closure entry above)
 
