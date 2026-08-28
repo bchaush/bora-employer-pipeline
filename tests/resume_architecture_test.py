@@ -25,7 +25,11 @@ from resume_style import validate_resume_prose_style  # noqa: E402
 from resume_validation import (  # noqa: E402
     approve_derivative_for_export,
     build_resume_derivative,
+    complete_semantic_review,
     master_unchanged_after_derivative_build,
+    validate_derivative_eligibility,
+    validate_master_module_ids_unique,
+    validate_resume_master,
     validate_resume_module,
     validate_resume_patch,
 )
@@ -261,7 +265,7 @@ assert_true(
 print("PASS J: diff reports derivative changes.")
 
 
-# K. em-dash style rule → FAIL
+# K. em-dash style rule → style failure (distinct from provenance)
 style_k = validate_resume_prose_style(
     "Built workflow controls — with human approval.",
     context="MOD_STYLE_K",
@@ -274,11 +278,14 @@ module_k["wording"] = "Built workflow controls — with human approval."
 result_k = validate_resume_module(
     module_k, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
 )
-assert_false(result_k["valid"], "K: module with em dash should fail")
-print("PASS K: em-dash style rule catches prose.")
+assert_true(result_k["factual_valid"] is True, "K: factual lineage still valid")
+assert_false(result_k["style_valid"], "K: style should fail")
+assert_false(has_code(result_k["errors"], "RESUME_STYLE_EM_DASH"), "K: style not factual error")
+assert_true(has_code(result_k["style_warnings"], "RESUME_STYLE_EM_DASH"), "K: style warning")
+print("PASS K: em-dash style rule catches prose separately from provenance.")
 
 
-# L. generic AI filler → FAIL
+# L. generic AI filler → style failure (distinct from provenance)
 style_l = validate_resume_prose_style(
     "Spearheaded seamless innovative solutions for stakeholders.",
     context="MOD_STYLE_L",
@@ -288,15 +295,350 @@ assert_true(has_code(style_l["warnings"], "RESUME_STYLE_AI_FILLER"), "L: filler 
 print("PASS L: generic AI filler rule catches prose.")
 
 
-# Human review gate: export blocked until approval
+# Human review gate: export blocked until full eligibility + explicit approval
 assert_true(result_h["derivative"]["export_allowed"] is False, "export blocked by default")
 assert_true(
     result_h["derivative"]["review_status"] == "HUMAN_REVIEW_REQUIRED",
     "review required by default",
 )
-approved = approve_derivative_for_export(result_h["derivative"])
-assert_true(approved["valid"] is True, "approval path valid")
+approved = approve_derivative_for_export(
+    derivative=result_h["derivative"],
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_true(approved["valid"] is True, "approval path valid for built derivative")
 assert_true(approved["derivative"]["export_allowed"] is True, "export allowed after approval")
 print("PASS: human review gate blocks export until approval.")
 
-print("PASS: resume architecture tests A–L complete.")
+
+# F1 trust boundary: fabricated derivative cannot be approved
+fabricated_claim = copy.deepcopy(result_h["derivative"])
+fabricated_claim["modules"][0]["claim_ids"] = ["CLAIM_DOES_NOT_EXIST"]
+fabricated_claim["validation_digest"] = result_h["derivative"]["validation_digest"]
+fabricated_approval = approve_derivative_for_export(
+    derivative=fabricated_claim,
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_false(fabricated_approval["valid"], "F1: fabricated claim should fail approval")
+assert_true(
+    has_code(fabricated_approval["errors"], "DERIVATIVE_MUTATED_AFTER_VALIDATION")
+    or has_code(fabricated_approval["errors"], "MISSING_CLAIM_ID"),
+    "F1: fabricated derivative rejected",
+)
+print("PASS F1: fabricated derivative with nonexistent Claim cannot be approved.")
+
+
+fabricated_raw = copy.deepcopy(result_h["derivative"])
+fabricated_raw["modules"][0]["wording"] = (
+    "Spearheaded seamless enterprise SaaS platform ownership."
+)
+fabricated_raw["validation_digest"] = result_h["derivative"]["validation_digest"]
+fabricated_raw_approval = approve_derivative_for_export(
+    derivative=fabricated_raw,
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_false(fabricated_raw_approval["valid"], "F1: unsupported prose should fail")
+print("PASS F1: fabricated derivative with unsupported prose cannot be approved.")
+
+
+mutated_derivative = copy.deepcopy(result_h["derivative"])
+mutated_derivative["modules"][0]["wording"] = "Changed wording after validation."
+mutated_approval = approve_derivative_for_export(
+    derivative=mutated_derivative,
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_false(mutated_approval["valid"], "F1: mutation should fail approval")
+assert_true(
+    has_code(mutated_approval["errors"], "DERIVATIVE_MUTATED_AFTER_VALIDATION"),
+    "F1: mutation digest mismatch",
+)
+print("PASS F1: derivative mutated after validation cannot be approved.")
+
+
+no_digest = copy.deepcopy(result_h["derivative"])
+del no_digest["validation_digest"]
+no_digest_approval = approve_derivative_for_export(
+    derivative=no_digest,
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_false(no_digest_approval["valid"], "F1: missing digest should fail")
+assert_true(
+    has_code(no_digest_approval["errors"], "DERIVATIVE_VALIDATION_DIGEST_MISSING"),
+    "F1: digest required",
+)
+print("PASS F1: derivative without validation digest cannot be approved.")
+
+
+# F2 semantics: unsupported terminology substitution fails
+patch_bpmn = {
+    "patch_id": "PATCH_BPMN_TRAP",
+    "target_master_id": MASTER["master_id"],
+    "operations": [
+        {
+            "op": "TERMINOLOGY_SUBSTITUTE",
+            "module_id": "MOD_BULLET_WW_PROC",
+            "from_term": "operating process",
+            "to_term": "BPMN enterprise process modeling process",
+        }
+    ],
+}
+result_bpmn = build_resume_derivative(
+    master=MASTER,
+    patch=patch_bpmn,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    derivative_id="DERIV_BPMN_TRAP",
+)
+assert_false(result_bpmn["valid"], "F2: BPMN substitution should fail")
+assert_true(
+    has_code(result_bpmn["errors"], "RESUME_FORBIDDEN_CONTEXT_LEAKAGE")
+    or has_code(result_bpmn["errors"], "RESUME_WORDING_SEMANTIC_VIOLATION"),
+    "F2: BPMN blocked",
+)
+print("PASS F2: BPMN substitution against CLAIM_WW_006 fails.")
+
+
+patch_lean = {
+    "patch_id": "PATCH_LEAN_TRAP",
+    "target_master_id": MASTER["master_id"],
+    "operations": [
+        {
+            "op": "TERMINOLOGY_SUBSTITUTE",
+            "module_id": "MOD_BULLET_WW_PROC",
+            "from_term": "structured operating process",
+            "to_term": "Lean Six Sigma transformation process",
+        }
+    ],
+}
+result_lean = build_resume_derivative(
+    master=MASTER,
+    patch=patch_lean,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    derivative_id="DERIV_LEAN_TRAP",
+)
+assert_false(result_lean["valid"], "F2: Lean/Six Sigma substitution should fail")
+print("PASS F2: Lean/Six Sigma substitution fails.")
+
+
+patch_seniority = {
+    "patch_id": "PATCH_SENIORITY_TRAP",
+    "target_master_id": MASTER["master_id"],
+    "operations": [
+        {
+            "op": "TERMINOLOGY_SUBSTITUTE",
+            "module_id": "MOD_BULLET_WW_PROC",
+            "from_term": "human approval",
+            "to_term": "organization-wide transformation leadership",
+        }
+    ],
+}
+result_seniority = build_resume_derivative(
+    master=MASTER,
+    patch=patch_seniority,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    derivative_id="DERIV_SENIORITY_TRAP",
+)
+assert_false(result_seniority["valid"], "F2: seniority expansion should fail")
+print("PASS F2: unsupported scope/seniority expansion fails.")
+
+
+patch_benign = {
+    "patch_id": "PATCH_BENIGN_TERM",
+    "target_master_id": MASTER["master_id"],
+    "operations": [
+        {
+            "op": "TERMINOLOGY_SUBSTITUTE",
+            "module_id": "MOD_BULLET_WW_PROC",
+            "from_term": "manual OP-support workflow",
+            "to_term": "documented manual OP-support workflow",
+        }
+    ],
+}
+result_benign = build_resume_derivative(
+    master=MASTER,
+    patch=patch_benign,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    derivative_id="DERIV_BENIGN_TERM",
+)
+assert_true(result_benign["valid"], "F2: benign substitution should build")
+assert_true(
+    result_benign["derivative"]["review_status"] == "NEEDS_SEMANTIC_REVIEW",
+    "F2: benign terminology requires semantic review",
+)
+semantic_blocked = approve_derivative_for_export(
+    derivative=result_benign["derivative"],
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_false(semantic_blocked["valid"], "F2: unresolved semantic review blocks export")
+assert_true(
+    has_code(semantic_blocked["errors"], "DERIVATIVE_NOT_READY_FOR_EXPORT_APPROVAL")
+    or has_code(semantic_blocked["errors"], "SEMANTIC_REVIEW_UNRESOLVED"),
+    "F2: semantic review gate",
+)
+cleared = complete_semantic_review(
+    derivative=result_benign["derivative"],
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+)
+assert_true(cleared["valid"], "F2: semantic review can be cleared")
+approved_benign = approve_derivative_for_export(
+    derivative=cleared["derivative"],
+    master=MASTER,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    human_approval=True,
+)
+assert_true(approved_benign["valid"], "F2: cleared derivative can export")
+print("PASS F2: benign terminology substitution is review-gated; unsafe substitutions fail.")
+
+
+# F3 immutability: education and immutable_snapshot
+master_immutable = copy.deepcopy(MASTER)
+master_immutable["education"] = [
+    {
+        "education_id": "EDU_SYNTH_001",
+        "school_name": "Synthetic State University",
+        "degree_name": "B.S. Synthetic Studies",
+        "date_range": "2020 – 2024",
+        "location": "Synthetic City",
+    }
+]
+master_immutable["modules"][0]["immutable_snapshot"] = {
+    "organization": "Winter Walk",
+    "formal_title": "SYNTHETIC_FIXTURE_ROLE",
+}
+deriv_immutable = build_resume_derivative(
+    master=master_immutable,
+    patch=patch_h,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+    derivative_id="DERIV_IMMUTABLE_BASE",
+)
+assert_true(deriv_immutable["valid"], "F3: immutable base derivative builds")
+
+degree_mutated = copy.deepcopy(deriv_immutable["derivative"])
+degree_mutated["education"][0]["degree_name"] = "Ph.D. Invented Studies"
+immutable_degree = validate_immutable_fields_preserved(
+    master_immutable, degree_mutated
+)
+assert_false(immutable_degree["valid"], "F3: degree mutation should fail")
+assert_true(
+    has_code(immutable_degree["errors"], "IMMUTABLE_EDUCATION_FIELD_ALTERED"),
+    "F3: degree name",
+)
+print("PASS F3: degree name mutation fails.")
+
+school_mutated = copy.deepcopy(deriv_immutable["derivative"])
+school_mutated["education"][0]["school_name"] = "Other University"
+immutable_school = validate_immutable_fields_preserved(
+    master_immutable, school_mutated
+)
+assert_false(immutable_school["valid"], "F3: school mutation should fail")
+print("PASS F3: school name mutation fails.")
+
+snapshot_title_mutated = copy.deepcopy(deriv_immutable["derivative"])
+snapshot_title_mutated["modules"][0]["immutable_snapshot"]["formal_title"] = "CEO"
+immutable_snapshot = validate_immutable_fields_preserved(
+    master_immutable, snapshot_title_mutated
+)
+assert_false(immutable_snapshot["valid"], "F3: snapshot title mutation should fail")
+assert_true(
+    has_code(immutable_snapshot["errors"], "IMMUTABLE_MODULE_SNAPSHOT_ALTERED"),
+    "F3: snapshot title",
+)
+print("PASS F3: immutable snapshot title mutation fails.")
+
+snapshot_employer_mutated = copy.deepcopy(deriv_immutable["derivative"])
+snapshot_employer_mutated["modules"][0]["immutable_snapshot"]["organization"] = "Other Org"
+immutable_employer = validate_immutable_fields_preserved(
+    master_immutable, snapshot_employer_mutated
+)
+assert_false(immutable_employer["valid"], "F3: snapshot employer mutation should fail")
+print("PASS F3: immutable snapshot employer mutation fails.")
+
+untouched_eligibility = validate_derivative_eligibility(
+    deriv_immutable["derivative"],
+    master=master_immutable,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+)
+assert_true(untouched_eligibility["valid"], "F3: untouched derivative passes")
+print("PASS F3: untouched derivative passes immutability checks.")
+
+
+# F4 unknown wording target fails
+patch_unknown_variant = {
+    "patch_id": "PATCH_UNKNOWN_VARIANT",
+    "target_master_id": MASTER["master_id"],
+    "operations": [
+        {
+            "op": "SELECT_WORDING_VARIANT",
+            "module_id": "MOD_DOES_NOT_EXIST",
+            "variant_index": 0,
+        }
+    ],
+}
+applied_unknown_variant = apply_resume_patch(MASTER, patch_unknown_variant)
+assert_false(applied_unknown_variant["valid"], "F4: unknown variant target should fail")
+assert_true(
+    has_code(applied_unknown_variant["errors"], "UNKNOWN_MODULE_ID"),
+    "F4: unknown variant module",
+)
+patch_unknown_term = {
+    "patch_id": "PATCH_UNKNOWN_TERM",
+    "target_master_id": MASTER["master_id"],
+    "operations": [
+        {
+            "op": "TERMINOLOGY_SUBSTITUTE",
+            "module_id": "MOD_DOES_NOT_EXIST",
+            "from_term": "workflow",
+            "to_term": "process",
+        }
+    ],
+}
+applied_unknown_term = apply_resume_patch(MASTER, patch_unknown_term)
+assert_false(applied_unknown_term["valid"], "F4: unknown terminology target should fail")
+assert_true(
+    has_code(applied_unknown_term["errors"], "UNKNOWN_MODULE_ID"),
+    "F4: unknown terminology module",
+)
+print("PASS F4: unknown wording targets fail explicitly.")
+
+
+# F5 duplicate module IDs fail closed
+master_duplicate = copy.deepcopy(MASTER)
+master_duplicate["modules"].append(copy.deepcopy(MASTER["modules"][0]))
+duplicate_check = validate_master_module_ids_unique(master_duplicate)
+assert_false(duplicate_check["valid"], "F5: duplicate module_id should fail")
+assert_true(has_code(duplicate_check["errors"], "DUPLICATE_MODULE_ID"), "F5: duplicate code")
+master_duplicate_validation = validate_resume_master(
+    master_duplicate,
+    claim_index=CLAIM_INDEX,
+    evidence_index=EVIDENCE_INDEX,
+)
+assert_false(master_duplicate_validation["valid"], "F5: master with duplicates should fail")
+print("PASS F5: duplicate module IDs fail closed.")
+
+
+print("PASS: resume architecture tests A–L and audit remediations complete.")

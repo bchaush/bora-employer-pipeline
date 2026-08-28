@@ -19,7 +19,8 @@
     "contact",
     "diff",
     "review_status",
-    "export_allowed"
+    "export_allowed",
+    "validation_digest"
   ],
   "properties": {
     "derivative_id": { "type": "string", "minLength": 1 },
@@ -120,11 +121,22 @@
     },
     "review_status": {
       "type": "string",
-      "enum": ["DRAFT", "HUMAN_REVIEW_REQUIRED", "APPROVED_FOR_EXPORT"]
+      "enum": [
+        "DRAFT",
+        "NEEDS_SEMANTIC_REVIEW",
+        "HUMAN_REVIEW_REQUIRED",
+        "APPROVED_FOR_EXPORT"
+      ]
     },
     "export_allowed": {
       "type": "boolean",
       "description": "False until human review approves export."
+    },
+    "validation_digest": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "description": "SHA-256 digest of validated derivative content; detects post-validation mutation."
     },
     "style_warnings": {
       "type": "array",

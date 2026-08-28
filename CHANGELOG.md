@@ -19,6 +19,43 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Remediate résumé architecture v1 audit findings (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Independent Claude adversarial audit (`CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_FINDINGS`) identified blocking trust-boundary, terminology semantic, immutability, and classification defects. Narrow remediation only; no architecture redesign.
+
+**Changed**
+
+* **F1:** `approve_derivative_for_export` now requires master + trusted indexes + explicit `human_approval=true`, full eligibility re-validation, and `validation_digest` mutation detection.
+* **F2:** `TERMINOLOGY_SUBSTITUTE` runs claim semantic-boundary + forbidden-context checks; benign substitutions gate to `NEEDS_SEMANTIC_REVIEW`; `complete_semantic_review` clears before export.
+* **F3:** Extended immutable validation to education entries (by `education_id`) and `modules[].immutable_snapshot`.
+* **F4:** `UNKNOWN_MODULE_ID` for missing `SELECT_WORDING_VARIANT` / `TERMINOLOGY_SUBSTITUTE` targets.
+* **F5:** `DUPLICATE_MODULE_ID` validation on master modules.
+* **F6:** Separated factual (`errors`) vs style (`style_warnings`) validation paths.
+* Added `resume_semantic.py`, `resume_digest.py`; updated derivative schema (`validation_digest`, `NEEDS_SEMANTIC_REVIEW`).
+* Adversarial regression tests in `tests/resume_architecture_test.py`.
+
+**Affected Areas**
+
+* `src/resume_validation.py`, `src/resume_patch_apply.py`, `src/resume_semantic.py`, `src/resume_digest.py`
+* `schemas/resume_derivative.schema.json`
+* `tests/resume_architecture_test.py`, `tests/resume_schema_smoke_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/resume_architecture_test.py` (A–L + F1–F5 adversarial) — PASS
+* `tests/resume_schema_smoke_test.py` — PASS
+* Full established suites + golden runner (15/15) — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT (remediated; awaiting re-audit)
+
+---
+
 ## 2026-08-28 — Implement résumé architecture v1 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

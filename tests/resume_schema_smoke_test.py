@@ -10,6 +10,7 @@ FIXTURES = ROOT / "fixtures" / "resume_architecture"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
+from resume_digest import compute_derivative_validation_digest  # noqa: E402
 from schema_validation import build_draft202012_validator  # noqa: E402
 
 
@@ -79,6 +80,7 @@ valid_derivative = {
     "review_status": "HUMAN_REVIEW_REQUIRED",
     "export_allowed": False,
 }
+valid_derivative["validation_digest"] = compute_derivative_validation_digest(valid_derivative)
 
 assert_true(module_validator.is_valid(valid_module), "valid module should pass schema")
 assert_false(

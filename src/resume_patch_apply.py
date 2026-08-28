@@ -118,8 +118,10 @@ def apply_resume_patch(
         elif op == "SELECT_WORDING_VARIANT":
             module_id = operation.get("module_id")
             variant_index = operation.get("variant_index")
+            module_found = False
             for module in derivative["modules"]:
                 if module.get("module_id") == module_id:
+                    module_found = True
                     variants = module.get("approved_wording_variants")
                     if (
                         not isinstance(variants, list)
@@ -136,13 +138,19 @@ def apply_resume_patch(
                     else:
                         module["wording"] = variants[variant_index]
                     break
+            if not module_found:
+                errors.append(
+                    _error("UNKNOWN_MODULE_ID", module_id=module_id, op=op)
+                )
 
         elif op == "TERMINOLOGY_SUBSTITUTE":
             module_id = operation.get("module_id")
             from_term = str(operation.get("from_term") or "")
             to_term = str(operation.get("to_term") or "")
+            module_found = False
             for module in derivative["modules"]:
                 if module.get("module_id") == module_id:
+                    module_found = True
                     wording = str(module.get("wording") or "")
                     if from_term not in wording:
                         errors.append(
@@ -155,6 +163,10 @@ def apply_resume_patch(
                     else:
                         module["wording"] = wording.replace(from_term, to_term, 1)
                     break
+            if not module_found:
+                errors.append(
+                    _error("UNKNOWN_MODULE_ID", module_id=module_id, op=op)
+                )
         else:
             errors.append(_error("UNSUPPORTED_PATCH_OP", op=op, index=index))
 
@@ -204,6 +216,87 @@ def validate_immutable_fields_preserved(
                         field=field,
                         master_value=master_section.get(field),
                         derivative_value=deriv_section.get(field),
+                    )
+                )
+
+    master_education = {
+        entry.get("education_id"): entry
+        for entry in (master.get("education") or [])
+        if isinstance(entry, Mapping) and isinstance(entry.get("education_id"), str)
+    }
+    deriv_education = {
+        entry.get("education_id"): entry
+        for entry in (derivative.get("education") or [])
+        if isinstance(entry, Mapping) and isinstance(entry.get("education_id"), str)
+    }
+    for education_id, master_entry in master_education.items():
+        deriv_entry = deriv_education.get(education_id)
+        if not isinstance(deriv_entry, Mapping):
+            errors.append(
+                _error(
+                    "IMMUTABLE_EDUCATION_ENTRY_MISSING",
+                    education_id=education_id,
+                )
+            )
+            continue
+        for field in ("school_name", "degree_name", "date_range", "location"):
+            if master_entry.get(field) != deriv_entry.get(field):
+                errors.append(
+                    _error(
+                        "IMMUTABLE_EDUCATION_FIELD_ALTERED",
+                        education_id=education_id,
+                        field=field,
+                        master_value=master_entry.get(field),
+                        derivative_value=deriv_entry.get(field),
+                    )
+                )
+
+    master_modules = {
+        module.get("module_id"): module
+        for module in (master.get("modules") or [])
+        if isinstance(module, Mapping) and isinstance(module.get("module_id"), str)
+    }
+    deriv_modules = {
+        module.get("module_id"): module
+        for module in (derivative.get("modules") or [])
+        if isinstance(module, Mapping) and isinstance(module.get("module_id"), str)
+    }
+    protected_snapshot_fields = (
+        "organization",
+        "formal_title",
+        "employment_category",
+        "date_range",
+        "location",
+        "degree_name",
+        "school_name",
+        "approved_metrics",
+        "approved_tools",
+    )
+    for module_id, master_module in master_modules.items():
+        master_snapshot = master_module.get("immutable_snapshot")
+        if not isinstance(master_snapshot, Mapping):
+            continue
+        deriv_module = deriv_modules.get(module_id)
+        if not isinstance(deriv_module, Mapping):
+            errors.append(
+                _error("IMMUTABLE_MODULE_MISSING", module_id=module_id)
+            )
+            continue
+        deriv_snapshot = deriv_module.get("immutable_snapshot")
+        if not isinstance(deriv_snapshot, Mapping):
+            errors.append(
+                _error("IMMUTABLE_MODULE_SNAPSHOT_MISSING", module_id=module_id)
+            )
+            continue
+        for field in protected_snapshot_fields:
+            if master_snapshot.get(field) != deriv_snapshot.get(field):
+                errors.append(
+                    _error(
+                        "IMMUTABLE_MODULE_SNAPSHOT_ALTERED",
+                        module_id=module_id,
+                        field=field,
+                        master_value=master_snapshot.get(field),
+                        derivative_value=deriv_snapshot.get(field),
                     )
                 )
 

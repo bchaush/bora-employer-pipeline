@@ -181,11 +181,12 @@ No production engine yet.
   * Tests A–L in `tests/resume_architecture_test.py`; schema smoke in `tests/resume_schema_smoke_test.py`.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (awaiting external audit; not CLOSED).
+  * Claude adversarial audit (`CLAUDE_RESUME_ARCHITECTURE_V1_AUDIT_FINDINGS`): remediation applied for export trust boundary, terminology semantic safeguards, extended immutability, patch integrity, and style/provenance classification.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT** (awaiting external re-audit; not CLOSED).
 
 ## Current Task
 
-`RESUME_ARCHITECTURE_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Awaiting external audit. Do not begin résumé generation or master résumé authoring unless explicitly approved.
+`RESUME_ARCHITECTURE_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Claude audit remediation applied; awaiting external re-audit. Do not begin résumé generation or master résumé authoring unless explicitly approved.
 
 ## Not Built Yet
 
@@ -231,7 +232,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. External audit of `RESUME_ARCHITECTURE_V1` (do not mark CLOSED until audit passes).
+1. External re-audit of `RESUME_ARCHITECTURE_V1` after Claude remediation (do not mark CLOSED until re-audit passes).
 2. Await explicit approval before master résumé authoring or job-specific résumé generation.
 
 ## Do Not Start Yet
@@ -240,4 +241,4 @@ Do not begin master résumé authoring, job-specific résumé generation, or ren
 
 ## Next Approved Task
 
-`RESUME_ARCHITECTURE_V1` implemented pending external audit. No next milestone started.
+`RESUME_ARCHITECTURE_V1` remediated pending external re-audit. No next milestone started.
