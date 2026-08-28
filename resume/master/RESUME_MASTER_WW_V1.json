@@ -1,6 +1,6 @@
 {
   "master_id": "RESUME_MASTER_WW_V1",
-  "version": "5",
+  "version": "6",
   "protected": true,
   "contact": {
     "name": "Bora Chaush",
@@ -160,6 +160,61 @@
         "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_MM_001_SCOPE",
+      "module_type": "PROJECT_BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_001"],
+      "evidence_ids": ["MM_SCOPE_001", "MM_BOUNDARY_001"],
+      "wording": "Built a Python/Streamlit prototype for preliminary coffee-shop market screening using documented heuristic scoring boundaries.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Digital Solutions"],
+      "capabilities": ["Python application development", "project scoping"],
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_MM_002_DETERMINISTIC_AI",
+      "module_type": "PROJECT_BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_002"],
+      "evidence_ids": ["MM_SCORE_001", "MM_LLM_001"],
+      "wording": "Separated deterministic scoring from an optional LLM narrative layer instructed not to alter scores, thresholds, status, or scenario calculations.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
+      "capabilities": ["deterministic scoring logic", "bounded LLM integration"],
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_MM_003_INTEGRATION",
+      "module_type": "PROJECT_BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_003"],
+      "evidence_ids": ["MM_PLACES_001", "MM_CENSUS_001"],
+      "wording": "Integrated Google Places nearby-search and U.S. Census ACS demographic data into a coffee-shop market-screening workflow.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations", "Digital Solutions"],
+      "capabilities": ["REST/API integration", "Census/public-data integration"],
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_MM_004_CONTROLS",
+      "module_type": "PROJECT_BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_004"],
+      "evidence_ids": ["MM_GEOFENCE_001", "MM_RATELIMIT_001", "MM_FALLBACK_001"],
+      "wording": "Implemented a 3.5-mile geofence, a local 50-request daily limit, and retry with degraded stub fallback for failed Places or Census fetches.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Technical Operations"],
+      "capabilities": ["operational controls", "failure/degradation handling"],
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_MM_005_TESTING",
+      "module_type": "PROJECT_BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_005"],
+      "evidence_ids": ["MM_TEST_001"],
+      "wording": "Built an automated pytest suite covering the MarketMind screening pipeline.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
+      "capabilities": ["validation/testing"],
+      "status": "ACTIVE"
     }
   ],
   "experience_sections": [
@@ -209,5 +264,5 @@
     "UAT documentation"
   ],
   "date": "2026-08-28",
-  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 5. WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE through MOD_WW_006_PROCESS (wording unchanged). TITLE_RESOLVED: source contractual position Intern; source functional role AI Researcher and Developer; human-approved display title AI Researcher & Developer Intern (not source-verbatim formal title); formal_title remains PENDING_BORA_REVIEW. CONTACT_RESOLVED: Bora explicitly confirmed contact block on 2026-08-28 (name Bora Chaush; email bchaush@brandeis.edu; phone +1 857 919 8421; location Boston, MA; linkedin linkedin.com/in/bora-chaush-msba). GitHub not stored (not in contact schema). METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP via WW_OFFER_001; exact end day unresolved. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. Not a submitted résumé; no derivative export approved."
+  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 6. WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE through MOD_WW_006_PROCESS (wording unchanged). TITLE_RESOLVED: source contractual position Intern; source functional role AI Researcher and Developer; human-approved display title AI Researcher & Developer Intern (not source-verbatim formal title); formal_title remains PENDING_BORA_REVIEW. CONTACT_RESOLVED: Bora explicitly confirmed contact block on 2026-08-28 (name Bora Chaush; email bchaush@brandeis.edu; phone +1 857 919 8421; location Boston, MA; linkedin linkedin.com/in/bora-chaush-msba). GitHub not stored (not in contact schema). METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP via WW_OFFER_001; exact end day unresolved. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. MARKETMIND_ADDED: Bora explicitly approved the exact wording of five PERSONAL_PROJECT bullet modules for EXP_MM_001 (MarketMind AI) on 2026-08-28: MOD_MM_001_SCOPE, MOD_MM_002_DETERMINISTIC_AI, MOD_MM_003_INTEGRATION, MOD_MM_004_CONTROLS, MOD_MM_005_TESTING (claim_ids/evidence_ids unchanged from claims/marketmind/CLAIM_MM_001-005; wording byte-identical to approval). module_type=PROJECT_BULLET; no experience_sections entry created for EXP_MM_001 because no verified formal_title, date_range, or employer/client relationship exists in the repository for this personal project (EXP_MM_001 notes: no verified employer, client, sponsor, or employment dates) — none was invented. Modules are NOT in default_module_order and are excluded from every derivative unless explicitly selected via INCLUDE_MODULE in a future, separately-scoped job-tailoring milestone. CLAIM_MM_005 remains OBSERVED; its module wording does not assert a pass count or stronger performance outcome. Not a submitted résumé; no derivative export approved."
 }

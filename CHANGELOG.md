@@ -19,6 +19,44 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Approve MarketMind resume modules and integrate into protected master (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`)
+
+**Reason**
+
+Bora explicitly approved the exact wording of all five MarketMind draft resume modules. Integrate them into `resume/master/RESUME_MASTER_WW_V1.json` using the existing production resume-module/master architecture, with no new approval schema field and no inferred factual metadata.
+
+**Changed**
+
+* `resume/master/RESUME_MASTER_WW_V1.json`: version 5 -> 6. Added 5 `PROJECT_BULLET` modules (`MOD_MM_001_SCOPE`, `MOD_MM_002_DETERMINISTIC_AI`, `MOD_MM_003_INTEGRATION`, `MOD_MM_004_CONTROLS`, `MOD_MM_005_TESTING`) to `modules[]`, each with exact Bora-approved wording, unchanged Claim/Evidence lineage, `status=ACTIVE`, no `immutable_snapshot`. None added to `default_module_order`. No `experience_sections` entry created for `EXP_MM_001` (see below). `notes` updated to record the addition.
+* `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json`: marked `status=APPROVED_AND_INTEGRATED_INTO_MASTER`, `human_approval=true`, preserved as the historical/audit record with wording byte-identical to the master.
+* Added `tests/marketmind_resume_module_approval_test.py`.
+* Updated `tests/marketmind_resume_module_drafting_test.py`, `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`, `tests/winter_walk_resume_title_resolution_test.py`: scoped generic "every module in the master" loops to Winter-Walk-specific modules now that MarketMind modules legitimately coexist in the same master's `modules[]`; no Winter Walk assertion was weakened.
+
+**Not changed**
+
+* Claims, Evidence, Experiences, Winter Walk module wordings/contact/title architecture, schemas, requirement matcher, resume validators.
+
+**Architecture note — no new approval schema**
+
+`resume_module.schema.json` has no module-level `human_approval` property; none was added. The module-level `human_approval` field present only in the draft/historical file was dropped when converting to production form (not part of the production schema). The real safety boundary remains whether a module is inside the protected master and inside `default_module_order`, which governs default derivative inclusion — not a per-module flag.
+
+**Experience representation**
+
+No `experience_sections` entry was created for `EXP_MM_001`. `resume_master.schema.json` requires non-empty `organization`/`formal_title`/`date_range` for any `experience_sections` entry, and `EXP_MM_001`'s own notes state no verified employer, client, sponsor, or employment dates exist for this personal project — there is no repository-verified value for `formal_title`/`date_range`, and reusing the Winter Walk `PENDING_BORA_REVIEW` sentinel would misrepresent that a real title exists pending review, which is not true here. Module inclusion in the master does not require an `experience_sections` entry, so this was not needed and nothing was invented.
+
+**Tests / Verification**
+
+* All five modules independently pass the production resume_module schema, Claim lineage, Evidence lineage, semantic-boundary, and prose-style checks; full master passes `validate_resume_master`.
+* Confirmed empirically: a no-op patch includes only the 6 Winter Walk modules; an explicit patch selecting all 5 MarketMind modules succeeds and still leaves `export_allowed=False`.
+* Winter Walk wordings/section/contact confirmed byte-identical; all 11 Claims confirmed byte-unchanged via hash comparison.
+* 27/27 test suites -- PASS. Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable -- unchanged.
+
+**Status**
+
+MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. No resume generated, no job-specific tailoring begun. Approved modules are not automatically included in any future resume.
+
+---
+
 ## 2026-08-28 — Refine MarketMind resume module wording (`MARKETMIND_RESUME_MODULE_WORDING_REFINEMENT_V1`)
 
 **Reason**

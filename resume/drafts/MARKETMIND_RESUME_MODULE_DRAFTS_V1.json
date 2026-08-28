@@ -1,70 +1,130 @@
 {
   "draft_set_id": "MARKETMIND_RESUME_MODULE_DRAFTS_V1",
   "experience_id": "EXP_MM_001",
-  "status": "DRAFT_PENDING_HUMAN_REVIEW",
-  "human_approval": false,
+  "status": "APPROVED_AND_INTEGRATED_INTO_MASTER",
+  "human_approval": true,
   "date": "2026-08-28",
-  "notes": "MarketMind résumé-module bullet candidates drafted from the five Bora-approved MarketMind Claims (CLAIM_MM_001–CLAIM_MM_005). Deliberately NOT part of resume/master/RESUME_MASTER_WW_V1.json and NOT referenced by any experience_sections/bullet_module_ids in that protected master, so no derivative or export pipeline can include this content today regardless of this file's own status flags. Each module's wording is unchanged from what is recorded here until Bora explicitly reviews and approves it (mirroring the exact-wording approval convention already used for the Winter Walk modules and for CLAIM_MM_001–005 themselves). Claim approval does not equal résumé-module approval.",
+  "notes": "HISTORICAL/AUDIT RECORD. MarketMind résumé-module bullet candidates drafted from the five Bora-approved MarketMind Claims (CLAIM_MM_001–CLAIM_MM_005) on 2026-08-28, refined once per Bora's wording review, then explicitly approved by Bora on 2026-08-28 for the exact wording recorded below. All five were subsequently integrated into resume/master/RESUME_MASTER_WW_V1.json (version 6) as module_type=PROJECT_BULLET entries with byte-identical wording. This file is preserved as a historical/audit record of the drafting-and-approval workflow; it is not itself consumed by any résumé-generation or export path (resume/drafts/ is not loaded by production code). The wording recorded here must remain identical to the wording in the protected master — there must be no divergence between the two.",
   "modules": [
     {
       "module_id": "MOD_MM_001_SCOPE",
-      "module_type": "BULLET",
+      "module_type": "PROJECT_BULLET",
       "experience_id": "EXP_MM_001",
-      "claim_ids": ["CLAIM_MM_001"],
-      "evidence_ids": ["MM_SCOPE_001", "MM_BOUNDARY_001"],
+      "claim_ids": [
+        "CLAIM_MM_001"
+      ],
+      "evidence_ids": [
+        "MM_SCOPE_001",
+        "MM_BOUNDARY_001"
+      ],
       "wording": "Built a Python/Streamlit prototype for preliminary coffee-shop market screening using documented heuristic scoring boundaries.",
-      "allowed_role_families": ["Business Systems", "Implementation", "Digital Solutions"],
-      "capabilities": ["Python application development", "project scoping"],
-      "status": "OPTIONAL",
-      "human_approval": false
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Digital Solutions"
+      ],
+      "capabilities": [
+        "Python application development",
+        "project scoping"
+      ],
+      "status": "ACTIVE",
+      "human_approval": true
     },
     {
       "module_id": "MOD_MM_002_DETERMINISTIC_AI",
-      "module_type": "BULLET",
+      "module_type": "PROJECT_BULLET",
       "experience_id": "EXP_MM_001",
-      "claim_ids": ["CLAIM_MM_002"],
-      "evidence_ids": ["MM_SCORE_001", "MM_LLM_001"],
+      "claim_ids": [
+        "CLAIM_MM_002"
+      ],
+      "evidence_ids": [
+        "MM_SCORE_001",
+        "MM_LLM_001"
+      ],
       "wording": "Separated deterministic scoring from an optional LLM narrative layer instructed not to alter scores, thresholds, status, or scenario calculations.",
-      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
-      "capabilities": ["deterministic scoring logic", "bounded LLM integration"],
-      "status": "OPTIONAL",
-      "human_approval": false
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Data Operations"
+      ],
+      "capabilities": [
+        "deterministic scoring logic",
+        "bounded LLM integration"
+      ],
+      "status": "ACTIVE",
+      "human_approval": true
     },
     {
       "module_id": "MOD_MM_003_INTEGRATION",
-      "module_type": "BULLET",
+      "module_type": "PROJECT_BULLET",
       "experience_id": "EXP_MM_001",
-      "claim_ids": ["CLAIM_MM_003"],
-      "evidence_ids": ["MM_PLACES_001", "MM_CENSUS_001"],
+      "claim_ids": [
+        "CLAIM_MM_003"
+      ],
+      "evidence_ids": [
+        "MM_PLACES_001",
+        "MM_CENSUS_001"
+      ],
       "wording": "Integrated Google Places nearby-search and U.S. Census ACS demographic data into a coffee-shop market-screening workflow.",
-      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations", "Digital Solutions"],
-      "capabilities": ["REST/API integration", "Census/public-data integration"],
-      "status": "OPTIONAL",
-      "human_approval": false
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Data Operations",
+        "Digital Solutions"
+      ],
+      "capabilities": [
+        "REST/API integration",
+        "Census/public-data integration"
+      ],
+      "status": "ACTIVE",
+      "human_approval": true
     },
     {
       "module_id": "MOD_MM_004_CONTROLS",
-      "module_type": "BULLET",
+      "module_type": "PROJECT_BULLET",
       "experience_id": "EXP_MM_001",
-      "claim_ids": ["CLAIM_MM_004"],
-      "evidence_ids": ["MM_GEOFENCE_001", "MM_RATELIMIT_001", "MM_FALLBACK_001"],
+      "claim_ids": [
+        "CLAIM_MM_004"
+      ],
+      "evidence_ids": [
+        "MM_GEOFENCE_001",
+        "MM_RATELIMIT_001",
+        "MM_FALLBACK_001"
+      ],
       "wording": "Implemented a 3.5-mile geofence, a local 50-request daily limit, and retry with degraded stub fallback for failed Places or Census fetches.",
-      "allowed_role_families": ["Business Systems", "Implementation", "Technical Operations"],
-      "capabilities": ["operational controls", "failure/degradation handling"],
-      "status": "OPTIONAL",
-      "human_approval": false
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Technical Operations"
+      ],
+      "capabilities": [
+        "operational controls",
+        "failure/degradation handling"
+      ],
+      "status": "ACTIVE",
+      "human_approval": true
     },
     {
       "module_id": "MOD_MM_005_TESTING",
-      "module_type": "BULLET",
+      "module_type": "PROJECT_BULLET",
       "experience_id": "EXP_MM_001",
-      "claim_ids": ["CLAIM_MM_005"],
-      "evidence_ids": ["MM_TEST_001"],
+      "claim_ids": [
+        "CLAIM_MM_005"
+      ],
+      "evidence_ids": [
+        "MM_TEST_001"
+      ],
       "wording": "Built an automated pytest suite covering the MarketMind screening pipeline.",
-      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
-      "capabilities": ["validation/testing"],
-      "status": "OPTIONAL",
-      "human_approval": false
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Data Operations"
+      ],
+      "capabilities": [
+        "validation/testing"
+      ],
+      "status": "ACTIVE",
+      "human_approval": true
     }
   ]
 }

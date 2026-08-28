@@ -82,9 +82,13 @@ BORA_APPROVED_WORDINGS = {
 }
 
 
-# Master stores exact Bora-approved wording unchanged
+# Master stores exact Bora-approved Winter Walk wording unchanged (the master
+# also legitimately carries approved MarketMind PROJECT_BULLET modules from
+# a later milestone; this file only asserts Winter Walk content).
 for module in MASTER["modules"]:
     module_id = module["module_id"]
+    if not module_id.startswith("MOD_WW_"):
+        continue
     expected = BORA_APPROVED_WORDINGS.get(module_id)
     assert_true(expected is not None, f"missing approved wording fixture for {module_id}")
     assert_true(
@@ -105,12 +109,14 @@ assert_true(MASTER.get("protected") is True, "master must remain protected")
 print("PASS: real Winter Walk master validates.")
 
 
-# Every module resolves to EXP_WW_001 with reusable claim lineage
+# Every Winter Walk module resolves to EXP_WW_001; every module (Winter Walk
+# and any other approved module) passes real lineage/semantic/style validation.
 for module in MASTER["modules"]:
-    assert_true(
-        module.get("experience_id") == "EXP_WW_001",
-        f"{module['module_id']} must reference EXP_WW_001",
-    )
+    if module["module_id"].startswith("MOD_WW_"):
+        assert_true(
+            module.get("experience_id") == "EXP_WW_001",
+            f"{module['module_id']} must reference EXP_WW_001",
+        )
     module_result = validate_resume_module(
         module,
         claim_index=CLAIM_INDEX,

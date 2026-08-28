@@ -1,8 +1,13 @@
-"""Bounded tests for MarketMind résumé-module drafting (MARKETMIND_RESUME_MODULE_DRAFTING_V1).
+"""Bounded tests for MarketMind résumé-module drafting/approval history.
 
-These modules are DRAFTS. They are deliberately kept out of
-resume/master/RESUME_MASTER_WW_V1.json so no derivative-build or export
-pipeline can reach them regardless of any approval flag on this draft file.
+Covers MARKETMIND_RESUME_MODULE_DRAFTING_V1 and its supersession by
+MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1: the five
+modules were drafted, refined, explicitly approved by Bora, and then
+integrated into resume/master/RESUME_MASTER_WW_V1.json. This file's
+draft record (resume/drafts/) is preserved as a historical/audit
+artifact and is not itself consumed by any résumé-generation or export
+path; production reachability is covered by
+tests/marketmind_resume_module_approval_test.py.
 """
 
 from __future__ import annotations
@@ -93,27 +98,27 @@ EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]
 
 
-# A. Draft file exists, is container-level DRAFT_PENDING_HUMAN_REVIEW / not approved
+# A. Draft file exists as the historical/audit record: Bora explicitly approved
+#    all five, and they were integrated into the protected master.
 draft = json.loads(DRAFT_PATH.read_text(encoding="utf-8"))
-assert_true(draft["status"] == "DRAFT_PENDING_HUMAN_REVIEW", "A: draft set must be pending review")
-assert_true(draft["human_approval"] is False, "A: draft set must not be human-approved")
+assert_true(
+    draft["status"] == "APPROVED_AND_INTEGRATED_INTO_MASTER",
+    "A: draft set must record approved-and-integrated status",
+)
+assert_true(draft["human_approval"] is True, "A: draft set must record Bora's approval")
 assert_true(draft["experience_id"] == "EXP_MM_001", "A: draft set must reference EXP_MM_001")
-print("PASS A: draft set is pending human review, not approved.")
+print("PASS A: draft set records Bora's approval and master integration.")
 
 
-# B. Exactly 3-5 modules, each with human_approval=false at module level
+# B. Exactly 3-5 modules, each recording Bora's approval at module level
 modules = draft["modules"]
 assert_true(3 <= len(modules) <= 5, f"B: expected 3-5 modules, got {len(modules)}")
 for module in modules:
     assert_true(
-        module.get("human_approval") is False,
-        f"B: {module['module_id']} must not be human-approved",
+        module.get("human_approval") is True,
+        f"B: {module['module_id']} must record Bora's approval",
     )
-    assert_true(
-        module.get("status") != "ACTIVE",
-        f"B: {module['module_id']} must not be marked ACTIVE (reserved for approved master content)",
-    )
-print(f"PASS B: {len(modules)} draft modules present, none human-approved or ACTIVE.")
+print(f"PASS B: {len(modules)} draft-history modules present, all recording Bora's approval.")
 
 
 # C. Every module traces exclusively to approved MarketMind Claim_ID(s) and their
@@ -182,38 +187,37 @@ assert_true(
 print("PASS F: OBSERVED testing claim not turned into a stronger performance assertion.")
 
 
-# G. Draft modules are NOT reachable from the protected master (structural
-#    unreachability, not merely a status flag)
+# G. Draft-history wording is byte-identical to what was integrated into the
+#    protected master -- no divergence between the two records.
 master = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
-master_module_ids = {m["module_id"] for m in master["modules"]}
-draft_module_ids = {m["module_id"] for m in modules}
-assert_true(
-    master_module_ids.isdisjoint(draft_module_ids),
-    "G: draft module IDs must not appear in the protected master",
-)
-master_experience_ids = {s["experience_id"] for s in master["experience_sections"]}
-assert_true(
-    "EXP_MM_001" not in master_experience_ids,
-    "G: protected master must not reference EXP_MM_001 yet",
-)
-print("PASS G: draft modules are structurally absent from the protected master.")
+master_by_id = {m["module_id"]: m for m in master["modules"]}
+for module in modules:
+    master_module = master_by_id.get(module["module_id"])
+    assert_true(
+        master_module is not None,
+        f"G: {module['module_id']} must be present in the protected master",
+    )
+    assert_true(
+        master_module["wording"] == module["wording"],
+        f"G: {module['module_id']} draft-history wording diverges from master wording",
+    )
+print("PASS G: draft-history wording matches the integrated master wording exactly (no divergence).")
 
 
-# H. Winter Walk claims, MarketMind claims, evidence, experiences, and the
-#    protected master are byte-unchanged by this milestone.
+# H. Winter Walk claims and MarketMind claims are byte-unchanged by this
+#    milestone (the protected master legitimately changed; that is covered
+#    by tests/marketmind_resume_module_approval_test.py).
 ww_hashes_before = {name: sha256_file(WW_CLAIMS_ROOT / name) for name in WINTER_WALK_CLAIM_FILES}
 mm_hashes_before = {
     f"CLAIM_MM_{i:03d}.json": sha256_file(MM_CLAIMS_ROOT / f"CLAIM_MM_{i:03d}.json")
     for i in range(1, 6)
 }
-master_hash_before = sha256_file(MASTER_PATH)
 
 for name, digest in ww_hashes_before.items():
     assert_true(sha256_file(WW_CLAIMS_ROOT / name) == digest, f"H: Winter Walk claim mutated: {name}")
 for name, digest in mm_hashes_before.items():
     assert_true(sha256_file(MM_CLAIMS_ROOT / name) == digest, f"H: MarketMind claim mutated: {name}")
-assert_true(sha256_file(MASTER_PATH) == master_hash_before, "H: protected master mutated")
-print("PASS H: Winter Walk claims, MarketMind claims, and protected master unchanged.")
+print("PASS H: Winter Walk claims and MarketMind claims unchanged.")
 
 
 # I. Repository counts unchanged (claim drafting created no new Claim/Evidence/Experience)

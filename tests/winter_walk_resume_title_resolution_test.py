@@ -154,8 +154,10 @@ assert_true(
 print("PASS G: Experience/Evidence records unchanged.")
 
 
-# H. Six approved module wordings unchanged
+# H. Six approved Winter Walk module wordings unchanged
 for module in MASTER["modules"]:
+    if module["module_id"] not in BORA_APPROVED_WORDINGS:
+        continue
     expected = BORA_APPROVED_WORDINGS[module["module_id"]]
     assert_true(module.get("wording") == expected, f"{module['module_id']} wording changed")
 print("PASS H: six approved module wordings unchanged.")
