@@ -59,17 +59,17 @@ def error_codes(result: dict) -> list[str]:
 # ---------------------------------------------------------------------------
 real = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(real["valid"] is True, "real Experience Registry failed")
-assert_true(real["records_checked"] == 1, f"expected 1 record, got {real['records_checked']}")
+assert_true(real["records_checked"] == 2, f"expected 2 records, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted Experience index missing")
 assert_true(
-    list(real["index"].keys()) == ["EXP_WW_001"],
+    list(real["index"].keys()) == ["EXP_MM_001", "EXP_WW_001"],
     f"unexpected Experience_ID set: {list(real['index'].keys())}",
 )
 assert_true(
     real["index"]["EXP_WW_001"]["experience_type"] == "ORGANIZATIONAL_ENGAGEMENT",
     "EXP_WW_001 experience_type mismatch",
 )
-print("PASS 1: real Experience Registry (EXP_WW_001) passed.")
+print("PASS 1: real Experience Registry (EXP_MM_001, EXP_WW_001) passed.")
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,21 @@
+{
+  "evidence_id": "MM_GEOFENCE_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The live analysis adapter enforces a maximum geofence distance of 3.5 miles from the configured analysis center before rejecting out-of-range coordinates.",
+  "capabilities": [
+    "validation/testing"
+  ],
+  "technologies": [
+    "Python"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "pipeline/live_adapter.py MAX_GEOFENCE_MILES = 3.5; distance check before bundle assembly",
+  "safe_for_external_use": true,
+  "notes": "Geographic bound for live screening workflow.",
+  "limitations": [
+    "Applies to configured live adapter behavior",
+    "Does not prove nationwide or enterprise geographic coverage"
+  ],
+  "workflow_stage": "build"
+}

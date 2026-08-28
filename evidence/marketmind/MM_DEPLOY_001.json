@@ -1,0 +1,20 @@
+{
+  "evidence_id": "MM_DEPLOY_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "On 2026-08-28, the README-linked Streamlit deployment URL https://marketmind-ai-z47gznxwymayw5nyaegfvu.streamlit.app/ returned HTTP 200 and was accessible; an older phase deployment URL (marketmind-ai-graersee39mjsxx57h7fed.streamlit.app) returned HTTP 404 on the same date.",
+  "capabilities": [],
+  "technologies": [
+    "Streamlit"
+  ],
+  "evidence_state": "OBSERVED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "README.md Quick links live application URL; HTTP HEAD/GET verification 2026-08-28",
+  "safe_for_external_use": true,
+  "notes": "Observed accessibility on one date only. Legacy URL is stale.",
+  "limitations": [
+    "Does not prove production deployment",
+    "Does not prove customer usage, uptime SLA, or ongoing availability",
+    "Current liveness beyond verification date is UNKNOWN"
+  ],
+  "workflow_stage": "deployment"
+}

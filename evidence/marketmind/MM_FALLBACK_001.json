@@ -1,0 +1,22 @@
+{
+  "evidence_id": "MM_FALLBACK_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "External data fetch failures use retry attempts and, on exhaustion, return degraded stub payloads rather than failing the entire pipeline; this is implemented in pipeline/circuit_breaker.py as retry plus degraded stub fallback, not a classical open/half-open/closed circuit-breaker state model.",
+  "capabilities": [
+    "failure/degradation handling"
+  ],
+  "technologies": [
+    "Python",
+    "tenacity"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "pipeline/circuit_breaker.py fetch_competitors_with_retry() and fetch_census_with_retry(); _GOOGLE_FAILURE_STUB and _CENSUS_FAILURE_STUB",
+  "safe_for_external_use": true,
+  "notes": "File is named circuit_breaker.py but behavior is retry with degraded stubs.",
+  "limitations": [
+    "Not a classical circuit-breaker pattern",
+    "Degraded stubs may reduce data completeness without halting the UI"
+  ],
+  "workflow_stage": "build"
+}

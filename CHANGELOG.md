@@ -19,6 +19,35 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — MarketMind Evidence Extraction v1 (IMPLEMENTED_PENDING_HUMAN_REVIEW)
+
+**Reason**
+
+Ingest MarketMind AI project facts from verified primary artifacts into the evidence-controlled architecture without creating Claims or résumé outputs.
+
+**Changed**
+
+* `experiences/EXP_MM_001.json` — MarketMind identity (`PERSONAL_PROJECT`).
+* `evidence/marketmind/MM_SCOPE_001.json` through `MM_AUTHOR_001.json` — 12 bounded evidence records.
+* `tests/marketmind_evidence_extraction_test.py`; regression count updates in integrity tests.
+* `CURRENT_STATE.md`, `CHANGELOG.md`.
+
+**Affected Areas**
+
+* Experience registry, Evidence repository, integrity tests, milestone docs.
+
+**Tests / Verification**
+
+* Full established test suites (23) — PASS
+* Golden runner (15/15) — PASS
+* Winter Walk records, six approved Claims, protected master — unchanged.
+
+**Status**
+
+IMPLEMENTED_PENDING_HUMAN_REVIEW
+
+---
+
 ## 2026-08-28 — Close Winter Walk contact block resolution v1 (CLOSED)
 
 **Reason**

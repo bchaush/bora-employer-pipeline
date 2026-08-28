@@ -1,0 +1,17 @@
+{
+  "evidence_id": "MM_BOUNDARY_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "Project documentation and UI explicitly frame MarketMind as a preliminary market-screening prototype whose scores are heuristics for screening and are not empirically validated predictors of business success, profitability, or investment outcomes.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "README.md opening paragraphs; app.py caption \"Coffee-shop preliminary market-screening prototype\"",
+  "safe_for_external_use": true,
+  "notes": "Boundary language protects against production or predictive-validity inflation in downstream claims.",
+  "limitations": [
+    "Documentation boundary only",
+    "Does not by itself prove implementation completeness"
+  ],
+  "workflow_stage": "requirements"
+}

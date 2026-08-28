@@ -1,0 +1,22 @@
+{
+  "evidence_id": "MM_SCORE_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The application computes deterministic, configuration-driven screening scores via scoring_engine.score() using weights from config/scoring_weights.json before any LLM narrative is generated.",
+  "capabilities": [
+    "deterministic scoring logic",
+    "configuration-driven logic"
+  ],
+  "technologies": [
+    "Python"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "scoring_engine/scoring_engine.py score(); config/scoring_weights.json; app.py _run_pipeline_from_bundle() lines 54-61",
+  "safe_for_external_use": true,
+  "notes": "Pipeline order shows scoring precedes analyst payload build and UI adaptation.",
+  "limitations": [
+    "Scores are configured heuristics for screening",
+    "Does not prove predictive accuracy or business outcomes"
+  ],
+  "workflow_stage": "build"
+}

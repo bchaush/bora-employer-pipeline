@@ -1,0 +1,22 @@
+{
+  "evidence_id": "MM_LLM_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "After deterministic scores are produced, an optional Anthropic LLM layer generates narrative explanation via generate_report(); the SYSTEM_PROMPT instructs the model that it cannot alter official scores, thresholds, status, or scenario calculations.",
+  "capabilities": [
+    "bounded LLM integration"
+  ],
+  "technologies": [
+    "Python",
+    "Anthropic API"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "app.py generate_report() call after _run_pipeline_from_bundle(); report_engine/llm_analyst.py generate_report(); report_engine/prompt_builder.py SYSTEM_PROMPT lines 95-97",
+  "safe_for_external_use": true,
+  "notes": "LLM provides explanation layer with fallback paths; it does not replace deterministic scoring.",
+  "limitations": [
+    "Not autonomous decision-making or model-driven scoring",
+    "Does not validate correctness of the underlying market model"
+  ],
+  "workflow_stage": "build"
+}

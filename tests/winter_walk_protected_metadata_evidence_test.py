@@ -90,7 +90,7 @@ ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(ev_result["records_checked"] == 14, "expected 14 evidence records")
+assert_true(ev_result["records_checked"] == 26, "expected 26 evidence records")
 assert_true("WW_OFFER_001" in ev_result["index"], "WW_OFFER_001 missing from trusted index")
 
 

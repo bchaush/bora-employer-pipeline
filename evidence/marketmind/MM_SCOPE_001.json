@@ -1,0 +1,23 @@
+{
+  "evidence_id": "MM_SCOPE_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "MarketMind AI is implemented as a Python Streamlit application scoped as a preliminary market-screening prototype for coffee shops; the live UI business type is fixed to coffee_shop.",
+  "capabilities": [
+    "Python application development"
+  ],
+  "technologies": [
+    "Python",
+    "Streamlit"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "app.py (Streamlit imports and UI); requirements.txt (streamlit==1.61.1); ui/live_scope.py LIVE_BUSINESS_TYPE = \"coffee_shop\"; tests/test_live_scope.py",
+  "safe_for_external_use": true,
+  "notes": "Identity/scope fact only. Does not prove predictive validity, production use, or enterprise deployment.",
+  "limitations": [
+    "Preliminary screening prototype only",
+    "Coffee-shop scope only in live UI",
+    "Not a validated site-selection or investment system"
+  ],
+  "workflow_stage": "build"
+}

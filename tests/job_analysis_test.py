@@ -53,8 +53,8 @@ def load_bsa_fixture() -> dict:
 exp = validate_experience_repository()
 ev = validate_evidence_repository()
 cl = validate_claim_repository()
-assert_true(exp["valid"] is True and exp["records_checked"] == 1, "Experience regression")
-assert_true(ev["valid"] is True and ev["records_checked"] == 14, "Evidence regression")
+assert_true(exp["valid"] is True and exp["records_checked"] == 2, "Experience regression")
+assert_true(ev["valid"] is True and ev["records_checked"] == 26, "Evidence regression")
 assert_true(
     ev["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
     "Evidence Experience integrity",

@@ -1,0 +1,28 @@
+{
+  "evidence_id": "MM_TEST_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The repository contains an automated pytest suite with 35 test_*.py modules and 187 tests collected; a verification run on 2026-08-28 using the project .venv311 reported 186 passed and 1 failed (tests/test_live_bundle_assembler.py::test_assemble_top_level_keys_match_mock_contract).",
+  "capabilities": [
+    "validation/testing"
+  ],
+  "technologies": [
+    "pytest",
+    "Python"
+  ],
+  "evidence_state": "OBSERVED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "tests/ directory; verification run 2026-08-28 via .venv311: pytest --collect-only (187 collected) and pytest -q (186 passed, 1 failed)",
+  "safe_for_external_use": true,
+  "notes": "Test-state observation from a single verification run. External MarketMind project was not modified during evidence extraction.",
+  "limitations": [
+    "Does not claim all tests pass",
+    "Single-run observation; failure cause not diagnosed in this milestone",
+    "Not proof of production reliability or user adoption"
+  ],
+  "workflow_stage": "validation",
+  "tests": [
+    "pytest collection: 187 tests",
+    "pytest run 2026-08-28: 186 passed / 1 failed",
+    "failed: tests/test_live_bundle_assembler.py::test_assemble_top_level_keys_match_mock_contract"
+  ]
+}

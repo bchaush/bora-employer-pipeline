@@ -1,0 +1,25 @@
+{
+  "evidence_id": "MM_CENSUS_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The project implements U.S. Census ACS demographic integration with structured models, geographic-level handling, and retry-enabled fetch logic.",
+  "capabilities": [
+    "Census/public-data integration",
+    "structured-data integration",
+    "REST/API integration"
+  ],
+  "technologies": [
+    "Python",
+    "requests",
+    "Census ACS API"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "data_layer/census_api.py CensusData model; fetch_census_demographics(); tenacity retry configuration",
+  "safe_for_external_use": true,
+  "notes": "Code includes geography-level and fallback behavior; completeness varies by location.",
+  "limitations": [
+    "Geographic coverage and fallback behavior are location-dependent",
+    "Does not prove complete census coverage at every coordinate"
+  ],
+  "workflow_stage": "build"
+}

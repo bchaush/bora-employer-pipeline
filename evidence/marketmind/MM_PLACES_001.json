@@ -1,0 +1,24 @@
+{
+  "evidence_id": "MM_PLACES_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The project implements Google Places API (New) nearby-search integration to fetch competitor place data for screening inputs.",
+  "capabilities": [
+    "REST/API integration",
+    "structured-data integration"
+  ],
+  "technologies": [
+    "Google Places API",
+    "Python",
+    "requests"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "data_layer/google_places.py BASE_URL = \"https://places.googleapis.com/v1/places:searchNearby\"; NEARBY_SEARCH_MAX_RESULTS = 20",
+  "safe_for_external_use": true,
+  "notes": "Integration code exists; runtime behavior depends on API key and live query parameters.",
+  "limitations": [
+    "Nearby Search returns at most 20 places per request",
+    "Does not prove unrestricted API coverage or enterprise Maps expertise"
+  ],
+  "workflow_stage": "build"
+}

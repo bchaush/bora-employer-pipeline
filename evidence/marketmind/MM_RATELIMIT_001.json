@@ -1,0 +1,22 @@
+{
+  "evidence_id": "MM_RATELIMIT_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The project implements a local daily request counter with DAILY_LIMIT = 50 using an on-disk JSON counter file that resets at local midnight.",
+  "capabilities": [
+    "failure/degradation handling",
+    "configuration-driven logic"
+  ],
+  "technologies": [
+    "Python"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "marketmind-ai repository (https://github.com/bchaush/marketmind-ai)",
+  "source_location": "pipeline/rate_limiter.py DAILY_LIMIT = 50; _COUNTER_FILE = Path(\"cache/rate_limit_counter.json\")",
+  "safe_for_external_use": true,
+  "notes": "This is a local application counter, not a cloud-provider quota system.",
+  "limitations": [
+    "Local file-based counter only",
+    "Not enterprise quota management or cloud-provider rate governance"
+  ],
+  "workflow_stage": "build"
+}

@@ -73,10 +73,10 @@ SECTION = MASTER["experience_sections"][0]
 
 experience_result = validate_experience_repository()
 assert_true(experience_result["valid"] is True, "experience repository invalid")
-assert_true(len(experience_result["index"]) == 1, "Experience count must remain 1")
+assert_true(len(experience_result["index"]) == 2, "Experience count must be 2 after MarketMind ingestion")
 evidence_result = validate_evidence_repository(experience_result=experience_result)
 assert_true(evidence_result["valid"] is True, "evidence repository invalid")
-assert_true(len(evidence_result["index"]) == 14, "Evidence count must remain 14")
+assert_true(len(evidence_result["index"]) == 26, "Evidence count must be 26 after MarketMind ingestion")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 6, "Claims count must remain 6")

@@ -51,6 +51,23 @@ EXPECTED_WW_IDS = [
     "WW_TEST_001",
 ]
 
+EXPECTED_MM_IDS = [
+    "MM_AUTHOR_001",
+    "MM_BOUNDARY_001",
+    "MM_CENSUS_001",
+    "MM_DEPLOY_001",
+    "MM_FALLBACK_001",
+    "MM_GEOFENCE_001",
+    "MM_LLM_001",
+    "MM_PLACES_001",
+    "MM_RATELIMIT_001",
+    "MM_SCOPE_001",
+    "MM_SCORE_001",
+    "MM_TEST_001",
+]
+
+EXPECTED_ALL_IDS = sorted(EXPECTED_WW_IDS + EXPECTED_MM_IDS)
+
 
 def assert_true(condition: bool, message: str) -> None:
     if not condition:
@@ -109,11 +126,11 @@ def write_temp_experience_root(base: Path, experience_id: str = "EXP_TEST_001") 
 # PASS 1 — AUTHORITATIVE: current real repository
 # ---------------------------------------------------------------------------
 real = validate_evidence_repository(EVIDENCE_ROOT)
-assert_true(real["valid"] is True, "current Winter Walk evidence repository failed")
-assert_true(real["records_checked"] == 14, f"expected 14 records, got {real['records_checked']}")
+assert_true(real["valid"] is True, "current evidence repository failed")
+assert_true(real["records_checked"] == 26, f"expected 26 records, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
-    sorted(real["index"].keys()) == EXPECTED_WW_IDS,
+    sorted(real["index"].keys()) == EXPECTED_ALL_IDS,
     f"unexpected Evidence_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
@@ -124,7 +141,7 @@ assert_true(
     EXPERIENCE_REGISTRY_STATUS == EXPERIENCE_REFERENCE_STATUS,
     "status alias drifted",
 )
-print("PASS 1 [AUTHORITATIVE]: current real Winter Walk evidence repository (14 records) passed.")
+print("PASS 1 [AUTHORITATIVE]: current real evidence repository (26 records) passed.")
 
 
 # ---------------------------------------------------------------------------

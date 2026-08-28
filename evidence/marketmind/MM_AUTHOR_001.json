@@ -1,0 +1,20 @@
+{
+  "evidence_id": "MM_AUTHOR_001",
+  "experience_id": "EXP_MM_001",
+  "fact": "The GitHub repository github.com/bchaush/marketmind-ai lists bchaush as the sole contributor (21 commits) as observed during evidence extraction on 2026-08-28.",
+  "capabilities": [],
+  "technologies": [
+    "GitHub"
+  ],
+  "evidence_state": "OBSERVED",
+  "original_source": "GitHub repository contributors API for bchaush/marketmind-ai",
+  "source_location": "https://api.github.com/repos/bchaush/marketmind-ai/contributors — sole entry login bchaush, contributions 21 (observed 2026-08-28)",
+  "safe_for_external_use": true,
+  "notes": "Repository contribution signal only.",
+  "limitations": [
+    "Does not prove formal employment, client engagement, organizational role, or paid work",
+    "Does not prove sole intellectual authorship of every idea",
+    "Does not prove absence of AI assistance or uncommitted collaborators"
+  ],
+  "workflow_stage": "build"
+}

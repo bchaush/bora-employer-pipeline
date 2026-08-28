@@ -28,9 +28,9 @@ Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) = **CLOSED**.
 
 Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) = **CLOSED**.
 
-Canonical Experience records: **1** (`EXP_WW_001`).
+Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
-Evidence records: **14** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata).
+Evidence records: **26** — 14 Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata) plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`).
 
 Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
 
@@ -301,12 +301,45 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval before job-specific tailoring or additional experience sections.
+1. Human review of MarketMind Evidence records before Claim drafting.
+2. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
 
-Do not begin job-specific résumé generation, rendering/export, or additional experience sections without explicit approval.
+Do not begin MarketMind Claim drafting, résumé modules, job-specific résumé generation, rendering/export, or additional experience sections without explicit approval.
 
 ## Next Approved Task
 
-`CONTACT_BLOCK_RESOLUTION_V1` closed. No next milestone started.
+`MARKETMIND_EVIDENCE_EXTRACTION_V1` — implemented pending human review.
+
+---
+
+## 2026-08-28 — MarketMind Evidence Extraction v1 (IMPLEMENTED — PENDING HUMAN REVIEW)
+
+**Reason**
+
+Ingest MarketMind AI as an evidence-controlled project using only facts supported by verified primary artifacts from the marketmind-ai repository.
+
+**Changed**
+
+* Added canonical `experiences/EXP_MM_001.json` (`PERSONAL_PROJECT`; identity only).
+* Added 12 MarketMind Evidence records under `evidence/marketmind/` (`MM_SCOPE_001`–`MM_AUTHOR_001`).
+* Added `tests/marketmind_evidence_extraction_test.py`.
+* Updated repository regression counts in related integrity tests.
+
+**Not changed**
+
+* No Claims, résumé modules, résumé patches, or protected master content.
+* Winter Walk Experience/Evidence/Claims unchanged.
+* Schemas unchanged.
+
+**Verification**
+
+* 23/23 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository after ingestion: 2 Experience / 26 Evidence / 6 reusable Claims.
+
+**Status**
+
+`MARKETMIND_EVIDENCE_EXTRACTION_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW`
+
