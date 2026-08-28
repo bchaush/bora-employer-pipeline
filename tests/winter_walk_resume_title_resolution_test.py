@@ -27,7 +27,6 @@ from resume_title_metadata import (  # noqa: E402
     validate_experience_title_metadata,
 )
 from resume_validation import (  # noqa: E402
-    approve_derivative_for_export,
     build_resume_derivative,
     validate_resume_master,
 )
@@ -162,7 +161,7 @@ for module in MASTER["modules"]:
 print("PASS H: six approved module wordings unchanged.")
 
 
-# I. Export remains blocked because contact is unresolved
+# I. Contact metadata no longer blocks protected-metadata export readiness
 master_result = validate_resume_master(
     MASTER,
     claim_index=claim_result["index"],
@@ -185,28 +184,16 @@ derivative_result = build_resume_derivative(
 )
 assert_true(derivative_result["valid"] is True, "derivative should build")
 derivative = derivative_result["derivative"]
-export_attempt = approve_derivative_for_export(
-    derivative=derivative,
-    master=MASTER,
-    claim_index=claim_result["index"],
-    evidence_index=ev_result["index"],
-    human_approval=True,
-)
-assert_false(export_attempt["valid"], "export must remain blocked with unresolved contact")
-assert_true(
-    any(error.get("field") == "contact.name" for error in export_attempt["errors"]),
-    "contact.name must block export",
-)
+from resume_protected_metadata import validate_protected_metadata_resolved  # noqa: E402
+
+metadata_result = validate_protected_metadata_resolved(derivative)
+assert_true(metadata_result["valid"] is True, "protected metadata must pass with resolved contact")
 assert_false(
-    any(
-        error.get("field", "").endswith("formal_title")
-        for error in export_attempt["errors"]
-        if error.get("code") == "UNRESOLVED_PROTECTED_METADATA"
-    ),
-    "approved display title must not leave formal_title blocking export",
+    any(error.get("field") == "contact.name" for error in metadata_result["errors"]),
+    "contact.name must not block protected metadata",
 )
-assert_true(derivative.get("export_allowed") is False, "export_allowed must remain false")
-print("PASS I: export remains blocked because contact is unresolved.")
+assert_true(derivative.get("export_allowed") is False, "export_allowed must remain false before approval")
+print("PASS I: contact metadata resolved; protected-metadata export readiness passes.")
 
 
 print("PASS: Winter Walk resume title resolution tests complete.")

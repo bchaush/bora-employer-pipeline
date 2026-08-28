@@ -256,8 +256,24 @@ assert_true(
     "master notes must record explicit Bora approval event",
 )
 assert_true(
-    MASTER["contact"]["name"] == "PENDING_BORA_REVIEW",
-    "contact block must remain unresolved",
+    MASTER["contact"]["name"] == "Bora Chaush",
+    "contact name must be Bora-confirmed",
+)
+assert_true(
+    MASTER["contact"]["email"] == "bchaush@brandeis.edu",
+    "contact email must be Bora-confirmed",
+)
+assert_true(
+    MASTER["contact"]["phone"] == "+1 857 919 8421",
+    "contact phone must be Bora-confirmed",
+)
+assert_true(
+    MASTER["contact"]["location"] == "Boston, MA",
+    "contact location must be Bora-confirmed",
+)
+assert_true(
+    MASTER["contact"]["linkedin"] == "linkedin.com/in/bora-chaush-msba",
+    "contact linkedin must be Bora-confirmed",
 )
 assert_true(
     MASTER["experience_sections"][0]["formal_title"] == "PENDING_BORA_REVIEW",
@@ -275,6 +291,6 @@ assert_true(
     MASTER["experience_sections"][0]["employment_category"] == "INTERNSHIP",
     "employment category must be INTERNSHIP per WW_OFFER_001",
 )
-print("PASS: Bora module wording approval recorded; title resolved via display label; contact pending.")
+print("PASS: Bora module wording approval recorded; title resolved via display label; contact resolved.")
 
 print("PASS: master resume Winter Walk v1 real-content tests complete.")

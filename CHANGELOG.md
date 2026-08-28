@@ -19,6 +19,40 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Winter Walk contact block resolution v1 (IMPLEMENTED_PENDING_ADVERSARIAL_REVIEW)
+
+**Reason**
+
+Replace unresolved protected contact metadata in `RESUME_MASTER_WW_V1` with Bora-confirmed identity facts for résumé use.
+
+**Changed**
+
+* `resume/master/RESUME_MASTER_WW_V1.json` version 5: contact block resolved from Bora-confirmed name, email, phone, location, and LinkedIn.
+* GitHub not stored (not in `resume_immutable_contact` schema).
+* Protected-metadata export gate no longer blocked by unresolved `contact.name`.
+* Experience/Evidence/Claims, six module wordings, and title metadata unchanged.
+* Tests: `tests/winter_walk_contact_resolution_test.py`; updates to related Winter Walk résumé tests.
+
+**Affected Areas**
+
+* `resume/master/RESUME_MASTER_WW_V1.json`
+* `tests/winter_walk_contact_resolution_test.py`
+* `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_resume_title_resolution_test.py`, `tests/resume_export_protected_metadata_test.py`, `tests/resume_module_display_title_binding_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/winter_walk_contact_resolution_test.py` — PASS
+* 22/22 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+IMPLEMENTED_PENDING_ADVERSARIAL_REVIEW
+
+---
+
 ## 2026-08-28 — Close Winter Walk résumé title resolution v1 (CLOSED)
 
 **Reason**

@@ -1,13 +1,13 @@
 {
   "master_id": "RESUME_MASTER_WW_V1",
-  "version": "4",
+  "version": "5",
   "protected": true,
   "contact": {
-    "name": "PENDING_BORA_REVIEW",
-    "email": null,
-    "phone": null,
-    "location": null,
-    "linkedin": null
+    "name": "Bora Chaush",
+    "email": "bchaush@brandeis.edu",
+    "phone": "+1 857 919 8421",
+    "location": "Boston, MA",
+    "linkedin": "linkedin.com/in/bora-chaush-msba"
   },
   "education": [],
   "modules": [
@@ -209,5 +209,5 @@
     "UAT documentation"
   ],
   "date": "2026-08-28",
-  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 4. WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE through MOD_WW_006_PROCESS (wording unchanged). TITLE_RESOLVED: source contractual position Intern; source functional role AI Researcher and Developer; human-approved display title AI Researcher & Developer Intern (not source-verbatim formal title); formal_title remains PENDING_BORA_REVIEW. METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP via WW_OFFER_001; exact end day unresolved. contact PENDING_BORA_REVIEW. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. Not a submitted résumé; no derivative export approved."
+  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 5. WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE through MOD_WW_006_PROCESS (wording unchanged). TITLE_RESOLVED: source contractual position Intern; source functional role AI Researcher and Developer; human-approved display title AI Researcher & Developer Intern (not source-verbatim formal title); formal_title remains PENDING_BORA_REVIEW. CONTACT_RESOLVED: Bora explicitly confirmed contact block on 2026-08-28 (name Bora Chaush; email bchaush@brandeis.edu; phone +1 857 919 8421; location Boston, MA; linkedin linkedin.com/in/bora-chaush-msba). GitHub not stored (not in contact schema). METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP via WW_OFFER_001; exact end day unresolved. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. Not a submitted résumé; no derivative export approved."
 }

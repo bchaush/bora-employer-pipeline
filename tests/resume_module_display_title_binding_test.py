@@ -204,46 +204,28 @@ assert_true(synth_export["valid"] is True, "synthetic export should pass")
 print("PASS 7: resolved source-verbatim formal title path preserved.")
 
 
-# 8. Real Winter Walk master blocked only by unresolved contact
-ww_export = approve_derivative_for_export(
-    derivative=WW_DERIVATIVE,
-    master=WW_MASTER,
-    claim_index=CLAIM_INDEX,
-    evidence_index=EVIDENCE_INDEX,
-    human_approval=True,
+# 8. Real Winter Walk master protected metadata passes with resolved contact
+ww_metadata = validate_protected_metadata_resolved(WW_DERIVATIVE)
+assert_true(ww_metadata["valid"] is True, "WW protected metadata must pass")
+assert_false(
+    any(error.get("field") == "contact.name" for error in ww_metadata["errors"]),
+    "contact must not block protected metadata",
 )
-assert_false(ww_export["valid"], "WW export must remain blocked")
-assert_true(
-    any(error.get("field") == "contact.name" for error in ww_export["errors"]),
-    "contact must be sole blocker",
-)
-assert_false(has_code(ww_export["errors"], "MODULE_DISPLAY_TITLE_MISMATCH"), "title binding ok")
 master_result = validate_resume_master(
     WW_MASTER,
     claim_index=CLAIM_INDEX,
     evidence_index=EVIDENCE_INDEX,
 )
 assert_true(master_result["valid"] is True, "real WW master must validate")
-print("PASS 8: real Winter Walk master blocked only by unresolved contact.")
+print("PASS 8: real Winter Walk master protected metadata passes with resolved contact.")
 
 
-# 9. Synthetic resolved contact + correct display-title binding -> export PASS
-ww_resolved_contact_master = copy.deepcopy(WW_MASTER)
-ww_resolved_contact_master["contact"]["name"] = "Synthetic Resolved Applicant"
-resolved_build = build_resume_derivative(
-    master=ww_resolved_contact_master,
-    patch=identity_patch,
-    claim_index=CLAIM_INDEX,
-    evidence_index=EVIDENCE_INDEX,
-    derivative_id="DERIV_L1_WW_RESOLVED_CONTACT_001",
-)
-assert_true(resolved_build["valid"] is True, "resolved-contact derivative must build")
-resolved_contact = resolved_build["derivative"]
-resolved_meta = validate_protected_metadata_resolved(resolved_contact)
+# 9. Real master contact + correct display-title binding -> export PASS
+resolved_meta = validate_protected_metadata_resolved(WW_DERIVATIVE)
 assert_true(resolved_meta["valid"] is True, "resolved contact + binding should pass metadata")
 resolved_export = approve_derivative_for_export(
-    derivative=resolved_contact,
-    master=ww_resolved_contact_master,
+    derivative=WW_DERIVATIVE,
+    master=WW_MASTER,
     claim_index=CLAIM_INDEX,
     evidence_index=EVIDENCE_INDEX,
     human_approval=True,
@@ -257,14 +239,14 @@ print("PASS 9: resolved contact + correct display-title binding exports.")
 
 
 # 10. Title mutation after derivative build -> blocked
-post_build = copy.deepcopy(resolved_contact)
+post_build = copy.deepcopy(WW_DERIVATIVE)
 first_visible_module(post_build)["immutable_snapshot"]["display_title"] = (
     "Senior AI Research Lead"
 )
 post_build["validation_digest"] = compute_derivative_validation_digest(post_build)
 post_build_export = approve_derivative_for_export(
     derivative=post_build,
-    master=ww_resolved_contact_master,
+    master=WW_MASTER,
     claim_index=CLAIM_INDEX,
     evidence_index=EVIDENCE_INDEX,
     human_approval=True,

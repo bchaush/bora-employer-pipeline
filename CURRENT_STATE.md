@@ -198,25 +198,25 @@ No production engine yet.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
   * Status: **CLOSED**.
-* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**METADATA_PARTIAL_PENDING_CONTACT**):
+* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**METADATA_RESOLVED_PENDING_EXPORT_PIPELINE**):
 
   * First real evidence-controlled résumé module set for `EXP_WW_001` only.
-  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 4).
+  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 5).
   * Six bullets (`MOD_WW_001_SCOPE` through `MOD_WW_006_PROCESS`), one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
   * **Bora explicitly approved exact module wording on 2026-08-28** (recorded in master `notes` as `WORDING_APPROVED`; wording unchanged).
   * Partial metadata resolved via `WW_OFFER_001`: date range `Jun 2026 – Aug 2026`, employment category `INTERNSHIP`; exact end day unresolved (Aug 21 vs Aug 22).
   * Human-approved résumé display title `AI Researcher & Developer Intern` stored separately from source facts; `formal_title` remains `PENDING_BORA_REVIEW` (no source-verbatim formal title).
   * Source title facts preserved on master section: contractual position `Intern`; functional role `AI Researcher and Developer`.
-  * Still unresolved: contact (`PENDING_BORA_REVIEW`).
+  * **Bora-confirmed contact block resolved on 2026-08-28** (name, email, phone, location, LinkedIn stored in protected master contact; GitHub not in schema).
   * Display organization `Winter Walk`; legal organization `Winter Walk, Inc.` documented in Experience notes and Evidence.
-  * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
-  * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_resume_title_resolution_test.py`.
-  * Status: **METADATA_PARTIAL_PENDING_CONTACT** (not CLOSED).
+  * No job-specific tailoring, no PDF/DOCX export pipeline, no other experiences ingested.
+  * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_resume_title_resolution_test.py`, `tests/winter_walk_contact_resolution_test.py`.
+  * Status: **METADATA_RESOLVED_PENDING_EXPORT_PIPELINE** (not CLOSED).
 * Winter Walk Résumé Title Resolution v1 (`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`) (**CLOSED**):
 
   * Minimal architecture extension: `source_contractual_position`, `source_functional_role`, `display_title`, `display_title_approval` on experience sections; `display_title` on module immutable snapshots.
   * `formal_title` sentinel preserved; human-approved display label bound via `approved_display_title` approval metadata (`is_source_verbatim=false`).
-  * Export gate accepts approved display title when source formal title unresolved; contact unresolved still blocks export.
+  * Export gate accepts approved display title when source formal title unresolved.
   * Implementation commit `e3c83a1`; L-1 remediation commit `1ccad88` (module `immutable_snapshot.display_title` bound to section-approved `display_title` via `experience_id`).
   * Claude audit L-1 remediated; Claude final adversarial re-audit: `CLAUDE_WINTER_WALK_RESUME_TITLE_RESOLUTION_V1_FINAL_PASS` (no findings).
   * Experience/Evidence/Claims unchanged; six module wordings unchanged; display-title/source-title separation preserved.
@@ -224,9 +224,17 @@ No production engine yet.
   * **I-1 (non-blocking):** résumé protected-metadata export guard `immutable_snapshot` sentinel coverage for `degree_name`, `school_name`, `approved_metrics`, `approved_tools` remains a future note; not implemented in this milestone.
   * Status: **CLOSED**.
 
+* Contact Block Resolution v1 (`CONTACT_BLOCK_RESOLUTION_V1`) (**IMPLEMENTED_PENDING_ADVERSARIAL_REVIEW**):
+
+  * Bora-confirmed protected contact facts stored in `RESUME_MASTER_WW_V1` contact block (version 5).
+  * Protected-metadata export gate no longer blocked by unresolved `contact.name`.
+  * Experience/Evidence/Claims, six module wordings, and title metadata unchanged.
+  * Tests: `tests/winter_walk_contact_resolution_test.py`; updates to related Winter Walk résumé tests.
+  * Status: **IMPLEMENTED_PENDING_ADVERSARIAL_REVIEW** (not CLOSED).
+
 ## Current Task
 
-`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_PARTIAL_PENDING_CONTACT**. Title resolution closed; contact remains unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`CONTACT_BLOCK_RESOLUTION_V1` = **IMPLEMENTED_PENDING_ADVERSARIAL_REVIEW**. Protected contact block resolved from Bora-confirmed facts; no résumé generation or job-specific tailoring started. Do not begin additional experience sections unless explicitly approved.
 * Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**CLOSED**):
 
   * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
@@ -243,7 +251,7 @@ No production engine yet.
 
 ## Current Task
 
-`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_PARTIAL_PENDING_CONTACT**. Module wording Bora-approved; offer-letter metadata and display title resolved; contact remains unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_RESOLVED_PENDING_EXPORT_PIPELINE**. Module wording, offer-letter metadata, display title, and contact block resolved; `formal_title` sentinel and exact end day remain unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -289,7 +297,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Resolve contact block when Bora provides approved contact facts.
+1. Adversarial review of `CONTACT_BLOCK_RESOLUTION_V1`.
 2. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
@@ -298,4 +306,4 @@ Do not begin job-specific résumé generation, rendering/export, or additional e
 
 ## Next Approved Task
 
-Contact resolution is the bounded next task. `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` closed. No next milestone started.
+`CONTACT_BLOCK_RESOLUTION_V1` implemented pending adversarial review. No next milestone started.

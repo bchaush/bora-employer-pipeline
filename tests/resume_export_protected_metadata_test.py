@@ -92,7 +92,17 @@ assert_true(
 )
 
 
-# A. Real Winter Walk derivative with approved display title but unresolved contact -> approval FAIL
+# A. Real Winter Walk derivative with resolved contact + approved display title -> metadata PASS
+ww_metadata = validate_protected_metadata_resolved(WW_DERIVATIVE)
+assert_true(ww_metadata["valid"] is True, "A: WW derivative protected metadata must pass")
+assert_false(
+    "contact.name" in unresolved_fields(ww_metadata["errors"]),
+    "A: contact.name must not block protected metadata",
+)
+assert_false(
+    "experience_sections[0].formal_title" in unresolved_fields(ww_metadata["errors"]),
+    "A: approved display title must satisfy title export readiness",
+)
 ww_approval = approve_derivative_for_export(
     derivative=WW_DERIVATIVE,
     master=WW_MASTER,
@@ -100,49 +110,44 @@ ww_approval = approve_derivative_for_export(
     evidence_index=EVIDENCE_INDEX,
     human_approval=True,
 )
-assert_false(ww_approval["valid"], "A: WW derivative must not export-approve with unresolved contact")
-assert_true(
-    has_code(ww_approval["errors"], "UNRESOLVED_PROTECTED_METADATA"),
-    "A: unresolved protected metadata error required",
-)
-assert_true(
-    "contact.name" in unresolved_fields(ww_approval["errors"]),
-    "A: contact.name must block export",
-)
-assert_false(
-    "experience_sections[0].formal_title" in unresolved_fields(ww_approval["errors"]),
-    "A: approved display title must satisfy title export readiness",
-)
-print("PASS A: WW derivative export blocked by unresolved contact, not display title.")
+assert_true(ww_approval["valid"] is True, "A: WW derivative export-approval eligible with resolved contact")
+print("PASS A: WW derivative protected metadata passes with resolved contact.")
 
 
 assert_true(
-    WW_DERIVATIVE["contact"]["name"] == UNRESOLVED_PROTECTED_METADATA_SENTINEL,
-    "WW fixture must keep unresolved contact.name",
+    WW_DERIVATIVE["contact"]["name"] == "Bora Chaush",
+    "WW fixture must carry Bora-confirmed contact.name",
 )
 assert_true(
     WW_DERIVATIVE["experience_sections"][0]["display_title"]
     == "AI Researcher & Developer Intern",
     "WW fixture must carry approved display title",
 )
-print("PASS B: unresolved contact.name blocks export approval.")
+print("PASS B: Bora-confirmed contact.name present on derivative.")
 
 
-# C. Multiple unresolved protected fields -> FAIL and identify contact (title resolved via display label)
-unresolved = unresolved_fields(ww_approval["errors"])
-assert_true("contact.name" in unresolved, "C: contact.name must be identified")
+# C. Unresolved contact sentinel reintroduced after build -> FAIL
+unresolved_contact = copy.deepcopy(WW_DERIVATIVE)
+unresolved_contact["contact"]["name"] = UNRESOLVED_PROTECTED_METADATA_SENTINEL
+unresolved_contact["validation_digest"] = compute_derivative_validation_digest(unresolved_contact)
+unresolved_metadata = validate_protected_metadata_resolved(unresolved_contact)
+assert_false(unresolved_metadata["valid"], "C: unresolved contact sentinel must fail metadata")
+assert_true(
+    "contact.name" in unresolved_fields(unresolved_metadata["errors"]),
+    "C: contact.name must be identified",
+)
 assert_false(
-    "experience_sections[0].formal_title" in unresolved,
+    "experience_sections[0].formal_title" in unresolved_fields(unresolved_metadata["errors"]),
     "C: formal_title sentinel must not block when display title approved",
 )
 for expected_field in (
     "modules[MOD_WW_001_SCOPE].immutable_snapshot.formal_title",
 ):
     assert_false(
-        expected_field in unresolved,
+        expected_field in unresolved_fields(unresolved_metadata["errors"]),
         f"C: snapshot formal_title must not block when display_title present: {expected_field}",
     )
-print("PASS C: unresolved contact identified; title path resolved via display label.")
+print("PASS C: unresolved contact sentinel blocks protected metadata; title path still resolved.")
 
 
 # D. Unresolved sentinel introduced after derivative build -> approval FAIL
