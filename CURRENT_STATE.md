@@ -26,6 +26,8 @@ P-2 process-mapping evidence model (`P2_PROCESS_MAPPING_EVIDENCE_MODEL`) = **CLO
 
 Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) = **CLOSED**.
 
+Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) = **CLOSED**.
+
 Canonical Experience records: **1** (`EXP_WW_001`).
 
 Evidence records: **14** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata).
@@ -208,19 +210,23 @@ No production engine yet.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
   * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`.
   * Status: **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT** (not CLOSED).
-* Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**REMEDIATED_PENDING_EXTERNAL_REAUDIT**):
+* Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**CLOSED**):
 
   * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
   * `EXP_WW_001` notes updated with legal org, internship category, contractual position, functional role, department, bounded dates.
   * Experience schema constraint: single `organization` field preserves display `Winter Walk`; legal name in notes/Evidence.
-  * Claude audit M-1 remediated: export approval now rejects `PENDING_BORA_REVIEW` unresolved protected metadata (`UNRESOLVED_PROTECTED_METADATA`).
+  * Trusted metadata state: legal/source organization `Winter Walk, Inc.`; display organization `Winter Walk`; unpaid internship documented; contractual position `Intern`; functional role `AI Researcher and Developer`; department `Development Department`; month-level résumé date `Jun 2026 – Aug 2026`; exact Aug 21 vs Aug 22 end day unresolved; protected `formal_title` unresolved; no synthetic composed title created.
+  * Implementation commit `2ec0d6c`; M-1 export-gate remediation commit `b1e056d`.
+  * Claude audit M-1 remediated: export approval rejects `PENDING_BORA_REVIEW` unresolved protected metadata (`UNRESOLVED_PROTECTED_METADATA`).
+  * Claude final adversarial re-audit: `CLAUDE_WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1_FINAL_PASS` (M-1 independently verified fixed).
+  * **I-1 (non-blocking):** résumé protected-metadata export guard currently checks the immutable_snapshot fields used by the active Winter Walk master, but future modules that populate `degree_name`, `school_name`, `approved_metrics`, or `approved_tools` must extend sentinel validation before relying on those fields for export. Current Winter Walk master does not populate the affected fields. Not a closure blocker; not implemented in this milestone.
   * No Claim records created or modified; no accomplishment Claims for metadata.
   * Tests: `tests/winter_walk_protected_metadata_evidence_test.py`, `tests/resume_export_protected_metadata_test.py`.
-  * Status: **REMEDIATED_PENDING_EXTERNAL_REAUDIT**.
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` = **REMEDIATED_PENDING_EXTERNAL_REAUDIT**. Claude M-1 export-gate remediation landed; external re-audit pending. Formal title and contact remain unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT**. Module wording Bora-approved; offer-letter metadata ingested and export-gate M-1 closed. Formal title and contact remain unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -232,7 +238,7 @@ No production engine yet.
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
-* Master résumé Winter Walk module wording Bora-approved; partial protected metadata resolved (date range, internship category); formal title and contact pending; no export pipeline
+* Résumé protected-metadata export guard I-1: extend `immutable_snapshot` sentinel validation for `degree_name`, `school_name`, `approved_metrics`, `approved_tools` before future education-bearing/tool-bearing modules rely on those fields (non-blocking; current Winter Walk master unaffected)
 * Networking research
 * Google Workspace / external integrations
 * Automated monitoring
@@ -268,8 +274,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Resolve formal title governance (contractual Intern vs functional AI Researcher and Developer — do not compose without explicit policy).
 2. Resolve contact block when Bora provides approved contact facts.
-3. External re-audit of `WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` (post M-1 remediation).
-4. Await explicit approval before job-specific tailoring or additional experience sections.
+3. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
 
@@ -277,4 +282,4 @@ Do not begin job-specific résumé generation, rendering/export, or additional e
 
 ## Next Approved Task
 
-`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` remediated pending external re-audit. Formal title and contact resolution remain bounded next tasks. No next milestone started.
+`MASTER_RESUME_WINTER_WALK_V1` metadata partial resolution complete for offer-letter facts; formal title and contact resolution remain bounded next tasks. No next milestone started.

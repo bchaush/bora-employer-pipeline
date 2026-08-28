@@ -19,6 +19,37 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close Winter Walk protected metadata evidence v1 (CLOSED)
+
+**Reason**
+
+Claude final adversarial re-audit `CLAUDE_WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1_FINAL_PASS` independently verified blocking defect M-1 fixed. Operational closure of metadata evidence milestone.
+
+**Changed**
+
+* Status → **CLOSED** for `WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`.
+* Milestone chain recorded: implementation `2ec0d6c`, M-1 remediation `b1e056d`.
+* **I-1 (non-blocking):** future `immutable_snapshot` sentinel coverage for `degree_name`, `school_name`, `approved_metrics`, `approved_tools` documented; not implemented.
+* `MASTER_RESUME_WINTER_WALK_V1` remains **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT** (not CLOSED).
+* Documentation-only closure; no code, Evidence, Claim, Experience, or résumé content changes.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Pre-closure: 19/19 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+* Six Bora-approved module strings — unchanged
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-28 — Remediate Winter Walk export-gate M-1 (REMEDIATED_PENDING_EXTERNAL_REAUDIT)
 
 **Reason**
