@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Approve Winter Walk master module wordings (WORDING_APPROVED_PENDING_METADATA_RESOLUTION)
+
+**Reason**
+
+Bora explicitly approved exact wording for all six Winter Walk résumé modules. Replace prior candidate text, re-validate, and record approval without modifying Claims/Evidence/Experience records.
+
+**Changed**
+
+* `resume/master/RESUME_MASTER_WW_V1.json` version 1 → 2 with Bora-approved exact wordings.
+* Master `notes`: `WORDING_APPROVED` event recorded for all six modules (2026-08-28).
+* Contact, formal title, date range remain `PENDING_BORA_REVIEW`.
+* Tests updated for exact wording + approval record assertions.
+* Status → **WORDING_APPROVED_PENDING_METADATA_RESOLUTION** (not CLOSED).
+
+**Affected Areas**
+
+* `resume/master/RESUME_MASTER_WW_V1.json`
+* `tests/master_resume_winter_walk_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/master_resume_winter_walk_test.py` — PASS
+* 17/17 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+WORDING_APPROVED_PENDING_METADATA_RESOLUTION
+
+---
+
 ## 2026-08-28 — Implement master résumé Winter Walk v1 (IMPLEMENTED_PENDING_HUMAN_REVIEW)
 
 **Reason**

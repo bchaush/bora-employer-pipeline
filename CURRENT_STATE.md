@@ -196,20 +196,21 @@ No production engine yet.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
   * Status: **CLOSED**.
-* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**IMPLEMENTED_PENDING_HUMAN_REVIEW**):
+* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**WORDING_APPROVED_PENDING_METADATA_RESOLUTION**):
 
   * First real evidence-controlled résumé module set for `EXP_WW_001` only.
-  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json`.
-  * Six candidate bullets (`MOD_WW_001_SCOPE` through `MOD_WW_006_PROCESS`), one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
-  * All module wording validated through closed résumé architecture (lineage, semantic guard, style, immutability).
-  * Contact, formal title, and date range use `PENDING_BORA_REVIEW` placeholders; no Bora approval recorded.
+  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 2).
+  * Six bullets (`MOD_WW_001_SCOPE` through `MOD_WW_006_PROCESS`), one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
+  * **Bora explicitly approved exact module wording on 2026-08-28** (recorded in master `notes` as `WORDING_APPROVED`).
+  * Protected metadata still unresolved: contact (`PENDING_BORA_REVIEW`), formal title (`PENDING_BORA_REVIEW`), date range (`PENDING_BORA_REVIEW`).
+  * Offer-letter context (Winter Walk, Inc.; Jun–Aug 2026 internship) not ingested into Experience/Evidence in this step.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
   * Tests: `tests/master_resume_winter_walk_test.py`.
-  * Status: **IMPLEMENTED_PENDING_HUMAN_REVIEW** (awaiting ChatGPT inspection + explicit Bora wording review; not CLOSED).
+  * Status: **WORDING_APPROVED_PENDING_METADATA_RESOLUTION** (not CLOSED).
 
 ## Current Task
 
-`MASTER_RESUME_WINTER_WALK_V1` = **IMPLEMENTED_PENDING_HUMAN_REVIEW**. Awaiting ChatGPT inspection and explicit Bora wording review. Do not treat candidate module wording as approved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`MASTER_RESUME_WINTER_WALK_V1` = **WORDING_APPROVED_PENDING_METADATA_RESOLUTION**. Module wording Bora-approved; contact/formal title/date range await repository-authoritative metadata resolution. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -221,7 +222,7 @@ No production engine yet.
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
-* Master résumé Winter Walk candidate content (`MASTER_RESUME_WINTER_WALK_V1`) implemented pending human review; full master résumé / export pipeline not built
+* Master résumé Winter Walk module wording Bora-approved; protected metadata (contact, title, dates) pending resolution; no export pipeline
 * Networking research
 * Google Workspace / external integrations
 * Automated monitoring
@@ -255,14 +256,14 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. ChatGPT inspection of `MASTER_RESUME_WINTER_WALK_V1` candidate module wording.
-2. Bora explicit wording review/approval for Winter Walk bullets and immutable header placeholders.
+1. Resolve protected metadata via bounded Evidence/Experience update (formal title, organization legal name, date range `Jun 2026 – Aug 2026` from offer letter with explicit day discrepancy noted).
+2. Resolve contact block when Bora provides approved contact facts.
 3. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
 
-Do not treat candidate module wording as Bora-approved. Do not begin job-specific résumé generation, rendering/export, or additional experience sections without explicit approval.
+Do not begin job-specific résumé generation, rendering/export, or additional experience sections without explicit approval. Do not set formal title from offer letter until repository-authoritative evidence supports it.
 
 ## Next Approved Task
 
-`MASTER_RESUME_WINTER_WALK_V1` implemented pending human review. No next milestone started.
+`MASTER_RESUME_WINTER_WALK_V1` wording approved; metadata resolution is the next bounded task. No next milestone started.

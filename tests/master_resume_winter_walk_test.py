@@ -51,6 +51,48 @@ def load_trusted_indexes() -> tuple[dict, dict]:
 EVIDENCE_INDEX, CLAIM_INDEX = load_trusted_indexes()
 MASTER = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
 
+BORA_APPROVED_WORDINGS = {
+    "MOD_WW_001_SCOPE": (
+        "Defined scope and guardrails for Winter Walk's internal Google Workspace "
+        "operating system, including explicit limits on CRM functionality, public "
+        "dashboards, automated sending, and causal fundraising claims."
+    ),
+    "MOD_WW_002_CONTROLS": (
+        "Implemented fail-closed email controls that block live follow-up when the "
+        "kill switch, test mode, or live-followup restriction is active, before "
+        "queue-level eligibility checks run."
+    ),
+    "MOD_WW_003_INTAKE": (
+        "Built a Google Drive-to-Workbook A CSV import workflow with automated "
+        "logging for successful, held, and failed runs."
+    ),
+    "MOD_WW_004_SYNC": (
+        "Built a self-report evidence workflow that maps form responses into the "
+        "Evidence Log and syncs approved updates to the Adoption Matrix with audit "
+        "logging."
+    ),
+    "MOD_WW_005_UAT": (
+        "Documented 10 passing pilot/UAT checks covering import validation, PII "
+        "absence, applicability checks, and related functional scenarios."
+    ),
+    "MOD_WW_006_PROCESS": (
+        "Mapped Winter Walk's manual OP-support workflow into a structured operating "
+        "process covering evidence tracking, review, follow-up, and human approval."
+    ),
+}
+
+
+# Master stores exact Bora-approved wording unchanged
+for module in MASTER["modules"]:
+    module_id = module["module_id"]
+    expected = BORA_APPROVED_WORDINGS.get(module_id)
+    assert_true(expected is not None, f"missing approved wording fixture for {module_id}")
+    assert_true(
+        module.get("wording") == expected,
+        f"{module_id} must store exact Bora-approved wording",
+    )
+print("PASS: exact Bora-approved wordings stored unchanged.")
+
 
 # Real Winter Walk master content validates through closed architecture
 master_result = validate_resume_master(
@@ -206,16 +248,25 @@ assert_true(
 print("PASS: candidate derivative remains human-review-required with export blocked.")
 
 
-# Master notes confirm no fabricated Bora approval
+# Bora wording approval recorded; protected metadata still pending
+notes = str(MASTER.get("notes", ""))
+assert_true("WORDING_APPROVED" in notes, "master notes must record wording approval")
 assert_true(
-    "PENDING_BORA_REVIEW" in str(MASTER.get("notes", ""))
-    or MASTER["contact"]["name"] == "PENDING_BORA_REVIEW",
-    "master must flag pending human review",
+    "Bora explicitly approved" in notes,
+    "master notes must record explicit Bora approval event",
 )
 assert_true(
-    "No Bora approval" in str(MASTER.get("notes", "")),
-    "master notes must not claim Bora approval",
+    MASTER["contact"]["name"] == "PENDING_BORA_REVIEW",
+    "contact block must remain unresolved",
 )
-print("PASS: no fabricated Bora approval recorded.")
+assert_true(
+    MASTER["experience_sections"][0]["formal_title"] == "PENDING_BORA_REVIEW",
+    "formal title must remain unresolved",
+)
+assert_true(
+    MASTER["experience_sections"][0]["date_range"] == "PENDING_BORA_REVIEW",
+    "date range must remain unresolved",
+)
+print("PASS: Bora module wording approval recorded; metadata still pending.")
 
 print("PASS: master resume Winter Walk v1 real-content tests complete.")
