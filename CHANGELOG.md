@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Refine MarketMind resume module wording (`MARKETMIND_RESUME_MODULE_WORDING_REFINEMENT_V1`)
+
+**Reason**
+
+Independent Cursor re-audit of the draft milestone passed (`CURSOR_MARKETMIND_RESUME_MODULE_DRAFTING_FINAL_PASS`, no architecture remediation required). Bora's human wording review requested targeted refinements to the five draft wordings rather than approving them as-is.
+
+**Changed**
+
+* `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json`: refined wording on 4 of 5 modules (`MOD_MM_001_SCOPE`, `MOD_MM_002_DETERMINISTIC_AI`, `MOD_MM_004_CONTROLS`, `MOD_MM_005_TESTING`); `MOD_MM_003_INTEGRATION` kept exactly as-is. No lineage, role families, capabilities, status, or approval flags changed on any module.
+
+**Not changed**
+
+* Claims, Evidence, Experiences, Winter Walk Claims/modules, protected resume master, schemas, requirement matcher, resume validators.
+
+**Tests / Verification**
+
+* All 5 refined wordings pass real `validate_resume_module_lineage` / `validate_module_wording_semantics` / `validate_resume_prose_style` checks; no new proposition beyond each wording's approved Claim.
+* 26/26 test suites — PASS (no test hardcoded exact draft wording, so none required updating). Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable — unchanged.
+* Drafts remain structurally outside the protected master; `human_approval=false` remains draft metadata only, not an enforced production security gate.
+
+**Status**
+
+MARKETMIND_RESUME_MODULE_WORDING_REFINEMENT_V1_IMPLEMENTED_PENDING_HUMAN_APPROVAL. Not pushed. No module approved, no resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Draft MarketMind resume modules (`MARKETMIND_RESUME_MODULE_DRAFTING_V1`)
 
 **Reason**
