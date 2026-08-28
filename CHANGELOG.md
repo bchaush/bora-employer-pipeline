@@ -19,6 +19,46 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Winter Walk résumé title resolution v1 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Resolve protected Winter Walk résumé display title without conflating source facts or overwriting `formal_title` with a composed label.
+
+**Changed**
+
+* Architecture extension: `source_contractual_position`, `source_functional_role`, `display_title`, `display_title_approval` on experience sections; `display_title` on module immutable snapshots.
+* Schema: `resume_display_title_approval.schema.json`; updates to `resume_master`, `resume_derivative`, `resume_module`.
+* Validators: `src/resume_title_metadata.py`; export gate updated in `resume_protected_metadata.py`; master validation in `resume_validation.py`.
+* Master `RESUME_MASTER_WW_V1.json` version 4: human-approved display title `AI Researcher & Developer Intern`; `formal_title` remains `PENDING_BORA_REVIEW`.
+* Source facts on master: contractual position `Intern`; functional role `AI Researcher and Developer`.
+* `MASTER_RESUME_WINTER_WALK_V1` → **METADATA_PARTIAL_PENDING_CONTACT** (not CLOSED).
+* Tests: `tests/winter_walk_resume_title_resolution_test.py`; updates to related Winter Walk résumé tests.
+* Experience/Evidence/Claims and six module wordings unchanged.
+
+**Affected Areas**
+
+* `schemas/resume_display_title_approval.schema.json`
+* `schemas/resume_master.schema.json`, `schemas/resume_derivative.schema.json`, `schemas/resume_module.schema.json`
+* `src/resume_title_metadata.py`, `src/resume_protected_metadata.py`, `src/resume_validation.py`, `src/resume_patch_apply.py`
+* `resume/master/RESUME_MASTER_WW_V1.json`
+* `tests/winter_walk_resume_title_resolution_test.py`
+* `tests/master_resume_winter_walk_test.py`, `tests/resume_export_protected_metadata_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/winter_walk_resume_title_resolution_test.py` — PASS
+* 20/20 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-28 — Close Winter Walk protected metadata evidence v1 (CLOSED)
 
 **Reason**

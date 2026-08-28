@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/resume_display_title_approval.schema.json",
+  "title": "Human-Approved Résumé Display Title Approval",
+  "description": "Records explicit human approval of a résumé presentation title that is not a source-verbatim formal title.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approved",
+    "approved_by",
+    "approved_on",
+    "approved_display_title",
+    "is_source_verbatim"
+  ],
+  "properties": {
+    "approved": {
+      "type": "boolean",
+      "const": true
+    },
+    "approved_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "approved_display_title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact display title string covered by this approval event."
+    },
+    "is_source_verbatim": {
+      "type": "boolean",
+      "const": false,
+      "description": "Must be false: display titles approved under this schema are presentation labels, not source-extracted formal titles."
+    },
+    "approval_note": {
+      "type": ["string", "null"]
+    }
+  }
+}

@@ -198,18 +198,32 @@ No production engine yet.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
   * Status: **CLOSED**.
-* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT**):
+* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**METADATA_PARTIAL_PENDING_CONTACT**):
 
   * First real evidence-controlled résumé module set for `EXP_WW_001` only.
-  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 3).
+  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 4).
   * Six bullets (`MOD_WW_001_SCOPE` through `MOD_WW_006_PROCESS`), one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
   * **Bora explicitly approved exact module wording on 2026-08-28** (recorded in master `notes` as `WORDING_APPROVED`; wording unchanged).
   * Partial metadata resolved via `WW_OFFER_001`: date range `Jun 2026 – Aug 2026`, employment category `INTERNSHIP`; exact end day unresolved (Aug 21 vs Aug 22).
-  * Still unresolved: contact (`PENDING_BORA_REVIEW`), formal title (`PENDING_BORA_REVIEW` — contractual Intern vs functional AI Researcher and Developer not composed).
+  * Human-approved résumé display title `AI Researcher & Developer Intern` stored separately from source facts; `formal_title` remains `PENDING_BORA_REVIEW` (no source-verbatim formal title).
+  * Source title facts preserved on master section: contractual position `Intern`; functional role `AI Researcher and Developer`.
+  * Still unresolved: contact (`PENDING_BORA_REVIEW`).
   * Display organization `Winter Walk`; legal organization `Winter Walk, Inc.` documented in Experience notes and Evidence.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
-  * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`.
-  * Status: **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT** (not CLOSED).
+  * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_resume_title_resolution_test.py`.
+  * Status: **METADATA_PARTIAL_PENDING_CONTACT** (not CLOSED).
+* Winter Walk Résumé Title Resolution v1 (`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`) (**IMPLEMENTED_PENDING_EXTERNAL_AUDIT**):
+
+  * Minimal architecture extension: `source_contractual_position`, `source_functional_role`, `display_title`, `display_title_approval` on experience sections; `display_title` on module immutable snapshots.
+  * `formal_title` sentinel preserved; human-approved display label bound via `approved_display_title` approval metadata (`is_source_verbatim=false`).
+  * Export gate accepts approved display title when source formal title unresolved; contact unresolved still blocks export.
+  * Experience/Evidence/Claims unchanged; six module wordings unchanged.
+  * Tests: `tests/winter_walk_resume_title_resolution_test.py`.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+
+## Current Task
+
+`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Display title resolved via human-approved presentation label; contact remains pending. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 * Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**CLOSED**):
 
   * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
@@ -272,8 +286,8 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Resolve formal title governance (contractual Intern vs functional AI Researcher and Developer — do not compose without explicit policy).
-2. Resolve contact block when Bora provides approved contact facts.
+1. Resolve contact block when Bora provides approved contact facts.
+2. External audit of `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`.
 3. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
@@ -282,4 +296,4 @@ Do not begin job-specific résumé generation, rendering/export, or additional e
 
 ## Next Approved Task
 
-`MASTER_RESUME_WINTER_WALK_V1` metadata partial resolution complete for offer-letter facts; formal title and contact resolution remain bounded next tasks. No next milestone started.
+`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` implemented pending external audit. Contact resolution remains the bounded next task. No next milestone started.

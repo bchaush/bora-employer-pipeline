@@ -261,7 +261,11 @@ assert_true(
 )
 assert_true(
     MASTER["experience_sections"][0]["formal_title"] == "PENDING_BORA_REVIEW",
-    "formal title must remain unresolved",
+    "source formal title sentinel must remain unresolved",
+)
+assert_true(
+    MASTER["experience_sections"][0]["display_title"] == "AI Researcher & Developer Intern",
+    "human-approved display title must be stored",
 )
 assert_true(
     MASTER["experience_sections"][0]["date_range"] == "Jun 2026 – Aug 2026",
@@ -271,6 +275,6 @@ assert_true(
     MASTER["experience_sections"][0]["employment_category"] == "INTERNSHIP",
     "employment category must be INTERNSHIP per WW_OFFER_001",
 )
-print("PASS: Bora module wording approval recorded; partial metadata resolved.")
+print("PASS: Bora module wording approval recorded; title resolved via display label; contact pending.")
 
 print("PASS: master resume Winter Walk v1 real-content tests complete.")

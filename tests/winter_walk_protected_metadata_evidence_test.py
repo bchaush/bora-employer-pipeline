@@ -123,22 +123,26 @@ print("PASS D: functional role AI Researcher and Developer source-supported.")
 # E. Composed title AI Researcher & Developer Intern is NOT silently created
 assert_true(
     section.get("formal_title") == "PENDING_BORA_REVIEW",
-    "formal_title must remain unresolved",
+    "formal_title sentinel must remain unresolved",
 )
-assert_false(
-    section.get("formal_title") == FORBIDDEN_COMPOSED_TITLE,
-    "composed title must not be set",
+assert_true(
+    section.get("display_title") == FORBIDDEN_COMPOSED_TITLE,
+    "composed title belongs in approved display_title only",
 )
 for module in MASTER["modules"]:
     assert_true(
         module["immutable_snapshot"]["formal_title"] == "PENDING_BORA_REVIEW",
-        f"{module['module_id']} formal_title must remain unresolved",
+        f"{module['module_id']} formal_title sentinel must remain unresolved",
+    )
+    assert_true(
+        module["immutable_snapshot"]["display_title"] == FORBIDDEN_COMPOSED_TITLE,
+        f"{module['module_id']} display_title must store approved label",
     )
 assert_true(
     FORBIDDEN_COMPOSED_TITLE in limitations,
     "limitations must block composed title",
 )
-print("PASS E: composed title AI Researcher & Developer Intern not created.")
+print("PASS E: composed title stored only as approved display_title, not formal_title.")
 
 
 # F. Month-level date range resolves to Jun 2026 – Aug 2026

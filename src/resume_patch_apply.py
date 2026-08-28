@@ -207,6 +207,10 @@ def validate_immutable_fields_preserved(
             "date_range",
             "location",
             "experience_id",
+            "source_contractual_position",
+            "source_functional_role",
+            "display_title",
+            "display_title_approval",
         ):
             if master_section.get(field) != deriv_section.get(field):
                 errors.append(
@@ -264,6 +268,7 @@ def validate_immutable_fields_preserved(
     protected_snapshot_fields = (
         "organization",
         "formal_title",
+        "display_title",
         "employment_category",
         "date_range",
         "location",

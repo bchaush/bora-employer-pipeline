@@ -92,6 +92,7 @@
       "properties": {
         "organization": { "type": "string" },
         "formal_title": { "type": "string" },
+        "display_title": { "type": "string" },
         "employment_category": { "type": "string" },
         "date_range": { "type": "string" },
         "location": { "type": "string" },

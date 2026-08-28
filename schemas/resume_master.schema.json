@@ -76,6 +76,24 @@
           "employment_category": { "type": ["string", "null"] },
           "date_range": { "type": "string", "minLength": 1 },
           "location": { "type": ["string", "null"] },
+          "source_contractual_position": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Source-document contractual position (not a composed display label)."
+          },
+          "source_functional_role": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Source-document functional role descriptor (not a composed display label)."
+          },
+          "display_title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Human-approved résumé presentation title; not a source-verbatim formal title."
+          },
+          "display_title_approval": {
+            "$ref": "resume_display_title_approval.schema.json"
+          },
           "bullet_module_ids": {
             "type": "array",
             "items": { "type": "string", "minLength": 1 }

@@ -6,6 +6,11 @@ from typing import Any, Mapping
 
 UNRESOLVED_PROTECTED_METADATA_SENTINEL = "PENDING_BORA_REVIEW"
 
+from resume_title_metadata import (  # noqa: E402
+    is_experience_title_export_ready,
+    is_source_formal_title_unresolved,
+)
+
 
 def is_unresolved_protected_metadata_value(value: Any) -> bool:
     """True when a protected field still carries the repository unresolved sentinel."""
@@ -78,9 +83,34 @@ def validate_protected_metadata_resolved(
             _check_required_string(
                 errors, field=f"{prefix}.organization", value=section.get("organization")
             )
-            _check_required_string(
-                errors, field=f"{prefix}.formal_title", value=section.get("formal_title")
-            )
+            formal_title = section.get("formal_title")
+            if is_source_formal_title_unresolved(formal_title):
+                if not is_experience_title_export_ready(section):
+                    display_title = section.get("display_title")
+                    if not isinstance(display_title, str) or is_unresolved_protected_metadata_value(
+                        display_title
+                    ):
+                        _append_unresolved(
+                            errors,
+                            field=f"{prefix}.display_title",
+                            value=display_title,
+                        )
+                    else:
+                        errors.append(
+                            {
+                                "code": "DISPLAY_TITLE_NOT_APPROVED",
+                                "field": f"{prefix}.display_title_approval",
+                                "detail": (
+                                    "display title present but lacks valid human approval binding"
+                                ),
+                            }
+                        )
+            else:
+                _check_required_string(
+                    errors,
+                    field=f"{prefix}.formal_title",
+                    value=formal_title,
+                )
             _check_required_string(
                 errors, field=f"{prefix}.date_range", value=section.get("date_range")
             )
@@ -132,11 +162,31 @@ def validate_protected_metadata_resolved(
                 continue
             prefix = f"modules[{module_id}].immutable_snapshot"
             for field in ("organization", "formal_title", "date_range"):
-                if field in snapshot:
-                    _check_required_string(
+                if field not in snapshot:
+                    continue
+                value = snapshot.get(field)
+                if field == "formal_title" and is_source_formal_title_unresolved(value):
+                    display_title = snapshot.get("display_title")
+                    if isinstance(display_title, str) and display_title:
+                        continue
+                    _append_unresolved(
                         errors,
                         field=f"{prefix}.{field}",
-                        value=snapshot.get(field),
+                        value=value,
+                    )
+                    continue
+                _check_required_string(
+                    errors,
+                    field=f"{prefix}.{field}",
+                    value=value,
+                )
+            if "display_title" in snapshot:
+                display_title = snapshot.get("display_title")
+                if is_unresolved_protected_metadata_value(display_title):
+                    _append_unresolved(
+                        errors,
+                        field=f"{prefix}.display_title",
+                        value=display_title,
                     )
             if "employment_category" in snapshot:
                 _check_optional_string(
