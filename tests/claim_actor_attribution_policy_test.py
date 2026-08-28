@@ -233,4 +233,91 @@ assert_true(
 print("PASS 3: human approval gates actor attribution after substantive validity.")
 
 
+# ---------------------------------------------------------------------------
+# 4. Semantic guard blocks sole/exclusive/unaided-authorship overreach even
+#    with valid substantive Evidence and human_approval=true (P-1 remediation)
+# ---------------------------------------------------------------------------
+FORBIDDEN_ATTRIBUTION_WORDINGS = [
+    ("case1_sole_architected", "Solely architected and built the system."),
+    ("case2_single_handed", "Single-handedly developed the platform."),
+    ("case3_entire_alone", "Built the entire application alone."),
+    ("case4_without_ai", "Built the application without any AI assistance."),
+    ("case5_all_code_no_ai", "Wrote all code without AI."),
+    ("case6_exclusive", "Exclusively implemented the integration."),
+    ("case7_no_collaborators", "Built the system with no collaborators."),
+    (
+        "case8_claude_regression",
+        "Solely architected and independently built the entire MarketMind "
+        "platform without any AI assistance, integrating Google Places and "
+        "Census ACS data feeds.",
+    ),
+]
+
+for label, wording in FORBIDDEN_ATTRIBUTION_WORDINGS:
+    result = validate_claim(
+        make_active_voice_claim(
+            f"CLAIM_SYN_{label.upper()}",
+            ["EVID_V1"],
+            "VERIFIED",
+            human_approval=True,
+        )
+        | {"wording": wording},
+        supported_index,
+    )
+    assert_false(
+        result["valid_record"],
+        f"{label}: sole/exclusive/unaided wording must fail valid_record: {wording!r}",
+    )
+    assert_false(
+        result["reusable"],
+        f"{label}: sole/exclusive/unaided wording must not be reusable: {wording!r}",
+    )
+    assert_true(
+        has_code(result["errors"], "FORBIDDEN_SEMANTIC_PATTERN"),
+        f"{label}: expected FORBIDDEN_SEMANTIC_PATTERN for {wording!r}",
+    )
+
+print("PASS 4: semantic guard blocks all sole/exclusive/unaided-authorship cases.")
+
+
+# ---------------------------------------------------------------------------
+# 5. Safe non-matches: ordinary conventional active-voice wording still
+#    validates and remains reusable after human approval.
+# ---------------------------------------------------------------------------
+SAFE_ATTRIBUTION_WORDINGS = [
+    ("safe1", "Built a Python/Streamlit market-screening prototype."),
+    ("safe2", "Integrated Google Places and Census ACS data feeds."),
+    ("safe3", "Implemented bounded operational controls."),
+    ("safe4", "Independently verified the integration behavior."),
+    ("safe5", "Independent validation confirmed the expected output."),
+    (
+        "safe6",
+        "Implemented a deterministic scoring layer independently of the "
+        "LLM narrative layer.",
+    ),
+]
+
+for label, wording in SAFE_ATTRIBUTION_WORDINGS:
+    result = validate_claim(
+        make_active_voice_claim(
+            f"CLAIM_SYN_{label.upper()}",
+            ["EVID_V1"],
+            "VERIFIED",
+            human_approval=True,
+        )
+        | {"wording": wording},
+        supported_index,
+    )
+    assert_true(
+        result["valid_record"] is True,
+        f"{label}: conventional wording must remain valid_record: {wording!r}",
+    )
+    assert_true(
+        result["reusable"] is True,
+        f"{label}: conventional wording must remain reusable: {wording!r}",
+    )
+
+print("PASS 5: conventional active-voice wording remains unaffected by the new guard.")
+
+
 print("PASS: claim actor attribution policy tests completed successfully.")

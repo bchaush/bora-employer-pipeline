@@ -32,7 +32,7 @@ MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOS
 
 MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW** (actor-attribution policy formalized).
 
-Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **IMPLEMENTED — PENDING CLAUDE REAUDIT**.
+Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **IMPLEMENTED — PENDING CLAUDE REAUDIT** (P-1 HIGH semantic-guard remediation added; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -309,7 +309,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Human review of five MarketMind Claim draft candidates before approval.
 2. Await explicit approval before résumé modules or job-specific tailoring.
-3. Claude reaudit of `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` implementation.
+3. Claude reaudit of `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` follow-up (P-1 HIGH finding).
 
 ## Do Not Start Yet
 
@@ -317,7 +317,40 @@ Do not approve MarketMind Claims, create résumé modules, generate résumé out
 
 ## Next Approved Task
 
-`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` implemented pending Claude reaudit.
+`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` implemented pending Claude reaudit. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` remains open until that reaudit passes.
+
+---
+
+## 2026-08-28 — Claim Actor Attribution Semantic Guard Remediation v1 (IMPLEMENTED — PENDING CLAUDE REAUDIT)
+
+**Reason**
+
+Claude's `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` re-audit identified `P-1 — HIGH`: the semantic guard (`src/claim_semantic_guard.py`) had no rule enforcing the ADR's "Limits of Attribution." A synthetic Claim with valid substantive lineage, `evidence_state=VERIFIED`, and `human_approval=true`, worded to assert sole/exclusive/unaided authorship, passed with `valid_record=true`, `reusable=true`, zero errors — `human_approval` could bypass the ADR's explicit sole/exclusive/no-AI-assistance/no-collaborator limits.
+
+**Changed**
+
+* `src/claim_semantic_guard.py`: added an unconditional (Evidence-independent) rule set, `_ACTOR_ATTRIBUTION_OVERREACH_RULES` (category `sole_exclusive_unaided_authorship_overreach`), covering sole-authorship, single-handed, exclusive-authorship, "alone", no-AI-assistance, and no-collaborator wording. Unlike the existing evidence-relative `_BOUNDARY_RULES`, these patterns block regardless of cited Evidence content or `human_approval`, since no Evidence record in this architecture can license those propositions. Wired into `validate_claim_semantic_boundaries()`, which is already called by `validate_claim()` — no other validator touched.
+* `tests/claim_actor_attribution_policy_test.py`: added 8 required forbidden-wording adversarial cases (including Claude's exact reproduction) and 6 required safe-wording non-match cases, all exercised through the real `validate_claim()` with `human_approval=true`.
+
+**Not changed**
+
+* Claim schema, Evidence schema, Experience schema, `claim_lineage.py`, `claim_state_validation.py`, `requirement_match.py`, all five MarketMind Claim files (wording/state/lineage/`human_approval`), all six Winter Walk Claims, Evidence, Experiences, protected résumé master, résumé modules.
+
+**Verification**
+
+* Human-approval bypass reproduced and blocked: valid Evidence + valid state + `human_approval=true` + forbidden wording → `valid_record=false`, `reusable=false`, `FORBIDDEN_SEMANTIC_PATTERN`.
+* All 8 required forbidden cases (including the exact Claude regression) blocked; all 6 required safe cases pass.
+* Adversarial self-check variants (`solely implemented`, `sole architect`, `single handedly built`, `singlehandedly built`, `built everything alone`, `without AI assistance`, `no artificial intelligence assistance`, `exclusive implementation`, etc.) all caught; safe variants (`Independently verified...`, `Implemented ... independently of the LLM layer`) all pass.
+* All 11 real Claims re-validated: 6 Winter Walk remain `valid_record=true`/`reusable=true`/`human_approval=true`; 5 MarketMind remain `valid_record=true`/`reusable=false`/`human_approval=false`, wording/state/lineage byte-unchanged.
+* 25/25 test suites pass; Golden 15/15; counts unchanged (Experience=2, Evidence=26, Claims=11, reusable=6).
+
+**Limitations**
+
+Bounded deterministic pattern coverage for obvious sole/exclusive/unaided-authorship overreach, not exhaustive natural-language authorship detection — consistent with the existing semantic guard's own documented scope.
+
+**Status**
+
+`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1_IMPLEMENTED_PENDING_CLAUDE_REAUDIT`. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` remains not fully closed until this reaudit passes.
 
 ---
 

@@ -13,6 +13,13 @@ Positive support requires:
 
 Quantified outcomes additionally require the matching number to appear in
 Evidence near related outcome-category language (not a bare number alone).
+
+Actor-attribution overreach (sole/exclusive/unaided authorship) is a
+separate, unconditional check: per
+docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md, no Evidence record
+in this architecture can license sole/exclusive/unaided-authorship wording,
+so these patterns are blocked regardless of cited Evidence content and
+regardless of human_approval.
 """
 
 from __future__ import annotations
@@ -22,6 +29,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 
 ERROR_CODE = "FORBIDDEN_SEMANTIC_PATTERN"
+ACTOR_ATTRIBUTION_CATEGORY = "sole_exclusive_unaided_authorship_overreach"
 
 # Local window sizes for bounded negation / outcome-context checks.
 _NEGATION_BEFORE = 90
@@ -229,6 +237,105 @@ _BOUNDARY_RULES: tuple[tuple[str, str, re.Pattern[str], re.Pattern[str]], ...] =
         "qa_ownership_upgrade",
         re.compile(r"\bproduction\s+qa(?:\s+ownership)?\b"),
         re.compile(r"\bproduction\s+qa(?:\s+ownership)?\b"),
+    ),
+)
+
+
+# Actor-attribution overreach: sole / exclusive / unaided-authorship wording.
+#
+# Unlike _BOUNDARY_RULES, these are NOT evidence-relative. Per
+# ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1, human_approval may authorize
+# conventional active-voice attribution (Built, Implemented, Integrated,
+# Automated, Defined, Documented, Separated) for work substantive Evidence
+# supports, but it can never establish sole intellectual authorship,
+# exclusive implementation/ownership, absence of AI assistance, or absence
+# of collaborators. No Evidence record in this architecture can license
+# those stronger propositions, so these patterns are unconditional: they
+# block regardless of cited Evidence content and regardless of
+# human_approval.
+#
+# Bounded action-term vocabulary shared by these rules (kept narrow so
+# generic words like "independent"/"independently" alone never match).
+_ATTRIBUTION_ACTION_TERM = (
+    r"(?:built|build|develop(?:ed|ing)?|creat(?:ed|ing)|implement(?:ed|ing)?|"
+    r"architect(?:ed|ing)?|design(?:ed|ing)?|author(?:ed|ing)?)"
+)
+
+# (rule_id, pattern) — normalized-text patterns, matched unconditionally.
+_ACTOR_ATTRIBUTION_OVERREACH_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "sole_authorship_verb",
+        re.compile(rf"\bsole(?:ly)?\s+{_ATTRIBUTION_ACTION_TERM}\b"),
+    ),
+    (
+        "sole_authorship_noun",
+        re.compile(
+            r"\bsole\s+(?:author|creator|developer|architect|designer|owner)\b"
+        ),
+    ),
+    (
+        "single_handed_authorship",
+        re.compile(
+            rf"\bsingle\s?handed(?:ly)?\b[\w\s]{{0,20}}\b{_ATTRIBUTION_ACTION_TERM}\b"
+            rf"|\b{_ATTRIBUTION_ACTION_TERM}\b[\w\s]{{0,20}}\bsingle\s?handed(?:ly)?\b"
+        ),
+    ),
+    (
+        "exclusive_authorship_verb",
+        re.compile(rf"\bexclusive(?:ly)?\s+{_ATTRIBUTION_ACTION_TERM}\b"),
+    ),
+    (
+        "exclusive_authorship_noun",
+        re.compile(
+            r"\bexclusive\s+(?:author|creator|developer|architect|designer|"
+            r"owner|implementation)\b"
+        ),
+    ),
+    (
+        "entirely_own_work",
+        re.compile(
+            r"\bentirely\s+my\s+own\s+(?:implementation|work|code|design)\b"
+        ),
+    ),
+    (
+        "action_term_alone",
+        re.compile(rf"\b{_ATTRIBUTION_ACTION_TERM}\b[\w\s]{{0,40}}\balone\b"),
+    ),
+    (
+        "no_ai_assistance",
+        re.compile(
+            r"\bno\s+(?:ai|artificial\s+intelligence)\s+(?:assistance|help|support)\b"
+        ),
+    ),
+    (
+        "without_ai_assistance",
+        re.compile(
+            r"\bwithout\s+(?:any\s+)?(?:ai|artificial\s+intelligence)\s+"
+            r"(?:assistance|help|support)\b"
+        ),
+    ),
+    (
+        "all_code_without_ai",
+        re.compile(r"\bwrote\s+all\s+(?:the\s+)?code\s+without\s+ai\b"),
+    ),
+    (
+        "unaided_implementation",
+        re.compile(r"\bunaided\s+implementation\b"),
+    ),
+    (
+        "action_term_without_assistance",
+        re.compile(
+            rf"\b{_ATTRIBUTION_ACTION_TERM}\b[\w\s]{{0,40}}\bwithout\s+"
+            rf"(?:any\s+)?(?:assistance|help)\b"
+        ),
+    ),
+    (
+        "no_collaborators",
+        re.compile(r"\bno\s+collaborators?\b|\bwithout\s+collaborators?\b"),
+    ),
+    (
+        "entirely_alone",
+        re.compile(r"\bentirely\s+alone\b"),
     ),
 )
 
@@ -447,6 +554,33 @@ def validate_claim_semantic_boundaries(
     support = build_evidence_support_corpus(cited_evidence)
     errors: list[dict[str, Any]] = []
     seen_rules: set[str] = set()
+
+    # Actor-attribution overreach is unconditional: no cited Evidence and no
+    # human_approval value can license sole/exclusive/unaided-authorship
+    # wording, so this check runs regardless of Evidence support.
+    for rule_id, pattern in _ACTOR_ATTRIBUTION_OVERREACH_RULES:
+        if rule_id in seen_rules:
+            continue
+        match = pattern.search(wording_n)
+        if not match:
+            continue
+        seen_rules.add(rule_id)
+        errors.append(
+            _error(
+                ERROR_CODE,
+                claim_id=claim_id,
+                category=ACTOR_ATTRIBUTION_CATEGORY,
+                rule_id=rule_id,
+                matched_text=match.group(0).strip(),
+                detail=(
+                    "claim wording asserts unsupported sole/exclusive/unaided "
+                    f"authorship {match.group(0).strip()!r}; human_approval "
+                    "cannot establish sole intellectual authorship, exclusive "
+                    "implementation, absence of AI assistance, or absence of "
+                    "collaborators (ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1)"
+                ),
+            )
+        )
 
     for rule_id, category, claim_pat, evidence_pat in _BOUNDARY_RULES:
         if rule_id in seen_rules:

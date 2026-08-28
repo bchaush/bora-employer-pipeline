@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Claim Actor Attribution Semantic Guard Remediation v1 (IMPLEMENTED_PENDING_CLAUDE_REAUDIT)
+
+**Reason**
+
+Remediate Claude's `P-1 — HIGH` finding on `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`: the semantic guard had no rule enforcing the ADR's "Limits of Attribution," so `human_approval=true` on an otherwise-valid Claim could authorize wording asserting sole/exclusive/unaided authorship (e.g. "solely architected," "without any AI assistance," "no collaborators") with zero errors.
+
+**Changed**
+
+* `src/claim_semantic_guard.py`: new unconditional, system-wide rule set `_ACTOR_ATTRIBUTION_OVERREACH_RULES` (category `sole_exclusive_unaided_authorship_overreach`), covering sole-authorship, single-handed, exclusive-authorship/ownership, action-term-alone, no-AI-assistance, and no-collaborator wording. Runs regardless of cited Evidence support or `human_approval`, unlike the existing evidence-relative `_BOUNDARY_RULES`. Wired into the existing `validate_claim_semantic_boundaries()` call path — no other validator, schema, or matcher touched.
+* `tests/claim_actor_attribution_policy_test.py`: 8 required forbidden-wording adversarial cases (including the exact Claude regression example) plus 6 required safe-wording non-match cases, run through the real `validate_claim()` with `human_approval=true`.
+
+**Not changed**
+
+* Claim/Evidence/Experience schemas; `claim_lineage.py`; `claim_state_validation.py`; `requirement_match.py`; all five MarketMind Claim files (wording, state, lineage, `human_approval=false`); all six Winter Walk Claims (byte-unchanged, still `human_approval=true`/reusable); Evidence; Experiences; protected résumé master; résumé modules.
+
+**Tests / Verification**
+
+* Human-approval-bypass reproduction: valid Evidence + valid state + `human_approval=true` + forbidden wording → `valid_record=false`, `reusable=false`, `FORBIDDEN_SEMANTIC_PATTERN`.
+* All 8 required forbidden cases blocked; all 6 required safe cases pass; adversarial self-check variants (`sole architect`, `singlehandedly built`, `without AI assistance`, `no artificial intelligence assistance`, `exclusive implementation`, etc.) caught with no false positives on safe variants.
+* All 11 real Claims re-verified unaffected (6 Winter Walk reusable/approved; 5 MarketMind non-reusable/unapproved, content byte-unchanged).
+* 25/25 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 6 reusable — unchanged.
+
+**Limitations**
+
+Bounded deterministic pattern coverage for explicit sole/exclusive/unaided-authorship overreach; not exhaustive natural-language authorship detection, consistent with the existing semantic guard's documented scope.
+
+**Status**
+
+IMPLEMENTED_PENDING_CLAUDE_REAUDIT. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` remains open until this reaudit passes.
+
+---
+
 ## 2026-08-28 — Claim Actor Attribution Policy v1 (IMPLEMENTED_PENDING_CLAUDE_REAUDIT)
 
 **Reason**
