@@ -63,12 +63,10 @@ assert_true(cl["valid"] is True and cl["records_checked"] == 11, "Claim regressi
 reusable_approved = [
     cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable_approved) == 6, f"expected 6 reusable claims, got {reusable_approved}")
+assert_true(len(reusable_approved) == 11, f"expected 11 reusable claims, got {reusable_approved}")
 for claim_id, claim in cl["index"].items():
-    if claim_id.startswith("CLAIM_WW_"):
+    if claim_id.startswith("CLAIM_WW_") or claim_id.startswith("CLAIM_MM_"):
         assert_true(claim["human_approval"] is True, f"{claim['claim_id']} must be approved")
-    elif claim_id.startswith("CLAIM_MM_"):
-        assert_true(claim["human_approval"] is False, f"{claim['claim_id']} must remain draft")
 print("PASS 0: Experience/Evidence/Claim repositories unchanged and valid.")
 
 EVIDENCE_INDEX = ev["index"]

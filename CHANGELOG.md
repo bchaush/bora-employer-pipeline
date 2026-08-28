@@ -19,6 +19,43 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Approve MarketMind Claim wording (`CLAIM_MM_WORDING_APPROVAL_V1`)
+
+**Reason**
+
+Bora explicitly approved the exact existing wording of `CLAIM_MM_001` through `CLAIM_MM_005`, subject to their cited substantive Evidence and existing Claim boundaries.
+
+**Changed**
+
+* `claims/marketmind/CLAIM_MM_001.json` through `CLAIM_MM_005.json`: `human_approval: false → true`. No other field changed on any of the five files.
+* `tests/claim_actor_attribution_policy_test.py`, `tests/job_analysis_test.py`, `tests/marketmind_claim_drafting_test.py`, `tests/marketmind_evidence_extraction_test.py`, `tests/winter_walk_contact_resolution_test.py`, `golden-tests/run_job_analysis_golden_set.py`: updated assertions that hardcoded the prior ("unapproved," "reusable=6") state to reflect the new, legitimate state. All other assertions (lineage, state compatibility, schema, semantic-guard coverage, byte-integrity hashes) unchanged.
+
+**Not changed**
+
+* Claim wording, `evidence_ids`, `evidence_state` on all five MarketMind Claims; all Evidence records; both Experience records; all six Winter Walk Claims; protected résumé master; schemas; requirement matcher; `src/claim_semantic_guard.py` and other validators.
+
+**Meaning of this approval**
+
+Confirms only that it is truthful for Bora to describe himself using the exact stored conventional actor-attribution wording of each Claim. Does not establish sole authorship, exclusive implementation, absence of AI assistance, absence of collaborators, authorship of every line, production use, enterprise scale, business outcomes, users/adoption, or an employment relationship — per `ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1`.
+
+**Resulting state**
+
+* `CLAIM_MM_001`–`004`: `evidence_state=VERIFIED`, `valid_record=true`, `reusable=true`.
+* `CLAIM_MM_005`: `evidence_state=OBSERVED`, `valid_record=true`, `reusable=true` — reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule (unchanged validator logic; same rule already governing reusable, `OBSERVED` `CLAIM_WW_005`).
+* Reusable Claim count: 6 → **11**.
+* No résumé module created for MarketMind. No job-specific tailoring begun.
+
+**Tests / Verification**
+
+* 25/25 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable.
+* Semantic guard independently re-verified active against the real, now-approved claims: forbidden sole/exclusive/unaided-authorship variants of real claim wording still blocked; a narrow pre-existing action-term vocabulary gap (missing "integrate"/"automate"/"separate"/"document"/"define") was found and documented in `CURRENT_STATE.md` as a non-blocking follow-up — it does not affect any currently-approved wording.
+
+**Status**
+
+CLAIM_MM_WORDING_APPROVAL_V1 recorded. `MARKETMIND_CLAIM_DRAFTING_V1` remains open pending résumé-module creation, which requires separate, explicit approval.
+
+---
+
 ## 2026-08-28 — Close Claim Actor Attribution Policy v1 (CLOSED)
 
 **Reason**

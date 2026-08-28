@@ -20,7 +20,7 @@
     "model-driven scoring",
     "AI decision engine"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-28",
   "version": "1"
 }

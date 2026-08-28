@@ -106,7 +106,8 @@ evidence_index = ev_result["index"]
 
 
 # ---------------------------------------------------------------------------
-# 1. Every MarketMind claim validates as valid_record but not reusable
+# 1. Every MarketMind claim validates as valid_record and, after Bora's
+#    explicit approval of the exact wording, is reusable.
 # ---------------------------------------------------------------------------
 for claim_id in MARKETMIND_CLAIM_IDS:
     path = CLAIMS_ROOT / f"{claim_id}.json"
@@ -116,14 +117,10 @@ for claim_id in MARKETMIND_CLAIM_IDS:
         list(claim_validator.iter_errors(claim)) == [],
         f"{claim_id} failed claim schema",
     )
-    assert_true(claim["human_approval"] is False, f"{claim_id} must not be approved")
+    assert_true(claim["human_approval"] is True, f"{claim_id} must be Bora-approved")
     result = validate_claim(claim, evidence_index)
     assert_true(result["valid_record"] is True, f"{claim_id} must be valid_record: {result}")
-    assert_true(result["reusable"] is False, f"{claim_id} must not be reusable")
-    assert_true(
-        any(w.get("code") == "NOT_HUMAN_APPROVED" for w in result["warnings"]),
-        f"{claim_id} must warn NOT_HUMAN_APPROVED",
-    )
+    assert_true(result["reusable"] is True, f"{claim_id} must be reusable after approval")
     wording = claim["wording"].lower()
     for phrase in FORBIDDEN_INFLATION_PHRASES:
         assert_true(
@@ -131,7 +128,7 @@ for claim_id in MARKETMIND_CLAIM_IDS:
             f"{claim_id} contains forbidden inflation phrase: {phrase}",
         )
 
-print("PASS 1: MarketMind claims are valid_record, not reusable, not inflated.")
+print("PASS 1: MarketMind claims are valid_record, reusable, not inflated.")
 
 
 # ---------------------------------------------------------------------------
@@ -219,18 +216,22 @@ assert_true(claim_result["records_checked"] == 11, "expected 11 total claim reco
 reusable = [
     cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable) == 6, f"reusable claim count must remain 6, got {len(reusable)}")
+assert_true(len(reusable) == 11, f"reusable claim count must be 11, got {len(reusable)}")
 assert_true(
-    sorted(reusable) == sorted([f"CLAIM_WW_{i:03d}" for i in range(1, 7)]),
+    sorted(reusable)
+    == sorted(
+        [f"CLAIM_WW_{i:03d}" for i in range(1, 7)]
+        + [f"CLAIM_MM_{i:03d}" for i in range(1, 6)]
+    ),
     f"unexpected reusable claim set: {reusable}",
 )
 for claim_id in MARKETMIND_CLAIM_IDS:
     assert_true(
-        claim_result["index"][claim_id]["human_approval"] is False,
-        f"{claim_id} must remain unapproved",
+        claim_result["index"][claim_id]["human_approval"] is True,
+        f"{claim_id} must be Bora-approved",
     )
 
-print("PASS 4: 11 total claims; 6 reusable (Winter Walk only).")
+print("PASS 4: 11 total claims; 11 reusable (Winter Walk + Bora-approved MarketMind).")
 
 
 # ---------------------------------------------------------------------------

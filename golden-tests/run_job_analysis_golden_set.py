@@ -69,19 +69,18 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
     reusable_count = sum(
         1 for claim in cl["index"].values() if claim.get("human_approval") is True
     )
-    if reusable_count != 6:
-        fail(f"expected 6 reusable claims, got {reusable_count}")
+    if reusable_count != 11:
+        fail(f"expected 11 reusable claims, got {reusable_count}")
     for claim in cl["index"].values():
         claim_id = claim.get("claim_id", "")
-        if isinstance(claim_id, str) and claim_id.startswith("CLAIM_WW_"):
+        if isinstance(claim_id, str) and (
+            claim_id.startswith("CLAIM_WW_") or claim_id.startswith("CLAIM_MM_")
+        ):
             if claim.get("human_approval") is not True:
                 fail(f"{claim_id} must be approved/reusable gate")
-        elif isinstance(claim_id, str) and claim_id.startswith("CLAIM_MM_"):
-            if claim.get("human_approval") is not False:
-                fail(f"{claim_id} must remain unapproved draft")
     print(
         "PASS 0: repository regression "
-        "(2 Experience / 26 Evidence / 11 Claims / 6 reusable)."
+        "(2 Experience / 26 Evidence / 11 Claims / 11 reusable)."
     )
     return ev["index"], cl["index"]
 

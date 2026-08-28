@@ -144,10 +144,10 @@ for claim_id in MARKETMIND_CLAIM_IDS:
         claim["evidence_state"] == EXPECTED_STATE_BY_CLAIM[claim_id],
         f"{claim_id} state must be {EXPECTED_STATE_BY_CLAIM[claim_id]}",
     )
-    assert_true(claim["human_approval"] is False, f"{claim_id} must remain unapproved")
+    assert_true(claim["human_approval"] is True, f"{claim_id} must be Bora-approved")
     result = validate_claim(claim, evidence_index)
     assert_true(result["valid_record"] is True, f"{claim_id} must validate: {result}")
-    assert_true(result["reusable"] is False, f"{claim_id} must not be reusable")
+    assert_true(result["reusable"] is True, f"{claim_id} must be reusable after approval")
 
 assert_true(
     sha256_file(EVIDENCE_ROOT / "MM_AUTHOR_001.json") == mm_author_hash,

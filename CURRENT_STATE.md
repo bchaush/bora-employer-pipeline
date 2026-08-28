@@ -30,7 +30,7 @@ Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVID
 
 MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOSED**.
 
-MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW** (actor-attribution policy formalized).
+MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **CLAIM WORDING APPROVED — RÉSUMÉ MODULES NOT YET CREATED** (Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005`; see `CLAIM_MM_WORDING_APPROVAL_V1` below).
 
 Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **CLOSED** (P-1 HIGH semantic-guard remediation independently re-verified; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
 
@@ -38,7 +38,7 @@ Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
 
-Claim records: **11** total — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`; `human_approval=true`, `reusable=true`) plus 5 MarketMind draft claim candidates (`CLAIM_MM_001`–`CLAIM_MM_005`; `human_approval=false`, `reusable=false`).
+Claim records: **11** total, all `human_approval=true` and `reusable=true` — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable). Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. No MarketMind résumé module exists yet.
 
 No production engine yet.
 
@@ -307,17 +307,47 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Human review of five MarketMind Claim draft candidates before approval.
-2. Await explicit approval before résumé modules or job-specific tailoring.
-3. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` closed. Await explicit human approval before approving any MarketMind Claim or starting a new milestone.
+1. Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005` on 2026-08-28. All 11 Claims are now `human_approval=true` / reusable.
+2. Await explicit approval before creating any MarketMind résumé module or beginning job-specific tailoring.
+3. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` remains closed.
 
 ## Do Not Start Yet
 
-Do not approve MarketMind Claims, create résumé modules, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval.
+Do not create résumé modules, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Claim wording approval is not résumé-module approval.
 
 ## Next Approved Task
 
-None started. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` (including its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` follow-up) is closed.
+None started. `CLAIM_MM_WORDING_APPROVAL_V1` recorded Bora's approval of the five MarketMind Claims' exact wording; no résumé module or job-specific tailoring work has begun.
+
+---
+
+## 2026-08-28 — MarketMind Claim wording approval (`CLAIM_MM_WORDING_APPROVAL_V1`)
+
+**Reason**
+
+Bora explicitly reviewed and approved the exact existing wording of `CLAIM_MM_001` through `CLAIM_MM_005`, subject to their cited substantive Evidence and existing Claim boundaries (`allowed_contexts`/`forbidden_contexts`).
+
+**Recorded**
+
+* `human_approval: false → true` on all five MarketMind Claim files. No other field changed on any of them (wording, `evidence_ids`, `evidence_state`, `allowed_contexts`, `forbidden_contexts`, `date`, `version` all byte-unchanged).
+* Approval means only that it is truthful for Bora to describe himself using the exact stored conventional actor-attribution wording. It does **not** establish sole authorship, exclusive implementation, absence of AI assistance, absence of collaborators, authorship of every line, production use, enterprise scale, business outcomes, users/adoption, or an employment relationship.
+* `CLAIM_MM_001`–`004`: `evidence_state=VERIFIED`, `valid_record=true`, `reusable=true`.
+* `CLAIM_MM_005`: `evidence_state=OBSERVED`, `valid_record=true`, `reusable=true` — reusable per the existing, unmodified `REUSABLE_CLAIM_STATES = {VERIFIED, SUPPORTED, OBSERVED}` rule (the same rule already governing the reusable `CLAIM_WW_005`, also `OBSERVED`). No validator logic was changed to produce this result; it is the pre-existing architecture's own determination.
+* Reusable Claim count: **6 → 11** (all 11 Claims now reusable). This is a legitimate, validator-determined consequence of approval, not a hardcoded assumption.
+
+**Test/golden updates (legitimate, not weakening)**
+
+Several regression tests and the golden runner asserted the *prior* truth ("MarketMind claims remain unapproved," "reusable count = 6") as part of the now-closed drafting/policy milestones. Updated the specific outdated assertions in `tests/claim_actor_attribution_policy_test.py`, `tests/job_analysis_test.py`, `tests/marketmind_claim_drafting_test.py`, `tests/marketmind_evidence_extraction_test.py`, `tests/winter_walk_contact_resolution_test.py`, and `golden-tests/run_job_analysis_golden_set.py` to reflect the new, correct state (`human_approval=true`, reusable count 11). All lineage/state/schema/semantic-guard/byte-integrity assertions in these files were preserved unchanged.
+
+**Verified unchanged**
+
+* All five MarketMind Claim wording strings, `evidence_ids`, `evidence_state` — byte-identical to the closed drafting milestone.
+* All 14 Winter Walk Evidence, all 12 MarketMind Evidence, both Experience records, all 6 Winter Walk Claims, the protected résumé master — byte-unchanged.
+* No résumé module created. No schema changed. No requirement-matcher change.
+
+**Semantic-guard finding (not remediated in this milestone — approval-recording only)**
+
+While adversarially re-testing the semantic guard against the real, now-approved claim wording, a narrow gap was found: `src/claim_semantic_guard.py`'s `_ATTRIBUTION_ACTION_TERM` vocabulary (added in the P-1 remediation) omits "integrate," "automate," "separate," "document," and "define" — several of the ADR's own named conventional verbs, one of which ("Integrated") is the literal first word of `CLAIM_MM_003`'s real, approved wording. As a result, a hypothetical claim worded "Single-handedly integrated..." is not currently caught by the `single_handed_authorship` rule, though "Single-handedly built/implemented/..." is. This does not affect the actual approved wording of any of the five claims (none contain a forbidden qualifier), and all 8 originally-required forbidden test cases plus the exact Claude regression string remain blocked. Flagged as a LOW/MEDIUM follow-up for a future narrow patch extending the shared action-term vocabulary — out of scope for this approval-recording milestone.
 
 ---
 
