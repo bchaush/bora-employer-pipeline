@@ -19,6 +19,40 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Define project bullet rendering contract (`PROJECT_BULLET_RENDERING_CONTRACT_V1`)
+
+**Reason**
+
+Define the smallest safe contract for carrying `PROJECT_BULLET` modules (the five approved MarketMind bullets) through future derivative generation/rendering without requiring or inventing unsupported project-header metadata. `EXP_MM_001` has no verified employer, client, sponsor, formal title, paid relationship, project date, or location.
+
+**Changed**
+
+* Added `src/resume_project_bullet.py`: `validate_project_bullet_contract()` (a PROJECT_BULLET module must not carry `immutable_snapshot` and must not be referenced by any `experience_sections[].bullet_module_ids`) and `resolve_project_display_name()` (resolves only the verified `Experience.experience_name`, returns None rather than guessing when unresolved).
+* Wired `validate_project_bullet_contract()` into `validate_resume_master()` in `src/resume_validation.py`.
+* Added `tests/resume_project_bullet_contract_test.py`.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `resume/master/RESUME_MASTER_WW_V1.json` (data unchanged, only validator code added), `resume/drafts/`, `schemas/`, approved wording, `default_module_order`, `skills_order`.
+
+**Outcome**
+
+OUTCOME A (safe structural contract implemented now) rather than a blocking evidence-decision stop: `module_type` already distinguishes employment bullets from project bullets, and a module's own `experience_id` already attaches it to `EXP_MM_001` without an `experience_sections` entry. What was missing was a deterministic guarantee against future fabrication, now added. No project date, location, technology-display-line, URL, or formal title is verified or was added; actual document rendering of those fields still requires a separate future evidence/approval decision.
+
+**Tests / Verification**
+
+* Real master validates cleanly under the new rule; all 5 PROJECT_BULLET modules already conform.
+* Adversarially confirmed the rule fires: fabricated `immutable_snapshot` and `experience_sections` membership on a PROJECT_BULLET module both correctly rejected.
+* `resolve_project_display_name()` returns "MarketMind AI" for all 5 real modules, None for unresolved input.
+* Default derivative and explicit MarketMind selection behavior unchanged.
+* 28/28 test suites -- PASS. Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Status**
+
+PROJECT_BULLET_RENDERING_CONTRACT_V1_IMPLEMENTED_PENDING_REAUDIT. Not pushed. No resume generated. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close MarketMind resume module integration (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`, CLOSED)
 
 **Reason**

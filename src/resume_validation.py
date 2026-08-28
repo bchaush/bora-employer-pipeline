@@ -14,6 +14,7 @@ from resume_patch_apply import (
     reject_forbidden_patch_extension,
     validate_immutable_fields_preserved,
 )
+from resume_project_bullet import validate_project_bullet_contract
 from resume_protected_metadata import validate_protected_metadata_resolved
 from resume_semantic import (
     patch_contains_terminology_substitute,
@@ -198,6 +199,13 @@ def validate_resume_master(
             )
             if not binding["valid"]:
                 errors.extend(binding["errors"])
+
+            project_contract = validate_project_bullet_contract(
+                module,
+                experience_sections=sections if isinstance(sections, list) else None,
+            )
+            if not project_contract["valid"]:
+                errors.extend(project_contract["errors"])
 
     return {
         "valid": len(errors) == 0,
