@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close Claim Actor Attribution Policy v1 (CLOSED)
+
+**Reason**
+
+Independent Claude final re-audit of the P-1 HIGH semantic-guard remediation (commit `3902b86`) passed: fresh, independent reproduction of the exact bypass wording (valid Evidence + `VERIFIED` state + `human_approval=true` + sole/exclusive/unaided-authorship wording) returns `valid_record=false`, `reusable=false`, `FORBIDDEN_SEMANTIC_PATTERN`. All 8 required forbidden cases and 6 required safe cases re-verified independently. Zero drift confirmed on Winter Walk Claims/Evidence, MarketMind Evidence/Experience, and the protected résumé master across the full `2baffc6`–`3902b86` chain.
+
+**Changed**
+
+* Documentation only: `CURRENT_STATE.md`, `CHANGELOG.md` — mark `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` closed.
+
+**Not changed**
+
+* No code, schema, Claim, Evidence, Experience, or résumé file touched by this closure commit.
+
+**Tests / Verification**
+
+* 25/25 test suites — PASS (fresh re-run). Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 6 reusable — unchanged.
+* All 6 Winter Walk Claims: `valid_record=true`, `reusable=true`, `human_approval=true`, byte-unchanged.
+* All 5 MarketMind Claims: `valid_record=true`, `reusable=false`, `human_approval=false`, wording/state/lineage unchanged.
+
+**Status**
+
+CLOSED. `MARKETMIND_CLAIM_DRAFTING_V1` remains pending explicit human approval; no MarketMind Claim is reusable; no résumé module or output exists for MarketMind.
+
+---
+
 ## 2026-08-28 — Claim Actor Attribution Semantic Guard Remediation v1 (IMPLEMENTED_PENDING_CLAUDE_REAUDIT)
 
 **Reason**

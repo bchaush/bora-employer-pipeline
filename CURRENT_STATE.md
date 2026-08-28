@@ -32,7 +32,7 @@ MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOS
 
 MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW** (actor-attribution policy formalized).
 
-Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **IMPLEMENTED — PENDING CLAUDE REAUDIT** (P-1 HIGH semantic-guard remediation added; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
+Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **CLOSED** (P-1 HIGH semantic-guard remediation independently re-verified; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -309,7 +309,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Human review of five MarketMind Claim draft candidates before approval.
 2. Await explicit approval before résumé modules or job-specific tailoring.
-3. Claude reaudit of `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` follow-up (P-1 HIGH finding).
+3. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` closed. Await explicit human approval before approving any MarketMind Claim or starting a new milestone.
 
 ## Do Not Start Yet
 
@@ -317,7 +317,25 @@ Do not approve MarketMind Claims, create résumé modules, generate résumé out
 
 ## Next Approved Task
 
-`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` implemented pending Claude reaudit. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` remains open until that reaudit passes.
+None started. `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` (including its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` follow-up) is closed.
+
+---
+
+## 2026-08-28 — Claim Actor Attribution Policy v1 closure (CLOSED)
+
+**Reason**
+
+Independent Claude final re-audit of `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` (commit `3902b86`) confirmed the P-1 HIGH finding is remediated: fresh reproduction of the exact bypass wording against `human_approval=true` and otherwise-valid Evidence/state now returns `valid_record=false`, `reusable=false`, `FORBIDDEN_SEMANTIC_PATTERN`. All 8 required forbidden cases and 6 required safe cases independently re-verified. Zero drift confirmed across the full `2baffc6`–`3902b86` chain on Winter Walk Claims/Evidence, MarketMind Evidence/Experience, and the protected résumé master. 25/25 tests, Golden 15/15, repository counts unchanged (2 Experience / 26 Evidence / 11 Claims / 6 reusable).
+
+**Verified unchanged across the full chain**
+
+* All 6 Winter Walk Claims: byte-unchanged, `valid_record=true`, `reusable=true`, `human_approval=true`.
+* All 5 MarketMind Claims: wording/state/lineage unchanged, `valid_record=true`, `reusable=false`, `human_approval=false`.
+* Evidence, Experiences, protected résumé master: byte-unchanged.
+
+**Status**
+
+`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` — **CLOSED**. `MARKETMIND_CLAIM_DRAFTING_V1` remains `IMPLEMENTED — PENDING HUMAN REVIEW`; no MarketMind Claim is approved or reusable. No résumé module or résumé output exists for MarketMind.
 
 ---
 
