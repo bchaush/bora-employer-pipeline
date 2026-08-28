@@ -40,13 +40,13 @@ MarketMind Résumé Module Drafting v1 (`MARKETMIND_RESUME_MODULE_DRAFTING_V1`) 
 
 MarketMind Résumé Module Wording Refinement v1 (`MARKETMIND_RESUME_MODULE_WORDING_REFINEMENT_V1`) = **CLOSED** (independent Cursor draft/architecture audit passed; Bora's wording review requested targeted refinements to 4 of the 5 draft wordings; superseded by explicit approval below).
 
-MarketMind Résumé Module Approval and Master Integration v1 (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (Bora explicitly approved all five exact MarketMind module sentences on 2026-08-28; all five integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6) as `PROJECT_BULLET` entries; see below).
+MarketMind Résumé Module Approval and Master Integration v1 (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`) = **CLOSED** (independent Cursor re-audit passed: `CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`; Bora explicitly approved all five exact MarketMind module sentences on 2026-08-28; all five integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6, 11 modules) as `PROJECT_BULLET` entries; see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
 
-Claim records: **11** total, all `human_approval=true` and `reusable=true` — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable). Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. No MarketMind résumé module exists yet.
+Claim records: **11** total, all `human_approval=true` and `reusable=true` — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable). Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. Five human-approved MarketMind résumé modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`) now exist in the protected master (`resume/master/RESUME_MASTER_WW_V1.json`, version 6, 11 total modules) and are available for controlled, explicit selection; they are not in `default_module_order` and are therefore not automatically included in any derivative. No job-specific résumé has yet been generated.
 
 No production engine yet.
 
@@ -316,16 +316,52 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 ## Immediate Next Steps
 
 1. Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005` on 2026-08-28. All 11 Claims are now `human_approval=true` / reusable.
-2. Five MarketMind résumé-module bullet drafts created 2026-08-28, refined once per Bora's wording review (independent Cursor audit passed: `CURSOR_MARKETMIND_RESUME_MODULE_DRAFTING_FINAL_PASS`), then explicitly approved by Bora for the exact five sentences on 2026-08-28 and integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6) as `PROJECT_BULLET` modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`). No `experience_sections` entry was created for `EXP_MM_001` — no verified `formal_title`/`date_range`/employer relationship exists for this `PERSONAL_PROJECT`. Modules are present in the master but excluded from `default_module_order`, so none appears in any derivative unless explicitly selected via a future job-tailoring milestone. `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json` preserved as the historical/audit record, wording byte-identical to the master.
+2. Five MarketMind résumé-module bullet drafts created 2026-08-28, refined once per Bora's wording review, then explicitly approved by Bora for the exact five sentences on 2026-08-28 and integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6, 11 total modules) as `PROJECT_BULLET` modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`). Independent Cursor re-audit passed (`CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); milestone closed and pushed. No `experience_sections` entry was created for `EXP_MM_001` — no verified `formal_title`/`date_range`/employer relationship exists for this `PERSONAL_PROJECT`. Modules are present in the master but excluded from `default_module_order`, so none appears in any derivative unless explicitly selected in a future job-tailoring milestone. `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json` preserved as the historical/audit record, wording byte-identical to the master.
 3. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` follow-up are both closed and pushed.
 
 ## Do Not Start Yet
 
-Do not add MarketMind modules to `default_module_order`, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Résumé-module wording approval is not résumé-generation approval, and it is not automatic inclusion in every future résumé.
+Do not add MarketMind modules to `default_module_order`, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Résumé-module integration into the master is not résumé-generation approval, and it is not automatic inclusion in every future résumé.
 
 ## Next Approved Task
 
-None started. `MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1` integrated five Bora-approved bullet modules into the protected master, pending independent Claude re-audit; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1` is closed; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Close MarketMind résumé module integration (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of commit `8b01622` passed: `CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. One stale documentation sentence was identified ("No MarketMind résumé module exists yet" in `CURRENT_STATE.md`, left over from before the modules were integrated) and corrected; no other change was required.
+
+**Confirmed by the re-audit**
+
+* All five Bora-approved MarketMind wordings are byte-identical in the protected master; Claim/Evidence lineage intact; `CLAIM_MM_005` remains `OBSERVED`; actor-attribution boundaries safe.
+* All five production `PROJECT_BULLET` modules pass schema/semantic/lineage validation.
+* MarketMind modules are `ACTIVE` but absent from `default_module_order` — selectable explicitly, not included by default.
+* Omitting an `experience_sections` entry for `EXP_MM_001` is structurally safe at current architecture depth; `PROJECT_BULLET` is structurally supported for storage/selection; future visual rendering remains deferred.
+* The four pre-existing test-scoping changes (`tests/marketmind_resume_module_drafting_test.py`, `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`, `tests/winter_walk_resume_title_resolution_test.py`) were legitimate — no Winter Walk assertion weakened.
+* Winter Walk, Claims, Evidence, Experiences, schemas, and `src/` byte-unchanged.
+* 27/27 test suites — PASS. Golden 15/15 — PASS.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: corrected the stale "No MarketMind résumé module exists yet" sentence to accurately state that five human-approved MarketMind résumé modules now exist in the protected master, are available for controlled explicit selection, are not in `default_module_order`, and are therefore not automatically included in any derivative; no job-specific résumé has yet been generated. Marked the milestone `CLOSED`.
+* `CHANGELOG.md`: closure entry recorded.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, job-analysis logic, immigration logic. Repository counts unchanged: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Deferred, not addressed in this closure**
+
+* `PROJECT_BULLET` future rendering/export presentation — deferred to a future rendering/tailoring milestone.
+* A cosmetic test-log message referring to "six Winter Walk modules" — informational only, does not weaken behavior, not fixed here.
+
+**Status**
+
+`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1_CLOSED`. No résumé generated. No job-specific tailoring begun. No new Experience started.
 
 ---
 

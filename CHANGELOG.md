@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close MarketMind resume module integration (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of commit `8b01622` passed: `CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. One stale documentation sentence was corrected; no other change required.
+
+**Changed**
+
+* `CURRENT_STATE.md`: corrected the stale "No MarketMind resume module exists yet" sentence to accurately state that five human-approved MarketMind resume modules exist in the protected master, are available for controlled explicit selection, are not in `default_module_order`, and are not automatically included in any derivative; no job-specific resume has yet been generated. Milestone marked CLOSED.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, job-analysis logic, immigration logic.
+
+**Confirmed by the independent re-audit**
+
+* All five Bora-approved wordings byte-identical; Claim/Evidence lineage intact; `CLAIM_MM_005` remains OBSERVED; actor-attribution boundaries safe.
+* All five `PROJECT_BULLET` modules pass schema/semantic/lineage validation; ACTIVE but absent from `default_module_order` (selectable, not default-included).
+* Omitting an `experience_sections` entry for `EXP_MM_001` remains structurally safe; MarketMind remains a PERSONAL_PROJECT; no unsupported project metadata invented.
+* Winter Walk, Claims, Evidence, Experiences unchanged.
+* 27/27 tests PASS. Golden 15/15 PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Deferred (not addressed here)**
+
+* PROJECT_BULLET future rendering/export presentation.
+* Cosmetic test-log wording referring to "six Winter Walk modules" (informational only).
+
+**Status**
+
+MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1_CLOSED. No resume generated. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Approve MarketMind resume modules and integrate into protected master (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`)
 
 **Reason**
