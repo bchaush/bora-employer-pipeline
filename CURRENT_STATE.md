@@ -196,10 +196,20 @@ No production engine yet.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
   * Status: **CLOSED**.
+* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**IMPLEMENTED_PENDING_HUMAN_REVIEW**):
+
+  * First real evidence-controlled résumé module set for `EXP_WW_001` only.
+  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json`.
+  * Six candidate bullets (`MOD_WW_001_SCOPE` through `MOD_WW_006_PROCESS`), one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
+  * All module wording validated through closed résumé architecture (lineage, semantic guard, style, immutability).
+  * Contact, formal title, and date range use `PENDING_BORA_REVIEW` placeholders; no Bora approval recorded.
+  * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
+  * Tests: `tests/master_resume_winter_walk_test.py`.
+  * Status: **IMPLEMENTED_PENDING_HUMAN_REVIEW** (awaiting ChatGPT inspection + explicit Bora wording review; not CLOSED).
 
 ## Current Task
 
-None active. `RESUME_ARCHITECTURE_V1` = **CLOSED**. Awaiting explicit approval for the next milestone. Do not begin master résumé authoring or job-specific résumé generation unless explicitly approved.
+`MASTER_RESUME_WINTER_WALK_V1` = **IMPLEMENTED_PENDING_HUMAN_REVIEW**. Awaiting ChatGPT inspection and explicit Bora wording review. Do not treat candidate module wording as approved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -211,7 +221,7 @@ None active. `RESUME_ARCHITECTURE_V1` = **CLOSED**. Awaiting explicit approval f
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
-* Master résumé authoring / job-specific résumé generation / rendering / export (DOCX/PDF)
+* Master résumé Winter Walk candidate content (`MASTER_RESUME_WINTER_WALK_V1`) implemented pending human review; full master résumé / export pipeline not built
 * Networking research
 * Google Workspace / external integrations
 * Automated monitoring
@@ -221,7 +231,7 @@ None active. `RESUME_ARCHITECTURE_V1` = **CLOSED**. Awaiting explicit approval f
 * No production application automation exists.
 * No external integrations are connected.
 * No job applications can be submitted automatically.
-* Résumé architecture v1 closed (schemas + validators + synthetic fixtures); no master résumé or export pipeline yet.
+* Résumé architecture v1 closed; Winter Walk candidate master modules exist under `resume/master/`; no export pipeline yet.
 * Six Winter Walk Claim Bank records are Bora-approved and reusable under production claim validation.
 * Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No runtime workflow depends on multi-model agreement; deterministic validators enforce invariants; evidence wins over model opinion; Bora retains consequential approval.
@@ -245,12 +255,14 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Await explicit approval for the next milestone (do not auto-start master résumé authoring or job-specific résumé generation).
+1. ChatGPT inspection of `MASTER_RESUME_WINTER_WALK_V1` candidate module wording.
+2. Bora explicit wording review/approval for Winter Walk bullets and immutable header placeholders.
+3. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
 
-Do not begin master résumé authoring, job-specific résumé generation, or rendering/export without explicit approval.
+Do not treat candidate module wording as Bora-approved. Do not begin job-specific résumé generation, rendering/export, or additional experience sections without explicit approval.
 
 ## Next Approved Task
 
-None started.
+`MASTER_RESUME_WINTER_WALK_V1` implemented pending human review. No next milestone started.

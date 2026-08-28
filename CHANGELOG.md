@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Implement master résumé Winter Walk v1 (IMPLEMENTED_PENDING_HUMAN_REVIEW)
+
+**Reason**
+
+Create the first real evidence-controlled résumé module set for trusted Winter Walk experience (`EXP_WW_001`) and prove real content passes the closed résumé architecture. Not the complete master résumé.
+
+**Changed**
+
+* Protected master content: `resume/master/RESUME_MASTER_WW_V1.json`.
+* Six candidate bullets, one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
+* Immutable header placeholders (`PENDING_BORA_REVIEW`) for contact, formal title, date range.
+* Tests: `tests/master_resume_winter_walk_test.py`.
+* Status → **IMPLEMENTED_PENDING_HUMAN_REVIEW** (not CLOSED).
+
+**Affected Areas**
+
+* `resume/master/RESUME_MASTER_WW_V1.json`
+* `tests/master_resume_winter_walk_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/master_resume_winter_walk_test.py` — PASS
+* 17/17 established + new test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+IMPLEMENTED_PENDING_HUMAN_REVIEW
+
+---
+
 ## 2026-08-28 — Close résumé architecture v1 (CLOSED)
 
 **Reason**

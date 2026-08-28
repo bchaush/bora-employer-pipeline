@@ -1,0 +1,196 @@
+{
+  "master_id": "RESUME_MASTER_WW_V1",
+  "version": "1",
+  "protected": true,
+  "contact": {
+    "name": "PENDING_BORA_REVIEW",
+    "email": null,
+    "phone": null,
+    "location": null,
+    "linkedin": null
+  },
+  "education": [],
+  "modules": [
+    {
+      "module_id": "MOD_WW_001_SCOPE",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_001"],
+      "evidence_ids": ["WW_ARCH_001"],
+      "wording": "Defined the Winter Walk OP Recommendation Adoption and Support System as an internal Google Workspace operating tool and documented scope boundaries excluding CRM, public dashboard, partner ranking, AI auto-sending, and causal fundraising-impact modeling.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation"
+      ],
+      "capabilities": [
+        "requirements definition",
+        "system scope boundary"
+      ],
+      "immutable_snapshot": {
+        "organization": "Winter Walk",
+        "formal_title": "PENDING_BORA_REVIEW",
+        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+        "date_range": "PENDING_BORA_REVIEW"
+      },
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_WW_002_CONTROLS",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_002"],
+      "evidence_ids": ["WW_CTRL_001", "WW_CTRL_002"],
+      "wording": "Implemented fail-closed follow-up send controls that block live email sending when a master kill switch, test mode, or live follow-up restriction is active before per-row Follow_Up_Queue eligibility is evaluated.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Technical Operations",
+        "Implementation"
+      ],
+      "capabilities": [
+        "fail-closed controls",
+        "follow-up queue gating"
+      ],
+      "immutable_snapshot": {
+        "organization": "Winter Walk",
+        "formal_title": "PENDING_BORA_REVIEW",
+        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+        "date_range": "PENDING_BORA_REVIEW"
+      },
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_WW_003_INTAKE",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_003"],
+      "evidence_ids": ["WW_DATA_002"],
+      "wording": "Built Google Drive CSV intake into Workbook A with automated import logging that records Success, Held, and Failed run statuses.",
+      "allowed_role_families": [
+        "Data Operations",
+        "Business Systems",
+        "Implementation"
+      ],
+      "capabilities": [
+        "structured data intake",
+        "import logging"
+      ],
+      "immutable_snapshot": {
+        "organization": "Winter Walk",
+        "formal_title": "PENDING_BORA_REVIEW",
+        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+        "date_range": "PENDING_BORA_REVIEW"
+      },
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_WW_004_SYNC",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_004"],
+      "evidence_ids": ["WW_CONN_001", "WW_SYNC_001"],
+      "wording": "Built automated mapping from self-report form responses into an Evidence_Log and synchronized approved evidence updates into an Adoption_Matrix with approval-sync audit logging.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Business Process",
+        "Implementation",
+        "Data Operations"
+      ],
+      "capabilities": [
+        "form-to-evidence mapping",
+        "approval sync"
+      ],
+      "immutable_snapshot": {
+        "organization": "Winter Walk",
+        "formal_title": "PENDING_BORA_REVIEW",
+        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+        "date_range": "PENDING_BORA_REVIEW"
+      },
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_WW_005_UAT",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_005"],
+      "evidence_ids": ["WW_TEST_001"],
+      "wording": "Documented Winter Walk Workbook B pilot and UAT results, including ten pilot test rows recorded as PASS for import validation, PII absence checks, applicability cross-checks, and related functional scenarios.",
+      "allowed_role_families": [
+        "Implementation",
+        "Technical Operations",
+        "Business Systems"
+      ],
+      "capabilities": [
+        "pilot testing",
+        "UAT documentation"
+      ],
+      "immutable_snapshot": {
+        "organization": "Winter Walk",
+        "formal_title": "PENDING_BORA_REVIEW",
+        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+        "date_range": "PENDING_BORA_REVIEW"
+      },
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_WW_006_PROCESS",
+      "module_type": "BULLET",
+      "experience_id": "EXP_WW_001",
+      "claim_ids": ["CLAIM_WW_006"],
+      "evidence_ids": ["WW_PROC_001"],
+      "wording": "Documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering evidence tracking, review, follow-up, and human approval.",
+      "allowed_role_families": [
+        "Business Process",
+        "Business Systems",
+        "Implementation",
+        "process mapping"
+      ],
+      "capabilities": [
+        "process_mapping"
+      ],
+      "immutable_snapshot": {
+        "organization": "Winter Walk",
+        "formal_title": "PENDING_BORA_REVIEW",
+        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+        "date_range": "PENDING_BORA_REVIEW"
+      },
+      "status": "ACTIVE"
+    }
+  ],
+  "experience_sections": [
+    {
+      "section_id": "SEC_WW_001",
+      "experience_id": "EXP_WW_001",
+      "organization": "Winter Walk",
+      "formal_title": "PENDING_BORA_REVIEW",
+      "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
+      "date_range": "PENDING_BORA_REVIEW",
+      "location": null,
+      "bullet_module_ids": [
+        "MOD_WW_001_SCOPE",
+        "MOD_WW_002_CONTROLS",
+        "MOD_WW_003_INTAKE",
+        "MOD_WW_004_SYNC",
+        "MOD_WW_005_UAT",
+        "MOD_WW_006_PROCESS"
+      ]
+    }
+  ],
+  "default_module_order": [
+    "MOD_WW_001_SCOPE",
+    "MOD_WW_002_CONTROLS",
+    "MOD_WW_003_INTAKE",
+    "MOD_WW_004_SYNC",
+    "MOD_WW_005_UAT",
+    "MOD_WW_006_PROCESS"
+  ],
+  "skills_order": [
+    "Google Workspace",
+    "process mapping",
+    "requirements definition",
+    "fail-closed controls",
+    "structured data intake",
+    "UAT documentation"
+  ],
+  "date": "2026-08-28",
+  "notes": "MASTER_RESUME_WINTER_WALK_V1 candidate content. Module wording and immutable header fields (contact, formal_title, date_range) are PENDING_BORA_REVIEW. No Bora approval recorded. Not a submitted résumé."
+}
