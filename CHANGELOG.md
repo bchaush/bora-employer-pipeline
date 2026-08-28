@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Reapprove corrected CLAIM_WW_006 (P-2_EVIDENCE_MODEL_RESOLVED)
+
+**Reason**
+
+Bora explicitly reapproved corrected `CLAIM_WW_006` for reusable use after evidence-bounded wording remediation (`data intake` removed).
+
+**Changed**
+
+* `CLAIM_WW_006`: `human_approval` false → true only (wording unchanged).
+* Matcher positive `process_mapping` use enabled.
+* `GT_PROCESS_MAP_P2`: REJECT/NONE → APPLY/STRONG with provenance.
+* P-2 status: `P-2_EVIDENCE_MODEL_RESOLVED`.
+
+**Affected Areas**
+
+* `claims/winter_walk/CLAIM_WW_006.json`
+* `golden-tests/job_analysis/GT_PROCESS_MAP_P2/expected.json`
+* tests, golden runner, `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Full established suites + golden runner — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — PASS
+
+**Status**
+
+P-2_EVIDENCE_MODEL_RESOLVED
+
+---
+
 ## 2026-08-28 — Correct CLAIM_WW_006 evidence-bounded wording (P2_PROCESS_MAPPING_CLAIM_PENDING_REAPPROVAL)
 
 **Reason**

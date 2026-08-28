@@ -31,7 +31,7 @@
     "Celonis",
     "UiPath Process Mining"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-28",
   "version": "1"
 }
