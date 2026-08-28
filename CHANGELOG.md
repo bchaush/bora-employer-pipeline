@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close Winter Walk résumé title resolution v1 (CLOSED)
+
+**Reason**
+
+Claude final adversarial re-audit `CLAUDE_WINTER_WALK_RESUME_TITLE_RESOLUTION_V1_FINAL_PASS` independently verified L-1 remediation fixed. Operational closure of title-resolution milestone.
+
+**Changed**
+
+* Status → **CLOSED** for `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`.
+* Milestone chain recorded: implementation `e3c83a1`, L-1 remediation `1ccad88`.
+* Display-title/source-title separation preserved; six Bora-approved module strings unchanged; source truth unchanged.
+* `MASTER_RESUME_WINTER_WALK_V1` remains **METADATA_PARTIAL_PENDING_CONTACT** (contact unresolved; not CLOSED).
+* **I-1 (non-blocking):** future `immutable_snapshot` sentinel coverage for `degree_name`, `school_name`, `approved_metrics`, `approved_tools` documented; not implemented.
+* Documentation-only closure; no code, Evidence, Claim, Experience, or résumé content changes.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Pre-closure: 21/21 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+* Six Bora-approved module strings — unchanged
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-28 — Winter Walk résumé title resolution v1 L-1 remediation (REMEDIATED_PENDING_EXTERNAL_REAUDIT)
 
 **Reason**

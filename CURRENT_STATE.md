@@ -212,19 +212,21 @@ No production engine yet.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
   * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_resume_title_resolution_test.py`.
   * Status: **METADATA_PARTIAL_PENDING_CONTACT** (not CLOSED).
-* Winter Walk Résumé Title Resolution v1 (`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`) (**REMEDIATED_PENDING_EXTERNAL_REAUDIT**):
+* Winter Walk Résumé Title Resolution v1 (`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`) (**CLOSED**):
 
   * Minimal architecture extension: `source_contractual_position`, `source_functional_role`, `display_title`, `display_title_approval` on experience sections; `display_title` on module immutable snapshots.
   * `formal_title` sentinel preserved; human-approved display label bound via `approved_display_title` approval metadata (`is_source_verbatim=false`).
   * Export gate accepts approved display title when source formal title unresolved; contact unresolved still blocks export.
-  * Claude audit L-1 remediated: module `immutable_snapshot.display_title` must match corresponding experience section's approved `display_title`; module snapshots cannot independently establish title readiness (`MODULE_DISPLAY_TITLE_MISMATCH`, `MODULE_DISPLAY_TITLE_APPROVAL_UNRESOLVED`, `MODULE_DISPLAY_TITLE_SECTION_NOT_FOUND`).
-  * Experience/Evidence/Claims unchanged; six module wordings unchanged.
+  * Implementation commit `e3c83a1`; L-1 remediation commit `1ccad88` (module `immutable_snapshot.display_title` bound to section-approved `display_title` via `experience_id`).
+  * Claude audit L-1 remediated; Claude final adversarial re-audit: `CLAUDE_WINTER_WALK_RESUME_TITLE_RESOLUTION_V1_FINAL_PASS` (no findings).
+  * Experience/Evidence/Claims unchanged; six module wordings unchanged; display-title/source-title separation preserved.
   * Tests: `tests/winter_walk_resume_title_resolution_test.py`, `tests/resume_module_display_title_binding_test.py`.
-  * Status: **REMEDIATED_PENDING_EXTERNAL_REAUDIT** (not CLOSED).
+  * **I-1 (non-blocking):** résumé protected-metadata export guard `immutable_snapshot` sentinel coverage for `degree_name`, `school_name`, `approved_metrics`, `approved_tools` remains a future note; not implemented in this milestone.
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` = **REMEDIATED_PENDING_EXTERNAL_REAUDIT**. Claude L-1 module-to-section display title binding gap remediated; display title resolved via human-approved presentation label; contact remains pending. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_PARTIAL_PENDING_CONTACT**. Title resolution closed; contact remains unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 * Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**CLOSED**):
 
   * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
@@ -241,7 +243,7 @@ No production engine yet.
 
 ## Current Task
 
-`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT**. Module wording Bora-approved; offer-letter metadata ingested and export-gate M-1 closed. Formal title and contact remain unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`MASTER_RESUME_WINTER_WALK_V1` = **METADATA_PARTIAL_PENDING_CONTACT**. Module wording Bora-approved; offer-letter metadata and display title resolved; contact remains unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -288,8 +290,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 ## Immediate Next Steps
 
 1. Resolve contact block when Bora provides approved contact facts.
-2. External re-audit of `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` (L-1 remediation).
-3. Await explicit approval before job-specific tailoring or additional experience sections.
+2. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
 
@@ -297,4 +298,4 @@ Do not begin job-specific résumé generation, rendering/export, or additional e
 
 ## Next Approved Task
 
-`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` remediated pending external re-audit. Contact resolution remains the bounded next task. No next milestone started.
+Contact resolution is the bounded next task. `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` closed. No next milestone started.
