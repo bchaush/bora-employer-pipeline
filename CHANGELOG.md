@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close Winter Walk contact block resolution v1 (CLOSED)
+
+**Reason**
+
+Claude final adversarial audit `CLAUDE_CONTACT_BLOCK_RESOLUTION_V1_FINAL_PASS` independently verified contact resolution behavior. Operational closure of contact-block milestone.
+
+**Changed**
+
+* Status → **CLOSED** for `CONTACT_BLOCK_RESOLUTION_V1`.
+* Milestone chain recorded: implementation `a6386b0`.
+* Contact metadata resolved from Bora-provided facts; no schema broadening; contact remains immutable/protected; explicit `human_approval` still required for export.
+* `CONTACT_RESOLVED` master note is documentary only; no validator uses notes as truth/approval oracle.
+* **I-1 (non-blocking):** future `immutable_snapshot` sentinel coverage documented; not implemented.
+* `MASTER_RESUME_WINTER_WALK_V1` remains **METADATA_RESOLVED_PENDING_EXPORT_PIPELINE** (not CLOSED).
+* Documentation-only closure; no code, Evidence, Claim, Experience, or résumé content changes.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Pre-closure: 22/22 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+* Six Bora-approved module strings — unchanged
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-28 — Winter Walk contact block resolution v1 (IMPLEMENTED_PENDING_ADVERSARIAL_REVIEW)
 
 **Reason**
