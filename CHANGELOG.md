@@ -19,6 +19,37 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Approve CLAIM_WW_006 for reusable use (P-2_EVIDENCE_MODEL_RESOLVED)
+
+**Reason**
+
+Bora explicitly approved `CLAIM_WW_006` for reusable use in a distinct approval step, following repository two-step claim convention after P-2 audit remediation.
+
+**Changed**
+
+* `CLAIM_WW_006`: `human_approval` false → true only.
+* Matcher positive `process_mapping` use enabled via reusable claim gate.
+* `GT_PROCESS_MAP_P2`: REJECT/NONE → APPLY/STRONG with provenance.
+* P-2 status: `P-2_EVIDENCE_MODEL_RESOLVED`.
+* Claim wording, lineage, contexts, and Evidence unchanged.
+
+**Affected Areas**
+
+* `claims/winter_walk/CLAIM_WW_006.json` (`human_approval`, `date`)
+* `golden-tests/job_analysis/GT_PROCESS_MAP_P2/expected.json`
+* tests, golden runner, `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Full established suites + golden runner — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — PASS
+
+**Status**
+
+P-2_EVIDENCE_MODEL_RESOLVED
+
+---
+
 ## 2026-08-28 — Remediate P-2 process-mapping audit P-1–P-4 (P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL)
 
 **Reason**

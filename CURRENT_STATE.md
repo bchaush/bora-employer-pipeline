@@ -22,13 +22,13 @@ Job Analysis v1 first vertical slice = **CLOSED**.
 
 Job Analysis v1 Golden Set = **CLOSED**.
 
-P-2 process-mapping evidence model = **P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL**.
+P-2 process-mapping evidence model = **P-2_EVIDENCE_MODEL_RESOLVED** (CLAIM_WW_006 approved for reusable use).
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
 Evidence records: **13** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping).
 
-Claim records: **6** under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`). **5** reusable (`CLAIM_WW_001`–`CLAIM_WW_005`, `human_approval=true`). `CLAIM_WW_006` exists (`valid_record=true`) but `human_approval=false` (`reusable=false`) pending distinct Bora approval.
+Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
 
 No production engine yet.
 
@@ -159,16 +159,16 @@ No production engine yet.
   * Second Claude re-audit findings remediated: PRIORITY distinct-Claim breadth (anti requirement-splitting); expanded trusted synonym recall; Application Analyst / Application Support family tokens (Blueprint §6).
   * Final Claude residual findings remediated: N-1 synonym paraphrases (needs→requirements, structured/tabular ingest/load, validate pilot); N-2 plural `applications analyst`; N-3 Priority breadth assumption documented in code (no logic change).
   * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
-  * **P-2 evidence model remediated** (`P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL`): `WW_PROC_001` cites Master Blueprint Section 1 Executive Summary only (`process_mapping`); `workflow_analysis` removed; `CLAIM_WW_006` wording corrected; `human_approval=false`; matcher positive use blocked until distinct Bora approval; `GT_PROCESS_MAP_P2` reflects REJECT/NONE pending approval.
+  * **P-2 evidence model resolved**: `WW_PROC_001` + approved `CLAIM_WW_006` (`process_mapping`); Bora explicitly approved `CLAIM_WW_006` for reusable use (2026-08-28); matcher positive use enabled; `GT_PROCESS_MAP_P2` routes APPLY.
   * Claude P-2 audit remediation applied (`CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_CHANGES_REQUIRED`).
   * No résumé-generation work begun.
   * Status: **CLOSED**.
 
 ## Current Task
 
-`P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL**.
+`P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **P-2_EVIDENCE_MODEL_RESOLVED**.
 
-Evidence basis corrected; `process_mapping` supported at evidence layer; `CLAIM_WW_006` awaits explicit Bora approval before reusable/matcher positive use. Blocker: `EXPLICIT_BORA_CLAIM_APPROVAL_REQUIRED`. Do not infer approval from implementation direction. Do not begin résumé generation. Do not push until approval milestone completes.
+Bora explicitly approved `CLAIM_WW_006` for reusable use. Six reusable Winter Walk claims. Awaiting explicit next approved task. Do not begin résumé generation unless explicitly approved.
 
 ## Not Built Yet
 
@@ -214,15 +214,13 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Bora explicit approval of `CLAIM_WW_006` in a distinct step (`EXPLICIT_BORA_CLAIM_APPROVAL_REQUIRED`).
-2. After approval: enable matcher positive use and update `GT_PROCESS_MAP_P2` if routing legitimately changes.
-3. Do not begin résumé generation until explicitly approved.
+1. Await explicit approval for the next milestone (do not auto-start résumé generation).
+2. Additional Experience/Evidence/Claims only when explicitly approved.
 
 ## Do Not Start Yet
 
 Do not begin:
 
-* inferring `CLAIM_WW_006` human approval from implementation or audit direction;
 * résumé modules / resume generation;
 * inventing additional Experience IDs without evidence/ADR need;
 * Winter Walk Batch 2 without explicit approval;
@@ -233,4 +231,4 @@ Do not begin:
 
 ## Next Approved Task
 
-Distinct Bora approval of `CLAIM_WW_006` for reusable use (not started).
+None started. Awaiting Bora's explicit next approved task after P-2 resolution.
