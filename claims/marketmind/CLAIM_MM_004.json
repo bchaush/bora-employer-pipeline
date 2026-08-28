@@ -4,10 +4,9 @@
   "evidence_ids": [
     "MM_GEOFENCE_001",
     "MM_RATELIMIT_001",
-    "MM_FALLBACK_001",
-    "MM_AUTHOR_001"
+    "MM_FALLBACK_001"
   ],
-  "evidence_state": "OBSERVED",
+  "evidence_state": "VERIFIED",
   "allowed_contexts": [
     "resume",
     "interview",

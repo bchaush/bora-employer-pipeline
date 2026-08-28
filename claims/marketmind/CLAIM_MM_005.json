@@ -2,8 +2,7 @@
   "claim_id": "CLAIM_MM_005",
   "wording": "Built an automated pytest validation suite covering the MarketMind screening pipeline.",
   "evidence_ids": [
-    "MM_TEST_001",
-    "MM_AUTHOR_001"
+    "MM_TEST_001"
   ],
   "evidence_state": "OBSERVED",
   "allowed_contexts": [

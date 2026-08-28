@@ -31,6 +31,10 @@ Never invent or infer a factual claim merely to improve job fit. Unknown informa
 - Do NOT fabricate: work experience, technologies, metrics, employment dates, titles, immigration/OPT facts, employer details, sponsorship facts, or résumé claims.
 - Every material factual claim must trace directly to approved evidence in `evidence/` or `claims/`. No evidence lineage = no claim creation.
 
+## Claim Actor Attribution (v1)
+
+Substantive Evidence in `evidence_ids` establishes what happened. Bora's explicit `human_approval` on the exact Claim establishes conventional résumé active-voice actor attribution for that supported work. Human approval cannot create unsupported substantive facts. Authoritative policy: `docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md`.
+
 ## Deterministic Work vs AI Work
 - **Code (Deterministic)**: IDs, duplicate detection, dates, paths, schemas, state, audit logs, retries, idempotency, validation, and missing field checks.
 - **AI (Semantic)**: Interpreting job descriptions, semantic evidence matching, qualification classification, and initial draft wording.

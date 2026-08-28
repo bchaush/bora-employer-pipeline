@@ -19,7 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
-## 2026-08-28 — MarketMind claim authorship-lineage remediation (REMEDIATED_PENDING_CLAUDE_REAUDIT)
+## 2026-08-28 — Claim Actor Attribution Policy v1 (IMPLEMENTED_PENDING_CLAUDE_REAUDIT)
+
+**Reason**
+
+Formalize separation of substantive Evidence lineage from conventional résumé actor attribution via human approval; remediate MarketMind draft Claims that incorrectly mixed `MM_AUTHOR_001` into substantive `evidence_ids`.
+
+**Changed**
+
+* `docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md`.
+* `claims/marketmind/CLAIM_MM_001.json`–`CLAIM_MM_005.json`: substantive lineage restored; `MM_AUTHOR_001` removed.
+* `BLUEPRINT.md`, `AGENTS.md`, `.cursor/rules/truth.mdc`, `CURRENT_STATE.md`.
+* `tests/claim_actor_attribution_policy_test.py`; `tests/marketmind_claim_drafting_test.py`.
+
+**Affected Areas**
+
+* Governance, MarketMind draft claim lineage, regression tests.
+
+**Tests / Verification**
+
+* Full established test suites (25) — PASS expected.
+* Golden runner (15/15) — PASS expected.
+* Repository counts unchanged: Experience 2, Evidence 26, Claims 11, reusable 6.
+
+**Status**
+
+`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1_IMPLEMENTED_PENDING_CLAUDE_REAUDIT`
+
+---
+
+## 2026-08-28 — MarketMind claim authorship-lineage remediation (SUPERSEDED)
 
 **Reason**
 

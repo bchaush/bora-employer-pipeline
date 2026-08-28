@@ -108,6 +108,14 @@ Unsupported keywords must not be inserted merely to improve ATS similarity.
 
 A semantic match may change wording only when the revised wording truthfully describes existing evidence.
 
+## Claim Actor Attribution
+
+Operational enforcement of `docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md`:
+
+* Substantive `evidence_ids` establish what happened; human approval of the exact Claim establishes Bora's conventional actor attribution for that supported work.
+* Human approval cannot create unsupported substantive facts.
+* Do not cite authorship/contribution metadata Evidence (e.g. `MM_AUTHOR_001`) in ordinary substantive lineage solely to authorize active-voice wording.
+
 ## Stop Rule
 
 If requested output requires a factual claim that cannot be supported by existing approved evidence:

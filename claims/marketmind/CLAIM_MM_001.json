@@ -3,10 +3,9 @@
   "wording": "Built a Python/Streamlit preliminary market-screening prototype scoped to coffee shops, with documented limits that scores are screening heuristics and not validated predictors of business success.",
   "evidence_ids": [
     "MM_SCOPE_001",
-    "MM_BOUNDARY_001",
-    "MM_AUTHOR_001"
+    "MM_BOUNDARY_001"
   ],
-  "evidence_state": "OBSERVED",
+  "evidence_state": "VERIFIED",
   "allowed_contexts": [
     "resume",
     "interview",

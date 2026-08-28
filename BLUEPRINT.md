@@ -577,6 +577,14 @@ Every approved reusable claim receives:
 The claim bank prevents each AI from creatively reconstructing Bora's
 history.
 
+**Claim actor attribution (v1).** Substantive `evidence_ids` establish what
+happened; Bora's explicit `human_approval` on the exact Claim establishes
+conventional résumé active-voice actor attribution for that supported work.
+Human approval cannot create unsupported substantive facts. Conventional
+actor attribution does not imply sole, unaided, or exclusive authorship.
+Authoritative detail:
+`docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md`.
+
 **16. FORBIDDEN-CLAIM REGISTRY**
 
 Maintain explicit semantic boundaries.

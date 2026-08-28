@@ -30,7 +30,9 @@ Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVID
 
 MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOSED**.
 
-MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **REMEDIATED — PENDING CLAUDE REAUDIT**.
+MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW** (actor-attribution policy formalized).
+
+Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **IMPLEMENTED — PENDING CLAUDE REAUDIT**.
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -307,6 +309,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Human review of five MarketMind Claim draft candidates before approval.
 2. Await explicit approval before résumé modules or job-specific tailoring.
+3. Claude reaudit of `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` implementation.
 
 ## Do Not Start Yet
 
@@ -314,11 +317,34 @@ Do not approve MarketMind Claims, create résumé modules, generate résumé out
 
 ## Next Approved Task
 
-`MARKETMIND_CLAIM_DRAFTING_V1` remediated pending Claude reaudit.
+`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` implemented pending Claude reaudit.
 
 ---
 
-## 2026-08-28 — MarketMind Claim Drafting v1 authorship-lineage remediation (REMEDIATED — PENDING CLAUDE REAUDIT)
+## 2026-08-28 — Claim Actor Attribution Policy v1 (IMPLEMENTED — PENDING CLAUDE REAUDIT)
+
+**Reason**
+
+Claude remediation re-audit returned `ARCHITECTURE_DECISION_REQUIRED`: mixing `MM_AUTHOR_001` into substantive `evidence_ids` conflated authorship metadata with work facts and forced VERIFIED Claims to OBSERVED. Formalize the policy Winter Walk already follows in practice.
+
+**Changed**
+
+* `docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md` — authoritative policy.
+* `claims/marketmind/CLAIM_MM_001`–`CLAIM_MM_005`: removed `MM_AUTHOR_001` from substantive `evidence_ids`; restored `evidence_state` (`VERIFIED` on 001–004; `OBSERVED` on 005).
+* `BLUEPRINT.md`, `AGENTS.md`, `.cursor/rules/truth.mdc` — minimal references.
+* `tests/claim_actor_attribution_policy_test.py`; updated `tests/marketmind_claim_drafting_test.py`.
+
+**Not changed**
+
+* Claim wording, `human_approval=false`, reusability, `MM_AUTHOR_001` Evidence record, MarketMind Evidence otherwise, Experiences, Winter Walk Claims, master, validators, schemas.
+
+**Status**
+
+`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1_IMPLEMENTED_PENDING_CLAUDE_REAUDIT`
+
+---
+
+## 2026-08-28 — MarketMind Claim Drafting v1 authorship-lineage remediation (SUPERSEDED)
 
 **Reason**
 
@@ -336,7 +362,7 @@ Claude `CLAUDE_MARKETMIND_CLAIM_DRAFTING_V1_FINAL_PASS` required binding `MM_AUT
 
 **Status**
 
-`MARKETMIND_CLAIM_DRAFTING_V1_REMEDIATED_PENDING_CLAUDE_REAUDIT`
+`MARKETMIND_CLAIM_DRAFTING_V1_REMEDIATED_PENDING_CLAUDE_REAUDIT` (superseded by `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`)
 
 ---
 

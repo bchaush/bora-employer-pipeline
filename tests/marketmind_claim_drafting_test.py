@@ -154,8 +154,16 @@ print("PASS 2: lineage references approved MarketMind evidence for EXP_MM_001.")
 
 
 # ---------------------------------------------------------------------------
-# 2b. Authorship lineage remediation: MM_AUTHOR_001 bound to every MarketMind claim
+# 2b. Claim actor attribution policy: substantive lineage only; no MM_AUTHOR_001
 # ---------------------------------------------------------------------------
+EXPECTED_EVIDENCE_STATE_BY_CLAIM = {
+    "CLAIM_MM_001": "VERIFIED",
+    "CLAIM_MM_002": "VERIFIED",
+    "CLAIM_MM_003": "VERIFIED",
+    "CLAIM_MM_004": "VERIFIED",
+    "CLAIM_MM_005": "OBSERVED",
+}
+
 author_evidence_hash = sha256_file(MM_AUTHOR_EVIDENCE_PATH)
 author_evidence = json.loads(MM_AUTHOR_EVIDENCE_PATH.read_text(encoding="utf-8"))
 assert_true(author_evidence["evidence_state"] == "OBSERVED", "MM_AUTHOR_001 must remain OBSERVED")
@@ -170,23 +178,23 @@ for claim_id in MARKETMIND_CLAIM_IDS:
     claim = json.loads((CLAIMS_ROOT / f"{claim_id}.json").read_text(encoding="utf-8"))
     prior_ids = PRIOR_EVIDENCE_IDS_BY_CLAIM[claim_id]
     assert_true(
-        claim["evidence_ids"][: len(prior_ids)] == prior_ids,
-        f"{claim_id} must preserve prior evidence lineage order",
+        claim["evidence_ids"] == prior_ids,
+        f"{claim_id} must cite substantive evidence only: {claim['evidence_ids']}",
     )
     assert_true(
-        "MM_AUTHOR_001" in claim["evidence_ids"],
-        f"{claim_id} must cite MM_AUTHOR_001 for actor attribution",
+        "MM_AUTHOR_001" not in claim["evidence_ids"],
+        f"{claim_id} must not cite MM_AUTHOR_001 in substantive lineage",
     )
     assert_true(
-        claim["evidence_state"] == "OBSERVED",
-        f"{claim_id} evidence_state must be OBSERVED after authorship bind",
+        claim["evidence_state"] == EXPECTED_EVIDENCE_STATE_BY_CLAIM[claim_id],
+        f"{claim_id} evidence_state must be {EXPECTED_EVIDENCE_STATE_BY_CLAIM[claim_id]}",
     )
 
 assert_true(
     sha256_file(MM_AUTHOR_EVIDENCE_PATH) == author_evidence_hash,
     "MM_AUTHOR_001 evidence record must remain byte-unchanged",
 )
-print("PASS 2b: MM_AUTHOR_001 bound to all MarketMind claims; evidence unchanged.")
+print("PASS 2b: substantive lineage restored; MM_AUTHOR_001 excluded from claims.")
 
 
 # ---------------------------------------------------------------------------

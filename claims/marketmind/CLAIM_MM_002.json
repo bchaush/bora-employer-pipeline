@@ -3,10 +3,9 @@
   "wording": "Separated deterministic, configuration-driven screening score generation from an optional Anthropic LLM narrative layer whose prompt instructs it not to alter official scores, thresholds, status, or scenario calculations.",
   "evidence_ids": [
     "MM_SCORE_001",
-    "MM_LLM_001",
-    "MM_AUTHOR_001"
+    "MM_LLM_001"
   ],
-  "evidence_state": "OBSERVED",
+  "evidence_state": "VERIFIED",
   "allowed_contexts": [
     "resume",
     "interview",
