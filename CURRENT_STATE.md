@@ -42,7 +42,7 @@ MarketMind Résumé Module Wording Refinement v1 (`MARKETMIND_RESUME_MODULE_WORD
 
 MarketMind Résumé Module Approval and Master Integration v1 (`MARKETMIND_RESUME_MODULE_APPROVAL_AND_MASTER_INTEGRATION_V1`) = **CLOSED** (independent Cursor re-audit passed: `CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`; Bora explicitly approved all five exact MarketMind module sentences on 2026-08-28; all five integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6, 11 modules) as `PROJECT_BULLET` entries; see below).
 
-Project Bullet Rendering Contract v1 (`PROJECT_BULLET_RENDERING_CONTRACT_V1`) = **IMPLEMENTED — PENDING REAUDIT** (deterministic structural contract added: `PROJECT_BULLET` modules must not carry `immutable_snapshot` or appear in `experience_sections`; a verified-only project-display-name resolver added; no factual project-header data invented; see below).
+Project Bullet Rendering Contract v1 (`PROJECT_BULLET_RENDERING_CONTRACT_V1`) = **CLOSED** (independent Cursor re-audit passed: `CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`; deterministic structural contract added: `PROJECT_BULLET` modules must not carry `immutable_snapshot` or appear in `experience_sections`; a verified-only project-display-name resolver added; no factual project-header data invented; see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -319,7 +319,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005` on 2026-08-28. All 11 Claims are now `human_approval=true` / reusable.
 2. Five MarketMind résumé-module bullet drafts created 2026-08-28, refined once per Bora's wording review, then explicitly approved by Bora for the exact five sentences on 2026-08-28 and integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6, 11 total modules) as `PROJECT_BULLET` modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`). Independent Cursor re-audit passed (`CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); milestone closed and pushed. No `experience_sections` entry was created for `EXP_MM_001` — no verified `formal_title`/`date_range`/employer relationship exists for this `PERSONAL_PROJECT`. Modules are present in the master but excluded from `default_module_order`, so none appears in any derivative unless explicitly selected in a future job-tailoring milestone. `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json` preserved as the historical/audit record, wording byte-identical to the master.
-3. `PROJECT_BULLET_RENDERING_CONTRACT_V1` added a deterministic, tested structural contract (`src/resume_project_bullet.py`) for `PROJECT_BULLET` modules: they must not carry `immutable_snapshot` and must not be referenced by any `experience_sections[].bullet_module_ids`; a `resolve_project_display_name()` helper resolves only the already-verified `EXP_MM_001.experience_name` ("MarketMind AI") for future rendering use, returning `None` (never a guess) when unresolved. No project date, location, technology-display-line, URL, or formal title was added — none is currently verified, and none was invented.
+3. `PROJECT_BULLET_RENDERING_CONTRACT_V1` added a deterministic, tested structural contract (`src/resume_project_bullet.py`) for `PROJECT_BULLET` modules: they must not carry `immutable_snapshot` and must not be referenced by any `experience_sections[].bullet_module_ids`; a `resolve_project_display_name()` helper resolves only the already-verified `EXP_MM_001.experience_name` field ("MarketMind AI") for future rendering use, returning `None` (never a guess) when unresolved. No project date, location, technology-display-line, URL, or formal title was added — none is currently verified, and none was invented. Independent Cursor re-audit passed (`CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); milestone closed and pushed.
 4. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` follow-up are both closed and pushed.
 
 ## Do Not Start Yet
@@ -328,7 +328,47 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-None started. `PROJECT_BULLET_RENDERING_CONTRACT_V1` is implemented pending independent re-audit; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `PROJECT_BULLET_RENDERING_CONTRACT_V1` is closed; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Close project bullet rendering contract (`PROJECT_BULLET_RENDERING_CONTRACT_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of commit `984630f` passed: `CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. One INFO-only documentation ambiguity was identified and clarified; no code, schema, Experience data, or validation change was made.
+
+**Documentation clarification applied**
+
+`CURRENT_STATE.md` described the project display-name source as effectively `organization`/`experience_name`. The implementation actually resolves from `experience_name` only (`resolve_project_display_name()` reads `record.get("experience_name")`, never `organization`). Wording corrected so documentation matches the code exactly.
+
+**Confirmed by the independent re-audit**
+
+* Commit scope narrow; `EXP_MM_001` identity uses verified `experience_name = "MarketMind AI"`; `resolve_project_display_name()` reads `experience_name` only.
+* `PROJECT_BULLET` `immutable_snapshot` prohibition and `experience_sections` exclusion are legitimate current invariants; future project-specific schema extension remains conceptually unblocked.
+* No fabricated project date, location, URL, formal title, employer/client/sponsor relationship, or technology display line was introduced.
+* Validator wiring is deterministic and preserves existing validation; default derivative behavior remains Winter Walk only; explicit MarketMind selection still works.
+* Protected master, Claims, Evidence, Experiences, schemas, drafts, wording, module order, and skills order unchanged.
+* 28/28 test suites — PASS. Golden 15/15 — PASS.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: corrected the `organization`/`experience_name` ambiguity to state `experience_name` only; milestone marked `CLOSED`.
+* `CHANGELOG.md`: closure entry recorded.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, `default_module_order`, `skills_order`, derivative selection logic, job-analysis logic, immigration logic. Repository counts unchanged: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Deferred, not addressed in this closure**
+
+* Future project-specific presentation/header schema (dates, URL, technology line) if such metadata is ever verified — not designed now.
+* Project date, location, formal title, stable résumé-safe URL, and curated technology display line remain UNKNOWN/unapproved for presentation — not inferred.
+* `resolve_project_display_name()` does not explicitly assert `experience_type == PERSONAL_PROJECT`; current master is valid regardless, and this is not a current blocker.
+
+**Status**
+
+`PROJECT_BULLET_RENDERING_CONTRACT_V1_CLOSED`. No résumé generated. No job-specific tailoring begun. No new Experience started.
 
 ---
 
@@ -346,7 +386,7 @@ Existing architecture already answers most of the task's questions without new d
 
 * Added `src/resume_project_bullet.py`:
   * `validate_project_bullet_contract()` — deterministic rule: a `PROJECT_BULLET` module must not carry `immutable_snapshot` at all, and must not be referenced by any `experience_sections[].bullet_module_ids`. Non-`PROJECT_BULLET` modules are out of scope.
-  * `resolve_project_display_name()` — resolves only the already-verified `Experience.experience_name` for a `PROJECT_BULLET` module's `experience_id`; returns `None` (never a guess) when unresolved. For the five real MarketMind modules this resolves to `"MarketMind AI"` — the project's own verified name, already established in `EXP_MM_001` and independently audited in prior milestones as legitimate for `organization`/`experience_name`, not an employer.
+  * `resolve_project_display_name()` — resolves only the already-verified `Experience.experience_name` field (not `organization`, not any other field) for a `PROJECT_BULLET` module's `experience_id`; returns `None` (never a guess) when unresolved. For the five real MarketMind modules this resolves to `"MarketMind AI"` — the project's own verified name, already established as `EXP_MM_001.experience_name` and independently audited in prior milestones as legitimate for a personal project, not an employer.
 * Wired `validate_project_bullet_contract()` into `validate_resume_master()` (`src/resume_validation.py`) so every master validation enforces it automatically going forward.
 * Added `tests/resume_project_bullet_contract_test.py`.
 

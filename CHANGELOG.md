@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close project bullet rendering contract (`PROJECT_BULLET_RENDERING_CONTRACT_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of commit `984630f` passed: `CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. One INFO-only documentation ambiguity was corrected; no other change required.
+
+**Changed**
+
+* `CURRENT_STATE.md`: clarified that the project display-name source is `experience_name` only (not `organization`/`experience_name`), matching `resolve_project_display_name()` exactly. Milestone marked CLOSED.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, `default_module_order`, `skills_order`, derivative selection logic, job-analysis logic, immigration logic.
+
+**Confirmed by the independent re-audit**
+
+* PROJECT_BULLET remains distinct from employment BULLET; `immutable_snapshot` forbidden on PROJECT_BULLET; PROJECT_BULLET exclusion from `experience_sections` membership is a legitimate current invariant.
+* MarketMind project display identity resolves from verified `EXP_MM_001.experience_name` only; unresolved project metadata returns/remains UNKNOWN rather than guessed.
+* No renderer/exporter built; no resume generated; no approved wording changed; no Claims/Evidence/Experiences changed; no master-selection behavior changed.
+* 28/28 tests PASS. Golden 15/15 PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Deferred (not addressed here)**
+
+* Future project-specific presentation/header schema, if project metadata (dates, URL, technology line) is ever verified.
+* Missing project presentation metadata remains UNKNOWN, not inferred.
+* Optional future explicit `experience_type == PERSONAL_PROJECT` assertion in `resolve_project_display_name()`.
+
+**Status**
+
+PROJECT_BULLET_RENDERING_CONTRACT_V1_CLOSED. No resume generated. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Define project bullet rendering contract (`PROJECT_BULLET_RENDERING_CONTRACT_V1`)
 
 **Reason**
