@@ -19,7 +19,11 @@ from resume_semantic import (
     patch_contains_terminology_substitute,
     validate_module_wording_semantics,
 )
-from resume_title_metadata import validate_experience_title_metadata
+from resume_title_metadata import (
+    build_experience_section_index,
+    validate_experience_title_metadata,
+    validate_module_snapshot_title_binding,
+)
 from resume_style import validate_modules_style, validate_resume_prose_style
 from schema_validation import build_draft202012_validator
 
@@ -161,6 +165,9 @@ def validate_resume_master(
                     errors.extend(result["errors"])
 
     sections = master.get("experience_sections")
+    section_index = build_experience_section_index(
+        sections if isinstance(sections, list) else []
+    )
     if isinstance(sections, list):
         for index, section in enumerate(sections):
             if isinstance(section, Mapping):
@@ -170,6 +177,27 @@ def validate_resume_master(
                 )
                 if not title_result["valid"]:
                     errors.extend(title_result["errors"])
+
+    if isinstance(modules, list):
+        for module in modules:
+            if not isinstance(module, Mapping):
+                continue
+            module_id = module.get("module_id")
+            if not isinstance(module_id, str) or not module_id:
+                continue
+            experience_id = module.get("experience_id")
+            section = (
+                section_index.get(experience_id)
+                if isinstance(experience_id, str)
+                else None
+            )
+            binding = validate_module_snapshot_title_binding(
+                module,
+                section,
+                field_prefix=f"modules[{module_id}].immutable_snapshot",
+            )
+            if not binding["valid"]:
+                errors.extend(binding["errors"])
 
     return {
         "valid": len(errors) == 0,

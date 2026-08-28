@@ -212,18 +212,19 @@ No production engine yet.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
   * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_resume_title_resolution_test.py`.
   * Status: **METADATA_PARTIAL_PENDING_CONTACT** (not CLOSED).
-* Winter Walk Résumé Title Resolution v1 (`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`) (**IMPLEMENTED_PENDING_EXTERNAL_AUDIT**):
+* Winter Walk Résumé Title Resolution v1 (`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`) (**REMEDIATED_PENDING_EXTERNAL_REAUDIT**):
 
   * Minimal architecture extension: `source_contractual_position`, `source_functional_role`, `display_title`, `display_title_approval` on experience sections; `display_title` on module immutable snapshots.
   * `formal_title` sentinel preserved; human-approved display label bound via `approved_display_title` approval metadata (`is_source_verbatim=false`).
   * Export gate accepts approved display title when source formal title unresolved; contact unresolved still blocks export.
+  * Claude audit L-1 remediated: module `immutable_snapshot.display_title` must match corresponding experience section's approved `display_title`; module snapshots cannot independently establish title readiness (`MODULE_DISPLAY_TITLE_MISMATCH`, `MODULE_DISPLAY_TITLE_APPROVAL_UNRESOLVED`, `MODULE_DISPLAY_TITLE_SECTION_NOT_FOUND`).
   * Experience/Evidence/Claims unchanged; six module wordings unchanged.
-  * Tests: `tests/winter_walk_resume_title_resolution_test.py`.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+  * Tests: `tests/winter_walk_resume_title_resolution_test.py`, `tests/resume_module_display_title_binding_test.py`.
+  * Status: **REMEDIATED_PENDING_EXTERNAL_REAUDIT** (not CLOSED).
 
 ## Current Task
 
-`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Display title resolved via human-approved presentation label; contact remains pending. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` = **REMEDIATED_PENDING_EXTERNAL_REAUDIT**. Claude L-1 module-to-section display title binding gap remediated; display title resolved via human-approved presentation label; contact remains pending. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 * Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**CLOSED**):
 
   * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
@@ -287,7 +288,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 ## Immediate Next Steps
 
 1. Resolve contact block when Bora provides approved contact facts.
-2. External audit of `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1`.
+2. External re-audit of `WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` (L-1 remediation).
 3. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
@@ -296,4 +297,4 @@ Do not begin job-specific résumé generation, rendering/export, or additional e
 
 ## Next Approved Task
 
-`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` implemented pending external audit. Contact resolution remains the bounded next task. No next milestone started.
+`WINTER_WALK_RESUME_TITLE_RESOLUTION_V1` remediated pending external re-audit. Contact resolution remains the bounded next task. No next milestone started.

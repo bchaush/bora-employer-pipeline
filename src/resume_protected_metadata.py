@@ -7,8 +7,10 @@ from typing import Any, Mapping
 UNRESOLVED_PROTECTED_METADATA_SENTINEL = "PENDING_BORA_REVIEW"
 
 from resume_title_metadata import (  # noqa: E402
+    build_experience_section_index,
     is_experience_title_export_ready,
     is_source_formal_title_unresolved,
+    validate_module_snapshot_title_binding,
 )
 
 
@@ -148,6 +150,8 @@ def validate_protected_metadata_resolved(
                 value=entry.get("location"),
             )
 
+    section_index = build_experience_section_index(sections if isinstance(sections, list) else [])
+
     included = set(derivative.get("included_module_ids", []))
     modules = derivative.get("modules")
     if isinstance(modules, list):
@@ -161,33 +165,31 @@ def validate_protected_metadata_resolved(
             if not isinstance(snapshot, Mapping):
                 continue
             prefix = f"modules[{module_id}].immutable_snapshot"
+            experience_id = module.get("experience_id")
+            section = (
+                section_index.get(experience_id)
+                if isinstance(experience_id, str)
+                else None
+            )
+            binding = validate_module_snapshot_title_binding(
+                module,
+                section,
+                field_prefix=prefix,
+            )
+            if not binding["valid"]:
+                errors.extend(binding["errors"])
+
             for field in ("organization", "formal_title", "date_range"):
                 if field not in snapshot:
                     continue
                 value = snapshot.get(field)
                 if field == "formal_title" and is_source_formal_title_unresolved(value):
-                    display_title = snapshot.get("display_title")
-                    if isinstance(display_title, str) and display_title:
-                        continue
-                    _append_unresolved(
-                        errors,
-                        field=f"{prefix}.{field}",
-                        value=value,
-                    )
                     continue
                 _check_required_string(
                     errors,
                     field=f"{prefix}.{field}",
                     value=value,
                 )
-            if "display_title" in snapshot:
-                display_title = snapshot.get("display_title")
-                if is_unresolved_protected_metadata_value(display_title):
-                    _append_unresolved(
-                        errors,
-                        field=f"{prefix}.display_title",
-                        value=display_title,
-                    )
             if "employment_category" in snapshot:
                 _check_optional_string(
                     errors,

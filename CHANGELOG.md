@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Winter Walk résumé title resolution v1 L-1 remediation (REMEDIATED_PENDING_EXTERNAL_REAUDIT)
+
+**Reason**
+
+Claude audit `CLAUDE_WINTER_WALK_RESUME_TITLE_RESOLUTION_V1_AUDIT_FINDINGS` identified blocking defect L-1: module `immutable_snapshot.display_title` could independently satisfy title readiness without matching the corresponding experience section's approved display title.
+
+**Changed**
+
+* `validate_module_snapshot_title_binding()` in `src/resume_title_metadata.py`: module snapshots with unresolved `formal_title` must match section `display_title` and inherit section-level approval readiness via `experience_id` linkage.
+* `validate_protected_metadata_resolved()` in `src/resume_protected_metadata.py`: removed independent module display-title bypass; wired section-index lookup and binding validation.
+* `validate_resume_master()` in `src/resume_validation.py`: defense-in-depth module-to-section title binding on master load.
+* Adversarial regression tests: `tests/resume_module_display_title_binding_test.py` (10 cases A–F exploit paths + positive controls).
+* Experience/Evidence/Claims, six module wordings, display title approval event, and source truth unchanged.
+
+**Affected Areas**
+
+* `src/resume_title_metadata.py`, `src/resume_protected_metadata.py`, `src/resume_validation.py`
+* `tests/resume_module_display_title_binding_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/resume_module_display_title_binding_test.py` — PASS (10 adversarial cases)
+* 21/21 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+REMEDIATED_PENDING_EXTERNAL_REAUDIT
+
+---
+
 ## 2026-08-28 — Winter Walk résumé title resolution v1 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**
