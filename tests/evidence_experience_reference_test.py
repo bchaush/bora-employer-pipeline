@@ -36,6 +36,7 @@ EXPECTED_WW_IDS = [
     "WW_DATA_002",
     "WW_FUQ_001",
     "WW_MAP_001",
+    "WW_OFFER_001",
     "WW_PROC_001",
     "WW_SYNC_001",
     "WW_TEST_001",
@@ -100,9 +101,9 @@ exp = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(exp["valid"] is True, "real Experience Registry must be valid for REF PASS 1")
 evidence = validate_evidence_repository(EVIDENCE_ROOT, experience_root=EXPERIENCE_ROOT)
 assert_true(evidence["valid"] is True, "real Evidence Repository failed with Experience refs")
-assert_true(evidence["records_checked"] == 13, f"expected 13 evidence, got {evidence['records_checked']}")
+assert_true(evidence["records_checked"] == 14, f"expected 14 evidence, got {evidence['records_checked']}")
 assert_true(evidence["index"] is not None, "trusted Evidence index missing")
-assert_true(len(evidence["index"]) == 13, f"trusted Evidence index length {len(evidence['index'])}")
+assert_true(len(evidence["index"]) == 14, f"trusted Evidence index length {len(evidence['index'])}")
 assert_true(
     sorted(evidence["index"].keys()) == EXPECTED_WW_IDS,
     f"unexpected Evidence_ID set: {sorted(evidence['index'].keys())}",

@@ -19,6 +19,45 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Winter Walk protected metadata evidence v1 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
+
+**Reason**
+
+Ingest signed Winter Walk internship offer letter as documentary Evidence to resolve supported protected metadata for `EXP_WW_001` without modifying approved résumé module wordings or Claims.
+
+**Changed**
+
+* Added `WW_OFFER_001` documentary Evidence record (signed unpaid internship offer letter).
+* Updated `EXP_WW_001` notes and `source_of_truth` with offer-letter-supported metadata.
+* Master résumé metadata partial resolution: `date_range` → `Jun 2026 – Aug 2026`, `employment_category` → `INTERNSHIP`; `formal_title` and contact remain `PENDING_BORA_REVIEW`.
+* Display organization `Winter Walk` preserved; legal organization `Winter Walk, Inc.` documented in Evidence/Experience notes.
+* Exact end day explicitly unresolved (Aug 21 vs Aug 22 discrepancy).
+* Tests: `tests/winter_walk_protected_metadata_evidence_test.py`; regression count updates (14 Evidence).
+* Status → **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**; `MASTER_RESUME_WINTER_WALK_V1` → **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT** (not CLOSED).
+
+**Affected Areas**
+
+* `evidence/winter_walk/WW_OFFER_001.json`
+* `experiences/EXP_WW_001.json`
+* `resume/master/RESUME_MASTER_WW_V1.json`
+* `tests/winter_walk_protected_metadata_evidence_test.py`
+* `tests/master_resume_winter_walk_test.py`
+* `tests/evidence_repository_test.py`, `tests/evidence_experience_reference_test.py`, `tests/job_analysis_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/winter_walk_protected_metadata_evidence_test.py` — PASS
+* 18/18 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims
+
+**Status**
+
+IMPLEMENTED_PENDING_EXTERNAL_AUDIT
+
+---
+
 ## 2026-08-28 — Approve Winter Walk master module wordings (WORDING_APPROVED_PENDING_METADATA_RESOLUTION)
 
 **Reason**

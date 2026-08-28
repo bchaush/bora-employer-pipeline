@@ -264,9 +264,13 @@ assert_true(
     "formal title must remain unresolved",
 )
 assert_true(
-    MASTER["experience_sections"][0]["date_range"] == "PENDING_BORA_REVIEW",
-    "date range must remain unresolved",
+    MASTER["experience_sections"][0]["date_range"] == "Jun 2026 – Aug 2026",
+    "date range must be repository-trusted month-level range",
 )
-print("PASS: Bora module wording approval recorded; metadata still pending.")
+assert_true(
+    MASTER["experience_sections"][0]["employment_category"] == "INTERNSHIP",
+    "employment category must be INTERNSHIP per WW_OFFER_001",
+)
+print("PASS: Bora module wording approval recorded; partial metadata resolved.")
 
 print("PASS: master resume Winter Walk v1 real-content tests complete.")

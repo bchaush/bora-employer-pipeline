@@ -1,6 +1,6 @@
 {
   "master_id": "RESUME_MASTER_WW_V1",
-  "version": "2",
+  "version": "3",
   "protected": true,
   "contact": {
     "name": "PENDING_BORA_REVIEW",
@@ -29,8 +29,8 @@
       "immutable_snapshot": {
         "organization": "Winter Walk",
         "formal_title": "PENDING_BORA_REVIEW",
-        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-        "date_range": "PENDING_BORA_REVIEW"
+        "employment_category": "INTERNSHIP",
+        "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
     },
@@ -53,8 +53,8 @@
       "immutable_snapshot": {
         "organization": "Winter Walk",
         "formal_title": "PENDING_BORA_REVIEW",
-        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-        "date_range": "PENDING_BORA_REVIEW"
+        "employment_category": "INTERNSHIP",
+        "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
     },
@@ -77,8 +77,8 @@
       "immutable_snapshot": {
         "organization": "Winter Walk",
         "formal_title": "PENDING_BORA_REVIEW",
-        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-        "date_range": "PENDING_BORA_REVIEW"
+        "employment_category": "INTERNSHIP",
+        "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
     },
@@ -102,8 +102,8 @@
       "immutable_snapshot": {
         "organization": "Winter Walk",
         "formal_title": "PENDING_BORA_REVIEW",
-        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-        "date_range": "PENDING_BORA_REVIEW"
+        "employment_category": "INTERNSHIP",
+        "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
     },
@@ -126,8 +126,8 @@
       "immutable_snapshot": {
         "organization": "Winter Walk",
         "formal_title": "PENDING_BORA_REVIEW",
-        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-        "date_range": "PENDING_BORA_REVIEW"
+        "employment_category": "INTERNSHIP",
+        "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
     },
@@ -150,8 +150,8 @@
       "immutable_snapshot": {
         "organization": "Winter Walk",
         "formal_title": "PENDING_BORA_REVIEW",
-        "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-        "date_range": "PENDING_BORA_REVIEW"
+        "employment_category": "INTERNSHIP",
+        "date_range": "Jun 2026 – Aug 2026"
       },
       "status": "ACTIVE"
     }
@@ -162,8 +162,8 @@
       "experience_id": "EXP_WW_001",
       "organization": "Winter Walk",
       "formal_title": "PENDING_BORA_REVIEW",
-      "employment_category": "ORGANIZATIONAL_ENGAGEMENT",
-      "date_range": "PENDING_BORA_REVIEW",
+      "employment_category": "INTERNSHIP",
+      "date_range": "Jun 2026 – Aug 2026",
       "location": null,
       "bullet_module_ids": [
         "MOD_WW_001_SCOPE",
@@ -192,5 +192,5 @@
     "UAT documentation"
   ],
   "date": "2026-08-28",
-  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 2. WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE, MOD_WW_002_CONTROLS, MOD_WW_003_INTAKE, MOD_WW_004_SYNC, MOD_WW_005_UAT, MOD_WW_006_PROCESS. METADATA_PENDING: contact, formal_title, date_range remain PENDING_BORA_REVIEW pending repository-authoritative evidence. Not a submitted résumé; no derivative export approved."
+  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 3. WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE, MOD_WW_002_CONTROLS, MOD_WW_003_INTAKE, MOD_WW_004_SYNC, MOD_WW_005_UAT, MOD_WW_006_PROCESS (wording unchanged). METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP resolved via WW_OFFER_001; exact end day unresolved (Aug 21 vs Aug 22). formal_title PENDING_BORA_REVIEW (contractual Intern vs functional AI Researcher and Developer not composed). contact PENDING_BORA_REVIEW. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. Not a submitted résumé; no derivative export approved."
 }

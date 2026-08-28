@@ -3,6 +3,6 @@
   "experience_name": "Winter Walk",
   "experience_type": "ORGANIZATIONAL_ENGAGEMENT",
   "organization": "Winter Walk",
-  "source_of_truth": "BLUEPRINT.md (Winter Walk as primary organizational evidence); evidence/winter_walk/ Batch 1 records referencing EXP_WW_001",
-  "notes": "Canonical identity for the Winter Walk engagement represented by the current Winter Walk evidence records."
+  "source_of_truth": "BLUEPRINT.md (Winter Walk as primary organizational evidence); evidence/winter_walk/ Batch 1 records referencing EXP_WW_001; WW_OFFER_001 signed internship offer letter",
+  "notes": "Canonical identity for the Winter Walk engagement. Legal organization per WW_OFFER_001: Winter Walk, Inc. Unpaid internship category per WW_OFFER_001 (résumé employment_category INTERNSHIP). Contractual position: Intern. Documented functional role: AI Researcher and Developer. Department: Development Department. Month-level term bounded Jun 2026 – Aug 2026; exact end day unresolved (Aug 21 vs Aug 22)."
 }

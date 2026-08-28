@@ -1,0 +1,19 @@
+{
+  "evidence_id": "WW_OFFER_001",
+  "experience_id": "EXP_WW_001",
+  "fact": "Winter Walk, Inc.'s signed unpaid internship offer letter documents Bora's internship with contractual position title Intern, functional role as AI Researcher and Developer within the Development Department, and a term stated as June 1, 2026 through August 21, 2026 in one section and expected conclusion August 22, 2026 in another.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "Winter Walk signed unpaid internship offer letter (Bora-supplied; not stored in repository)",
+  "source_location": "Position field; Position Details (Development Department role); Term of Internship; Internship Duration section",
+  "safe_for_external_use": true,
+  "notes": "Documentary metadata evidence only; not an accomplishment Claim. Exact internship end day unresolved (Aug 21 vs Aug 22 discrepancy). Month-level résumé display bounded to Jun 2026 – Aug 2026. Boston office address and occasional Zoom mentioned; work arrangement not resolved. Do not compose résumé formal_title from Intern plus AI Researcher and Developer without separate governance.",
+  "limitations": [
+    "Does not prove daily work performed or project outcomes",
+    "Does not resolve exact end calendar day",
+    "Does not authorize composed résumé title AI Researcher & Developer Intern",
+    "Does not prove remote, hybrid, or Boston-based work arrangement",
+    "Does not replace display organization Winter Walk with legal name on résumé without separate policy"
+  ]
+}

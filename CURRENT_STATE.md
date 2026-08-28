@@ -28,7 +28,7 @@ Résumé Architecture v1 (`RESUME_ARCHITECTURE_V1`) = **CLOSED**.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
-Evidence records: **13** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping).
+Evidence records: **14** Winter Walk (`WW_ARCH_001`–`WW_TEST_001` Batch 1 plus `WW_PROC_001` for process mapping plus `WW_OFFER_001` documentary metadata).
 
 Claim records: **6** Winter Walk approved reusable claims under `claims/winter_walk/` (`CLAIM_WW_001`–`CLAIM_WW_006`); `human_approval=true` (`valid_record=true`, `reusable=true`).
 
@@ -196,21 +196,30 @@ No production engine yet.
   * No master résumé content, no job-specific résumé outputs, no rendering/export engine.
   * Experience/Evidence/Claim repository records unchanged.
   * Status: **CLOSED**.
-* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**WORDING_APPROVED_PENDING_METADATA_RESOLUTION**):
+* Master Résumé Winter Walk v1 (`MASTER_RESUME_WINTER_WALK_V1`) (**METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT**):
 
   * First real evidence-controlled résumé module set for `EXP_WW_001` only.
-  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 2).
+  * Protected master content: `resume/master/RESUME_MASTER_WW_V1.json` (version 3).
   * Six bullets (`MOD_WW_001_SCOPE` through `MOD_WW_006_PROCESS`), one per approved reusable Claim (`CLAIM_WW_001`–`CLAIM_WW_006`).
-  * **Bora explicitly approved exact module wording on 2026-08-28** (recorded in master `notes` as `WORDING_APPROVED`).
-  * Protected metadata still unresolved: contact (`PENDING_BORA_REVIEW`), formal title (`PENDING_BORA_REVIEW`), date range (`PENDING_BORA_REVIEW`).
-  * Offer-letter context (Winter Walk, Inc.; Jun–Aug 2026 internship) not ingested into Experience/Evidence in this step.
+  * **Bora explicitly approved exact module wording on 2026-08-28** (recorded in master `notes` as `WORDING_APPROVED`; wording unchanged).
+  * Partial metadata resolved via `WW_OFFER_001`: date range `Jun 2026 – Aug 2026`, employment category `INTERNSHIP`; exact end day unresolved (Aug 21 vs Aug 22).
+  * Still unresolved: contact (`PENDING_BORA_REVIEW`), formal title (`PENDING_BORA_REVIEW` — contractual Intern vs functional AI Researcher and Developer not composed).
+  * Display organization `Winter Walk`; legal organization `Winter Walk, Inc.` documented in Experience notes and Evidence.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
-  * Tests: `tests/master_resume_winter_walk_test.py`.
-  * Status: **WORDING_APPROVED_PENDING_METADATA_RESOLUTION** (not CLOSED).
+  * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`.
+  * Status: **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT** (not CLOSED).
+* Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**IMPLEMENTED_PENDING_EXTERNAL_AUDIT**):
+
+  * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
+  * `EXP_WW_001` notes updated with legal org, internship category, contractual position, functional role, department, bounded dates.
+  * Experience schema constraint: single `organization` field preserves display `Winter Walk`; legal name in notes/Evidence.
+  * No Claim records created or modified; no accomplishment Claims for metadata.
+  * Tests: `tests/winter_walk_protected_metadata_evidence_test.py`.
+  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
 
 ## Current Task
 
-`MASTER_RESUME_WINTER_WALK_V1` = **WORDING_APPROVED_PENDING_METADATA_RESOLUTION**. Module wording Bora-approved; contact/formal title/date range await repository-authoritative metadata resolution. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Offer-letter metadata ingested; `MASTER_RESUME_WINTER_WALK_V1` partial metadata resolved (date range, internship category). Formal title and contact remain pending. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -222,7 +231,7 @@ No production engine yet.
 * Additional Experience records / Evidence Batch 2+ / more Claim Bank records
 * Broader forbidden-claim / general NLP truth engine (beyond bounded semantic guard)
 * Production pipeline engine
-* Master résumé Winter Walk module wording Bora-approved; protected metadata (contact, title, dates) pending resolution; no export pipeline
+* Master résumé Winter Walk module wording Bora-approved; partial protected metadata resolved (date range, internship category); formal title and contact pending; no export pipeline
 * Networking research
 * Google Workspace / external integrations
 * Automated monitoring
@@ -256,14 +265,15 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 ## Immediate Next Steps
 
-1. Resolve protected metadata via bounded Evidence/Experience update (formal title, organization legal name, date range `Jun 2026 – Aug 2026` from offer letter with explicit day discrepancy noted).
+1. Resolve formal title governance (contractual Intern vs functional AI Researcher and Developer — do not compose without explicit policy).
 2. Resolve contact block when Bora provides approved contact facts.
-3. Await explicit approval before job-specific tailoring or additional experience sections.
+3. External audit of `WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`.
+4. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
 
-Do not begin job-specific résumé generation, rendering/export, or additional experience sections without explicit approval. Do not set formal title from offer letter until repository-authoritative evidence supports it.
+Do not begin job-specific résumé generation, rendering/export, or additional experience sections without explicit approval.
 
 ## Next Approved Task
 
-`MASTER_RESUME_WINTER_WALK_V1` wording approved; metadata resolution is the next bounded task. No next milestone started.
+`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` implemented pending external audit. Formal title and contact resolution remain bounded next tasks. No next milestone started.
