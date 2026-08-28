@@ -19,6 +19,41 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Remediate Winter Walk export-gate M-1 (REMEDIATED_PENDING_EXTERNAL_REAUDIT)
+
+**Reason**
+
+Claude audit `CLAUDE_WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1_AUDIT_FINDINGS` identified blocking defect M-1: `approve_derivative_for_export` could set `export_allowed=true` while protected metadata still carried `PENDING_BORA_REVIEW` sentinels.
+
+**Changed**
+
+* Added `src/resume_protected_metadata.py` with centralized sentinel and `validate_protected_metadata_resolved`.
+* Wired unresolved-metadata check into `validate_derivative_eligibility(..., for_export=True)` before export approval.
+* Deterministic error code: `UNRESOLVED_PROTECTED_METADATA` with per-field context.
+* Adversarial regression tests: `tests/resume_export_protected_metadata_test.py`.
+* No changes to approved module wordings, Claims, Evidence, Experience metadata facts, or `formal_title` resolution policy.
+* Status → **REMEDIATED_PENDING_EXTERNAL_REAUDIT** (not CLOSED).
+
+**Affected Areas**
+
+* `src/resume_protected_metadata.py`
+* `src/resume_validation.py`
+* `tests/resume_export_protected_metadata_test.py`
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* `tests/resume_export_protected_metadata_test.py` — PASS (A–F adversarial cases)
+* 19/19 test suites — PASS
+* Golden runner (15/15) — PASS
+* Repository: 1 Experience / 14 Evidence / 6 reusable Claims — unchanged
+
+**Status**
+
+REMEDIATED_PENDING_EXTERNAL_REAUDIT
+
+---
+
 ## 2026-08-28 — Winter Walk protected metadata evidence v1 (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

@@ -208,18 +208,19 @@ No production engine yet.
   * No job-specific tailoring, no PDF/DOCX export, no other experiences ingested.
   * Tests: `tests/master_resume_winter_walk_test.py`, `tests/winter_walk_protected_metadata_evidence_test.py`.
   * Status: **METADATA_PARTIAL_PENDING_TITLE_AND_CONTACT** (not CLOSED).
-* Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**IMPLEMENTED_PENDING_EXTERNAL_AUDIT**):
+* Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`) (**REMEDIATED_PENDING_EXTERNAL_REAUDIT**):
 
   * Documentary Evidence `WW_OFFER_001` ingested from signed unpaid internship offer letter (Bora-supplied; not stored in repository).
   * `EXP_WW_001` notes updated with legal org, internship category, contractual position, functional role, department, bounded dates.
   * Experience schema constraint: single `organization` field preserves display `Winter Walk`; legal name in notes/Evidence.
+  * Claude audit M-1 remediated: export approval now rejects `PENDING_BORA_REVIEW` unresolved protected metadata (`UNRESOLVED_PROTECTED_METADATA`).
   * No Claim records created or modified; no accomplishment Claims for metadata.
-  * Tests: `tests/winter_walk_protected_metadata_evidence_test.py`.
-  * Status: **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**.
+  * Tests: `tests/winter_walk_protected_metadata_evidence_test.py`, `tests/resume_export_protected_metadata_test.py`.
+  * Status: **REMEDIATED_PENDING_EXTERNAL_REAUDIT**.
 
 ## Current Task
 
-`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` = **IMPLEMENTED_PENDING_EXTERNAL_AUDIT**. Offer-letter metadata ingested; `MASTER_RESUME_WINTER_WALK_V1` partial metadata resolved (date range, internship category). Formal title and contact remain pending. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
+`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` = **REMEDIATED_PENDING_EXTERNAL_REAUDIT**. Claude M-1 export-gate remediation landed; external re-audit pending. Formal title and contact remain unresolved. Do not begin job-specific tailoring or additional experience sections unless explicitly approved.
 
 ## Not Built Yet
 
@@ -267,7 +268,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Resolve formal title governance (contractual Intern vs functional AI Researcher and Developer — do not compose without explicit policy).
 2. Resolve contact block when Bora provides approved contact facts.
-3. External audit of `WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1`.
+3. External re-audit of `WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` (post M-1 remediation).
 4. Await explicit approval before job-specific tailoring or additional experience sections.
 
 ## Do Not Start Yet
@@ -276,4 +277,4 @@ Do not begin job-specific résumé generation, rendering/export, or additional e
 
 ## Next Approved Task
 
-`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` implemented pending external audit. Formal title and contact resolution remain bounded next tasks. No next milestone started.
+`WINTER_WALK_PROTECTED_METADATA_EVIDENCE_V1` remediated pending external re-audit. Formal title and contact resolution remain bounded next tasks. No next milestone started.

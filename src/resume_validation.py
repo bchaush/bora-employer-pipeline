@@ -14,6 +14,7 @@ from resume_patch_apply import (
     reject_forbidden_patch_extension,
     validate_immutable_fields_preserved,
 )
+from resume_protected_metadata import validate_protected_metadata_resolved
 from resume_semantic import (
     patch_contains_terminology_substitute,
     validate_module_wording_semantics,
@@ -270,6 +271,11 @@ def validate_derivative_eligibility(
                 detail="terminology substitution requires semantic review clearance",
             )
         )
+
+    if for_export:
+        protected_metadata = validate_protected_metadata_resolved(derivative)
+        if not protected_metadata["valid"]:
+            errors.extend(protected_metadata["errors"])
 
     return {
         "valid": len(errors) == 0,
