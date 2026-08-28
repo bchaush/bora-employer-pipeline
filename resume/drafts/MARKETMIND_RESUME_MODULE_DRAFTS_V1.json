@@ -1,0 +1,70 @@
+{
+  "draft_set_id": "MARKETMIND_RESUME_MODULE_DRAFTS_V1",
+  "experience_id": "EXP_MM_001",
+  "status": "DRAFT_PENDING_HUMAN_REVIEW",
+  "human_approval": false,
+  "date": "2026-08-28",
+  "notes": "MarketMind résumé-module bullet candidates drafted from the five Bora-approved MarketMind Claims (CLAIM_MM_001–CLAIM_MM_005). Deliberately NOT part of resume/master/RESUME_MASTER_WW_V1.json and NOT referenced by any experience_sections/bullet_module_ids in that protected master, so no derivative or export pipeline can include this content today regardless of this file's own status flags. Each module's wording is unchanged from what is recorded here until Bora explicitly reviews and approves it (mirroring the exact-wording approval convention already used for the Winter Walk modules and for CLAIM_MM_001–005 themselves). Claim approval does not equal résumé-module approval.",
+  "modules": [
+    {
+      "module_id": "MOD_MM_001_SCOPE",
+      "module_type": "BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_001"],
+      "evidence_ids": ["MM_SCOPE_001", "MM_BOUNDARY_001"],
+      "wording": "Built a Python/Streamlit prototype for preliminary coffee-shop market screening, with documented limits on interpreting its scores as business predictions.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Digital Solutions"],
+      "capabilities": ["Python application development", "project scoping"],
+      "status": "OPTIONAL",
+      "human_approval": false
+    },
+    {
+      "module_id": "MOD_MM_002_DETERMINISTIC_AI",
+      "module_type": "BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_002"],
+      "evidence_ids": ["MM_SCORE_001", "MM_LLM_001"],
+      "wording": "Separated deterministic scoring logic from an optional LLM narrative layer instructed not to alter the underlying results.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
+      "capabilities": ["deterministic scoring logic", "bounded LLM integration"],
+      "status": "OPTIONAL",
+      "human_approval": false
+    },
+    {
+      "module_id": "MOD_MM_003_INTEGRATION",
+      "module_type": "BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_003"],
+      "evidence_ids": ["MM_PLACES_001", "MM_CENSUS_001"],
+      "wording": "Integrated Google Places nearby-search and U.S. Census ACS demographic data into a coffee-shop market-screening workflow.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations", "Digital Solutions"],
+      "capabilities": ["REST/API integration", "Census/public-data integration"],
+      "status": "OPTIONAL",
+      "human_approval": false
+    },
+    {
+      "module_id": "MOD_MM_004_CONTROLS",
+      "module_type": "BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_004"],
+      "evidence_ids": ["MM_GEOFENCE_001", "MM_RATELIMIT_001", "MM_FALLBACK_001"],
+      "wording": "Implemented operational controls including a 3.5-mile geographic boundary check, a 50-request daily limit, and automatic fallback handling when external API calls failed.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Technical Operations"],
+      "capabilities": ["operational controls", "failure/degradation handling"],
+      "status": "OPTIONAL",
+      "human_approval": false
+    },
+    {
+      "module_id": "MOD_MM_005_TESTING",
+      "module_type": "BULLET",
+      "experience_id": "EXP_MM_001",
+      "claim_ids": ["CLAIM_MM_005"],
+      "evidence_ids": ["MM_TEST_001"],
+      "wording": "Built an automated pytest test suite covering the market-screening pipeline's core logic.",
+      "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
+      "capabilities": ["validation/testing"],
+      "status": "OPTIONAL",
+      "human_approval": false
+    }
+  ]
+}

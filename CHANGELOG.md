@@ -19,6 +19,38 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Draft MarketMind resume modules (`MARKETMIND_RESUME_MODULE_DRAFTING_V1`)
+
+**Reason**
+
+Create resume-module drafts from the five already-approved MarketMind Claims, consistent with the existing Winter Walk resume-module architecture, without approving resume wording or generating a resume.
+
+**Changed**
+
+* Added `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json`: 5 draft bullet modules (`MOD_MM_001_SCOPE`, `MOD_MM_002_DETERMINISTIC_AI`, `MOD_MM_003_INTEGRATION`, `MOD_MM_004_CONTROLS`, `MOD_MM_005_TESTING`), one per approved MarketMind Claim, each tracing exclusively to that Claim's `claim_id` and exact cited `evidence_ids`, `status=OPTIONAL`, module-level `human_approval=false`. Container-level `status=DRAFT_PENDING_HUMAN_REVIEW`, `human_approval=false`.
+* Added `tests/marketmind_resume_module_drafting_test.py`.
+
+**Not changed**
+
+* Claims, Evidence, Experiences, `resume/master/RESUME_MASTER_WW_V1.json`, schemas, requirement matcher, resume validators.
+
+**Design note**
+
+Drafts are deliberately kept out of the protected master (not referenced by any `experience_sections`/`bullet_module_ids`), since the module schema has no enforced approval concept and an unenforced flag inside the master would not actually block inclusion in a derivative/export. Structural absence from the master is the real safety guarantee here.
+
+**Tests / Verification**
+
+* All 5 modules pass real `validate_resume_module_lineage`, `validate_module_wording_semantics`, and `validate_resume_prose_style` checks against the trusted Claim/Evidence indexes.
+* Explicit forbidden-phrase scan clean (no production-grade/enterprise/predictive/AI-powered/autonomous/circuit breaker/sole developer/without AI assistance/187 passing tests/customer/revenue/savings/em dash language).
+* `CLAIM_MM_005` (OBSERVED) module does not assert a pass count or stronger performance outcome.
+* 26/26 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable — unchanged.
+
+**Status**
+
+MARKETMIND_RESUME_MODULE_DRAFTING_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW. Not pushed. No module approved, no resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close claim actor attribution semantic guard action-term coverage v1 (CLOSED)
 
 **Reason**

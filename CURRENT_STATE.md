@@ -30,11 +30,13 @@ Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVID
 
 MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOSED**.
 
-MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **CLAIM WORDING APPROVED — RÉSUMÉ MODULES NOT YET CREATED** (Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005`; see `CLAIM_MM_WORDING_APPROVAL_V1` below).
+MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **CLAIM WORDING APPROVED — RÉSUMÉ MODULES NOT YET APPROVED** (Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005`; see `CLAIM_MM_WORDING_APPROVAL_V1` below).
 
 Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **CLOSED** (P-1 HIGH semantic-guard remediation independently re-verified; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
 
 Claim Actor Attribution Semantic Guard Action-Term Coverage v1 (`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1`) = **CLOSED** (independent Claude re-audit passed; extended action-term vocabulary to integrate/automate/separate/document/define; pushed).
+
+MarketMind Résumé Module Drafting v1 (`MARKETMIND_RESUME_MODULE_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW** (5 draft bullet modules created from the 5 approved MarketMind Claims; see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -310,16 +312,54 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 ## Immediate Next Steps
 
 1. Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005` on 2026-08-28. All 11 Claims are now `human_approval=true` / reusable.
-2. Await explicit approval before creating any MarketMind résumé module or beginning job-specific tailoring.
+2. Five MarketMind résumé-module bullet drafts created in `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json` on 2026-08-28. Await Bora's explicit review and exact-wording approval before any module is included in the protected master, a derivative, or an exported résumé.
 3. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` follow-up are both closed and pushed.
 
 ## Do Not Start Yet
 
-Do not create résumé modules, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Claim wording approval is not résumé-module approval.
+Do not merge the MarketMind draft modules into `resume/master/RESUME_MASTER_WW_V1.json`, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Claim wording approval is not résumé-module approval; résumé-module drafting is not résumé-module approval either.
 
 ## Next Approved Task
 
-None started. `CLAIM_MM_WORDING_APPROVAL_V1` recorded Bora's approval of the five MarketMind Claims' exact wording; no résumé module or job-specific tailoring work has begun.
+None started. `MARKETMIND_RESUME_MODULE_DRAFTING_V1` created five draft bullet modules pending Bora's review; no résumé module or job-specific tailoring work has begun.
+
+---
+
+## 2026-08-28 — MarketMind résumé-module drafting (`MARKETMIND_RESUME_MODULE_DRAFTING_V1`, IMPLEMENTED — PENDING HUMAN REVIEW)
+
+**Reason**
+
+Create résumé-module drafts from the five already-approved MarketMind Claims (`CLAIM_MM_001`–`CLAIM_MM_005`), consistent with the existing Winter Walk résumé-module architecture, without approving résumé wording, generating a résumé, or tailoring to a job.
+
+**Created**
+
+* `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json`: a draft container (`status=DRAFT_PENDING_HUMAN_REVIEW`, `human_approval=false`) holding 5 `resume_module`-shaped bullet drafts, one per approved MarketMind Claim:
+  * `MOD_MM_001_SCOPE` ← `CLAIM_MM_001`
+  * `MOD_MM_002_DETERMINISTIC_AI` ← `CLAIM_MM_002`
+  * `MOD_MM_003_INTEGRATION` ← `CLAIM_MM_003`
+  * `MOD_MM_004_CONTROLS` ← `CLAIM_MM_004`
+  * `MOD_MM_005_TESTING` ← `CLAIM_MM_005`
+* Each module: `claim_ids` cites exactly one approved MarketMind Claim, `evidence_ids` exactly matches that Claim's own cited Evidence, `status=OPTIONAL` (never `ACTIVE`), and a module-level `human_approval=false`.
+* `tests/marketmind_resume_module_drafting_test.py`: proves each module's lineage, semantic-boundary, and prose-style validity via the real `validate_resume_module_lineage`/`validate_module_wording_semantics`/`validate_resume_prose_style` functions; scans for forbidden inflation language; confirms structural absence from the protected master; confirms byte-integrity of Winter Walk Claims, MarketMind Claims, and the master.
+
+**Design decision — drafts kept out of the protected master**
+
+The draft file is deliberately **not** merged into `resume/master/RESUME_MASTER_WW_V1.json` and is not referenced by any `experience_sections`/`bullet_module_ids` there. `resume_module.schema.json` has no module-level approval concept, so a flag alone inside the master would not be enforced by any existing validator (`build_resume_derivative`/`approve_derivative_for_export` would treat it identically to an approved module). Keeping the drafts in a separate, unreferenced file makes them structurally unreachable by the derivative/export pipeline today, which is a stronger guarantee than an unenforced status field would provide. Merging any of these modules into the master requires a future, separately-scoped milestone after Bora reviews and approves the exact wording.
+
+**Not changed**
+
+* Claims (`claims/marketmind/`, `claims/winter_walk/`), Evidence, Experiences, `resume/master/RESUME_MASTER_WW_V1.json`, schemas, requirement matcher, résumé validators.
+
+**Verification**
+
+* All 5 modules independently pass `validate_resume_module_lineage` (cite only approved, human-approved MarketMind Claims and their exact Evidence lineage), `validate_module_wording_semantics` (no forbidden-context leakage against each Claim's `forbidden_contexts`), and `validate_resume_prose_style` (no em dashes, no AI-filler phrasing).
+* Explicit scan against the task's named forbidden phrases (production-grade, enterprise, predictive, AI-powered, autonomous, circuit breaker, sole developer, without AI assistance, 187 passing tests, customer/user/revenue/savings, etc.) — clean.
+* `CLAIM_MM_005` module (OBSERVED) does not assert a pass count or "all tests passed."
+* 26/26 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable — unchanged.
+
+**Status**
+
+`MARKETMIND_RESUME_MODULE_DRAFTING_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW`. Not pushed. No résumé module is approved. No résumé has been generated. No job-specific tailoring has begun.
 
 ---
 
