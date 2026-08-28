@@ -19,6 +19,35 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close P-2 process-mapping evidence model (CLOSED)
+
+**Reason**
+
+Claude Code final closure recheck returned `CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_FINAL_PASS`. Operationally close `P2_PROCESS_MAPPING_EVIDENCE_MODEL` without redesign, matcher changes, or résumé generation.
+
+**Changed**
+
+* Status → **CLOSED**.
+* Recorded audit trail: implement `538fe16`; remediate `c9b3422`; approve `070dc9f`; wording fix `abf96d3`; reapprove `37fbba9`; Claude final pass `CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_FINAL_PASS`.
+* `process_mapping` supported via `WW_PROC_001` → approved reusable `CLAIM_WW_006`.
+* Evidence: 13. Reusable claims: 6. `GT_PROCESS_MAP_P2` = APPLY.
+* Documentation-only closure commit.
+
+**Affected Areas**
+
+* `CURRENT_STATE.md`, `CHANGELOG.md`
+
+**Tests / Verification**
+
+* Full established suites + golden runner (15/15) — PASS
+* Repository: 1 Experience / 13 Evidence / 6 reusable Claims — PASS
+
+**Status**
+
+CLOSED
+
+---
+
 ## 2026-08-28 — Reapprove corrected CLAIM_WW_006 (P-2_EVIDENCE_MODEL_RESOLVED)
 
 **Reason**

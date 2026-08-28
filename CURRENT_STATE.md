@@ -22,7 +22,7 @@ Job Analysis v1 first vertical slice = **CLOSED**.
 
 Job Analysis v1 Golden Set = **CLOSED**.
 
-P-2 process-mapping evidence model = **P-2_EVIDENCE_MODEL_RESOLVED** (corrected `CLAIM_WW_006` reapproved).
+P-2 process-mapping evidence model (`P2_PROCESS_MAPPING_EVIDENCE_MODEL`) = **CLOSED**.
 
 Canonical Experience records: **1** (`EXP_WW_001`).
 
@@ -159,14 +159,23 @@ No production engine yet.
   * Second Claude re-audit findings remediated: PRIORITY distinct-Claim breadth (anti requirement-splitting); expanded trusted synonym recall; Application Analyst / Application Support family tokens (Blueprint §6).
   * Final Claude residual findings remediated: N-1 synonym paraphrases (needs→requirements, structured/tabular ingest/load, validate pilot); N-2 plural `applications analyst`; N-3 Priority breadth assumption documented in code (no logic change).
   * **P-1 fixed** (clause-level; compound mixed clauses stay UNCLEAR).
-  * **P-2 evidence model resolved**: `WW_PROC_001` + reapproved corrected `CLAIM_WW_006` (`process_mapping`); Bora explicitly reapproved 2026-08-28; matcher positive use enabled; `GT_PROCESS_MAP_P2` routes APPLY.
+  * **P-2 fixed** via closed `P2_PROCESS_MAPPING_EVIDENCE_MODEL` milestone (`WW_PROC_001` → `CLAIM_WW_006`).
+  * Claude final pass recorded (`CLAUDE_JOB_ANALYSIS_GOLDEN_SET_FINAL_PASS`).
   * No résumé-generation work begun.
+  * Status: **CLOSED**.
+* P-2 process-mapping evidence model (**CLOSED**):
+
+  * `WW_PROC_001` (`process_mapping`) citing `WinterWalk_Master_Blueprint.docx` Section 1 Executive Summary.
+  * `CLAIM_WW_006` with evidence-bounded wording; two-step human approval completed (implementation → wording remediation → Bora reapproval).
+  * Matcher consumes approved `process_mapping` provenance; `GT_PROCESS_MAP_P2` routes APPLY.
+  * Claude audits: remediation required (`CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_CHANGES_REQUIRED`); final closure `CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_FINAL_PASS`.
+  * Evidence count: **13**. Reusable claims: **6** (`CLAIM_WW_001`–`CLAIM_WW_006`).
+  * No résumé-generation work begun.
+  * Status: **CLOSED**.
 
 ## Current Task
 
-`P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **P-2_EVIDENCE_MODEL_RESOLVED**.
-
-Bora explicitly reapproved corrected `CLAIM_WW_006` for reusable use. Six reusable Winter Walk claims. Awaiting explicit next approved task. Do not begin résumé generation unless explicitly approved.
+None active. `P2_PROCESS_MAPPING_EVIDENCE_MODEL` = **CLOSED**. Awaiting Bora's explicit next approved task. Do not begin résumé generation unless explicitly approved.
 
 ## Not Built Yet
 
@@ -189,7 +198,7 @@ Bora explicitly reapproved corrected `CLAIM_WW_006` for reusable use. Six reusab
 * No external integrations are connected.
 * No job applications can be submitted automatically.
 * No resume-generation pipeline exists yet.
-* Five Winter Walk Claim Bank records are Bora-approved and reusable under production claim validation.
+* Six Winter Walk Claim Bank records are Bora-approved and reusable under production claim validation.
 * Winter Walk Batch 1 preserves UNKNOWN for daily production use, completed handoff, measured business impact, and live email sending unless separately evidenced.
 * No runtime workflow depends on multi-model agreement; deterministic validators enforce invariants; evidence wins over model opinion; Bora retains consequential approval.
 * No PII should be stored in this repository unless explicitly designed and approved later.
@@ -213,7 +222,6 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 ## Immediate Next Steps
 
 1. Await explicit approval for the next milestone (do not auto-start résumé generation).
-2. Optional: Claude closure recheck of resolved P-2 state.
 
 ## Do Not Start Yet
 
@@ -221,4 +229,4 @@ Do not begin résumé modules / resume generation without explicit approval.
 
 ## Next Approved Task
 
-None started. Awaiting Bora's explicit next approved task after P-2 resolution.
+None started.
