@@ -3,9 +3,10 @@
   "wording": "Integrated Google Places nearby-search and U.S. Census ACS demographic data feeds into the coffee-shop screening workflow.",
   "evidence_ids": [
     "MM_PLACES_001",
-    "MM_CENSUS_001"
+    "MM_CENSUS_001",
+    "MM_AUTHOR_001"
   ],
-  "evidence_state": "VERIFIED",
+  "evidence_state": "OBSERVED",
   "allowed_contexts": [
     "resume",
     "interview",

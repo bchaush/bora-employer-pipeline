@@ -19,6 +19,33 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — MarketMind claim authorship-lineage remediation (REMEDIATED_PENDING_CLAUDE_REAUDIT)
+
+**Reason**
+
+Bind `MM_AUTHOR_001` to all five MarketMind draft claims per Claude pre-approval remediation finding.
+
+**Changed**
+
+* `claims/marketmind/CLAIM_MM_001.json`–`CLAIM_MM_005.json`: added `MM_AUTHOR_001` to `evidence_ids`; `evidence_state` set to `OBSERVED` on 001–004 for compatibility with cited authorship evidence.
+* `tests/marketmind_claim_drafting_test.py`; `CURRENT_STATE.md`, `CHANGELOG.md`.
+
+**Affected Areas**
+
+* MarketMind draft claims (lineage only), tests, milestone docs.
+
+**Tests / Verification**
+
+* Full established test suites (24) — PASS expected.
+* Golden runner (15/15) — PASS expected.
+* Reusable Claims remain 6; Evidence/Experience/master/Winter Walk unchanged.
+
+**Status**
+
+REMEDIATED_PENDING_CLAUDE_REAUDIT
+
+---
+
 ## 2026-08-28 — MarketMind Claim Drafting v1 (IMPLEMENTED_PENDING_HUMAN_REVIEW)
 
 **Reason**

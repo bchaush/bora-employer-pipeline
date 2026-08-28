@@ -58,6 +58,16 @@ WINTER_WALK_CLAIM_FILES = [
     "CLAIM_WW_006.json",
 ]
 
+PRIOR_EVIDENCE_IDS_BY_CLAIM = {
+    "CLAIM_MM_001": ["MM_SCOPE_001", "MM_BOUNDARY_001"],
+    "CLAIM_MM_002": ["MM_SCORE_001", "MM_LLM_001"],
+    "CLAIM_MM_003": ["MM_PLACES_001", "MM_CENSUS_001"],
+    "CLAIM_MM_004": ["MM_GEOFENCE_001", "MM_RATELIMIT_001", "MM_FALLBACK_001"],
+    "CLAIM_MM_005": ["MM_TEST_001"],
+}
+
+MM_AUTHOR_EVIDENCE_PATH = EVIDENCE_ROOT / "marketmind" / "MM_AUTHOR_001.json"
+
 FORBIDDEN_INFLATION_PHRASES = [
     "production platform",
     "production deployment",
@@ -141,6 +151,42 @@ for claim_id in MARKETMIND_CLAIM_IDS:
         )
 
 print("PASS 2: lineage references approved MarketMind evidence for EXP_MM_001.")
+
+
+# ---------------------------------------------------------------------------
+# 2b. Authorship lineage remediation: MM_AUTHOR_001 bound to every MarketMind claim
+# ---------------------------------------------------------------------------
+author_evidence_hash = sha256_file(MM_AUTHOR_EVIDENCE_PATH)
+author_evidence = json.loads(MM_AUTHOR_EVIDENCE_PATH.read_text(encoding="utf-8"))
+assert_true(author_evidence["evidence_state"] == "OBSERVED", "MM_AUTHOR_001 must remain OBSERVED")
+assert_true(
+    "Does not prove sole intellectual authorship of every idea" in " ".join(
+        author_evidence.get("limitations", [])
+    ),
+    "MM_AUTHOR_001 limitations must remain unchanged",
+)
+
+for claim_id in MARKETMIND_CLAIM_IDS:
+    claim = json.loads((CLAIMS_ROOT / f"{claim_id}.json").read_text(encoding="utf-8"))
+    prior_ids = PRIOR_EVIDENCE_IDS_BY_CLAIM[claim_id]
+    assert_true(
+        claim["evidence_ids"][: len(prior_ids)] == prior_ids,
+        f"{claim_id} must preserve prior evidence lineage order",
+    )
+    assert_true(
+        "MM_AUTHOR_001" in claim["evidence_ids"],
+        f"{claim_id} must cite MM_AUTHOR_001 for actor attribution",
+    )
+    assert_true(
+        claim["evidence_state"] == "OBSERVED",
+        f"{claim_id} evidence_state must be OBSERVED after authorship bind",
+    )
+
+assert_true(
+    sha256_file(MM_AUTHOR_EVIDENCE_PATH) == author_evidence_hash,
+    "MM_AUTHOR_001 evidence record must remain byte-unchanged",
+)
+print("PASS 2b: MM_AUTHOR_001 bound to all MarketMind claims; evidence unchanged.")
 
 
 # ---------------------------------------------------------------------------

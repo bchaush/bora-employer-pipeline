@@ -30,7 +30,7 @@ Winter Walk Protected Metadata Evidence v1 (`WINTER_WALK_PROTECTED_METADATA_EVID
 
 MarketMind Evidence Extraction v1 (`MARKETMIND_EVIDENCE_EXTRACTION_V1`) = **CLOSED**.
 
-MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **IMPLEMENTED — PENDING HUMAN REVIEW**.
+MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **REMEDIATED — PENDING CLAUDE REAUDIT**.
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -314,7 +314,29 @@ Do not approve MarketMind Claims, create résumé modules, generate résumé out
 
 ## Next Approved Task
 
-`MARKETMIND_CLAIM_DRAFTING_V1` implemented pending human review.
+`MARKETMIND_CLAIM_DRAFTING_V1` remediated pending Claude reaudit.
+
+---
+
+## 2026-08-28 — MarketMind Claim Drafting v1 authorship-lineage remediation (REMEDIATED — PENDING CLAUDE REAUDIT)
+
+**Reason**
+
+Claude `CLAUDE_MARKETMIND_CLAIM_DRAFTING_V1_FINAL_PASS` required binding `MM_AUTHOR_001` to all five MarketMind draft claims for actor-attribution lineage.
+
+**Changed**
+
+* Added `MM_AUTHOR_001` to `evidence_ids` on `CLAIM_MM_001`–`CLAIM_MM_005` (wording unchanged).
+* Adjusted `evidence_state` to `OBSERVED` on `CLAIM_MM_001`–`CLAIM_MM_004` for state-compatibility with cited `MM_AUTHOR_001` (`OBSERVED`).
+* Updated `tests/marketmind_claim_drafting_test.py` authorship-lineage checks.
+
+**Not changed**
+
+* Claim wording, `human_approval=false`, reusability, Evidence, Experiences, Winter Walk, master.
+
+**Status**
+
+`MARKETMIND_CLAIM_DRAFTING_V1_REMEDIATED_PENDING_CLAUDE_REAUDIT`
 
 ---
 
