@@ -19,6 +19,31 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close claim actor attribution semantic guard action-term coverage v1 (CLOSED)
+
+**Reason**
+
+Independent Claude final re-audit of commit `f777c6a` (extended action-term vocabulary for the actor-attribution guard) passed: fresh, independent reproduction of "Single-handedly integrated...", "Solely automated...", and "Exclusively separated..." against valid Evidence and `human_approval=true` returns `valid_record=false`, `reusable=false`; plain conventional wording remains valid and reusable. Zero drift on Winter Walk Claims/Evidence, and on the MarketMind Claims beyond the already-recorded `human_approval` field, across the full `ecc0e22`–`f777c6a` chain.
+
+**Changed**
+
+* Documentation only: `CURRENT_STATE.md`, `CHANGELOG.md` — mark `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` closed.
+
+**Not changed**
+
+* No code, schema, Claim, Evidence, Experience, or résumé file touched by this closure commit.
+
+**Tests / Verification**
+
+* 25/25 test suites — PASS (fresh re-run). Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable — unchanged.
+* All 5 MarketMind Claims: `human_approval=true`, `valid_record=true`, `reusable=true`, wording/lineage/`evidence_state` unchanged, `CLAIM_MM_005` still `OBSERVED`.
+
+**Status**
+
+CLOSED and pushed. `MARKETMIND_CLAIM_DRAFTING_V1` remains open pending résumé-module creation.
+
+---
+
 ## 2026-08-28 — Approve MarketMind Claim wording (`CLAIM_MM_WORDING_APPROVAL_V1`)
 
 **Reason**

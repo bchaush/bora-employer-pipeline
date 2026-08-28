@@ -34,7 +34,7 @@ MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **CLAIM WORDING 
 
 Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **CLOSED** (P-1 HIGH semantic-guard remediation independently re-verified; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
 
-Claim Actor Attribution Semantic Guard Action-Term Coverage v1 (`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (extended action-term vocabulary to integrate/automate/separate/document/define; not yet pushed).
+Claim Actor Attribution Semantic Guard Action-Term Coverage v1 (`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1`) = **CLOSED** (independent Claude re-audit passed; extended action-term vocabulary to integrate/automate/separate/document/define; pushed).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -311,7 +311,7 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 
 1. Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005` on 2026-08-28. All 11 Claims are now `human_approval=true` / reusable.
 2. Await explicit approval before creating any MarketMind résumé module or beginning job-specific tailoring.
-3. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` remains closed.
+3. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` follow-up are both closed and pushed.
 
 ## Do Not Start Yet
 
@@ -319,7 +319,24 @@ Do not create résumé modules, generate résumé output, ingest Market Empire/L
 
 ## Next Approved Task
 
-None started. `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` implemented, pending independent Claude re-audit before push. `CLAIM_MM_WORDING_APPROVAL_V1` recorded Bora's approval of the five MarketMind Claims' exact wording; no résumé module or job-specific tailoring work has begun.
+None started. `CLAIM_MM_WORDING_APPROVAL_V1` recorded Bora's approval of the five MarketMind Claims' exact wording; no résumé module or job-specific tailoring work has begun.
+
+---
+
+## 2026-08-28 — Claim Actor Attribution Semantic Guard Action-Term Coverage v1 closure (CLOSED)
+
+**Reason**
+
+Independent Claude final re-audit of commit `f777c6a` (extended `_ATTRIBUTION_ACTION_TERM` to cover integrate/automate/separate/document/define) passed: fresh reproduction of "Single-handedly integrated...", "Solely automated...", and "Exclusively separated..." against valid Evidence and `human_approval=true` returns `valid_record=false`, `reusable=false`; plain "Integrated..."/"Automated..." wording remains valid and reusable. Zero drift confirmed on Winter Walk Claims/Evidence/Experiences/résumé master, and on the MarketMind Claims beyond the intended `human_approval` field, across the full `ecc0e22`–`f777c6a` chain.
+
+**Verified unchanged across the full chain**
+
+* All 6 Winter Walk Claims and all 26 Evidence records: byte-unchanged.
+* All 5 MarketMind Claims: `human_approval=true`, `valid_record=true`, `reusable=true`; wording/lineage/`evidence_state` unchanged; `CLAIM_MM_005` still `OBSERVED`.
+
+**Status**
+
+`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` — **CLOSED**. `MARKETMIND_CLAIM_DRAFTING_V1` remains open pending résumé-module creation, which requires separate, explicit approval.
 
 ---
 
