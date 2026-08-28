@@ -99,7 +99,6 @@ REAL_CLAIM_IDS = [
     "CLAIM_WW_003",
     "CLAIM_WW_004",
     "CLAIM_WW_005",
-    "CLAIM_WW_006",
 ]
 
 
@@ -291,6 +290,16 @@ for claim_id in REAL_CLAIM_IDS:
 r_pilot = validate_claim(load_real_claim("CLAIM_WW_005"), EVIDENCE_INDEX)
 assert_true(r_pilot["valid_record"] is True, "ten pilot test rows claim must pass")
 print("PASS 8: ten pilot test rows remains allowed (evidenced factual count).")
+
+r_proc = validate_claim(load_real_claim("CLAIM_WW_006"), EVIDENCE_INDEX)
+assert_true(r_proc["valid_record"] is True, f"CLAIM_WW_006 record must validate: {r_proc}")
+assert_false(r_proc["reusable"], "CLAIM_WW_006 must not be reusable before approval")
+assert_false(r_proc["human_approved"], "CLAIM_WW_006 must await human approval")
+assert_true(
+    "FORBIDDEN_SEMANTIC_PATTERN" not in error_codes(r_proc),
+    f"CLAIM_WW_006 semantic guard: {r_proc['errors']}",
+)
+print("PASS 8c: CLAIM_WW_006 valid_record but not reusable pending approval.")
 
 partners = make_evidence(
     "EVID_PARTNER_24",

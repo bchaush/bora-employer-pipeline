@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Remediate P-2 process-mapping audit P-1–P-4 (P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL)
+
+**Reason**
+
+Claude Code audit returned `CLAUDE_P2_PROCESS_MAPPING_EVIDENCE_MODEL_CHANGES_REQUIRED`. Correct provenance, remove `workflow_analysis` overreach, restore two-step human-approval convention, and align Golden/matcher with pending-approval truth.
+
+**Changed**
+
+* `WW_PROC_001`: Master Blueprint Section 1 Executive Summary citation only; `process_mapping` only; removed connector/sync and unsupported terminology.
+* `CLAIM_WW_006`: corrected wording; removed `workflow analysis`; `human_approval=false`.
+* Matcher: `workflow_analysis` patterns removed; process-mapping vocabulary dormant until reusable approval; semantic traps expanded (BPMN 2.0, Lean, value stream mapping, process reengineering).
+* `GT_PROCESS_MAP_P2`: restored REJECT / `REQ_P2_MAP=NONE`.
+* Status: `P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL` (not `P-2_EVIDENCE_MODEL_RESOLVED`).
+
+**Affected Areas**
+
+* `evidence/winter_walk/WW_PROC_001.json`, `claims/winter_walk/CLAIM_WW_006.json`
+* `src/requirement_match.py`, golden fixture, tests, docs
+
+**Tests / Verification**
+
+* Full established suites + golden runner — PASS
+* Repository: 1 Experience / 13 Evidence / 6 Claims (5 reusable) — PASS
+
+**Status**
+
+P2_PROCESS_MAPPING_CLAIM_PENDING_HUMAN_APPROVAL
+
+---
+
 ## 2026-08-27 — Implement P-2 process-mapping evidence model (IMPLEMENTED_PENDING_EXTERNAL_AUDIT)
 
 **Reason**

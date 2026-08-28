@@ -1,34 +1,31 @@
 {
-  "purpose": "P-2 resolved: process mapping has approved Claim provenance -> APPLY.",
+  "purpose": "Process-mapping claim exists but awaits human approval; REQ_P2_MAP stays NONE -> REJECT.",
   "role_family": "Business Process",
   "acceptable_decisions": [
-    "APPLY"
+    "REJECT"
   ],
   "forbidden_decisions": [
-    "REJECT",
     "PRIORITY_APPLY",
+    "APPLY",
     "EFFICIENT_APPLY"
   ],
   "key_matches": {
     "REQ_P2_MAP": {
-      "result": "STRONG",
-      "require_provenance": true,
-      "acceptable_results": [
-        "STRONG",
-        "SUPPORTED"
-      ]
+      "result": "NONE"
     }
   },
-  "expect_gap_substrings": [],
-  "require_hard_blockers": false,
+  "expect_gap_substrings": [
+    "process"
+  ],
+  "require_hard_blockers": true,
   "semantic_boundaries": [
-    "process mapping supported via CLAIM_WW_006 / WW_PROC_001"
+    "CLAIM_WW_006 process_mapping pending human approval; matcher positive use blocked"
   ],
   "known_limitations": [
-    "NONE"
+    "P-2"
   ],
   "notes": [
-    "Expected decision changed from REJECT because P-2 evidence-model gap is resolved; not test weakening."
+    "Golden expectation reflects current approved truth until Bora explicitly approves CLAIM_WW_006."
   ],
   "fixture_id": "GT_PROCESS_MAP_P2"
 }

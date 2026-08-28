@@ -60,7 +60,17 @@ assert_true(
     "Evidence Experience integrity",
 )
 assert_true(cl["valid"] is True and cl["records_checked"] == 6, "Claim regression")
+reusable_approved = [
+    cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
+]
+assert_true(len(reusable_approved) == 5, f"expected 5 reusable claims, got {reusable_approved}")
+assert_true(
+    cl["index"]["CLAIM_WW_006"]["human_approval"] is False,
+    "CLAIM_WW_006 must remain pending human approval",
+)
 for claim in cl["index"].values():
+    if claim["claim_id"] == "CLAIM_WW_006":
+        continue
     assert_true(claim["human_approval"] is True, f"{claim['claim_id']} must stay approved")
 print("PASS 0: Experience/Evidence/Claim repositories unchanged and valid.")
 
@@ -775,7 +785,7 @@ assert_true(
 )
 print("PASS R15: marketing workflow automation does not gain STRONG.")
 
-# Process mapping positive with provenance (P-2 resolved)
+# Process mapping vocabulary recognized but NONE until CLAIM_WW_006 approved
 pmap = match_requirement(
     job_id="JOB_X",
     requirement=_mini_req(
@@ -787,12 +797,9 @@ pmap = match_requirement(
     evidence_index=EVIDENCE_INDEX,
     match_index=0,
 )
-assert_true(pmap["result"] in {"STRONG", "SUPPORTED"}, f"P2 process mapping: {pmap}")
-assert_true(
-    pmap.get("claim_ids") == ["CLAIM_WW_006"],
-    f"P2 process mapping provenance: {pmap}",
-)
-print("PASS R16: process mapping matches with CLAIM_WW_006 provenance.")
+assert_true(pmap["result"] == "NONE", f"P2 pending approval: {pmap}")
+assert_true(not pmap.get("claim_ids"), pmap)
+print("PASS R16: process mapping NONE pending CLAIM_WW_006 human approval.")
 
 # Trap variants still NONE
 for trap_text in [
@@ -802,7 +809,11 @@ for trap_text in [
     "Production MLOps model deployment",
     "Workday administration specialization",
     "Cybersecurity controls and SOC 2 ownership",
-    "BPMN modeling expertise",
+    "BPMN 2.0 modeling expertise",
+    "Formal enterprise process modeling certification",
+    "Enterprise process architecture leadership",
+    "Lean process engineering certification",
+    "Value stream mapping expertise",
     "Six Sigma Black Belt certification",
     "Celonis process mining platform",
     "UiPath Process Mining telemetry",
@@ -1332,22 +1343,31 @@ ww_claim = json.loads(
 )
 assert_true(EVIDENCE_SCHEMA.is_valid(ww_proc), "WW_PROC_001 schema invalid")
 assert_true(ww_proc["experience_id"] == "EXP_WW_001", "WW_PROC_001 Experience ref")
+assert_true(ww_proc["capabilities"] == ["process_mapping"], ww_proc["capabilities"])
+assert_true(
+    "Section 1 Executive Summary" in ww_proc["source_location"],
+    ww_proc["source_location"],
+)
 assert_true("WW_PROC_001" in EVIDENCE_INDEX, "WW_PROC_001 in trusted Evidence index")
 assert_true(CLAIM_SCHEMA.is_valid(ww_claim), "CLAIM_WW_006 schema invalid")
+assert_true(
+    ww_claim["wording"]
+    == "Documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering data intake, evidence tracking, review, follow-up, and human approval.",
+    ww_claim["wording"],
+)
+assert_true(ww_claim["human_approval"] is False, "CLAIM_WW_006 must await approval")
 claim_val = validate_claim(ww_claim, EVIDENCE_INDEX)
 assert_true(claim_val["valid_record"] is True, claim_val)
-assert_true(claim_val["reusable"] is True, claim_val)
-assert_true(claim_val["human_approved"] is True, claim_val)
-print("PASS P2a: WW_PROC_001 + CLAIM_WW_006 schema, lineage, approval.")
+assert_true(claim_val["reusable"] is False, claim_val)
+assert_true(claim_val["human_approved"] is False, claim_val)
+print("PASS P2a: WW_PROC_001 provenance + CLAIM_WW_006 pending approval.")
 
-p2_pos = [
+for text in [
     "Map current-state workflows",
     "Document business processes for operations review",
     "Map operational handoffs between teams",
-    "Analyze an existing workflow",
     "Document current-state and future-state workflow",
-]
-for text in p2_pos:
+]:
     m = match_requirement(
         job_id="JOB_X",
         requirement=_mini_req(text, category="PROCESS", domain="Business Process"),
@@ -1355,12 +1375,9 @@ for text in p2_pos:
         evidence_index=EVIDENCE_INDEX,
         match_index=0,
     )
-    assert_true(
-        m["result"] in {"STRONG", "SUPPORTED"},
-        f"P2 positive failed for {text!r}: {m}",
-    )
-    assert_true(m["claim_ids"], f"P2 missing provenance for {text!r}: {m}")
-print("PASS P2b: bounded process_mapping / workflow_analysis positives.")
+    assert_true(m["result"] == "NONE", f"pending approval: {text!r} -> {m}")
+    assert_true(not m.get("claim_ids"), m)
+print("PASS P2b: process_mapping vocabulary dormant until approval.")
 
 p2_neg = [
     "process improvement",
@@ -1379,10 +1396,7 @@ for text in p2_neg:
         evidence_index=EVIDENCE_INDEX,
         match_index=0,
     )
-    assert_true(
-        "process_mapping" not in caps and "workflow_analysis" not in caps,
-        f"generic {text!r} inferred caps {caps}",
-    )
+    assert_true("process_mapping" not in caps, f"generic {text!r} inferred {caps}")
     assert_true(m["result"] == "NONE", f"generic {text!r} -> {m}")
 print("PASS P2c: generic process/workflow words remain non-positive.")
 
@@ -1404,7 +1418,7 @@ p2_result = analyze_job(
 )
 assert_true(p2_result["valid"] is True, p2_result["errors"])
 assert_true(
-    p2_result["analysis"]["decision"] == "APPLY",
+    p2_result["analysis"]["decision"] == "REJECT",
     f"GT_PROCESS_MAP_P2 routing: {p2_result['analysis']}",
 )
 map_match = next(
@@ -1412,11 +1426,8 @@ map_match = next(
     for m in p2_result["analysis"]["evidence_matches"]
     if m["requirement_id"] == "REQ_P2_MAP"
 )
-assert_true(
-    map_match["result"] in {"STRONG", "SUPPORTED"},
-    f"REQ_P2_MAP match: {map_match}",
-)
-assert_true("CLAIM_WW_006" in map_match.get("claim_ids", []), map_match)
-print("PASS P2d: GT_PROCESS_MAP_P2 routes APPLY with REQ_P2_MAP provenance.")
+assert_true(map_match["result"] == "NONE", f"REQ_P2_MAP match: {map_match}")
+assert_true(not map_match.get("claim_ids"), map_match)
+print("PASS P2d: GT_PROCESS_MAP_P2 REJECT with REQ_P2_MAP NONE pending approval.")
 
 print("PASS: job analysis vertical-slice tests completed successfully.")

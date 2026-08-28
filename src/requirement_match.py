@@ -39,7 +39,7 @@ _CLAIM_CAPABILITIES: dict[str, frozenset[str]] = {
         }
     ),
     "CLAIM_WW_005": frozenset({"uat", "pilot_testing", "test_documentation"}),
-    "CLAIM_WW_006": frozenset({"process_mapping", "workflow_analysis"}),
+    "CLAIM_WW_006": frozenset({"process_mapping"}),
 }
 
 # Bounded JD-anchor → existing canonical capability mappings only.
@@ -150,25 +150,20 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     ),
     (
         re.compile(
-            r"\bworkflow\s+analysis\b|"
-            r"\banalyz(?:e|ing)\s+(?:an\s+)?existing\s+workflow\b",
-            re.I,
-        ),
-        frozenset({"workflow_analysis"}),
-    ),
-    (
-        re.compile(
-            r"\bbpmn\b|\bbusiness\s+process\s+model(?:ing)?\s+notation\b|"
+            r"\bbpmn(?:\s*2(?:\.0)?)?\b|\bbusiness\s+process\s+model(?:ing)?\s+notation\b|"
             r"formal\s+enterprise\s+process\s+model(?:ing)?\b|"
             r"enterprise\s+process\s+architect(?:ure)?\b|"
-            r"business[- ]process\s+modeling\s+certification",
+            r"business[- ]process\s+modeling\s+certification|"
+            r"process\s+reengineering\s+leadership|"
+            r"enterprise\s+process\s+reengineering",
             re.I,
         ),
         frozenset({"bpmn_modeling"}),
     ),
     (
         re.compile(
-            r"\bsix\s+sigma\b|\blean\s+(?:six\s+sigma|process\s+engineering)\b|"
+            r"\bsix\s+sigma\b|\blean\b|\bvalue\s+stream\s+mapping\b|"
+            r"\blean\s+(?:six\s+sigma|process\s+engineering)\b|"
             r"lean\s+certification\b",
             re.I,
         ),
@@ -177,7 +172,7 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     (
         re.compile(
             r"\bcelonis\b|\bui\s*path\s+process\s+mining\b|"
-            r"process[- ]min(?:ing|e)\s+telemetry\b|"
+            r"process[- ]min(?:ing|e)(?:\s+telemetry)?\b|"
             r"automated\s+process\s+min(?:ing|e)\b",
             re.I,
         ),

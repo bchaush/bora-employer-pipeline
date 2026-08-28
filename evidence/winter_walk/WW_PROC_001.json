@@ -1,19 +1,18 @@
 {
   "evidence_id": "WW_PROC_001",
   "experience_id": "EXP_WW_001",
-  "fact": "The locked Winter Walk Master Blueprint documents the prior OP adoption/support workflow as manual tracking across scattered emails, spreadsheets, and staff memory, then specifies a structured replacement workflow integrating Haku data processing, evidence tracking, reviewable follow-up, exception handling, and human approval.",
+  "fact": "The locked Winter Walk Master Blueprint Executive Summary (Section 1 — \"What value it creates\") states that the OP Recommendation Adoption & Support System replaces manual OP adoption/support tracking across scattered emails, spreadsheets, and staff memory with a structured internal operating workflow for evidence tracking, reviewable follow-up, and human approval before consequential actions.",
   "capabilities": [
-    "process_mapping",
-    "workflow analysis"
+    "process_mapping"
   ],
   "technologies": [
     "Google Workspace"
   ],
   "evidence_state": "SUPPORTED",
   "original_source": "WinterWalk_Master_Blueprint.docx",
-  "source_location": "Section 2 — prior-state OP adoption/support workflow (manual tracking across emails, spreadsheets, staff memory); Sections 3–5 — replacement operating workflow (internal support view, evidence layer, reviewable follow-up queue, Haku validate/map/route/stage/roll-up flow, Self-Report Form → Evidence Connector → Approval Sync, human approval for consequential actions)",
+  "source_location": "Section 1 Executive Summary — \"What value it creates\" (manual prior-state OP adoption/support tracking across emails, spreadsheets, staff memory; structured replacement workflow with evidence tracking, reviewable follow-up, human approval)",
   "safe_for_external_use": true,
-  "notes": "Design and operating-workflow documentation only. Describes documented current-state and specified replacement workflow; does not prove every component was implemented or deployed.",
+  "notes": "Design-intent source only from the Master Blueprint Executive Summary. Does not prove that every planned component was implemented or deployed.",
   "limitations": [
     "Does not prove implementation completeness or daily production use",
     "Does not establish BPMN, formal enterprise process modeling, or process-reengineering leadership",

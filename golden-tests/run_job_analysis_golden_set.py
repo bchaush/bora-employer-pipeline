@@ -66,12 +66,25 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
         fail(f"Evidence regression failed: {ev}")
     if not (cl.get("valid") is True and cl.get("records_checked") == 6):
         fail(f"Claim regression failed: {cl}")
-    for claim in cl["index"].values():
-        if claim.get("human_approval") is not True:
-            fail(f"{claim.get('claim_id')} must remain approved/reusable gate")
+    reusable_count = sum(
+        1 for claim in cl["index"].values() if claim.get("human_approval") is True
+    )
+    if reusable_count != 5:
+        fail(f"expected 5 reusable claims, got {reusable_count}")
+    if cl["index"].get("CLAIM_WW_006", {}).get("human_approval") is not False:
+        fail("CLAIM_WW_006 must remain pending human approval")
+    for claim_id in (
+        "CLAIM_WW_001",
+        "CLAIM_WW_002",
+        "CLAIM_WW_003",
+        "CLAIM_WW_004",
+        "CLAIM_WW_005",
+    ):
+        if cl["index"][claim_id].get("human_approval") is not True:
+            fail(f"{claim_id} must remain approved/reusable gate")
     print(
         "PASS 0: repository regression "
-        "(1 Experience / 13 Evidence / 6 Claims reusable)."
+        "(1 Experience / 13 Evidence / 6 Claims, 5 reusable)."
     )
     return ev["index"], cl["index"]
 

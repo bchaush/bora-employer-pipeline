@@ -1,6 +1,6 @@
 {
   "claim_id": "CLAIM_WW_006",
-  "wording": "Analyzed and documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering data intake, evidence tracking, review, follow-up, and human approval.",
+  "wording": "Documented Winter Walk's manual OP-support workflow and translated it into a structured operating process covering data intake, evidence tracking, review, follow-up, and human approval.",
   "evidence_ids": [
     "WW_PROC_001"
   ],
@@ -17,8 +17,7 @@
     "document business processes",
     "map operational workflows",
     "identify workflow stages/handoffs",
-    "current-state to controlled future-state workflow",
-    "workflow analysis"
+    "current-state to controlled future-state workflow"
   ],
   "forbidden_contexts": [
     "BPMN expertise",
@@ -32,7 +31,7 @@
     "Celonis",
     "UiPath Process Mining"
   ],
-  "human_approval": true,
+  "human_approval": false,
   "date": "2026-08-27",
   "version": "1"
 }
