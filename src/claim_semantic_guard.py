@@ -258,7 +258,9 @@ _BOUNDARY_RULES: tuple[tuple[str, str, re.Pattern[str], re.Pattern[str]], ...] =
 # generic words like "independent"/"independently" alone never match).
 _ATTRIBUTION_ACTION_TERM = (
     r"(?:built|build|develop(?:ed|ing)?|creat(?:ed|ing)|implement(?:ed|ing)?|"
-    r"architect(?:ed|ing)?|design(?:ed|ing)?|author(?:ed|ing)?)"
+    r"architect(?:ed|ing)?|design(?:ed|ing)?|author(?:ed|ing)?|"
+    r"integrat(?:e|ed|ing)|automat(?:e|ed|ing)|separat(?:e|ed|ing)|"
+    r"document(?:ed|ing)?|defin(?:e|ed|ing))"
 )
 
 # (rule_id, pattern) — normalized-text patterns, matched unconditionally.

@@ -48,11 +48,42 @@ Confirms only that it is truthful for Bora to describe himself using the exact s
 **Tests / Verification**
 
 * 25/25 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable.
-* Semantic guard independently re-verified active against the real, now-approved claims: forbidden sole/exclusive/unaided-authorship variants of real claim wording still blocked; a narrow pre-existing action-term vocabulary gap (missing "integrate"/"automate"/"separate"/"document"/"define") was found and documented in `CURRENT_STATE.md` as a non-blocking follow-up — it does not affect any currently-approved wording.
+* Semantic guard independently re-verified active against the real, now-approved claims: forbidden sole/exclusive/unaided-authorship variants of real claim wording still blocked; a narrow pre-existing action-term vocabulary gap (missing "integrate"/"automate"/"separate"/"document"/"define") was found during this milestone's adversarial testing and fixed the same day — see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` below. It never affected any currently-approved wording.
 
 **Status**
 
 CLAIM_MM_WORDING_APPROVAL_V1 recorded. `MARKETMIND_CLAIM_DRAFTING_V1` remains open pending résumé-module creation, which requires separate, explicit approval.
+
+---
+
+## 2026-08-28 — Extend actor attribution guard coverage (`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1`)
+
+**Reason**
+
+Adversarial testing during the MarketMind approval-recording milestone found that `_ATTRIBUTION_ACTION_TERM` (the shared verb vocabulary added in the P-1 remediation) omitted "integrate," "automate," "separate," "document," and "define" — several of the ADR's own named conventional attribution verbs. `"Single-handedly integrated Google Places and Census ACS."` passed with valid Evidence, `human_approval=true`, and zero errors.
+
+**Changed**
+
+* `src/claim_semantic_guard.py`: extended `_ATTRIBUTION_ACTION_TERM` with `integrat(?:e|ed|ing)`, `automat(?:e|ed|ing)`, `separat(?:e|ed|ing)`, `document(?:ed|ing)?`, `defin(?:e|ed|ing)`. No new rule categories, no new error codes, no MarketMind-specific logic.
+* `tests/claim_actor_attribution_policy_test.py`: added 5 new forbidden cases and 5 new safe cases covering the extended vocabulary, run through the real `validate_claim()` with `human_approval=true`.
+
+**Not changed**
+
+* Schemas, `claim_lineage.py`, `claim_state_validation.py`, `requirement_match.py`, all five MarketMind Claim files (wording/lineage/`evidence_state`/`human_approval=true`), all six Winter Walk Claims, Evidence, Experiences, protected résumé master, résumé modules.
+
+**Tests / Verification**
+
+* 5 new forbidden cases blocked; 4 representative pre-existing forbidden cases still blocked (no regression); 7 required safe cases (including plain "Integrated"/"Automated"/"Separated"/"Documented"/"Defined" wording) remain valid and reusable.
+* All 11 real Claims re-verified unaffected; `CLAIM_MM_005` still `OBSERVED`, not upgraded.
+* 25/25 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable — unchanged.
+
+**Limitations**
+
+Bounded deterministic pattern coverage for explicit sole/exclusive/unaided-authorship overreach combined with a wider, still-finite set of conventional attribution verbs — not exhaustive natural-language authorship detection.
+
+**Status**
+
+IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed.
 
 ---
 

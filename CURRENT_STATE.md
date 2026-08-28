@@ -34,6 +34,8 @@ MarketMind Claim Drafting v1 (`MARKETMIND_CLAIM_DRAFTING_V1`) = **CLAIM WORDING 
 
 Claim Actor Attribution Policy v1 (`CLAIM_ACTOR_ATTRIBUTION_POLICY_V1`) = **CLOSED** (P-1 HIGH semantic-guard remediation independently re-verified; see `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_REMEDIATION_V1` below).
 
+Claim Actor Attribution Semantic Guard Action-Term Coverage v1 (`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (extended action-term vocabulary to integrate/automate/separate/document/define; not yet pushed).
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
@@ -317,7 +319,40 @@ Do not create résumé modules, generate résumé output, ingest Market Empire/L
 
 ## Next Approved Task
 
-None started. `CLAIM_MM_WORDING_APPROVAL_V1` recorded Bora's approval of the five MarketMind Claims' exact wording; no résumé module or job-specific tailoring work has begun.
+None started. `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` implemented, pending independent Claude re-audit before push. `CLAIM_MM_WORDING_APPROVAL_V1` recorded Bora's approval of the five MarketMind Claims' exact wording; no résumé module or job-specific tailoring work has begun.
+
+---
+
+## 2026-08-28 — Claim Actor Attribution Semantic Guard Action-Term Coverage v1 (IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+An adversarial probe run during the MarketMind approval-recording milestone found that `_ATTRIBUTION_ACTION_TERM` (the shared verb vocabulary added in the P-1 remediation) omitted "integrate," "automate," "separate," "document," and "define" — several of the ADR's own named conventional attribution verbs. `"Single-handedly integrated Google Places and Census ACS."` passed semantic validation with `human_approval=true`, an otherwise-valid substantive citation, and zero errors — the same class of gap the P-1 remediation closed for "built/implemented/architected/etc.," just not yet extended to these five additional verbs.
+
+**Changed**
+
+* `src/claim_semantic_guard.py`: extended `_ATTRIBUTION_ACTION_TERM` to add `integrat(?:e|ed|ing)`, `automat(?:e|ed|ing)`, `separat(?:e|ed|ing)`, `document(?:ed|ing)?`, `defin(?:e|ed|ing)`, alongside the existing verbs (built/build/develop/create/implement/architect/design/author). No new rule categories, no new error codes, no MarketMind-specific logic — the existing `sole_exclusive_unaided_authorship_overreach` rules simply now recognize these additional conventional verbs.
+* `tests/claim_actor_attribution_policy_test.py`: added Section 6 — 5 new forbidden cases ("Single-handedly integrated...", "Solely automated...", "Exclusively separated...", "Documented the entire system alone.", "Single-handedly defined...") and 5 new safe cases (plain "Integrated...", "Automated...", "Separated...", "Documented...", "Defined..." wording), all run through the real `validate_claim()` with `human_approval=true`.
+
+**Not changed**
+
+* Claim/Evidence/Experience schemas; `claim_lineage.py`; `claim_state_validation.py`; `requirement_match.py`; all five MarketMind Claim files (wording, lineage, `evidence_state`, `human_approval=true`); all six Winter Walk Claims; Evidence; Experiences; protected résumé master; résumé modules.
+
+**Verification**
+
+* All 5 new forbidden cases blocked (`valid_record=false`, `reusable=false`, `FORBIDDEN_SEMANTIC_PATTERN`, category `sole_exclusive_unaided_authorship_overreach`).
+* All 4 representative previously-covered forbidden cases ("Solely built...", "Exclusively implemented...", "...without AI assistance", "...with no collaborators") still blocked — no regression.
+* All 7 required safe cases (plain "Integrated"/"Automated"/"Separated"/"Documented"/"Defined" wording, plus "Independently verified..." and "...independently of the LLM narrative layer") remain valid and reusable.
+* All 11 real Claims re-verified unaffected: 6 Winter Walk and 5 MarketMind all `valid_record=true`/`reusable=true`; MarketMind wording/lineage/`evidence_state` byte-unchanged; `CLAIM_MM_005` still `OBSERVED` (not upgraded).
+* 25/25 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable — unchanged.
+
+**Limitations**
+
+Bounded deterministic pattern coverage for explicit sole/exclusive/unaided-authorship overreach combined with a wider (but still finite) set of conventional attribution verbs — not exhaustive natural-language authorship detection. A verb or phrasing outside this bounded vocabulary is not guaranteed to be caught.
+
+**Status**
+
+`CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not pushed.
 
 ---
 
@@ -345,9 +380,9 @@ Several regression tests and the golden runner asserted the *prior* truth ("Mark
 * All 14 Winter Walk Evidence, all 12 MarketMind Evidence, both Experience records, all 6 Winter Walk Claims, the protected résumé master — byte-unchanged.
 * No résumé module created. No schema changed. No requirement-matcher change.
 
-**Semantic-guard finding (not remediated in this milestone — approval-recording only)**
+**Semantic-guard finding — since remediated**
 
-While adversarially re-testing the semantic guard against the real, now-approved claim wording, a narrow gap was found: `src/claim_semantic_guard.py`'s `_ATTRIBUTION_ACTION_TERM` vocabulary (added in the P-1 remediation) omits "integrate," "automate," "separate," "document," and "define" — several of the ADR's own named conventional verbs, one of which ("Integrated") is the literal first word of `CLAIM_MM_003`'s real, approved wording. As a result, a hypothetical claim worded "Single-handedly integrated..." is not currently caught by the `single_handed_authorship` rule, though "Single-handedly built/implemented/..." is. This does not affect the actual approved wording of any of the five claims (none contain a forbidden qualifier), and all 8 originally-required forbidden test cases plus the exact Claude regression string remain blocked. Flagged as a LOW/MEDIUM follow-up for a future narrow patch extending the shared action-term vocabulary — out of scope for this approval-recording milestone.
+Adversarial re-testing during this milestone found a narrow gap: `_ATTRIBUTION_ACTION_TERM` (added in the P-1 remediation) omitted "integrate," "automate," "separate," "document," and "define" — several of the ADR's own named conventional verbs, one of which ("Integrated") is the literal first word of `CLAIM_MM_003`'s real, approved wording. This was fixed the same day in `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` (see entry below) before push — see that entry for the closed status. It never affected the actual approved wording of any of the five claims (none contain a forbidden qualifier).
 
 ---
 

@@ -320,4 +320,89 @@ for label, wording in SAFE_ATTRIBUTION_WORDINGS:
 print("PASS 5: conventional active-voice wording remains unaffected by the new guard.")
 
 
+# ---------------------------------------------------------------------------
+# 6. Action-term coverage extension (integrate/automate/separate/document/
+#    define) — CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1
+# ---------------------------------------------------------------------------
+NEW_FORBIDDEN_ATTRIBUTION_WORDINGS = [
+    (
+        "case1_single_handed_integrated",
+        "Single-handedly integrated Google Places and Census ACS.",
+    ),
+    ("case2_solely_automated", "Solely automated the validation workflow."),
+    (
+        "case3_exclusively_separated",
+        "Exclusively separated the scoring and narrative layers.",
+    ),
+    ("case4_documented_alone", "Documented the entire system alone."),
+    (
+        "case5_single_handed_defined",
+        "Single-handedly defined the workflow requirements.",
+    ),
+]
+
+for label, wording in NEW_FORBIDDEN_ATTRIBUTION_WORDINGS:
+    result = validate_claim(
+        make_active_voice_claim(
+            f"CLAIM_SYN_{label.upper()}",
+            ["EVID_V1"],
+            "VERIFIED",
+            human_approval=True,
+        )
+        | {"wording": wording},
+        supported_index,
+    )
+    assert_false(
+        result["valid_record"],
+        f"{label}: sole/exclusive/unaided wording must fail valid_record: {wording!r}",
+    )
+    assert_false(
+        result["reusable"],
+        f"{label}: sole/exclusive/unaided wording must not be reusable: {wording!r}",
+    )
+    assert_true(
+        has_code(result["errors"], "FORBIDDEN_SEMANTIC_PATTERN"),
+        f"{label}: expected FORBIDDEN_SEMANTIC_PATTERN for {wording!r}",
+    )
+    assert_true(
+        any(
+            e.get("category") == "sole_exclusive_unaided_authorship_overreach"
+            for e in result["errors"]
+        ),
+        f"{label}: expected actor-attribution overreach category for {wording!r}",
+    )
+
+print("PASS 6a: extended action-term vocabulary blocks new forbidden cases.")
+
+NEW_SAFE_ATTRIBUTION_WORDINGS = [
+    ("safe7", "Integrated Google Places and Census ACS."),
+    ("safe8", "Automated validation."),
+    ("safe9", "Separated deterministic scoring from the LLM narrative layer."),
+    ("safe10", "Documented the workflow."),
+    ("safe11", "Defined validation requirements."),
+]
+
+for label, wording in NEW_SAFE_ATTRIBUTION_WORDINGS:
+    result = validate_claim(
+        make_active_voice_claim(
+            f"CLAIM_SYN_{label.upper()}",
+            ["EVID_V1"],
+            "VERIFIED",
+            human_approval=True,
+        )
+        | {"wording": wording},
+        supported_index,
+    )
+    assert_true(
+        result["valid_record"] is True,
+        f"{label}: conventional wording must remain valid_record: {wording!r}",
+    )
+    assert_true(
+        result["reusable"] is True,
+        f"{label}: conventional wording must remain reusable: {wording!r}",
+    )
+
+print("PASS 6b: extended vocabulary does not reject ordinary conventional wording.")
+
+
 print("PASS: claim actor attribution policy tests completed successfully.")
