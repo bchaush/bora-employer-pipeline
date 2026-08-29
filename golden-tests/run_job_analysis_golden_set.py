@@ -59,7 +59,7 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
         fail(f"Experience regression failed: {exp}")
     if not (
         ev.get("valid") is True
-        and ev.get("records_checked") == 36
+        and ev.get("records_checked") == 37
         and ev.get("experience_registry_status")
         == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
     ):
@@ -80,7 +80,7 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
                 fail(f"{claim_id} must be approved/reusable gate")
     print(
         "PASS 0: repository regression "
-        "(4 Experience / 36 Evidence / 13 Claims / 13 reusable)."
+        "(4 Experience / 37 Evidence / 13 Claims / 13 reusable)."
     )
     return ev["index"], cl["index"]
 

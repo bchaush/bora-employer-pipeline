@@ -1,6 +1,6 @@
 {
   "master_id": "RESUME_MASTER_WW_V1",
-  "version": "7",
+  "version": "8",
   "protected": true,
   "contact": {
     "name": "Bora Chaush",
@@ -223,6 +223,59 @@
       "allowed_role_families": ["Business Systems", "Implementation", "Data Operations"],
       "capabilities": ["validation/testing"],
       "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_TELUS_001_REVIEW",
+      "module_type": "BULLET",
+      "experience_id": "EXP_TELUS_001",
+      "claim_ids": ["CLAIM_TELUS_001"],
+      "evidence_ids": ["TELUS_REVIEW_001", "TELUS_VOLUME_001"],
+      "wording": "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data under time-sensitive conditions.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Data Operations",
+        "Technical Operations"
+      ],
+      "capabilities": [
+        "high-volume review",
+        "policy/rule application",
+        "pattern recognition",
+        "SLA/time-sensitive execution"
+      ],
+      "immutable_snapshot": {
+        "organization": "TELUS Digital Bulgaria",
+        "formal_title": "Digital Trust and Safety Analyst with English (tele-agent)",
+        "display_title": "Digital Trust and Safety Analyst with English",
+        "date_range": "Nov 2024 – May 2025"
+      },
+      "status": "ACTIVE"
+    },
+    {
+      "module_id": "MOD_TELUS_002_PATTERN",
+      "module_type": "BULLET",
+      "experience_id": "EXP_TELUS_001",
+      "claim_ids": ["CLAIM_TELUS_002"],
+      "evidence_ids": ["TELUS_PATTERN_001", "TELUS_COLLAB_001"],
+      "wording": "Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Business Process",
+        "Data Operations"
+      ],
+      "capabilities": [
+        "categorization",
+        "consistency",
+        "trend-analysis support",
+        "cross-functional collaboration"
+      ],
+      "immutable_snapshot": {
+        "organization": "TELUS Digital Bulgaria",
+        "formal_title": "Digital Trust and Safety Analyst with English (tele-agent)",
+        "display_title": "Digital Trust and Safety Analyst with English",
+        "date_range": "Nov 2024 – May 2025"
+      },
+      "status": "ACTIVE"
     }
   ],
   "experience_sections": [
@@ -253,6 +306,28 @@
         "MOD_WW_005_UAT",
         "MOD_WW_006_PROCESS"
       ]
+    },
+    {
+      "section_id": "SEC_TELUS_001",
+      "experience_id": "EXP_TELUS_001",
+      "organization": "TELUS Digital Bulgaria",
+      "formal_title": "Digital Trust and Safety Analyst with English (tele-agent)",
+      "display_title": "Digital Trust and Safety Analyst with English",
+      "display_title_approval": {
+        "approved": true,
+        "approved_by": "Bora",
+        "approved_on": "2026-08-28",
+        "approved_display_title": "Digital Trust and Safety Analyst with English",
+        "is_source_verbatim": false,
+        "approval_note": "Human-approved résumé presentation removing only the parenthetical '(tele-agent)' suffix from the employer-issued formal title for recruiter readability. Not a change to the formal title, which remains 'Digital Trust and Safety Analyst with English (tele-agent)'."
+      },
+      "employment_category": null,
+      "date_range": "Nov 2024 – May 2025",
+      "location": null,
+      "bullet_module_ids": [
+        "MOD_TELUS_001_REVIEW",
+        "MOD_TELUS_002_PATTERN"
+      ]
     }
   ],
   "default_module_order": [
@@ -261,7 +336,9 @@
     "MOD_WW_003_INTAKE",
     "MOD_WW_004_SYNC",
     "MOD_WW_005_UAT",
-    "MOD_WW_006_PROCESS"
+    "MOD_WW_006_PROCESS",
+    "MOD_TELUS_001_REVIEW",
+    "MOD_TELUS_002_PATTERN"
   ],
   "skills_order": [
     "Google Workspace",
@@ -272,5 +349,5 @@
     "UAT documentation"
   ],
   "date": "2026-08-28",
-  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 7. EDUCATION_ADDED: added one education[] entry for EXP_EDU_BRANDEIS_001 on 2026-08-28, sourced from a Bora-supplied Brandeis official-system-generated Unofficial Transcript (prepared 2026-08-28) and a contemporaneous Brandeis academic-progress screen (last evaluated 2026-08-26): school_name Brandeis University, degree_name Business Analytics (M.S.), date_range Fall 2025 – Summer 2026 (source-faithful academic-period wording, not invented calendar months), location null. GPA (3.635) and degree-requirements-satisfied status (11/11, Satisfied) are documented in evidence/education/ records only; resume_master.schema.json's education entry has no GPA field, so GPA is not reflected in the protected master or rendered presentation in this milestone. No degree-conferral or graduation claim was made. No STEM/CIP designation was added (not verified by the source set used in this milestone). WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE through MOD_WW_006_PROCESS (wording unchanged). TITLE_RESOLVED: source contractual position Intern; source functional role AI Researcher and Developer; human-approved display title AI Researcher & Developer Intern (not source-verbatim formal title); formal_title remains PENDING_BORA_REVIEW. CONTACT_RESOLVED: Bora explicitly confirmed contact block on 2026-08-28 (name Bora Chaush; email bchaush@brandeis.edu; phone +1 857 919 8421; location Boston, MA; linkedin linkedin.com/in/bora-chaush-msba). GitHub not stored (not in contact schema). METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP via WW_OFFER_001; exact end day unresolved. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. MARKETMIND_ADDED: Bora explicitly approved the exact wording of five PERSONAL_PROJECT bullet modules for EXP_MM_001 (MarketMind AI) on 2026-08-28: MOD_MM_001_SCOPE, MOD_MM_002_DETERMINISTIC_AI, MOD_MM_003_INTEGRATION, MOD_MM_004_CONTROLS, MOD_MM_005_TESTING (claim_ids/evidence_ids unchanged from claims/marketmind/CLAIM_MM_001-005; wording byte-identical to approval). module_type=PROJECT_BULLET; no experience_sections entry created for EXP_MM_001 because no verified formal_title, date_range, or employer/client relationship exists in the repository for this personal project (EXP_MM_001 notes: no verified employer, client, sponsor, or employment dates) — none was invented. Modules are NOT in default_module_order and are excluded from every derivative unless explicitly selected via INCLUDE_MODULE in a future, separately-scoped job-tailoring milestone. CLAIM_MM_005 remains OBSERVED; its module wording does not assert a pass count or stronger performance outcome. Not a submitted résumé; no derivative export approved."
+  "notes": "MASTER_RESUME_WINTER_WALK_V1 version 8. TELUS_ADDED: Bora explicitly approved integration of two TELUS résumé modules (MOD_TELUS_001_REVIEW, MOD_TELUS_002_PATTERN) and a TELUS employment section (SEC_TELUS_001) on 2026-08-28, wording byte-identical to claims/telus/CLAIM_TELUS_001-002 (both human_approval=true). Employer-issued formal title 'Digital Trust and Safety Analyst with English (tele-agent)' (TELUS_OFFER_001, VERIFIED) is preserved unchanged and unmutated in formal_title; Bora separately approved a résumé display title 'Digital Trust and Safety Analyst with English' (parenthetical '(tele-agent)' suffix removed only for recruiter readability) via display_title_approval, exactly mirroring the existing Winter Walk display-title mechanism -- no schema change was required. date_range 'Nov 2024 - May 2025' is a human-approved month-level presentation: the start month is employer-verified (TELUS_OFFER_001, start date 15.11.2024); the end month is sourced only to Bora's direct human attestation of an exact 2025-05-01 last working day (TELUS_ENDDATE_001, evidence_state=OBSERVED, not employer-verified) and to Bora's LinkedIn profile (TELUS_LINKEDIN_PERIOD_001, also OBSERVED) -- the exact day never appears in résumé presentation, only the month-level range. LinkedIn's own separate display title 'Content Safety Analyst' is not used anywhere in this master. employment_category and location are null: no employment-category value and no location text were part of Bora's explicit presentation approval, so none was invented (Sofia, Bulgaria remains true only in the Experience/Evidence truth layer). Exactly the two approved TELUS bullets are included; no other TELUS Evidence (500+ weekly figure aside, which is preserved verbatim and remains OBSERVED) was surfaced. TELUS modules are included in default_module_order, placed after the six Winter Walk modules, consistent with Winter Walk being Bora's more recent/current experience. EDUCATION_ADDED: added one education[] entry for EXP_EDU_BRANDEIS_001 on 2026-08-28, sourced from a Bora-supplied Brandeis official-system-generated Unofficial Transcript (prepared 2026-08-28) and a contemporaneous Brandeis academic-progress screen (last evaluated 2026-08-26): school_name Brandeis University, degree_name Business Analytics (M.S.), date_range Fall 2025 – Summer 2026 (source-faithful academic-period wording, not invented calendar months), location null. GPA (3.635) and degree-requirements-satisfied status (11/11, Satisfied) are documented in evidence/education/ records only; resume_master.schema.json's education entry has no GPA field, so GPA is not reflected in the protected master or rendered presentation in this milestone. No degree-conferral or graduation claim was made. No STEM/CIP designation was added (not verified by the source set used in this milestone). WORDING_APPROVED: Bora explicitly approved exact module wording on 2026-08-28 for MOD_WW_001_SCOPE through MOD_WW_006_PROCESS (wording unchanged). TITLE_RESOLVED: source contractual position Intern; source functional role AI Researcher and Developer; human-approved display title AI Researcher & Developer Intern (not source-verbatim formal title); formal_title remains PENDING_BORA_REVIEW. CONTACT_RESOLVED: Bora explicitly confirmed contact block on 2026-08-28 (name Bora Chaush; email bchaush@brandeis.edu; phone +1 857 919 8421; location Boston, MA; linkedin linkedin.com/in/bora-chaush-msba). GitHub not stored (not in contact schema). METADATA_PARTIAL: date_range Jun 2026 – Aug 2026 and employment_category INTERNSHIP via WW_OFFER_001; exact end day unresolved. Display organization Winter Walk; legal organization Winter Walk, Inc. per WW_OFFER_001. MARKETMIND_ADDED: Bora explicitly approved the exact wording of five PERSONAL_PROJECT bullet modules for EXP_MM_001 (MarketMind AI) on 2026-08-28: MOD_MM_001_SCOPE, MOD_MM_002_DETERMINISTIC_AI, MOD_MM_003_INTEGRATION, MOD_MM_004_CONTROLS, MOD_MM_005_TESTING (claim_ids/evidence_ids unchanged from claims/marketmind/CLAIM_MM_001-005; wording byte-identical to approval). module_type=PROJECT_BULLET; no experience_sections entry created for EXP_MM_001 because no verified formal_title, date_range, or employer/client relationship exists in the repository for this personal project (EXP_MM_001 notes: no verified employer, client, sponsor, or employment dates) — none was invented. Modules are NOT in default_module_order and are excluded from every derivative unless explicitly selected via INCLUDE_MODULE in a future, separately-scoped job-tailoring milestone. CLAIM_MM_005 remains OBSERVED; its module wording does not assert a pass count or stronger performance outcome. Not a submitted résumé; no derivative export approved."
 }

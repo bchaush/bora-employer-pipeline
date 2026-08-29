@@ -50,7 +50,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
+assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (36 prior + 1 TELUS end-date record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
@@ -60,9 +60,9 @@ EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]
 
 MASTER = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
-assert_true(len(MASTER["modules"]) == 11, "master must have 11 modules")
+assert_true(len(MASTER["modules"]) == 13, "master must have 13 modules (6 WW + 5 MM + 2 TELUS)")
 
-WW_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "BULLET"]
+WW_IDS = [m["module_id"] for m in MASTER["modules"] if m.get("experience_id") == "EXP_WW_001"]
 MM_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "PROJECT_BULLET"]
 APPROVED_WW_WORDING = {m["module_id"]: m["wording"] for m in MASTER["modules"] if m["module_type"] == "BULLET"}
 APPROVED_MM_WORDING = {m["module_id"]: m["wording"] for m in MASTER["modules"] if m["module_type"] == "PROJECT_BULLET"}
@@ -84,13 +84,13 @@ def present(derivative):
     return view
 
 
-# 1. Current default Winter Walk-only derivative renders valid text.
+# 1. Current default derivative (Winter Walk + approved TELUS modules) renders valid text.
 default_derivative = build([{"op": "REORDER_MODULES", "module_ids": MASTER["default_module_order"]}], "TXT_DEFAULT")
 default_presentation = present(default_derivative)
 default_render = render_resume_text(default_presentation)
-assert_true(default_render["valid"] is True, f"default WW-only render must succeed: {default_render.get('errors')}")
+assert_true(default_render["valid"] is True, f"default render must succeed: {default_render.get('errors')}")
 assert_true(isinstance(default_render["text"], str) and default_render["text"], "rendered text must be a non-empty string")
-print("PASS 1: default Winter Walk-only derivative renders valid text.")
+print("PASS 1: default derivative (Winter Walk + TELUS) renders valid text.")
 
 
 # Byte-for-byte golden-style expected text fixture for the default path.
@@ -109,6 +109,9 @@ EXPECTED_DEFAULT_TEXT = "\n\n".join([
         "- " + APPROVED_WW_WORDING["MOD_WW_004_SYNC"],
         "- " + APPROVED_WW_WORDING["MOD_WW_005_UAT"],
         "- " + APPROVED_WW_WORDING["MOD_WW_006_PROCESS"],
+        "TELUS Digital Bulgaria, Digital Trust and Safety Analyst with English, Nov 2024 – May 2025",
+        "- Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data under time-sensitive conditions.",
+        "- Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.",
     ]),
     "\n".join(["SKILLS", ", ".join(MASTER["skills_order"])]),
 ])

@@ -46,7 +46,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 4, "Experience count must be 4 (Winter Walk, MarketMind, Brandeis education, TELUS)")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 36, "Evidence count must be 36 (29 prior + 7 new TELUS records)")
+assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (29 prior + 7 new TELUS records + 1 later TELUS end-date record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 later draft TELUS claims) -- Evidence ingestion itself adds no Claims")
@@ -55,7 +55,7 @@ EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]
 
 MASTER = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
-assert_true(len(MASTER["modules"]) == 11, "master modules must remain 11 -- TELUS is not added to the master in this milestone")
+assert_true(len(MASTER["modules"]) == 13, "master must have 13 modules -- TELUS was not added in this milestone (Evidence/Experience only) but has since been integrated by a later, separately-scoped milestone")
 
 TELUS_EVIDENCE_IDS = [
     "TELUS_OFFER_001",
@@ -221,7 +221,7 @@ print("PASS 16: 'improve workflows' correctly limited against quantified process
 
 
 # 17. Existing Winter Walk, MarketMind, and Education truth unchanged.
-WW_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "BULLET"]
+WW_IDS = [m["module_id"] for m in MASTER["modules"] if m.get("experience_id") == "EXP_WW_001"]
 MM_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "PROJECT_BULLET"]
 assert_true(len(WW_IDS) == 6, "Winter Walk module count must remain 6")
 assert_true(len(MM_IDS) == 5, "MarketMind module count must remain 5")
@@ -251,16 +251,19 @@ for path in [TELUS_EXPERIENCE_PATH, *sorted(TELUS_EVIDENCE_DIR.glob("*.json"))]:
 print("PASS 18: no Student ID or literal private email address leaked in new records.")
 
 
-# 19. No résumé modules or master TELUS block created in this milestone.
-assert_false(
-    any("TELUS" in json.dumps(m) for m in MASTER["modules"]),
-    "no TELUS résumé module may exist yet -- this milestone is Evidence/Experience only",
+# 19. This milestone (TELUS_EVIDENCE_V1) was itself Evidence/Experience only
+#     and created no résumé module or master integration. A later, separately
+#     scoped milestone (TELUS_MASTER_INTEGRATION_V1) has since integrated the
+#     approved modules -- confirmed here as the current true state, not
+#     re-litigated: exactly the two approved modules are present.
+telus_module_ids_in_master = {
+    m["module_id"] for m in MASTER["modules"] if m.get("experience_id") == "EXP_TELUS_001"
+}
+assert_true(
+    telus_module_ids_in_master == {"MOD_TELUS_001_REVIEW", "MOD_TELUS_002_PATTERN"},
+    f"master must now contain exactly the two approved TELUS modules, got {telus_module_ids_in_master}",
 )
-assert_false(
-    any(s.get("experience_id") == "EXP_TELUS_001" for s in MASTER.get("experience_sections", [])),
-    "no experience_sections entry for TELUS may exist yet",
-)
-print("PASS 19: no TELUS resume modules or master integration exist yet (Evidence/Experience only, as scoped).")
+print("PASS 19: this milestone itself added no resume module; the master now correctly reflects the later, separately-scoped TELUS_MASTER_INTEGRATION_V1.")
 
 
 print("PASS: TELUS_EVIDENCE_V1 tests completed successfully.")

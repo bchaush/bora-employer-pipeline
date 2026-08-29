@@ -90,7 +90,7 @@ ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(ev_result["records_checked"] == 36, "expected 36 evidence records")
+assert_true(ev_result["records_checked"] == 37, "expected 37 evidence records")
 assert_true("WW_OFFER_001" in ev_result["index"], "WW_OFFER_001 missing from trusted index")
 
 
@@ -132,6 +132,13 @@ assert_true(
 for module in MASTER["modules"]:
     if "immutable_snapshot" not in module:
         continue
+    if not module["module_id"].startswith("MOD_WW_"):
+        # Winter-Walk-specific assertion: only Winter Walk's formal_title is
+        # the PENDING_BORA_REVIEW sentinel. Other employment-shaped modules
+        # (e.g. TELUS) may legitimately carry a fully resolved formal_title
+        # with its own separately-approved display_title; that is a distinct,
+        # independently-tested contract, not a Winter Walk regression.
+        continue
     assert_true(
         module["immutable_snapshot"]["formal_title"] == "PENDING_BORA_REVIEW",
         f"{module['module_id']} formal_title sentinel must remain unresolved",
@@ -151,6 +158,11 @@ print("PASS E: composed title stored only as approved display_title, not formal_
 assert_true(section.get("date_range") == BOUNDED_DATE_RANGE, "master date_range")
 for module in MASTER["modules"]:
     if "immutable_snapshot" not in module:
+        continue
+    if not module["module_id"].startswith("MOD_WW_"):
+        # Winter-Walk-specific date range; other employment-shaped modules
+        # (e.g. TELUS) legitimately have their own distinct, independently
+        # verified/approved date_range -- not a Winter Walk regression.
         continue
     assert_true(
         module["immutable_snapshot"]["date_range"] == BOUNDED_DATE_RANGE,

@@ -58,7 +58,9 @@ Education Evidence v1 (`EDUCATION_EVIDENCE_V1`) = **CLOSED** (added `EXP_EDU_BRA
 
 TELUS Evidence v1 (`TELUS_EVIDENCE_V1`) = **CLOSED** (added `EXP_TELUS_001` (`experience_type=EMPLOYMENT`, organization `TELUS Digital Bulgaria`) and seven `evidence/telus/` records, split into employer-issued (VERIFIED) and Bora-profile-sourced (OBSERVED) tiers: `TELUS_OFFER_001` (formal title `Digital Trust and Safety Analyst with English (tele-agent)`, Operations department, TELUS Tower Sofia Bulgaria, start date 15.11.2024, 8h/day) and `TELUS_RECRUITING_001` (recruiter-email corroboration) are VERIFIED from a Bora-supplied job-offer PDF and recruiter email (both dated 13.11.2024, neither stored in the repository); `TELUS_LINKEDIN_PERIOD_001` (LinkedIn display title `Content Safety Analyst`, Full-time, Sofia on-site, Nov 2024 – May 2025/7 months) and four separate per-bullet responsibility records — `TELUS_REVIEW_001` (500+ weekly case review, exact figure preserved, no derived monthly/annual/percentage number), `TELUS_PATTERN_001` (enforcement categorization/trend-analysis support), `TELUS_COLLAB_001` (cross-functional collaboration, explicit limitation against upgrading "improve review workflows" into a measured causal-improvement claim), `TELUS_VOLUME_001` (high-volume/time-sensitive execution with structured/unstructured data, no numeric accuracy score) — are all OBSERVED (self-reported profile evidence, not employer-certified), evaluated separately per Blueprint's evidence rules rather than combined into a synthetic composite claim; no salary/benefits/probation/notice-period, SQL/BI/data-pipeline, U.S.-location, or U.S.-experience content anywhere; LinkedIn's shorter display title never overwrites the employer-issued formal title; no exact end day, degree/graduation-style, or team-leadership claim created; this milestone is Evidence + Experience only — **no Claims, no résumé modules, and no master/`resume/master/` integration were created**, per the milestone's explicit Evidence-first-then-audit-then-wording sequencing; Bulmarma and D Commerce Bank were not started; independent Cursor adversarial re-audit passed (`CURSOR_TELUS_EVIDENCE_V1_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`, no HIGH/MEDIUM findings); see below).
 
-TELUS Résumé Modules v1 (`TELUS_RESUME_MODULES_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (independent Cursor audit of the initial implementation passed — `CURSOR_TELUS_RESUME_MODULES_V1_AUDIT_PASS`, no HIGH/MEDIUM findings; Bora then explicitly approved revised final wording for both Claims/modules on 2026-08-28: `CLAIM_TELUS_001`/`MOD_TELUS_001_REVIEW` = "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data under time-sensitive conditions."; `CLAIM_TELUS_002`/`MOD_TELUS_002_PATTERN` = "Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns." — both Claims are now `human_approval=true`, `version=2`, `evidence_state=OBSERVED` unchanged, and correctly `reusable=true` as a validator-computed consequence (not a manually-set field); both draft modules in `resume/drafts/TELUS_RESUME_MODULE_DRAFTS_V1.json` (`status=APPROVED_WORDING_PENDING_MASTER_INTEGRATION`) now carry wording byte-identical to their Claims and correctly pass `validate_resume_module_lineage()`; **master integration was evaluated and explicitly NOT performed** — `HUMAN_PRESENTATION_DECISION_REQUIRED`: TELUS's employer-issued formal title/department/start-date are VERIFIED and can be displayed as-is with no invention, but its end period (Nov 2024 – May 2025) is sourced only to Bora's LinkedIn profile (OBSERVED), and `resume_master.schema.json`'s `experience_sections.date_range` is a single flat string with no evidence-state carrier — mixing a VERIFIED start with an OBSERVED-tier end into that one field is a genuine, unresolved human presentation decision this milestone did not invent an answer to; `500+ user cases weekly` remains OBSERVED-tier throughout, with an adversarial test confirming the architecture rejects any attempt to upgrade it to VERIFIED even after human approval; formal title unmutated; Cursor's non-blocking F-01–F-05 findings addressed (stale Claim-count documentation corrected, `MOD_TELUS_001_REVIEW` wording made byte-identical to its Claim, semantic-guard scope-creep declined per explicit instruction); Bulmarma, D Commerce, Summary, PDF/DOCX, and job-specific tailoring were not started; see below).
+TELUS Résumé Modules v1 (`TELUS_RESUME_MODULES_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (Bora explicitly approved revised final wording for both Claims/modules on 2026-08-28; both Claims are `human_approval=true`, `version=2`, `evidence_state=OBSERVED`, and `reusable=true`; master integration has since been completed by `TELUS_MASTER_INTEGRATION_V1` below, pending its own independent audit).
+
+TELUS Master Integration v1 (`TELUS_MASTER_INTEGRATION_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (Bora explicitly resolved the previously-outstanding presentation decisions on 2026-08-28: display title `Digital Trust and Safety Analyst with English` (removes only the formal title's parenthetical `(tele-agent)` suffix), résumé date range `Nov 2024 – May 2025` (end month backed by Bora's direct human attestation of an exact last working day, `TELUS_ENDDATE_001`, `evidence_state=OBSERVED`, never presented as employer-verified and never rendered as the exact day); `resume/master/RESUME_MASTER_WW_V1.json` (version 7→8) gained a `SEC_TELUS_001` experience_sections entry (using the existing, unmodified `display_title`/`display_title_approval` mechanism — no schema change) and the two already-approved modules `MOD_TELUS_001_REVIEW`/`MOD_TELUS_002_PATTERN` (wording untouched), both added to `default_module_order` after Winter Walk's six; the default rendered résumé now correctly shows a compact TELUS block (`TELUS Digital Bulgaria, Digital Trust and Safety Analyst with English, Nov 2024 – May 2025` plus exactly the 2 approved bullets); employer-issued formal title `Digital Trust and Safety Analyst with English (tele-agent)` remains unmutated in `formal_title`; **two real defects were discovered and fixed in the previously-closed `resume_experience_section.py` transform** during this integration — see below — since TELUS was the first experience ever to expose either latent gap; Winter Walk, MarketMind, Brandeis, and all non-TELUS Claims/Evidence/Experiences remain byte-unchanged; see below).
 
 Canonical Experience records: **4** (`EXP_WW_001`, `EXP_MM_001`, `EXP_EDU_BRANDEIS_001`, `EXP_TELUS_001`).
 
@@ -345,20 +347,16 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-`TELUS_RESUME_MODULES_V1` is implemented pending independent Cursor re-audit of this approval/documentation-correction round; not pushed. Both TELUS Claims/modules are now `human_approval=true` with Bora's exact approved wording, but are still NOT master-integrated — `HUMAN_PRESENTATION_DECISION_REQUIRED` on how to present a date_range mixing a VERIFIED start (Nov 2024) with an OBSERVED-tier LinkedIn-sourced end (May 2025) in `resume_master.schema.json`'s single flat `date_range` string. No Bulmarma, no D Commerce Bank, no PDF/DOCX, no Summary, no real résumé generation, no job-specific tailoring begun.
+`TELUS_MASTER_INTEGRATION_V1` is implemented pending independent Cursor re-audit; not pushed. TELUS is now fully integrated into the protected master (experience section + both approved modules, in `default_module_order`). No Bulmarma, no D Commerce Bank, no PDF/DOCX, no Summary, no real résumé generation, no job-specific tailoring begun.
 
-## Human Presentation Decision Required — TELUS Master Integration
+## Human Presentation Decision Required — TELUS Master Integration (RESOLVED 2026-08-28)
 
-Bora's approval of the two TELUS Claim/module sentences did **not** extend to any title or date presentation decision. Before TELUS can safely enter the protected master, Bora must choose:
+Bora resolved both previously-outstanding presentation decisions on 2026-08-28:
 
-1. **Date-range presentation**, given the start (Nov 2024) is VERIFIED (employer offer) but the end (May 2025) is OBSERVED-tier (Bora's own LinkedIn profile, not employer-confirmed), and the master schema has no field-level mechanism to carry an evidence-state distinction within `date_range`:
-   - (a) present `"Nov 2024 – May 2025"` as a month-level approximation, following the same convention already accepted for Winter Walk's own partially-unresolved end day (with the OBSERVED sourcing of the end month documented in Experience/Evidence notes, not on the résumé itself); or
-   - (b) present a coarser period (e.g. `"2024 – 2025"`); or
-   - (c) omit an end period/date_range presentation until independent end-date corroboration exists; or
-   - (d) defer TELUS master integration entirely until further evidence is available.
-2. **Title presentation** (lower-priority; the formal title alone requires no invention and can be displayed as-is with zero decision needed): does Bora want the full employer-issued formal title (`Digital Trust and Safety Analyst with English (tele-agent)`) shown, or does he want to separately approve a shorter recruiter-facing display title (mirroring Winter Walk's `display_title_approval` mechanism) given LinkedIn's shorter `Content Safety Analyst` wording? Absent a decision, the safe default is the formal title as-is.
+1. **Date-range presentation**: `"Nov 2024 – May 2025"`, a month-level approximation. The start month is employer-verified; the end month is backed by Bora's direct human attestation of an exact last working day (`2025-05-01`, `TELUS_ENDDATE_001`, `evidence_state=OBSERVED`, never presented as employer-verified and never rendered as the exact day — only the month-level range appears in résumé presentation).
+2. **Title presentation**: display title `"Digital Trust and Safety Analyst with English"` — the employer-issued formal title with only the parenthetical `(tele-agent)` suffix removed for recruiter readability, using the existing `display_title`/`display_title_approval` mechanism (no schema change). LinkedIn's separate `"Content Safety Analyst"` wording was explicitly not used.
 
-Until Bora decides, TELUS remains Claims/modules-approved but not master-integrated.
+TELUS is now integrated into the protected master accordingly; see `TELUS_MASTER_INTEGRATION_V1` above.
 
 ## Future Résumé-Module Caution (carried forward, not a blocker)
 
@@ -367,6 +365,64 @@ Until Bora decides, TELUS remains Claims/modules-approved but not master-integra
 ## Open Item Requiring Bora's Input (not a blocker for this milestone's scope)
 
 A message accompanying this milestone's instructions asserted that "official Brandeis program evidence independently establishes that the Master of Science in Business Analytics (MSBA) is STEM-designated" and proposed recording STEM as VERIFIED. No actual source document, URL, catalog page, or screenshot text for that claim was supplied in this milestone — only the assertion that such evidence exists. Per the Evidence_ID Rule (`BLUEPRINT.md` §10: "No Evidence_ID: NO NEW FACTUAL CLAIM") and `evidence.schema.json`'s required `original_source`/`source_location` fields, STEM designation was **not** added in this milestone. If Bora can supply the actual official Brandeis source (e.g. the specific catalog/CIP page, official program-designation letter, or a screenshot with its exact text), a follow-up milestone can add it as a proper, source-cited Evidence record. This does not block `EDUCATION_EVIDENCE_V1`, whose scope was education identity/GPA/requirements-satisfied only.
+
+---
+
+## 2026-08-28 — Integrate approved TELUS résumé modules into the protected master (`TELUS_MASTER_INTEGRATION_V1`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+Bora explicitly resolved the two previously-outstanding TELUS presentation decisions (display title, date-range convention). This milestone integrates the already human-approved TELUS Claims/modules into the protected master using existing contracts only, per those decisions.
+
+**Human presentation decisions applied**
+
+* Display title: `"Digital Trust and Safety Analyst with English"` — removes only the parenthetical `(tele-agent)` suffix from the employer-issued formal title, which remains unmutated. Implemented via the existing, unmodified `display_title`/`display_title_approval` mechanism (the same one already used for Winter Walk) — no schema change.
+* Date range: `"Nov 2024 – May 2025"` — a human-approved month-level presentation. The start month is employer-verified (`TELUS_OFFER_001`). The end month is backed by a new evidence record, `TELUS_ENDDATE_001` (`evidence_state=OBSERVED`), recording Bora's direct human attestation that his exact last working day was `2025-05-01` — a genuinely new fact, but explicitly NOT upgraded to employer-verified per instruction. The exact day never appears in résumé presentation; only the month-level range does.
+
+**Architecture finding**
+
+The existing architecture represents all four required facets — formal title, approved display title, date range, and selected approved modules — without any schema change: `resume_master.schema.json`'s `experience_sections` entry already supports `display_title`/`display_title_approval` alongside a fully-resolved `formal_title` (previously only exercised for Winter Walk, where `formal_title` was the unresolved sentinel). `evidence.schema.json` already supports a `evidence_state=OBSERVED` record whose `original_source` is a direct human attestation with no external document, without any schema change (`original_source`/`source_location` are free-text). No `ARCHITECTURE_DECISION_REQUIRED` stop was needed.
+
+**Two real defects discovered and fixed in the previously-closed `resume_experience_section.py` transform**
+
+Integrating TELUS was the first time this repository ever had more than one `experience_sections` entry, and the first time an experience had a *resolved* `formal_title` alongside an *approved* `display_title` — both exposed latent gaps in `build_employment_section_view()` that had never been exercised by Winter Walk alone:
+1. **Title precedence defect**: the function previously only consulted `display_title` when `formal_title` was the unresolved `PENDING_BORA_REVIEW` sentinel; a resolved `formal_title` (TELUS's case) always won, so the approved display title was silently unreachable and the full formal title (including `(tele-agent)`) would have rendered. Fixed: an approved `display_title` is now preferred whenever one exists, regardless of `formal_title`'s resolution state. Winter Walk's behavior is unchanged (its `formal_title` was already the unresolved sentinel).
+2. **Empty-section-header defect**: a section that resolved cleanly but ended up with zero currently-selected bullets was previously still emitted as an empty, bullet-less header rather than omitted — a real correctness gap for any future derivative that might exclude all of one experience's bullets while others remain selected. Fixed: such a section is now omitted entirely, mirroring how `build_project_section_view()` never emits an empty project group.
+
+Both fixes are narrowly targeted, backward-compatible (Winter Walk's own test suite re-verified unchanged), and documented in the module's own docstring and inline comments.
+
+**Changed**
+
+* Added `evidence/telus/TELUS_ENDDATE_001.json` (`evidence_state=OBSERVED`, direct Bora human attestation, exact fact `2025-05-01`, explicit limitations against employer-verification and against appearing in normal résumé presentation).
+* `experiences/EXP_TELUS_001.json`: notes updated to record the approved display title and the new end-date attestation; no protected fact altered.
+* `resume/drafts/TELUS_RESUME_MODULE_DRAFTS_V1.json`: `status: APPROVED_WORDING_PENDING_MASTER_INTEGRATION → APPROVED_AND_INTEGRATED_INTO_MASTER`, mirroring the MarketMind historical-record pattern; notes updated.
+* `resume/master/RESUME_MASTER_WW_V1.json` (version 7→8): added `SEC_TELUS_001` experience_sections entry and the two already-approved modules `MOD_TELUS_001_REVIEW`/`MOD_TELUS_002_PATTERN` (wording untouched, each with an `immutable_snapshot` mirroring Winter Walk's pattern), both appended to `default_module_order` after Winter Walk's six (Winter Walk being the more recent/current experience). Contact, all 6 Winter Walk modules, all 5 MarketMind modules, education, and `skills_order` are byte-unchanged — confirmed via diff.
+* `src/resume_experience_section.py`: the two defect fixes described above.
+* Added `tests/telus_master_integration_v1_test.py` and updated `tests/telus_resume_modules_v1_test.py`, `tests/resume_employment_section_view_test.py`, and several other existing test files whose Winter-Walk-specific assertions needed scoping now that a second, structurally similar experience section/module set legitimately coexists (exactly the same class of update required during the original MarketMind integration).
+* Updated Evidence/master-module count baselines (37 Evidence, 13 master modules) across affected test files and the Golden runner.
+
+**Not changed**
+
+* `schemas/`, all non-TELUS Claims/Evidence/Experiences, Winter Walk and MarketMind module wording, Brandeis education, job-analysis logic, immigration logic.
+
+**Render expectation confirmed**
+
+The default rendered résumé now shows, verbatim:
+```
+TELUS Digital Bulgaria, Digital Trust and Safety Analyst with English, Nov 2024 – May 2025
+- Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data under time-sensitive conditions.
+- Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.
+```
+No `(tele-agent)` suffix, no exact end day, no U.S. location, no third bullet, no unused TELUS evidence surfaced.
+
+**Tests / Verification**
+
+* Formal title preserved exactly; display title exact; `Content Safety Analyst` never used in the master; `TELUS_ENDDATE_001` correctly OBSERVED and not employer-verified; master renders `Nov 2024 – May 2025` with no exact day leaking; both TELUS Claims remain OBSERVED; `500+ weekly` still architecturally rejected from VERIFIED upgrade; both TELUS modules validate successfully; master contains exactly the 2 intended TELUS modules with byte-identical wording; no third TELUS bullet; Winter Walk/MarketMind/Brandeis unchanged; renderer deterministic; no forbidden semantic leakage.
+* 35/35 test suites — PASS. Golden 15/15 — PASS (fixture outcomes unchanged; only count baselines corrected). Repository: 4 Experience / 37 Evidence / 13 Claims / 13 reusable / 13 master modules.
+
+**Status**
+
+`TELUS_MASTER_INTEGRATION_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not pushed. No Bulmarma. No D Commerce. No Summary. No PDF/DOCX. No job-specific tailoring begun.
 
 ---
 

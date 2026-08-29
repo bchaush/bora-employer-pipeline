@@ -172,7 +172,7 @@ assert_true(
 
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(ev_result["records_checked"] == 36, "expected 36 evidence records")
+assert_true(ev_result["records_checked"] == 37, "expected 37 evidence records")
 for evidence_id in MARKETMIND_EVIDENCE_IDS:
     assert_true(evidence_id in ev_result["index"], f"{evidence_id} missing from trusted index")
 

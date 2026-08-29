@@ -49,7 +49,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 4, "Experience count must be 4 (Winter Walk, MarketMind, Brandeis education, TELUS)")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 36, "Evidence count must be 36 (29 prior + 7 new TELUS records)")
+assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (29 prior + 7 TELUS ingestion records + 1 later TELUS end-date record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 education-milestone-era + 2 later TELUS draft claims) -- education itself adds no Claims")
@@ -59,7 +59,7 @@ EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]
 
 MASTER = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
-assert_true(len(MASTER["modules"]) == 11, "master modules must remain 11 -- education is not a module")
+assert_true(len(MASTER["modules"]) == 13, "master modules must be 13 (11 education-milestone-era + 2 later TELUS modules) -- education itself is not a module")
 
 
 # 1. Experience record exists, correctly typed, and references only source-supported fields.
@@ -160,7 +160,7 @@ print("PASS 8: no Student ID leakage in new records or rendered output.")
 
 
 # 9. Existing Winter Walk / MarketMind wording unchanged.
-WW_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "BULLET"]
+WW_IDS = [m["module_id"] for m in MASTER["modules"] if m.get("experience_id") == "EXP_WW_001"]
 MM_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "PROJECT_BULLET"]
 assert_true(len(WW_IDS) == 6, "Winter Walk module count must remain 6")
 assert_true(len(MM_IDS) == 5, "MarketMind module count must remain 5")

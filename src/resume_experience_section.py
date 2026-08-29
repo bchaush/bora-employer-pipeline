@@ -131,12 +131,22 @@ def build_employment_section_view(
     Section identity: `organization` and `date_range` must be
     non-empty strings that are not the repository's
     `PENDING_BORA_REVIEW` unresolved-metadata sentinel. Title
-    resolution reuses the existing, already-closed title architecture
-    unchanged (`is_source_formal_title_unresolved()` /
-    `has_approved_display_title()`): a resolved `formal_title` is used
-    when present; otherwise an approved `display_title` is used;
-    otherwise the section fails to resolve. `employment_category` and
-    `location` are optional and only fail if explicitly set to the
+    resolution uses the existing title architecture's own primitives
+    (`is_source_formal_title_unresolved()` / `has_approved_display_title()`)
+    with a corrected precedence: an approved `display_title` is used
+    whenever one exists, regardless of whether `formal_title` also
+    happens to be resolved; otherwise a resolved `formal_title` is
+    used; otherwise the section fails to resolve. (Corrected during
+    `TELUS_MASTER_INTEGRATION_V1`: the previous precedence only ever
+    fell through to `display_title` when `formal_title` was the
+    unresolved sentinel, so a resolved `formal_title` with a separately
+    approved shorter `display_title` -- exactly TELUS's case, where
+    Bora approved dropping the formal title's parenthetical suffix for
+    recruiter readability -- was unreachable and silently rendered the
+    full formal title instead. Winter Walk's behavior is unchanged by
+    this fix, since its `formal_title` was already the unresolved
+    sentinel.) `employment_category` and `location` are optional and
+    only fail if explicitly set to the
     unresolved sentinel. No field is ever guessed or fabricated.
 
     Fail-closed contract: if ANY section fails to resolve (identity
@@ -145,8 +155,16 @@ def build_employment_section_view(
     partial result, matching the closed `build_project_section_view()`
     contract. `errors` is always fully populated regardless of `valid`.
 
+    A section that resolves cleanly but ends up with zero currently
+    selected bullets (e.g. `included_module_ids` excludes every bullet
+    it lists) is omitted from the output entirely -- it is never
+    emitted as an empty, bullet-less header. This is not an error
+    (`valid` stays `True`; the section is simply absent), mirroring how
+    `build_project_section_view()` never emits an empty project group.
+
     Returns `{"valid": bool, "sections": [...], "errors": [...]}`. Each
-    section (only present when `valid` is `True`) is
+    section (only present when `valid` is `True` and it has at least
+    one selected bullet) is
     `{"experience_id", "organization", "formal_title" or "display_title",
     "date_range", "employment_category" (if present), "location" (if
     present), "bullets": [{"module_id", "wording"}, ...]}` -- every
@@ -190,13 +208,23 @@ def build_employment_section_view(
 
         formal_title = section.get("formal_title")
         title_field: tuple[str, Any] | None = None
-        if not is_source_formal_title_unresolved(formal_title):
+        if has_approved_display_title(section):
+            # A human-approved display title is always preferred when present,
+            # regardless of whether the formal title happens to already be
+            # resolved. The display-title mechanism exists specifically to let
+            # Bora approve a cleaner/shorter recruiter-facing label without
+            # touching the protected formal title; a resolved formal_title
+            # must not silently pre-empt an approved display_title (defect
+            # found and fixed here -- previously only an *unresolved*
+            # formal_title fell through to display_title, so a resolved
+            # formal_title with an approved shorter display_title, as with
+            # TELUS, was never actually reachable).
+            title_field = ("display_title", section.get("display_title"))
+        elif not is_source_formal_title_unresolved(formal_title):
             if isinstance(formal_title, str) and formal_title:
                 title_field = ("formal_title", formal_title)
             else:
                 section_errors.append(_unresolved(f"{prefix}.formal_title", formal_title))
-        elif has_approved_display_title(section):
-            title_field = ("display_title", section.get("display_title"))
         else:
             section_errors.append(
                 _unresolved(f"{prefix}.display_title", section.get("display_title"))
@@ -238,6 +266,19 @@ def build_employment_section_view(
 
         if section_errors:
             errors.extend(section_errors)
+            continue
+
+        if not bullets:
+            # A section whose identity resolves cleanly but which has zero
+            # currently-selected bullets is omitted entirely, never emitted
+            # as an empty, bullet-less header (defect found and fixed during
+            # TELUS_MASTER_INTEGRATION_V1: this repository had only ever had
+            # one experience_sections entry until now, so a scenario where
+            # one section is fully selected while a second resolves with no
+            # selected bullets -- e.g. a future derivative that excludes both
+            # TELUS bullets while Winter Walk remains selected -- was never
+            # exercised. Mirrors how build_project_section_view() never
+            # emits an empty project group.)
             continue
 
         entry: dict[str, Any] = {

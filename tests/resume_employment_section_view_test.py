@@ -48,7 +48,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
+assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (36 prior + 1 TELUS end-date record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
@@ -57,9 +57,9 @@ EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]
 
 MASTER = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
-assert_true(len(MASTER["modules"]) == 11, "master must have 11 modules")
+assert_true(len(MASTER["modules"]) == 13, "master must have 13 modules (6 WW + 5 MM + 2 TELUS)")
 
-WW_MODULES = [m for m in MASTER["modules"] if m["module_type"] == "BULLET"]
+WW_MODULES = [m for m in MASTER["modules"] if m.get("experience_id") == "EXP_WW_001"]
 MM_MODULES = [m for m in MASTER["modules"] if m["module_type"] == "PROJECT_BULLET"]
 assert_true(len(WW_MODULES) == 6, "expected 6 Winter Walk BULLET modules")
 assert_true(len(MM_MODULES) == 5, "expected 5 MarketMind PROJECT_BULLET modules")
@@ -91,10 +91,16 @@ print("PASS B: excluding a module removes it from presentation (bullet_module_id
 
 # C. Module exists in section bullet_module_ids but is not selected/included -> must not render.
 # (Same underlying mechanism as B: bullet_module_ids still lists it, included_module_ids does not.)
+# With zero modules included, every section resolves with zero bullets, and a
+# section with zero selected bullets is correctly omitted entirely rather than
+# emitted as an empty, bullet-less header -- so the whole view has zero sections.
 empty_selection_view = build_employment_section_view(SECTIONS, MASTER["modules"], included_module_ids=[])
 assert_true(empty_selection_view["valid"] is True, "zero-selection view must still resolve (identity is independent of selection)")
-assert_true(empty_selection_view["sections"][0]["bullets"] == [], "zero selection must yield zero bullets despite bullet_module_ids listing all 6")
-print("PASS C: a module listed in bullet_module_ids but absent from included_module_ids never renders.")
+assert_true(
+    empty_selection_view["sections"] == [],
+    "zero selection must yield zero sections -- bullet_module_ids listing all 6 must not surface an empty header",
+)
+print("PASS C: a module listed in bullet_module_ids but absent from included_module_ids never renders (and the section itself is correctly omitted, not shown empty).")
 
 
 # D. Selected PROJECT_BULLET must not enter employment view, even if adversarially

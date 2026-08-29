@@ -48,7 +48,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
+assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (36 prior + 1 TELUS end-date record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
@@ -58,7 +58,7 @@ CLAIM_INDEX = claim_result["index"]
 EXPERIENCE_INDEX = exp_result["index"]
 
 MASTER = json.loads(MASTER_PATH.read_text(encoding="utf-8"))
-assert_true(len(MASTER["modules"]) == 11, "master must have 11 modules")
+assert_true(len(MASTER["modules"]) == 13, "master must have 13 modules (6 WW + 5 MM + 2 TELUS)")
 
 WW_MODULE_IDS = [
     "MOD_WW_001_SCOPE",
@@ -237,10 +237,12 @@ assert_true(
 print("PASS 8: fabricated employment-shaped metadata on a PROJECT_BULLET is deterministically rejected.")
 
 
-# 9. Default derivative remains unchanged (still exactly the 6 Winter Walk modules).
+# 9. Default derivative now correctly includes Winter Walk plus the two
+#    approved TELUS modules (default_module_order was legitimately extended
+#    by TELUS_MASTER_INTEGRATION_V1); MarketMind remains excluded from default.
 assert_true(
-    default_result["derivative"]["included_module_ids"] == WW_MODULE_IDS,
-    "default derivative must remain exactly the 6 Winter Walk modules",
+    default_result["derivative"]["included_module_ids"] == WW_MODULE_IDS + ["MOD_TELUS_001_REVIEW", "MOD_TELUS_002_PATTERN"],
+    "default derivative must be exactly the 6 Winter Walk modules plus the 2 approved TELUS modules",
 )
 print("PASS 9: default derivative unchanged.")
 

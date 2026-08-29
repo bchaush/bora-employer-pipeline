@@ -59,7 +59,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4 -- this milestone adds no new Experience")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36 -- this milestone adds no new Evidence")
+assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (36 prior + 1 TELUS end-date record added in the subsequent master-integration milestone)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 new draft TELUS claims)")
@@ -170,8 +170,10 @@ assert_true(
 print("PASS 6: all 11 non-TELUS Claims remain byte-for-byte unchanged.")
 
 
-# 7. Winter Walk remains unchanged (master modules/wording).
-WW_IDS = [m["module_id"] for m in MASTER["modules"] if m["module_type"] == "BULLET"]
+# 7. Winter Walk remains unchanged (master modules/wording). Filtered by
+#    experience_id, not module_type=BULLET alone -- TELUS modules are also
+#    module_type=BULLET, so a type-only filter would incorrectly include them.
+WW_IDS = [m["module_id"] for m in MASTER["modules"] if m.get("experience_id") == "EXP_WW_001"]
 assert_true(len(WW_IDS) == 6, "Winter Walk module count must remain 6")
 print("PASS 7: Winter Walk master modules unchanged.")
 
@@ -200,7 +202,7 @@ print("PASS 9: Brandeis education entry unchanged.")
 
 # 10. Golden baseline invariants remain intact (repository counts checked above
 #     already prove this; master modules count is the other Golden-relevant invariant).
-assert_true(len(MASTER["modules"]) == 11, "master modules must remain 11 -- no TELUS module integrated into the master")
+assert_true(len(MASTER["modules"]) == 13, "master must have 13 modules -- both approved TELUS modules are now integrated (see TELUS_MASTER_INTEGRATION_V1)")
 print("PASS 10: Golden-relevant repository invariants (master module count) intact.")
 
 
@@ -243,28 +245,41 @@ for module in TELUS_DRAFTS["modules"]:
 print("PASS 11c: both TELUS modules now pass production module-lineage validation following Claim approval.")
 
 
-# 11d. Despite modules now being lineage-valid, NO TELUS master integration
-#      exists: the protected master remains untouched because a genuine,
-#      separate human presentation decision (title/date-range) is still
-#      outstanding and was correctly NOT invented in this milestone.
-assert_false(
-    any("TELUS" in json.dumps(m) for m in MASTER["modules"]),
-    "no TELUS résumé module may exist in the protected master -- master integration requires a separate, still-unresolved presentation decision",
+# 11d. At the time this milestone (TELUS_RESUME_MODULES_V1) concluded, master
+#      integration was correctly withheld pending a separate, then-unresolved
+#      human presentation decision (title/date-range). That decision has since
+#      been made and integration completed by the later, separately-scoped
+#      TELUS_MASTER_INTEGRATION_V1 milestone -- confirmed here as the current
+#      true state, not re-litigated: both approved modules are present and
+#      the section correctly reflects the approved display title/date range.
+telus_module_ids_in_master = {
+    m["module_id"] for m in MASTER["modules"] if m.get("experience_id") == "EXP_TELUS_001"
+}
+assert_true(
+    telus_module_ids_in_master == {"MOD_TELUS_001_REVIEW", "MOD_TELUS_002_PATTERN"},
+    f"master must now contain exactly the two approved TELUS modules, got {telus_module_ids_in_master}",
 )
-assert_false(
-    any(s.get("experience_id") == "EXP_TELUS_001" for s in MASTER.get("experience_sections", [])),
-    "no experience_sections entry for TELUS may exist in the protected master -- title/date-range presentation remains undecided",
+telus_section = next((s for s in MASTER.get("experience_sections", []) if s.get("experience_id") == "EXP_TELUS_001"), None)
+assert_true(telus_section is not None, "master must now contain a TELUS experience_sections entry (integrated by TELUS_MASTER_INTEGRATION_V1)")
+assert_true(
+    telus_section["formal_title"] == "Digital Trust and Safety Analyst with English (tele-agent)",
+    "TELUS experience_sections formal_title must remain the exact, unmutated employer-issued title",
 )
 assert_true(
-    TELUS_DRAFTS["status"] == "APPROVED_WORDING_PENDING_MASTER_INTEGRATION",
-    "TELUS draft set status must reflect approved wording pending the separate master-integration presentation decision",
+    TELUS_DRAFTS["status"] == "APPROVED_AND_INTEGRATED_INTO_MASTER",
+    f"TELUS draft set status must reflect completed master integration, got {TELUS_DRAFTS['status']!r}",
 )
-print("PASS 11d: no TELUS master integration exists; wording approval does not imply or authorize a title/date presentation decision.")
+print("PASS 11d: master now contains exactly the two approved TELUS modules and a TELUS experience section with the unmutated formal title (integrated by the later, separately-scoped TELUS_MASTER_INTEGRATION_V1).")
 
 
-# 12. Renderer behavior remains deterministic: since nothing TELUS-related is
-#     wired into the master/presentation/renderer pipeline, the existing
-#     default rendered output must be byte-identical to before this milestone.
+# 12. Renderer behavior remains deterministic. At the time this milestone
+#     (TELUS_RESUME_MODULES_V1) concluded, nothing TELUS-related was wired
+#     into the master/presentation/renderer pipeline, so TELUS did not yet
+#     appear in the default rendered output. The later, separately-scoped
+#     TELUS_MASTER_INTEGRATION_V1 milestone deliberately added the two
+#     approved TELUS modules to default_module_order, so TELUS now correctly
+#     appears by design -- confirmed here as the current true state, not
+#     re-litigated. Determinism itself remains the substantive invariant.
 sys.path.insert(0, str(SRC_PATH))
 from resume_presentation import build_resume_presentation_view  # noqa: E402
 from resume_text_renderer import render_resume_text  # noqa: E402
@@ -285,8 +300,11 @@ assert_true(presentation["valid"] is True, "default presentation must still reso
 render_1 = render_resume_text(presentation)
 render_2 = render_resume_text(build_resume_presentation_view(default_result["derivative"], experience_index=EXPERIENCE_INDEX))
 assert_true(render_1 == render_2, "renderer output must remain deterministic across repeat calls")
-assert_false("TELUS" in render_1["text"], "TELUS must not appear anywhere in the default rendered résumé (not selected, not integrated)")
-print("PASS 12: renderer behavior remains deterministic; TELUS does not appear in the unrelated default rendered output.")
+assert_true(
+    "Digital Trust and Safety Analyst with English" in render_1["text"],
+    "TELUS now correctly appears in the default rendered resume, integrated by TELUS_MASTER_INTEGRATION_V1",
+)
+print("PASS 12: renderer behavior remains deterministic; TELUS now correctly appears in the default rendered output.")
 
 
 print("PASS: TELUS_RESUME_MODULES_V1 tests completed successfully.")
