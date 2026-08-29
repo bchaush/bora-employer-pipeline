@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add unified resume presentation view (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`)
+
+**Reason**
+
+Two independently-closed pure presentation transforms existed (employment-section view, project-section view) but nothing combined them with the already-presentation-ready contact/skills/education/summary fields into one deterministic, renderer-ready runtime structure.
+
+**Changed**
+
+* Added `src/resume_presentation.py`: `build_resume_presentation_view(derivative, *, experience_index)`. Composes `build_employment_section_view()` and `build_project_section_view()` unmodified. Contact/skills copied verbatim; education included only when non-empty; summary included only when `summary_module_id` resolves to a real SUMMARY-typed module that is also actually selected. Flat named-key output, no asserted top-level section order. Fail-closed: either sub-view invalid makes the whole result invalid (valid=false, presentation=None).
+* Added `tests/resume_presentation_view_test.py`.
+
+**Not changed**
+
+* `resume_experience_section.py`, `resume_project_bullet.py`, `resume_patch_apply.py`, `resume_validation.py`, `resume_master.schema.json`, `resume_derivative.schema.json`, `claims/`, `evidence/`, `experiences/`, protected master content, approved wording, `default_module_order`, job-analysis logic, immigration logic. Not wired into `build_resume_derivative()`, any schema, or any renderer.
+
+**Selected-module-order decision**
+
+`included_module_ids` is the only field guaranteed complete; `module_order` can omit modules included via INCLUDE_MODULE alone (demonstrated by this repository's own existing MarketMind-selection test pattern). Precedence: module_order first (filtered to included_module_ids), then remaining included_module_ids in inclusion order. Deterministic, complete, no new field; no ARCHITECTURE_DECISION_REQUIRED stop needed.
+
+**Tests / Verification**
+
+* Real default WW derivative valid/correctly-scoped; explicit MarketMind selection appears under project_sections; exclusion does not leak; partial project selection works; exact wording preserved; skills/contact preserved verbatim; empty education and absent summary omitted, never fabricated; either sub-view invalid fails the whole result closed; no mutation; deterministic repeat output; project/employment bullets never cross-contaminate; no unselected module appears anywhere; custom-selection/custom-REORDER_MODULES derivative proves the ordering precedence; summary composes only when set and actually selected.
+* 31/31 test suites -- PASS (30 baseline + 1 new). Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Status**
+
+UNIFIED_RESUME_PRESENTATION_MODEL_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. Not wired into production. No renderer built, no resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close employment section view builder (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`, CLOSED)
 
 **Reason**

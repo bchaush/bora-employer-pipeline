@@ -50,6 +50,8 @@ Résumé Presentation Pipeline Gap Analysis v1 (`RESUME_PRESENTATION_PIPELINE_GA
 
 Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`) = **CLOSED** (`build_employment_section_view()` in `src/resume_experience_section.py`: a pure, derived presentation transform reconciling `experience_sections[].bullet_module_ids` against `included_module_ids`, including only currently-selected `BULLET` modules, in the section's own bullet order; reuses the existing, unmodified title-resolution architecture (`is_source_formal_title_unresolved()`/`has_approved_display_title()`) and the existing `UNRESOLVED_PROTECTED_METADATA` error taxonomy; explicitly fail-closed, mirroring the closed project-section-view contract; not wired into `build_resume_derivative()`, the derivative schema, or any renderer — transform-only, proven independently; independent Cursor re-audit passed with INFO-only findings (deliberate fail-closed behavior / invalid-input edge cases already constrained upstream, non-blocking); see below).
 
+Unified Résumé Presentation Model v1 (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`build_resume_presentation_view()` in new file `src/resume_presentation.py`: a pure runtime assembler composing the closed employment- and project-section transforms — plus verbatim contact/education/skills/summary reconciliation — into one renderer-ready presentation view over an already-built derivative; no new schema, no persistent presentation snapshot, no duplication of either closed transform's filtering/ordering/identity logic; explicitly fail-closed (any sub-view failure yields `valid=false`/`presentation=None`); documented, non-ambiguous selected-module-order precedence (`module_order` first, then remaining `included_module_ids` in inclusion order); education/summary keys present only when verified content exists, omitted otherwise, never fabricated; no top-level section order asserted (flat named-key object, not an opinionated ordered list); not wired into `build_resume_derivative()`, any schema, or a renderer — transform-only; see below).
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
@@ -335,7 +337,37 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-None started. `EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` is closed (independent Cursor re-audit passed, INFO-only findings, non-blocking); not wired into production derivative-building; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+`UNIFIED_RESUME_PRESENTATION_MODEL_V1` is implemented pending independent Cursor re-audit; not wired into production derivative-building, no renderer built; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Add unified résumé presentation view (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+The repository had two independently-closed pure presentation transforms (employment-section view, project-section view) but nothing combined them with the already-presentation-ready contact/skills/education/summary fields into one deterministic, renderer-ready runtime structure. This milestone adds exactly one pure runtime assembler answering: given an already-built/validated derivative and the existing Experience source data, what structured résumé content is currently eligible to be presented?
+
+**Changed**
+
+* Added `src/resume_presentation.py`: `build_resume_presentation_view(derivative, *, experience_index)`. Composes `build_employment_section_view()` and `build_project_section_view()` unmodified — no duplicated filtering/ordering/identity logic. Contact copied verbatim; skills copied verbatim from `skills_order`; education included only when the derivative's `education` list is non-empty (currently always empty in the real master — omitted, never fabricated); summary included only when `summary_module_id` resolves to a real `SUMMARY`-typed module that is also present in the effective selected module set (no real `SUMMARY` module currently exists). No top-level section order is asserted — output is a flat named-key object (`contact`, `employment_sections`, `project_sections`, `skills`, optional `education`, optional `summary`), since no existing field establishes an authoritative order among résumé sections and inventing one would be an unauthorized layout decision. Fail-closed: either sub-view being invalid makes the whole result invalid (`valid=false`, `presentation=None`), with both sub-views' errors accumulated.
+* Added `tests/resume_presentation_view_test.py`.
+
+**Selected-module-order decision (documented, no ambiguity found)**
+
+`included_module_ids` is the only field guaranteed complete (`INCLUDE_MODULE` always appends to it); `module_order` (adjusted only by explicit `REORDER_MODULES`) can omit modules included via `INCLUDE_MODULE` alone, as demonstrated by this repository's own existing MarketMind-selection test pattern. Precedence used: `module_order` first (filtered to `included_module_ids`), then any remaining `included_module_ids` appended in their own inclusion order. This is complete, deterministic, and uses only existing fields in their existing documented semantics — no `ARCHITECTURE_DECISION_REQUIRED` stop was needed. This order is used only for project-bullet sequencing and summary resolution; employment bullet order remains governed solely by each section's own `bullet_module_ids`, unchanged.
+
+**Not changed**
+
+* `resume_experience_section.py`, `resume_project_bullet.py`, `resume_patch_apply.py`, `resume_validation.py` (no defect found requiring scope expansion), `resume_master.schema.json`, `resume_derivative.schema.json` (no schema expansion — runtime derivation only, no persistent presentation storage added), `claims/`, `evidence/`, `experiences/`, the protected master content, approved wording, `default_module_order`, job-analysis logic, immigration logic. Not wired into `build_resume_derivative()`, any schema, or any renderer/exporter.
+
+**Tests / Verification**
+
+* Real default Winter Walk derivative produces a valid, correctly-scoped presentation; explicit MarketMind selection appears under `project_sections`; employment exclusion does not leak; partial project selection filtering works; exact wording preserved for both employment and project bullets; skills/contact preserved verbatim; empty education and absent summary correctly omitted, never fabricated; employment sub-view invalid and project sub-view invalid each independently fail the whole result closed with `presentation=None`; no mutation of derivative/modules/experience index; deterministic repeat output; project bullets never enter employment and vice versa; no unselected module appears anywhere; a custom-selection/custom-`REORDER_MODULES` derivative proves the exact documented ordering precedence; summary composes only when both set and actually selected, never when set-but-unselected.
+* 31/31 test suites — PASS (30 baseline + 1 new). Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Status**
+
+`UNIFIED_RESUME_PRESENTATION_MODEL_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not pushed. Not wired into production. No renderer built. No résumé generated. No job-specific tailoring begun.
 
 ---
 
