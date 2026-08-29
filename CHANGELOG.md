@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close unified resume presentation model (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of commit `5385b31` passed: `CURSOR_UNIFIED_RESUME_PRESENTATION_MODEL_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. No HIGH or MEDIUM findings. Two LOW/non-blocking hardening observations only, not remediated in this closure.
+
+**Changed**
+
+* `CURRENT_STATE.md`: `UNIFIED_RESUME_PRESENTATION_MODEL_V1` marked CLOSED.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `tests/`, `resume/master/`, `resume/drafts/`, approved wording, `default_module_order`, derivative selection semantics, the closed employment-section transform, the closed project-section transform, job-analysis logic, immigration logic.
+
+**Confirmed by the independent re-audit**
+
+* A pure runtime unified resume presentation assembler exists and composes the closed employment-section and project-section transforms without duplicating their filtering/resolution logic.
+* Effective selected modules are derived deterministically (module_order first, then remaining included_module_ids in inclusion order); employment bullets remain governed by employment-section bullet order; project bullets receive the effective selected project-module order.
+* Contact passed through from validated derivative data; skills preserve current order; empty education and absent/unselected summary omitted, never fabricated.
+* Sub-view failure causes unified fail-closed output (valid=false, presentation=None); no partial presentation survives a material sub-view error. No unified presentation state persisted; no schema expansion. No renderer, no export, no resume generated, no job-specific tailoring.
+* 31/31 tests PASS. Golden 15/15 PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Reviewer LOW observations (non-blocking, not remediated here)**
+
+1. A corrupt/unvalidated derivative could in principle contain selected module IDs without matching module objects, silently irrelevant to project selection rather than explicitly flagged -- not a defect against any currently valid derivative.
+2. The presentation's contact field and any non-empty education field currently share nested object references with the input derivative rather than being deep-copied -- non-blocking since the assembler performs no mutation and derivatives are treated as read-only by convention.
+
+**Status**
+
+UNIFIED_RESUME_PRESENTATION_MODEL_V1_CLOSED_AND_PUSHED. No resume generated. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Add unified resume presentation view (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`)
 
 **Reason**

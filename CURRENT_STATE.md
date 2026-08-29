@@ -50,7 +50,7 @@ Résumé Presentation Pipeline Gap Analysis v1 (`RESUME_PRESENTATION_PIPELINE_GA
 
 Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`) = **CLOSED** (`build_employment_section_view()` in `src/resume_experience_section.py`: a pure, derived presentation transform reconciling `experience_sections[].bullet_module_ids` against `included_module_ids`, including only currently-selected `BULLET` modules, in the section's own bullet order; reuses the existing, unmodified title-resolution architecture (`is_source_formal_title_unresolved()`/`has_approved_display_title()`) and the existing `UNRESOLVED_PROTECTED_METADATA` error taxonomy; explicitly fail-closed, mirroring the closed project-section-view contract; not wired into `build_resume_derivative()`, the derivative schema, or any renderer — transform-only, proven independently; independent Cursor re-audit passed with INFO-only findings (deliberate fail-closed behavior / invalid-input edge cases already constrained upstream, non-blocking); see below).
 
-Unified Résumé Presentation Model v1 (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`build_resume_presentation_view()` in new file `src/resume_presentation.py`: a pure runtime assembler composing the closed employment- and project-section transforms — plus verbatim contact/education/skills/summary reconciliation — into one renderer-ready presentation view over an already-built derivative; no new schema, no persistent presentation snapshot, no duplication of either closed transform's filtering/ordering/identity logic; explicitly fail-closed (any sub-view failure yields `valid=false`/`presentation=None`); documented, non-ambiguous selected-module-order precedence (`module_order` first, then remaining `included_module_ids` in inclusion order); education/summary keys present only when verified content exists, omitted otherwise, never fabricated; no top-level section order asserted (flat named-key object, not an opinionated ordered list); not wired into `build_resume_derivative()`, any schema, or a renderer — transform-only; see below).
+Unified Résumé Presentation Model v1 (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`) = **CLOSED** (`build_resume_presentation_view()` in `src/resume_presentation.py`: a pure runtime assembler composing the closed employment- and project-section transforms — plus verbatim contact/education/skills/summary reconciliation — into one renderer-ready presentation view over an already-built derivative; no new schema, no persistent presentation snapshot, no duplication of either closed transform's filtering/ordering/identity logic; explicitly fail-closed (any sub-view failure yields `valid=false`/`presentation=None`); documented, non-ambiguous selected-module-order precedence (`module_order` first, then remaining `included_module_ids` in inclusion order); education/summary keys present only when verified content exists, omitted otherwise, never fabricated; no top-level section order asserted (flat named-key object, not an opinionated ordered list); not wired into `build_resume_derivative()`, any schema, or a renderer — transform-only; independent Cursor final re-audit passed (`CURSOR_UNIFIED_RESUME_PRESENTATION_MODEL_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`; two LOW/non-blocking hardening observations only, not remediated in this closure); see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -337,7 +337,43 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-`UNIFIED_RESUME_PRESENTATION_MODEL_V1` is implemented pending independent Cursor re-audit; not wired into production derivative-building, no renderer built; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `UNIFIED_RESUME_PRESENTATION_MODEL_V1` is closed (independent Cursor re-audit passed, two LOW/non-blocking findings only); not wired into production derivative-building, no renderer built; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Close unified résumé presentation model (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of commit `5385b31` passed: `CURSOR_UNIFIED_RESUME_PRESENTATION_MODEL_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. No HIGH or MEDIUM findings. Two LOW/non-blocking hardening observations only, not remediated in this closure.
+
+**Confirmed by the independent re-audit**
+
+* A pure runtime unified résumé presentation assembler now exists (`build_resume_presentation_view()`); it composes the already-closed employment-section and project-section transforms without duplicating their filtering/resolution logic.
+* Effective selected modules are derived deterministically from current derivative state (`module_order` first, then remaining `included_module_ids` in inclusion order).
+* Employment bullets remain governed solely by employment-section bullet order (`bullet_module_ids`, unchanged); project bullets receive the effective selected project-module order.
+* Contact is passed through from existing validated derivative data; skills preserve current derivative order; empty education is omitted rather than fabricated; an absent or unselected summary is omitted rather than fabricated.
+* Sub-view failure causes unified fail-closed output (`valid=false`, `presentation=None`); no partial unified presentation survives a material sub-view error.
+* No unified presentation state is persisted; no schema expansion occurred. No renderer exists yet. No PDF/DOCX export exists yet. No résumé was generated. No job-specific tailoring was started. This milestone is runtime presentation assembly only, not résumé rendering or export.
+* 31/31 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Reviewer LOW observations (non-blocking, not remediated here)**
+
+1. A corrupt/unvalidated derivative could in principle contain selected module IDs without matching module objects; such entries are currently silently irrelevant to project selection rather than explicitly flagged. Not a defect against any currently valid derivative (`build_resume_derivative()` already guarantees module/id consistency); noted as a future hardening candidate only if an untrusted/unvalidated derivative source is ever introduced.
+2. The presentation's `contact` field and any non-empty `education` field currently share nested object references with the input derivative rather than being deep-copied. Since the assembler performs no mutation and derivatives are already treated as read-only by convention throughout this architecture, this is a non-blocking hardening note, not a correctness defect.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: `UNIFIED_RESUME_PRESENTATION_MODEL_V1` marked `CLOSED`; phase summary and "Next Approved Task" updated.
+* `CHANGELOG.md`: closure entry recorded.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `tests/`, `resume/master/`, `resume/drafts/`, approved MarketMind/Winter Walk wording, `default_module_order`, derivative selection semantics, the closed employment-section transform, the closed project-section transform, job-analysis logic, immigration logic.
+
+**Status**
+
+`UNIFIED_RESUME_PRESENTATION_MODEL_V1_CLOSED_AND_PUSHED`. No renderer built. No résumé generated. No job-specific tailoring begun.
 
 ---
 
