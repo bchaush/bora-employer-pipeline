@@ -19,6 +19,51 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add verified Brandeis education evidence (`EDUCATION_EVIDENCE_V1`)
+
+**Reason**
+
+Add the smallest evidence-controlled representation necessary for Brandeis education to become part of the structured resume truth pipeline, so the existing unified presentation and test-only renderer can truthfully emit an EDUCATION section, without inventing STEM/CIP status, degree conferral, or any fact beyond what a Bora-supplied Unofficial Transcript (prepared 2026-08-28) and a contemporaneous academic-progress screen (last evaluated 2026-08-26) establish.
+
+**Architecture finding**
+
+`experience.schema.json` already supports `experience_type=EDUCATION`; `resume_master.schema.json`'s `education[]` array already exists and is already protected/immutable exactly like `contact`, following the same direct-to-master, Evidence-backed, non-Claim pattern already used for `WW_OFFER_001`. No schema change needed or made.
+
+**Changed**
+
+* Added `experiences/EXP_EDU_BRANDEIS_001.json` and three `evidence/education/` records (identity/enrollment, GPA 3.635/43 units, 11/11 requirements-satisfied status).
+* `resume/master/RESUME_MASTER_WW_V1.json`: version 6->7; one `education[]` entry added (Brandeis University / Business Analytics (M.S.) / "Fall 2025 - Summer 2026" / location null). Contact, all 11 modules, experience_sections, default_module_order, and skills_order byte-unchanged.
+* Added `tests/education_evidence_v1_test.py`.
+* Updated hardcoded Experience/Evidence count assertions (2->3, 26->29) across 13 existing test files and the Golden runner's own baseline check -- a count-baseline correction only; all 15 individual Golden fixture routing outcomes unchanged.
+* Updated two existing presentation/renderer tests whose "empty education" assertions described the prior real-data state; moved that coverage to an explicit empty-education derivative and added assertions for the new true default (education present). No invariant weakened.
+
+**Not changed**
+
+* `claims/` (all 11 Claims byte-unchanged), `schemas/`, `resume/drafts/`, `src/` (zero code changes -- the entire pipeline already handled education[] generically), Winter Walk/MarketMind wording, `default_module_order`, derivative selection semantics, job-analysis logic, immigration logic.
+
+**Deliberately not ingested**
+
+* STEM/CIP designation -- not verified by the transcript or academic-progress screen; a separate message asserted "official Brandeis program evidence" exists for STEM but supplied no actual source document/URL/screenshot, so per the Evidence_ID Rule it was not added. Recorded as an open item for Bora to supply the actual source.
+* Coursework (14 courses on the transcript) -- no coursework field exists in the education schema; deferred as out of this milestone's stated scope.
+* GPA in the master/presentation -- no GPA field exists in `resume_master.schema.json`'s education entry; GPA preserved only at the Evidence level, not rendered. Schema was not altered to force it in.
+* Degree conferral/graduation wording -- "11/11 requirements satisfied" / "status Satisfied" recorded exactly as such; no graduated/awarded/conferred wording created.
+* Exact calendar dates -- source-faithful "Fall 2025 - Summer 2026" used rather than inventing specific months.
+
+**Privacy**
+
+No Student ID, transcript PDF, or unnecessary academic-record content committed. Source referenced generically (prepared/evaluated dates only), matching the existing WW_OFFER_001 convention. Tested explicitly for absence of Student ID content.
+
+**Tests / Verification**
+
+* Exact Brandeis school name and Business Analytics (M.S.) wording; source-faithful period; education present in unified presentation and renderer with exact expected content; no STEM/CIP designation in any asserted fact or rendered output; no conferral/graduation wording; no Student ID leakage; Winter Walk/MarketMind wording unchanged; an unresolved education `school_name` sentinel correctly fails the existing, unmodified protected-metadata gate; deterministic repeat output.
+* 33/33 test suites -- PASS (32 baseline + 1 new). Golden 15/15 -- PASS (fixture outcomes unchanged; only the runner's repository-count baseline corrected). Repository: 3 Experience / 29 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Status**
+
+EDUCATION_EVIDENCE_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. No resume generated, no job-specific tailoring begun, no PDF/DOCX, no application/export readiness claimed.
+
+---
+
 ## 2026-08-28 — Close test-only resume text renderer (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`, CLOSED)
 
 **Reason**

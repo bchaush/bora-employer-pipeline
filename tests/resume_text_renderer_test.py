@@ -47,10 +47,10 @@ def assert_false(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 2, "Experience count must remain 2")
+assert_true(len(exp_result["index"]) == 3, "Experience count must remain 3")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 26, "Evidence count must remain 26")
+assert_true(len(ev_result["index"]) == 29, "Evidence count must remain 29")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")
@@ -96,6 +96,10 @@ print("PASS 1: default Winter Walk-only derivative renders valid text.")
 # Byte-for-byte golden-style expected text fixture for the default path.
 EXPECTED_DEFAULT_TEXT = "\n\n".join([
     "Bora Chaush | bchaush@brandeis.edu | +1 857 919 8421 | Boston, MA | linkedin.com/in/bora-chaush-msba",
+    "\n".join([
+        "EDUCATION",
+        "Business Analytics (M.S.), Brandeis University, Fall 2025 – Summer 2026",
+    ]),
     "\n".join([
         "EXPERIENCE",
         "Winter Walk, AI Researcher & Developer Intern, Jun 2026 – Aug 2026",
@@ -194,9 +198,19 @@ assert_true(
 print("PASS 10: contact values preserved.")
 
 
-# 11. Empty education creates no EDUCATION heading.
-assert_false("EDUCATION" in default_render["text"], "empty/absent education must never render an EDUCATION heading")
-print("PASS 11: empty education creates no EDUCATION heading.")
+# 11. Empty education creates no EDUCATION heading (proven via an explicit
+#     empty-education derivative, since the real master now carries a
+#     verified Brandeis entry and legitimately renders EDUCATION by default).
+assert_true("EDUCATION" in default_render["text"], "verified Brandeis education must render an EDUCATION heading by default")
+empty_education_derivative = copy.deepcopy(default_derivative)
+empty_education_derivative["education"] = []
+empty_education_render = render_resume_text(present(empty_education_derivative))
+assert_true(empty_education_render["valid"] is True, "empty-education render must succeed")
+assert_false(
+    "EDUCATION" in empty_education_render["text"],
+    "empty education must never render an EDUCATION heading",
+)
+print("PASS 11: default education renders correctly; empty education creates no EDUCATION heading.")
 
 
 # 12. Absent summary creates no SUMMARY heading.
@@ -261,8 +275,8 @@ print("PASS 16: no employment BULLET leaks into PROJECTS.")
 
 
 # 17. No empty section headings anywhere.
-for heading in ("SUMMARY", "EDUCATION"):
-    assert_false(heading in default_render["text"], f"{heading} must not appear when its content is absent")
+assert_false("SUMMARY" in default_render["text"], "SUMMARY must not appear when its content is absent")
+assert_false("EDUCATION" in empty_education_render["text"], "EDUCATION must not appear when its content is absent")
 print("PASS 17: no empty section headings.")
 
 

@@ -45,10 +45,10 @@ def assert_false(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 2, "Experience count must remain 2")
+assert_true(len(exp_result["index"]) == 3, "Experience count must remain 3")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 26, "Evidence count must remain 26")
+assert_true(len(ev_result["index"]) == 29, "Evidence count must remain 29")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")
@@ -97,7 +97,10 @@ assert_true(
     "default derivative must present all 6 Winter Walk bullets in order",
 )
 assert_true(presentation["project_sections"] == [], "default derivative must present zero project sections")
-assert_true("education" not in presentation, "empty education must be omitted, not fabricated")
+assert_true(
+    "education" in presentation and presentation["education"] == MASTER["education"],
+    "verified Brandeis education must appear in the unified presentation, copied verbatim",
+)
 assert_true("summary" not in presentation, "absent summary must be omitted, not fabricated")
 print("PASS 1: real default Winter Walk derivative produces a valid, correctly-scoped presentation.")
 
@@ -171,10 +174,30 @@ assert_true(presentation["contact"] == MASTER["contact"], "contact must be copie
 print("PASS 7: contact preserved exactly.")
 
 
-# 8. Empty education handled truthfully (omitted, not fabricated, not a placeholder array).
-assert_true(MASTER["education"] == [], "sanity: real master education is currently empty")
-assert_true("education" not in presentation, "empty education must be omitted from the presentation")
-print("PASS 8: empty education handled truthfully (omitted, no fabrication).")
+# 8. Verified Brandeis education renders with exact source-supported fields only,
+#    and empty education (proven via an explicit empty-education derivative, since
+#    the real master now carries a verified entry) is still correctly omitted.
+assert_true(
+    MASTER["education"] == [
+        {
+            "education_id": "EDU_BRANDEIS_MSBA",
+            "school_name": "Brandeis University",
+            "degree_name": "Business Analytics (M.S.)",
+            "date_range": "Fall 2025 – Summer 2026",
+            "location": None,
+        }
+    ],
+    f"real master education must contain exactly the verified Brandeis entry, got {MASTER['education']}",
+)
+empty_education_derivative = copy.deepcopy(default_derivative)
+empty_education_derivative["education"] = []
+empty_education_view = build_resume_presentation_view(empty_education_derivative, experience_index=EXPERIENCE_INDEX)
+assert_true(empty_education_view["valid"] is True, "empty-education derivative view must resolve")
+assert_true(
+    "education" not in empty_education_view["presentation"],
+    "empty education must still be omitted from the presentation, never fabricated",
+)
+print("PASS 8: verified Brandeis education renders truthfully; empty education is still correctly omitted.")
 
 
 # 9. No summary fabricated when none is selected/present.

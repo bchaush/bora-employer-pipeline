@@ -42,10 +42,10 @@ def assert_false(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 2, "Experience count must remain 2")
+assert_true(len(exp_result["index"]) == 3, "Experience count must remain 3")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 26, "Evidence count must remain 26")
+assert_true(len(ev_result["index"]) == 29, "Evidence count must remain 29")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")

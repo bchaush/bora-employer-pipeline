@@ -1,0 +1,17 @@
+{
+  "evidence_id": "EDU_BRANDEIS_GPA_001",
+  "experience_id": "EXP_EDU_BRANDEIS_001",
+  "fact": "Brandeis University's official-system-generated Unofficial Transcript, prepared August 28, 2026, states final transcript totals of Cumulative GPA 3.635 and Cumulative Units Earned 43 for Bora Raif Chaush across Fall Semester 2025, Spring Semester 2026, and Summer Semester 2026.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "Brandeis University official-system-generated Unofficial Transcript (Bora-supplied; not stored in repository)",
+  "source_location": "Final Transcript Totals section",
+  "safe_for_external_use": true,
+  "notes": "Documentary GPA/units evidence only; not an accomplishment Claim. Exact value 3.635 must not be rounded or altered when used. resume_master.schema.json's education entry currently has no GPA field, so this evidence is not yet reflected in the protected master or rendered presentation; a future, separately-scoped decision may add GPA display if desired.",
+  "limitations": [
+    "Does not establish degree conferral",
+    "Does not establish STEM/CIP designation",
+    "GPA display formatting (e.g. rounding) is a separate future presentation decision, not made by this record"
+  ]
+}

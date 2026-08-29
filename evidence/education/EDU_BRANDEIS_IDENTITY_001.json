@@ -1,0 +1,18 @@
+{
+  "evidence_id": "EDU_BRANDEIS_IDENTITY_001",
+  "experience_id": "EXP_EDU_BRANDEIS_001",
+  "fact": "Brandeis University's official-system-generated Unofficial Transcript, prepared August 28, 2026, identifies Bora Raif Chaush as a Graduate-level student in the International Business School enrolled in the Business Analytics (M.S.) program, with academic periods present for Fall Semester 2025, Spring Semester 2026, and Summer Semester 2026.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "Brandeis University official-system-generated Unofficial Transcript (Bora-supplied; not stored in repository)",
+  "source_location": "Identity header (Name, Institution, Academic Level, Academic Unit, Program of Study, Prepared On) and academic-period section headings",
+  "safe_for_external_use": true,
+  "notes": "Documentary identity/enrollment evidence only; not an accomplishment Claim. Establishes program identity and the three academic periods present on the transcript. Does not establish degree conferral, graduation date, or STEM/CIP designation.",
+  "limitations": [
+    "Does not establish degree conferral or a graduation date",
+    "Does not establish STEM/CIP designation",
+    "Does not establish exact calendar enrollment start/end dates beyond the named academic periods (Fall Semester 2025 through Summer Semester 2026)",
+    "Does not establish coursework content beyond what is separately evidenced"
+  ]
+}

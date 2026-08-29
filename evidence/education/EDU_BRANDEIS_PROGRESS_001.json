@@ -1,0 +1,17 @@
+{
+  "evidence_id": "EDU_BRANDEIS_PROGRESS_001",
+  "experience_id": "EXP_EDU_BRANDEIS_001",
+  "fact": "A Bora-supplied Brandeis academic-progress screen, last evaluated August 26, 2026, shows the Business Analytics (M.S.) program at 100% with 11 of 11 requirements satisfied, 41 units satisfying, 0 units in progress, status Satisfied, and cumulative GPA including transfer 3.635.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "Brandeis academic-progress screen (Bora-supplied; not stored in repository)",
+  "source_location": "Business Analytics (M.S.) program requirements summary, last evaluated 2026-08-26",
+  "safe_for_external_use": true,
+  "notes": "Documentary degree-requirements-satisfied evidence only; not an accomplishment Claim. 'Degree requirements satisfied' does not equal 'degree formally conferred'. Do not phrase downstream wording as graduated, degree awarded, or degree conferred from this record alone; a future independent, admissible source would be required to establish conferral.",
+  "limitations": [
+    "Does not establish degree conferral, graduation date, or an awarded-degree fact",
+    "Does not establish STEM/CIP designation",
+    "'41 units satisfying' on this screen and 'Cumulative Units Earned 43' on the transcript (EDU_BRANDEIS_GPA_001) are two distinct source figures from two distinct systems as of their respective evaluation/preparation dates; this record does not reconcile them"
+  ]
+}
