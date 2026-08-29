@@ -19,6 +19,35 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close employment section view builder (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor re-audit of commit `86b9a00` passed. Filtering, ordering, fail-closed behavior, title safety, project isolation, no mutation, and no source-truth drift all confirmed. Findings raised were INFO-only (deliberate fail-closed behavior / invalid-input edge cases already constrained upstream), non-blocking, no code change required.
+
+**Changed**
+
+* `CURRENT_STATE.md`: `EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` marked CLOSED.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, approved wording, `default_module_order`, derivative selection logic, job-analysis logic, immigration logic.
+
+**Confirmed by the independent re-audit**
+
+* build_employment_section_view() correctly reconciles bullet_module_ids against included_module_ids; excluded/unselected bullets never render; a selected PROJECT_BULLET or other non-BULLET type is excluded, never rendered; MarketMind never leaks in even under full-master selection.
+* Ordering follows the section's own bullet_module_ids exactly; documented precedence decision (ignoring top-level module_order) is sound.
+* Title resolution reuses the existing architecture unchanged; no title validation weakened.
+* Fail-closed contract holds; no partial sections ever survive an invalid result; function does not mutate inputs; no persistent representation created.
+* resume_patch_apply.py, resume_validation.py, resume_project_bullet.py, schemas, protected master, Claims, Evidence, Experiences unchanged.
+* 30/30 tests PASS. Golden 15/15 PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Status**
+
+EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1_CLOSED_AND_PUSHED. No resume generated. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Add employment section view builder (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`)
 
 **Reason**

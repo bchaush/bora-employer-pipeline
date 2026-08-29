@@ -48,7 +48,7 @@ Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`
 
 Résumé Presentation Pipeline Gap Analysis v1 (`RESUME_PRESENTATION_PIPELINE_GAP_ANALYSIS_V1`) = **COMPLETE** (read-only architecture/inventory review; identified the smallest next gap — `experience_sections[].bullet_module_ids` is never reconciled against a derivative's `included_module_ids` — and recommended `EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` as the next bounded milestone; no files changed).
 
-Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`build_employment_section_view()` in new file `src/resume_experience_section.py`: a pure, derived presentation transform reconciling `experience_sections[].bullet_module_ids` against `included_module_ids`, including only currently-selected `BULLET` modules, in the section's own bullet order; reuses the existing, unmodified title-resolution architecture (`is_source_formal_title_unresolved()`/`has_approved_display_title()`) and the existing `UNRESOLVED_PROTECTED_METADATA` error taxonomy; explicitly fail-closed, mirroring the closed project-section-view contract; not wired into `build_resume_derivative()`, the derivative schema, or any renderer — transform-only, proven independently; see below).
+Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`) = **CLOSED** (`build_employment_section_view()` in `src/resume_experience_section.py`: a pure, derived presentation transform reconciling `experience_sections[].bullet_module_ids` against `included_module_ids`, including only currently-selected `BULLET` modules, in the section's own bullet order; reuses the existing, unmodified title-resolution architecture (`is_source_formal_title_unresolved()`/`has_approved_display_title()`) and the existing `UNRESOLVED_PROTECTED_METADATA` error taxonomy; explicitly fail-closed, mirroring the closed project-section-view contract; not wired into `build_resume_derivative()`, the derivative schema, or any renderer — transform-only, proven independently; independent Cursor re-audit passed with INFO-only findings (deliberate fail-closed behavior / invalid-input edge cases already constrained upstream, non-blocking); see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -335,7 +335,42 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` is implemented pending independent Cursor re-audit; not wired into production derivative-building; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` is closed (independent Cursor re-audit passed, INFO-only findings, non-blocking); not wired into production derivative-building; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Close employment section view builder (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor re-audit of commit `86b9a00` passed. All important checks confirmed: filtering, ordering, fail-closed behavior, title safety, project isolation, no mutation, no source-truth drift, 30/30 tests, 15/15 Golden. The findings raised were INFO-only, not blockers — deliberate fail-closed behavior or invalid-input edge cases already constrained upstream — and required no code change.
+
+**Confirmed by the independent re-audit**
+
+* `build_employment_section_view()` correctly reconciles `experience_sections[].bullet_module_ids` against `included_module_ids`; excluded/unselected bullets never render; a selected `PROJECT_BULLET` or other non-`BULLET` type referenced from `bullet_module_ids` is excluded, never rendered; MarketMind never leaks into the employment view even under full-master selection.
+* Bullet ordering follows the section's own `bullet_module_ids` exactly; the documented ordering-precedence decision (ignoring top-level `module_order`) is sound; no architecture ambiguity.
+* Title resolution reuses the existing, unmodified `is_source_formal_title_unresolved()`/`has_approved_display_title()` architecture unchanged; no title validation was weakened.
+* Fail-closed contract holds: any section identity/reference error yields `valid=False`, `sections=[]`, with `errors` fully populated; no partial sections ever survive an invalid result.
+* Function does not mutate its inputs; no persistent representation created.
+* `resume_patch_apply.py`, `resume_validation.py`, `resume_project_bullet.py`, schemas, protected master, Claims, Evidence, Experiences, approved wording, `default_module_order`, and derivative selection semantics all remain byte-unchanged.
+* 30/30 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: `EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` marked `CLOSED`; phase summary and "Next Approved Task" updated.
+* `CHANGELOG.md`: closure entry recorded.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, approved wording, `default_module_order`, derivative selection logic, job-analysis logic, immigration logic.
+
+**Not claimed**
+
+The transform remains unwired — not part of `build_resume_derivative()`, any schema, or any renderer. No renderer was built. No résumé was generated. No job-specific tailoring was started.
+
+**Status**
+
+`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1_CLOSED_AND_PUSHED`. No résumé generated. No job-specific tailoring begun. No new Experience started.
 
 ---
 
