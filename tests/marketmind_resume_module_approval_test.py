@@ -164,7 +164,7 @@ claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
 reusable = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
-assert_true(len(reusable) == 11, f"reusable claim count must remain 11, got {len(reusable)}")
+assert_true(len(reusable) == 13, f"reusable claim count must be 13, got {len(reusable)}")
 
 EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]

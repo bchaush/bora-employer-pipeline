@@ -1,6 +1,6 @@
 {
   "claim_id": "CLAIM_TELUS_002",
-  "wording": "Tracked and categorized enforcement decisions to support trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.",
+  "wording": "Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.",
   "evidence_ids": [
     "TELUS_PATTERN_001",
     "TELUS_COLLAB_001"
@@ -21,7 +21,7 @@
     "BI ownership",
     "policy authorship"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-28",
-  "version": "1"
+  "version": "2"
 }

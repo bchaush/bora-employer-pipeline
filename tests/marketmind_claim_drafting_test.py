@@ -216,12 +216,13 @@ assert_true(claim_result["records_checked"] == 13, "expected 13 total claim reco
 reusable = [
     cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable) == 11, f"reusable claim count must be 11, got {len(reusable)}")
+assert_true(len(reusable) == 13, f"reusable claim count must be 13, got {len(reusable)}")
 assert_true(
     sorted(reusable)
     == sorted(
         [f"CLAIM_WW_{i:03d}" for i in range(1, 7)]
         + [f"CLAIM_MM_{i:03d}" for i in range(1, 6)]
+        + ["CLAIM_TELUS_001", "CLAIM_TELUS_002"]
     ),
     f"unexpected reusable claim set: {reusable}",
 )
@@ -231,7 +232,7 @@ for claim_id in MARKETMIND_CLAIM_IDS:
         f"{claim_id} must be Bora-approved",
     )
 
-print("PASS 4: 13 total claims; 11 reusable (Winter Walk + Bora-approved MarketMind).")
+print("PASS 4: 13 total claims; 13 reusable (Winter Walk + Bora-approved MarketMind + Bora-approved TELUS).")
 
 
 # ---------------------------------------------------------------------------

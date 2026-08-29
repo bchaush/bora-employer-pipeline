@@ -96,9 +96,9 @@ assert_true(
 )
 assert_true(
     len(discover_claim_files(CLAIMS_ROOT)) == 13,
-    "discover_claim_files should find 11 claim files",
+    "discover_claim_files should find 13 claim files",
 )
-print("PASS 1: valid real claim repository (11 records: 6 Winter Walk + 5 MarketMind) passed.")
+print("PASS 1: valid real claim repository (13 records: 6 Winter Walk + 5 MarketMind + 2 TELUS) passed.")
 
 
 # ---------------------------------------------------------------------------

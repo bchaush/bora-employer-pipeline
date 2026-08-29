@@ -19,6 +19,52 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Record Bora's TELUS wording approval; master integration deferred (`TELUS_RESUME_MODULES_V1`)
+
+**Reason**
+
+Independent Cursor audit of commit 208eeeb passed (CURSOR_TELUS_RESUME_MODULES_V1_AUDIT_PASS, no HIGH/MEDIUM findings). Bora then explicitly approved revised final wording for both TELUS Claims/modules. This entry records that approval, addresses Cursor's non-blocking F-01-F-05 findings, and evaluates whether TELUS can now safely enter the protected master.
+
+**Human approval recorded**
+
+CLAIM_TELUS_001/MOD_TELUS_001_REVIEW: "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data under time-sensitive conditions." CLAIM_TELUS_002/MOD_TELUS_002_PATTERN: "Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns." Covers only these exact sentences -- no evidence-state upgrade, new metric, new title/date presentation, or unrelated master change is authorized.
+
+**Changed**
+
+* `claims/telus/CLAIM_TELUS_001.json`, `CLAIM_TELUS_002.json`: wording updated to approved text; human_approval false->true; version 1->2.
+* `resume/drafts/TELUS_RESUME_MODULE_DRAFTS_V1.json`: both module wordings made byte-identical to their Claims (resolves F-04); status DRAFT_PENDING_HUMAN_REVIEW -> APPROVED_WORDING_PENDING_MASTER_INTEGRATION; human_approval true throughout; notes updated with the approval event, the still-unresolved master-integration questions, and the F-05 semantic-guard caveat.
+* `tests/telus_resume_modules_v1_test.py` updated to prove the new approved state while still proving no master integration exists.
+* Documentation corrections (F-01, F-02): stale "11 total" Claim-count summary corrected to 13; "16 existing test files" corrected to 15, with full 4+18=22 arithmetic for commit 208eeeb stated explicitly.
+* `tests/claim_repository_test.py` cosmetic pass-message strings corrected from 11 to 13 (F-03).
+* Reusable-claim-count assertions (11->13) corrected across 6 test files and the Golden runner, since both TELUS Claims are now legitimately reusable.
+
+**Not changed**
+
+* `schemas/`, `src/`, `evidence/`, `experiences/`, `resume/master/` (byte-unchanged), all 11 non-TELUS Claims, Winter Walk/MarketMind/Education, `default_module_order`, job-analysis logic, immigration logic. No new Claims, Evidence, or title/date convention invented.
+
+**Cursor findings addressed**
+
+F-01 corrected. F-02 corrected. F-03 corrected. F-04 resolved via byte-identical wording. F-05 recorded as a known non-blocking architectural caveat, not remediated (no semantic-guard redesign per explicit instruction) -- the human-approval gate is the operative control.
+
+**Master-integration decision: HUMAN_PRESENTATION_DECISION_REQUIRED**
+
+Both modules now pass validate_resume_module_lineage(). Master integration additionally requires deciding how to present a date_range mixing a VERIFIED start (Nov 2024) with an OBSERVED-tier LinkedIn-sourced end (May 2025) in a schema field with no evidence-state carrier -- a genuine, unresolved human decision, not invented here. The formal title alone needs no such decision (displayable as-is).
+
+**Truth / semantic safety**
+
+Formal title preserved unmutated; "500+ weekly" remains OBSERVED even after approval, with an adversarial test proving the architecture rejects any VERIFIED upgrade; no SQL, BI ownership, automation, systems implementation, policy creation, QA leadership, U.S.-experience implication, or invented metric anywhere.
+
+**Tests / Verification**
+
+* Exact approved wording on both Claims; human_approval=true; evidence_state=OBSERVED unchanged; reusable=true as a validator-computed consequence; byte-identical module/Claim wording; both modules now pass lineage validation; no causal-improvement wording; title unmutated; 11 non-TELUS Claims unchanged; WW/MM/Education unchanged; master module count intact; no TELUS module/experience_sections entry in the master; renderer deterministic and TELUS-free in the default output.
+* 35/35 test suites -- PASS. Golden 15/15 -- PASS. Repository: 4 Experience / 36 Evidence / 13 Claims / 13 reusable / 11 master modules.
+
+**Status**
+
+TELUS_RESUME_MODULES_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. Human approval recorded; master integration explicitly not performed pending Bora's presentation decision. No Bulmarma. No D Commerce. No Summary. No PDF/DOCX. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Add TELUS résumé claims and draft modules (`TELUS_RESUME_MODULES_V1`)
 
 **Reason**
@@ -34,7 +80,7 @@ Confirmed no schema change or architecture blocker exists for Claim/module creat
 * Added `claims/telus/CLAIM_TELUS_001.json` and `CLAIM_TELUS_002.json` (both OBSERVED, both human_approval=false draft). CLAIM_TELUS_001: 500+ weekly case review + policy-violation/pattern identification + time-sensitive high-volume execution. CLAIM_TELUS_002: enforcement categorization/trend-analysis support + cross-functional collaboration, deliberately omitting any "improved workflows" causal claim.
 * Added `resume/drafts/TELUS_RESUME_MODULE_DRAFTS_V1.json`: two draft BULLET modules, DRAFT_PENDING_HUMAN_REVIEW, human_approval=false throughout.
 * Added `tests/telus_resume_modules_v1_test.py` (12 checks).
-* Updated hardcoded total-Claim-count assertions (11->13) across 16 test files and the Golden runner's baseline check -- reusable-count assertions (still 11) untouched; all 15 fixture outcomes unchanged. Two tests' resume/ file-listing assertions updated to include the new draft file.
+* Updated hardcoded total-Claim-count assertions (11->13) across 15 test files and the Golden runner's baseline check -- reusable-count assertions (11 at that point) untouched; all 15 fixture outcomes unchanged. Two tests' resume/ file-listing assertions updated to include the new draft file. Commit 208eeeb totals exactly: 22 files changed = 4 new + 18 modified (2 docs, the Golden runner, and 15 test files). *(Corrected at TELUS approval time -- Cursor F-02 finding: this had incorrectly stated "16 existing test files"; the accurate count is 15.)*
 
 **Not changed**
 

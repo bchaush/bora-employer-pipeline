@@ -63,7 +63,7 @@ assert_true(cl["valid"] is True and cl["records_checked"] == 13, "Claim regressi
 reusable_approved = [
     cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable_approved) == 11, f"expected 11 reusable claims, got {reusable_approved}")
+assert_true(len(reusable_approved) == 13, f"expected 13 reusable claims, got {reusable_approved}")
 for claim_id, claim in cl["index"].items():
     if claim_id.startswith("CLAIM_WW_") or claim_id.startswith("CLAIM_MM_"):
         assert_true(claim["human_approval"] is True, f"{claim['claim_id']} must be approved")

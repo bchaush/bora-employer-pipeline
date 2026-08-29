@@ -222,8 +222,8 @@ print("PASS H: Winter Walk claims and MarketMind claims unchanged.")
 
 # I. Repository counts unchanged (claim drafting created no new Claim/Evidence/Experience)
 reusable = [cid for cid, rec in CLAIM_INDEX.items() if rec.get("human_approval") is True]
-assert_true(len(reusable) == 11, f"I: reusable claim count must remain 11, got {len(reusable)}")
-print("PASS I: repository counts as expected (4 Experience / 36 Evidence / 11 Claims / 11 reusable).")
+assert_true(len(reusable) == 13, f"I: reusable claim count must be 13, got {len(reusable)}")
+print("PASS I: repository counts as expected (4 Experience / 36 Evidence / 13 Claims / 13 reusable).")
 
 
 print("PASS: MarketMind resume-module drafting tests completed successfully.")

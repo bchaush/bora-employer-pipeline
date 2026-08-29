@@ -1,6 +1,6 @@
 {
   "claim_id": "CLAIM_TELUS_001",
-  "wording": "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across large volumes of structured and unstructured data under time-sensitive conditions.",
+  "wording": "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data under time-sensitive conditions.",
   "evidence_ids": [
     "TELUS_REVIEW_001",
     "TELUS_VOLUME_001"
@@ -22,7 +22,7 @@
     "production QA ownership",
     "policy authorship"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-28",
-  "version": "1"
+  "version": "2"
 }

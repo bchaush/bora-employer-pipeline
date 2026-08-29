@@ -1,15 +1,18 @@
-"""Bounded tests for TELUS draft Claims and draft résumé modules
-(TELUS_RESUME_MODULES_V1).
+"""Bounded tests for TELUS Claims/résumé modules, covering both their
+initial drafting and Bora's subsequent explicit human approval of
+revised final wording (TELUS_RESUME_MODULES_V1).
 
-Proves: the two new TELUS Claims have valid Evidence lineage and
+Proves: the two TELUS Claims have valid Evidence lineage and
 compatible evidence states; unsupported technologies/causal outcomes
 never leak in; the '500+ weekly' figure can never be represented as
-VERIFIED; the historical formal title is not mutated; the drafts are
-correctly NOT yet reusable/master-integrated (human_approval=false is
-the real gate, exactly mirroring the MarketMind drafting precedent);
-and existing Winter Walk, MarketMind, Education, and TELUS Evidence
-truth are all unchanged. No master integration is expected or tested
-as present -- this milestone is Claims + draft modules only.
+VERIFIED; the historical formal title is not mutated; both Claims are
+now human-approved with Bora's exact approved wording, byte-identical
+between Claim and module, and correctly reusable/lineage-valid as a
+result (matching the MarketMind approval precedent exactly); the
+protected master remains TELUS-free because a genuine, separate human
+presentation decision (title/date-range) remains outstanding; and
+existing Winter Walk, MarketMind, Education, and TELUS Evidence truth
+are all unchanged.
 """
 
 from __future__ import annotations
@@ -71,6 +74,19 @@ TELUS_EXPERIENCE = json.loads(EXPERIENCE_PATH.read_text(encoding="utf-8"))
 
 TELUS_CLAIM_IDS = ["CLAIM_TELUS_001", "CLAIM_TELUS_002"]
 
+APPROVED_WORDING = {
+    "CLAIM_TELUS_001": (
+        "Reviewed 500+ user cases weekly against platform policy, identifying "
+        "violations and behavioral patterns across structured and unstructured "
+        "data under time-sensitive conditions."
+    ),
+    "CLAIM_TELUS_002": (
+        "Tracked and categorized enforcement decisions for trend analysis and "
+        "consistency, collaborating with policy, operations, and analytics teams "
+        "to surface recurring risk patterns."
+    ),
+}
+
 
 # 1. Every TELUS Claim has valid Evidence lineage.
 for cid in TELUS_CLAIM_IDS:
@@ -93,22 +109,23 @@ for term in FORBIDDEN_TECH_TERMS:
 print("PASS 2: no unsupported technology invented in TELUS Claim/module wording.")
 
 
-# 3. '500+ weekly' cannot be represented as VERIFIED, and its evidence_state
-#    lineage is provably compatible only as OBSERVED (via cited OBSERVED evidence).
+# 3. '500+ weekly' cannot be represented as VERIFIED, even after human approval,
+#    and its evidence_state lineage is provably compatible only as OBSERVED.
 review_evidence = EVIDENCE_INDEX["TELUS_REVIEW_001"]
 assert_true(review_evidence["evidence_state"] == "OBSERVED", "TELUS_REVIEW_001 must remain OBSERVED, never upgraded")
 claim_001 = CLAIM_INDEX["CLAIM_TELUS_001"]
 assert_true("500+ user cases weekly" in claim_001["wording"], "exact '500+ user cases weekly' phrasing must be preserved in the Claim")
-assert_true(claim_001["evidence_state"] == "OBSERVED", "CLAIM_TELUS_001 must be OBSERVED, matching its weakest cited evidence tier")
+assert_true(claim_001["evidence_state"] == "OBSERVED", "CLAIM_TELUS_001 must be OBSERVED, matching its weakest cited evidence tier, even though human_approval=true")
 state_check = validate_claim_evidence_state_compatibility(claim_001, EVIDENCE_INDEX)
 assert_true(state_check["valid"] is True, f"CLAIM_TELUS_001 evidence-state compatibility must hold: {state_check['errors']}")
 # Adversarial: a VERIFIED claim citing this same OBSERVED evidence must fail --
-# proving the architecture itself would block any attempt to upgrade this figure.
+# proving the architecture itself would block any attempt to upgrade this figure,
+# and that human_approval never overrides evidence-state compatibility.
 adversarial_upgrade = copy.deepcopy(claim_001)
 adversarial_upgrade["evidence_state"] = "VERIFIED"
 upgrade_check = validate_claim_evidence_state_compatibility(adversarial_upgrade, EVIDENCE_INDEX)
 assert_false(upgrade_check["valid"], "a VERIFIED claim citing OBSERVED-only evidence must fail state-compatibility validation")
-print("PASS 3: '500+ weekly' remains OBSERVED-tier; upgrading it to VERIFIED is architecturally rejected.")
+print("PASS 3: '500+ weekly' remains OBSERVED-tier; upgrading it to VERIFIED is architecturally rejected even with human_approval=true.")
 
 
 # 4. Unsupported causal improvement wording is rejected or absent.
@@ -187,32 +204,62 @@ assert_true(len(MASTER["modules"]) == 11, "master modules must remain 11 -- no T
 print("PASS 10: Golden-relevant repository invariants (master module count) intact.")
 
 
-# 11. Any TELUS master integration obeys approval state: NONE exists, and the
-#     existing production module-lineage gate correctly rejects these drafts
-#     as not-yet-reusable, proving the approval boundary cannot be bypassed.
+# 11a. Both Claims now carry Bora's exact approved wording, are human-approved,
+#      and are correctly reusable as a validator-computed consequence (not a
+#      manually-set field) -- mirroring the MarketMind approval precedent.
+for cid in TELUS_CLAIM_IDS:
+    claim = CLAIM_INDEX[cid]
+    assert_true(claim["wording"] == APPROVED_WORDING[cid], f"{cid} wording must equal Bora's exact approved text, got {claim['wording']!r}")
+    assert_true(claim["human_approval"] is True, f"{cid} must now be human_approval=true")
+    assert_true(claim["evidence_state"] == "OBSERVED", f"{cid} must remain evidence_state=OBSERVED after approval")
+    result = validate_claim(claim, evidence_index=EVIDENCE_INDEX)
+    assert_true(result["reusable"] is True, f"{cid} must be reusable=true as a validator-computed consequence of human_approval=true + valid lineage/state")
+print("PASS 11a: both TELUS Claims carry the exact approved wording, are human-approved, and are correctly reusable.")
+
+
+# 11b. Matching TELUS module wording is byte-identical to its approved Claim,
+#      and modules are now human_approval=true, matching the approval event.
+MODULE_BY_ID = {m["module_id"]: m for m in TELUS_DRAFTS["modules"]}
+assert_true(
+    MODULE_BY_ID["MOD_TELUS_001_REVIEW"]["wording"] == CLAIM_INDEX["CLAIM_TELUS_001"]["wording"],
+    "MOD_TELUS_001_REVIEW wording must be byte-identical to CLAIM_TELUS_001 wording",
+)
+assert_true(
+    MODULE_BY_ID["MOD_TELUS_002_PATTERN"]["wording"] == CLAIM_INDEX["CLAIM_TELUS_002"]["wording"],
+    "MOD_TELUS_002_PATTERN wording must be byte-identical to CLAIM_TELUS_002 wording",
+)
+for module in TELUS_DRAFTS["modules"]:
+    assert_true(module["human_approval"] is True, f"{module['module_id']} must now be human_approval=true")
+print("PASS 11b: TELUS module wording is byte-identical to its approved Claim; modules are human_approval=true.")
+
+
+# 11c. Both modules now correctly PASS production module-lineage validation
+#      (the CLAIM_NOT_REUSABLE gate that blocked them pre-approval is now
+#      satisfied) -- proving approval genuinely unlocks lineage validity,
+#      exactly as the architecture intends.
+for module in TELUS_DRAFTS["modules"]:
+    lineage = validate_resume_module_lineage(module, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
+    assert_true(lineage["valid"] is True, f"{module['module_id']} must now pass production module-lineage validation: {lineage.get('errors')}")
+print("PASS 11c: both TELUS modules now pass production module-lineage validation following Claim approval.")
+
+
+# 11d. Despite modules now being lineage-valid, NO TELUS master integration
+#      exists: the protected master remains untouched because a genuine,
+#      separate human presentation decision (title/date-range) is still
+#      outstanding and was correctly NOT invented in this milestone.
 assert_false(
     any("TELUS" in json.dumps(m) for m in MASTER["modules"]),
-    "no TELUS résumé module may exist in the protected master in this milestone",
+    "no TELUS résumé module may exist in the protected master -- master integration requires a separate, still-unresolved presentation decision",
 )
 assert_false(
     any(s.get("experience_id") == "EXP_TELUS_001" for s in MASTER.get("experience_sections", [])),
-    "no experience_sections entry for TELUS may exist in the protected master in this milestone",
+    "no experience_sections entry for TELUS may exist in the protected master -- title/date-range presentation remains undecided",
 )
-for module in TELUS_DRAFTS["modules"]:
-    assert_true(module["human_approval"] is False, f"{module['module_id']} must remain human_approval=false (draft, pending Bora review)")
-    lineage = validate_resume_module_lineage(module, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
-    assert_false(
-        lineage["valid"],
-        f"{module['module_id']} must correctly FAIL production module-lineage validation while its Claim is unapproved "
-        "(CLAIM_NOT_REUSABLE) -- this proves the approval gate cannot be bypassed, not a defect",
-    )
-    assert_true(
-        any(e.get("code") == "CLAIM_NOT_REUSABLE" for e in lineage["errors"]),
-        f"{module['module_id']} must fail specifically with CLAIM_NOT_REUSABLE",
-    )
-assert_true(TELUS_DRAFTS["status"] == "DRAFT_PENDING_HUMAN_REVIEW", "TELUS draft set must remain in DRAFT_PENDING_HUMAN_REVIEW status")
-assert_true(TELUS_DRAFTS["human_approval"] is False, "TELUS draft set container must remain human_approval=false")
-print("PASS 11: no TELUS master integration exists; the approval gate correctly blocks unapproved drafts (CLAIM_NOT_REUSABLE).")
+assert_true(
+    TELUS_DRAFTS["status"] == "APPROVED_WORDING_PENDING_MASTER_INTEGRATION",
+    "TELUS draft set status must reflect approved wording pending the separate master-integration presentation decision",
+)
+print("PASS 11d: no TELUS master integration exists; wording approval does not imply or authorize a title/date presentation decision.")
 
 
 # 12. Renderer behavior remains deterministic: since nothing TELUS-related is
