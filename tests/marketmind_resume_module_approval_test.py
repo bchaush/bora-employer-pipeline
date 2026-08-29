@@ -156,10 +156,10 @@ FORBIDDEN_INFLATION_PHRASES = [
 
 exp_result = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 3, "Experience count must remain 3")
+assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4")
 ev_result = validate_evidence_repository(EVIDENCE_ROOT, experience_root=EXPERIENCE_ROOT)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 29, "Evidence count must remain 29")
+assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")

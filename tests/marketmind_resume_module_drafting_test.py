@@ -86,10 +86,10 @@ WINTER_WALK_CLAIM_FILES = [f"CLAIM_WW_{i:03d}.json" for i in range(1, 7)]
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 3, "Experience count must remain 3")
+assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 29, "Evidence count must remain 29")
+assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")
@@ -223,7 +223,7 @@ print("PASS H: Winter Walk claims and MarketMind claims unchanged.")
 # I. Repository counts unchanged (claim drafting created no new Claim/Evidence/Experience)
 reusable = [cid for cid, rec in CLAIM_INDEX.items() if rec.get("human_approval") is True]
 assert_true(len(reusable) == 11, f"I: reusable claim count must remain 11, got {len(reusable)}")
-print("PASS I: repository counts as expected (3 Experience / 29 Evidence / 11 Claims / 11 reusable).")
+print("PASS I: repository counts as expected (4 Experience / 36 Evidence / 11 Claims / 11 reusable).")
 
 
 print("PASS: MarketMind resume-module drafting tests completed successfully.")

@@ -1,0 +1,24 @@
+{
+  "evidence_id": "TELUS_REVIEW_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "Bora's LinkedIn professional profile states that in this role he analyzed and reviewed 500+ user cases weekly on a global video-sharing platform, identifying behavioral patterns and policy violations.",
+  "capabilities": [
+    "high-volume review",
+    "policy/rule application",
+    "pattern recognition",
+    "risk-pattern identification",
+    "attention to detail"
+  ],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's LinkedIn experience record (Bora-supplied screenshot; not stored in repository)",
+  "source_location": "Experience entry, first work-description bullet",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified or independently quantitatively verified. The '500+ weekly' figure is Bora's own characterization and must be preserved exactly; it must not be converted into a derived monthly, annual, percentage, or productivity figure. 'Policy violations' reflects application of existing platform policy, not authorship of policy.",
+  "limitations": [
+    "Not independently or quantitatively verified by employer documentation or system records",
+    "Does not establish formal QA ownership or policy-creation authority",
+    "Does not establish a measured accuracy or performance score",
+    "Does not establish U.S. trust-and-safety operations experience"
+  ]
+}

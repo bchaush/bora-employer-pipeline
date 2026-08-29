@@ -1,0 +1,21 @@
+{
+  "evidence_id": "TELUS_VOLUME_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "Bora's LinkedIn professional profile states that in this role he maintained high accuracy under time-sensitive conditions while working with large volumes of structured and unstructured data.",
+  "capabilities": [
+    "SLA/time-sensitive execution",
+    "handling high volumes",
+    "quality/consistency discipline"
+  ],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's LinkedIn experience record (Bora-supplied screenshot; not stored in repository)",
+  "source_location": "Experience entry, fourth work-description bullet",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified. 'High accuracy' is Bora's own qualitative characterization; no numeric accuracy or performance score is established by this or any other current source. 'Structured and unstructured data' reflects the operational content he worked with, not database, SQL, or data-pipeline ownership.",
+  "limitations": [
+    "Does not establish a measured or numeric accuracy or performance score",
+    "Does not establish database, SQL, BI, or data-pipeline ownership",
+    "Not independently verified by employer documentation"
+  ]
+}

@@ -19,6 +19,47 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add verified TELUS employment evidence (`TELUS_EVIDENCE_V1`)
+
+**Reason**
+
+Ingest the minimum strong, verified TELUS Digital Bulgaria employment evidence needed to support future resume use -- source truth and transferable employment evidence only, not resume wording or space allocation.
+
+**Architecture finding**
+
+`experience.schema.json` already supports `experience_type=EMPLOYMENT` (Winter Walk uses the more conservative ORGANIZATIONAL_ENGAGEMENT due to its own title/date ambiguity; TELUS has an unambiguous employer-issued offer, so EMPLOYMENT is the correct classification). The existing `evidence_state` enum already distinguishes employer-issued documentation (VERIFIED) from Bora's self-reported LinkedIn content (OBSERVED) -- no schema change needed. This milestone is Evidence + Experience only; Claims/resume modules are deferred to a future TELUS_RESUME_MODULES_V1 milestone; no master integration occurred.
+
+**Changed**
+
+* Added `experiences/EXP_TELUS_001.json` (EMPLOYMENT, TELUS Digital Bulgaria).
+* Added `evidence/telus/TELUS_OFFER_001.json` and `TELUS_RECRUITING_001.json` (VERIFIED, employer-issued): formal title "Digital Trust and Safety Analyst with English (tele-agent)", Operations department, TELUS Tower Sofia Bulgaria, start date 15.11.2024, 8h/day. Salary/benefits/probation/notice/leave intentionally excluded.
+* Added `evidence/telus/TELUS_LINKEDIN_PERIOD_001.json`, `TELUS_REVIEW_001.json`, `TELUS_PATTERN_001.json`, `TELUS_COLLAB_001.json`, `TELUS_VOLUME_001.json` (OBSERVED, LinkedIn-sourced, each of Bora's four responsibility bullets a separate record): display title "Content Safety Analyst" distinguished from the formal title; Nov 2024 - May 2025 (7 months, end month LinkedIn-only, exact day UNKNOWN); "500+ weekly" case review preserved exactly, no derived figure; enforcement categorization; cross-functional collaboration with explicit limitation against causal-improvement-ownership upgrade; high-volume/time-sensitive execution, no numeric accuracy score.
+* Added `tests/telus_evidence_v1_test.py` (19 checks including adversarial traps for title substitution, derived-number fabrication, policy-creation upgrade, team-membership upgrade, causal-improvement upgrade).
+* Updated hardcoded repository-count assertions (Experience 3->4, Evidence 29->36) across 16 existing test files and the Golden runner's own baseline check -- count-baseline correction only; all 15 fixture outcomes unchanged.
+
+**Not changed**
+
+* `claims/` (all 11 Claims unchanged), `schemas/`, `resume/master/`, `resume/drafts/` (no TELUS integration yet), `src/` (zero code changes), Winter Walk/MarketMind/Education evidence and wording, `default_module_order`, job-analysis logic, immigration logic. Bulmarma and D Commerce Bank not started.
+
+**Resume-selection boundary (design context only, not policy)**
+
+Bora's future intent to keep TELUS compact (~1-2 bullets) and not automatically include Bulmarma/D Commerce in a first application resume is recorded as a human-approved future presentation preference only -- no selection policy implemented, and no "ATS penalizes Bulgarian experience" claim recorded as fact.
+
+**Privacy**
+
+No salary, benefits, probation, notice-period, leave, Student ID, private recruiter email, onboarding documents, or the original offer PDF committed. Sources referenced generically, matching the WW_OFFER_001 convention.
+
+**Tests / Verification**
+
+* Exact formal title never overwritten by the LinkedIn display title; Operations/start date correctly sourced to the offer; true Sofia/Bulgaria location, no U.S. location; no fabricated end day; no compensation leakage; no SQL/BI/database invention; no U.S.-experience implication; correct VERIFIED/OBSERVED split; "500+ weekly" preserved with no derived figure; policy review vs. policy creation, team collaboration vs. membership/ownership, and "improve workflows" vs. causal-ownership all correctly distinguished; existing WW/MM/Education truth unchanged; no Student ID/email leakage; no TELUS resume module or master integration exists yet.
+* 34/34 test suites -- PASS (33 baseline + 1 new). Golden 15/15 -- PASS. Repository: 4 Experience / 36 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Status**
+
+TELUS_EVIDENCE_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. No Claims, resume modules, or master integration for TELUS. No Bulmarma. No D Commerce Bank. No Summary. No PDF/DOCX. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close Brandeis education evidence milestone (`EDUCATION_EVIDENCE_V1`, CLOSED)
 
 **Reason**

@@ -1,0 +1,18 @@
+{
+  "evidence_id": "TELUS_OFFER_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "TELUS Digital Bulgaria issued Bora Chaush a signed job offer dated 13.11.2024 for the formal position 'Digital Trust and Safety Analyst with English (tele-agent)' in the Operations department, based at TELUS Tower, Sofia, Bulgaria, with a start date of 15.11.2024 and an 8-hour-per-day labor contract.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "TELUS Digital Bulgaria signed job offer PDF dated 13.11.2024 (Bora-supplied; not stored in repository)",
+  "source_location": "Recipient field; Department field; Position field; Location field; Start Date field; Working Hours field",
+  "safe_for_external_use": true,
+  "notes": "Documentary employment-offer metadata evidence only; not an accomplishment Claim. Salary, benefits, probation, notice-period, and leave information present on the same offer are intentionally not recorded here as not useful to résumé/evidence purposes.",
+  "limitations": [
+    "Does not establish an end date or employment duration",
+    "Does not establish day-to-day responsibilities or duties actually performed",
+    "Does not establish U.S. work experience -- employment occurred in Sofia, Bulgaria",
+    "Offer acceptance and actual start are corroborated only by other sources (TELUS_RECRUITING_001; TELUS_LINKEDIN_PERIOD_001), not restated here"
+  ]
+}

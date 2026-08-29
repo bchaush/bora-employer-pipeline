@@ -1,0 +1,22 @@
+{
+  "evidence_id": "TELUS_PATTERN_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "Bora's LinkedIn professional profile states that in this role he tracked and categorized enforcement decisions to support trend analysis and consistency in moderation outcomes.",
+  "capabilities": [
+    "categorization",
+    "consistency",
+    "structured decision records",
+    "trend-analysis support"
+  ],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's LinkedIn experience record (Bora-supplied screenshot; not stored in repository)",
+  "source_location": "Experience entry, second work-description bullet",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified. Describes tracking/categorization work supporting trend analysis, not ownership of an analytics pipeline, BI system, or database.",
+  "limitations": [
+    "Not independently verified by employer documentation",
+    "Does not establish data engineering, SQL, or analytics-pipeline ownership",
+    "Does not establish a measured consistency or accuracy metric"
+  ]
+}

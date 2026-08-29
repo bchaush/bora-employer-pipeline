@@ -1,0 +1,16 @@
+{
+  "evidence_id": "TELUS_RECRUITING_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "A recruiter email from a @telusdigital.com address, dated 13.11.2024, corroborates that Bora Chaush was the recipient of a TELUS Digital Bulgaria job offer with an attached formal offer document.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "TELUS Digital recruiter email screenshot dated 13.11.2024, sent from a @telusdigital.com address (Bora-supplied; not stored in repository)",
+  "source_location": "Email sender address; email date; email body referencing the attached offer; recipient field",
+  "safe_for_external_use": true,
+  "notes": "Corroborating documentary evidence only; consistent with TELUS_OFFER_001. Does not itself establish job duties, title wording, or dates beyond confirming the offer's existence, recipient, and issuance date. Recruiter's private email address is not reproduced here.",
+  "limitations": [
+    "Does not establish job duties or responsibilities",
+    "Does not independently establish dates beyond corroborating the offer's issuance date"
+  ]
+}

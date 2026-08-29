@@ -1,0 +1,19 @@
+{
+  "evidence_id": "TELUS_COLLAB_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "Bora's LinkedIn professional profile states that in this role he collaborated with policy, operations, and analytics teams to surface recurring risk patterns and improve review workflows.",
+  "capabilities": [
+    "cross-functional collaboration"
+  ],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's LinkedIn experience record (Bora-supplied screenshot; not stored in repository)",
+  "source_location": "Experience entry, third work-description bullet",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified. The source supports collaboration/participation with cross-functional teams; it does not independently establish measured, attributable ownership of a workflow-improvement outcome. Future wording must not upgrade 'collaborated ... and improve review workflows' into a quantified or solely-attributed process-improvement achievement.",
+  "limitations": [
+    "Does not establish a measured or attributable causal process-improvement outcome",
+    "Does not establish team leadership or ownership of the workflow itself",
+    "Not independently verified by employer documentation"
+  ]
+}

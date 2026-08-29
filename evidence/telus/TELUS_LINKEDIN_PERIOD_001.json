@@ -1,0 +1,18 @@
+{
+  "evidence_id": "TELUS_LINKEDIN_PERIOD_001",
+  "experience_id": "EXP_TELUS_001",
+  "fact": "Bora's LinkedIn professional profile lists a 'Content Safety Analyst' full-time position at 'TELUS Digital', located in Sofia, Sofia City, Bulgaria (on-site), with a displayed period of Nov 2024 - May 2025 (7 months).",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's LinkedIn experience record (Bora-supplied screenshot; not stored in repository)",
+  "source_location": "Experience entry: title, employer, employment type, dates, and location fields",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified. 'Content Safety Analyst' is Bora's own profile-display wording and must not silently replace or be treated as equivalent to the employer-issued formal title in TELUS_OFFER_001 ('Digital Trust and Safety Analyst with English (tele-agent)'). The May 2025 end month is sourced only to this profile record, not to any employer document; the exact end day is UNKNOWN. Employment occurred in Bulgaria; this is not U.S. work experience.",
+  "limitations": [
+    "Does not establish an employer-confirmed end date",
+    "'Content Safety Analyst' is a self-selected display title, not a formal employer title",
+    "Does not establish U.S. work experience or U.S. work authorization",
+    "'Full-time' and '7 months' are Bora's own profile characterization, not independently verified by employer documentation"
+  ]
+}

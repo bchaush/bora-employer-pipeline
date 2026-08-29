@@ -63,7 +63,17 @@ EXPECTED_EDU_IDS = [
     "EDU_BRANDEIS_PROGRESS_001",
 ]
 
-EXPECTED_ALL_IDS = sorted(EXPECTED_WW_IDS + EXPECTED_MM_IDS + EXPECTED_EDU_IDS)
+EXPECTED_TELUS_IDS = [
+    "TELUS_COLLAB_001",
+    "TELUS_LINKEDIN_PERIOD_001",
+    "TELUS_OFFER_001",
+    "TELUS_PATTERN_001",
+    "TELUS_RECRUITING_001",
+    "TELUS_REVIEW_001",
+    "TELUS_VOLUME_001",
+]
+
+EXPECTED_ALL_IDS = sorted(EXPECTED_WW_IDS + EXPECTED_MM_IDS + EXPECTED_EDU_IDS + EXPECTED_TELUS_IDS)
 
 
 def assert_true(condition: bool, message: str) -> None:
@@ -124,9 +134,9 @@ exp = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(exp["valid"] is True, "real Experience Registry must be valid for REF PASS 1")
 evidence = validate_evidence_repository(EVIDENCE_ROOT, experience_root=EXPERIENCE_ROOT)
 assert_true(evidence["valid"] is True, "real Evidence Repository failed with Experience refs")
-assert_true(evidence["records_checked"] == 29, f"expected 29 evidence, got {evidence['records_checked']}")
+assert_true(evidence["records_checked"] == 36, f"expected 36 evidence, got {evidence['records_checked']}")
 assert_true(evidence["index"] is not None, "trusted Evidence index missing")
-assert_true(len(evidence["index"]) == 29, f"trusted Evidence index length {len(evidence['index'])}")
+assert_true(len(evidence["index"]) == 36, f"trusted Evidence index length {len(evidence['index'])}")
 assert_true(
     sorted(evidence["index"].keys()) == EXPECTED_ALL_IDS,
     f"unexpected Evidence_ID set: {sorted(evidence['index'].keys())}",

@@ -1,0 +1,8 @@
+{
+  "experience_id": "EXP_TELUS_001",
+  "experience_name": "TELUS Digital Bulgaria",
+  "experience_type": "EMPLOYMENT",
+  "organization": "TELUS Digital Bulgaria",
+  "source_of_truth": "Bora-supplied TELUS Digital Bulgaria job offer PDF dated 13.11.2024 (not stored in repository); Bora-supplied TELUS recruiting email screenshot dated 13.11.2024 (not stored in repository); Bora-supplied LinkedIn experience record (not stored in repository); evidence/telus/ records referencing EXP_TELUS_001",
+  "notes": "Canonical identity for Bora's TELUS Digital Bulgaria employment. Employer-issued formal title (TELUS_OFFER_001): 'Digital Trust and Safety Analyst with English (tele-agent)', Operations department, based at TELUS Tower, Sofia, Bulgaria, start date 15.11.2024. Bora's LinkedIn profile separately displays the shorter title 'Content Safety Analyst' and an end period of May 2025 (7 months); these are self-reported profile facts, not employer-certified, and must not silently replace or be conflated with the employer-issued formal title or an employer-confirmed end date. This is Bulgarian employment at an international company, not U.S. work experience. Exact end day and exact employer legal entity name beyond 'TELUS Digital Bulgaria' are unresolved."
+}
