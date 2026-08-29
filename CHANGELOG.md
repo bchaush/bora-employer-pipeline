@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add test-only resume text renderer (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`)
+
+**Reason**
+
+A pure runtime unified resume presentation view existed but nothing proved it could be converted into a linear resume representation safely, before any PDF/DOCX/layout complexity is introduced.
+
+**Changed**
+
+* Added `src/resume_text_renderer.py`: `render_resume_text(presentation_result)`, consuming the full envelope from `build_resume_presentation_view()`. Returns `{"valid","text","errors"}`. Renders only fields already present; never re-filters, re-resolves, or re-queries. Fails explicitly (no partial text) on malformed input shape via cheap deterministic checks only.
+* Added `tests/resume_text_renderer_test.py`, including one byte-for-byte golden-style expected-text fixture.
+
+**Not changed**
+
+* `resume_presentation.py`, `resume_experience_section.py`, `resume_project_bullet.py`, `resume_patch_apply.py`, `resume_validation.py`, `resume_master.schema.json`, `resume_derivative.schema.json`, `claims/`, `evidence/`, `experiences/`, protected master content, approved wording, `default_module_order`, job-analysis logic, immigration logic. Not wired into export approval, PDF/DOCX, Google Drive/Docs, job-specific derivative generation, or any browser workflow.
+
+**Section-order decision**
+
+No schema/validator/rule specifies an authoritative resume section order. BLUEPRINT.md section 2 (education before Winter Walk; Winter Walk before MarketMind) and section 46's illustrative patch example (SUMMARY first, then employer/project categories, then SKILLS last) make CONTACT -> SUMMARY -> EDUCATION -> EXPERIENCE -> PROJECTS -> SKILLS reasonably derivable rather than invented. No ARCHITECTURE_DECISION_REQUIRED stop needed.
+
+**Tests / Verification**
+
+* Default WW-only derivative renders valid text matching a byte-for-byte fixture exactly; explicit MarketMind selection renders PROJECTS, unselected MarketMind never appears; exclusion does not leak; exact wording preserved; bullet/skills order preserved; contact preserved; empty education/absent summary create no heading; synthetic summary/education render only when present; no cross-contamination between EXPERIENCE and PROJECTS; no empty headings; deterministic repeat output; no mutation; eight malformed-input cases each fail explicitly.
+* 32/32 test suites -- PASS (31 baseline + 1 new). Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Status**
+
+TEST_ONLY_RESUME_TEXT_RENDERER_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. Test-only, not wired into export/PDF/DOCX/Drive/Docs. No real resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close unified resume presentation model (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`, CLOSED)
 
 **Reason**

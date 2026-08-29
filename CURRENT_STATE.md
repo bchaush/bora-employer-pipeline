@@ -52,6 +52,8 @@ Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V
 
 Unified Résumé Presentation Model v1 (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`) = **CLOSED** (`build_resume_presentation_view()` in `src/resume_presentation.py`: a pure runtime assembler composing the closed employment- and project-section transforms — plus verbatim contact/education/skills/summary reconciliation — into one renderer-ready presentation view over an already-built derivative; no new schema, no persistent presentation snapshot, no duplication of either closed transform's filtering/ordering/identity logic; explicitly fail-closed (any sub-view failure yields `valid=false`/`presentation=None`); documented, non-ambiguous selected-module-order precedence (`module_order` first, then remaining `included_module_ids` in inclusion order); education/summary keys present only when verified content exists, omitted otherwise, never fabricated; no top-level section order asserted (flat named-key object, not an opinionated ordered list); not wired into `build_resume_derivative()`, any schema, or a renderer — transform-only; independent Cursor final re-audit passed (`CURSOR_UNIFIED_RESUME_PRESENTATION_MODEL_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`; two LOW/non-blocking hardening observations only, not remediated in this closure); see below).
 
+Test-Only Résumé Text Renderer v1 (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`render_resume_text()` in new file `src/resume_text_renderer.py`: a pure, deterministic TEST-ONLY plain-text renderer over the full `build_resume_presentation_view()` envelope; renders only fields already present in a valid presentation, never invents/infers/re-filters/re-resolves anything; section order `CONTACT → SUMMARY → EDUCATION → EXPERIENCE → PROJECTS → SKILLS`, evidence-grounded in `BLUEPRINT.md` §2/§46 (documented in the module docstring, not an invented layout); absent sections omitted entirely, never emitted as empty headings or placeholders; explicitly fail-closed (`valid=false`/`text=None`) on any malformed input shape; TEST-ONLY — not wired into export approval, PDF/DOCX, Google Drive/Docs, job-specific derivative generation, or any browser workflow; see below).
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
@@ -337,7 +339,37 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-None started. `UNIFIED_RESUME_PRESENTATION_MODEL_V1` is closed (independent Cursor re-audit passed, two LOW/non-blocking findings only); not wired into production derivative-building, no renderer built; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+`TEST_ONLY_RESUME_TEXT_RENDERER_V1` is implemented pending independent Cursor re-audit; test-only, not wired into export approval, PDF/DOCX, Google Drive/Docs, or job-specific derivative generation; no résumé module was auto-selected, no real résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Add test-only resume text renderer (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+The repository had a pure runtime unified résumé presentation view but no proof that it could be converted into a linear résumé representation safely, before any PDF/DOCX/layout complexity is introduced. This milestone adds exactly one deterministic TEST-ONLY plain-text renderer proving that conversion.
+
+**Changed**
+
+* Added `src/resume_text_renderer.py`: `render_resume_text(presentation_result)`, consuming the FULL envelope from `build_resume_presentation_view()` (`{"valid","presentation","errors"}`, the safer of the two documented input-contract options — it lets the renderer explicitly detect and fail on an upstream sub-view failure rather than trusting every caller to pre-check `valid`). Returns `{"valid": bool, "text": str | None, "errors": [...]}`. Renders only fields already present in the presentation; never re-filters bullets, never re-resolves titles, never re-queries modules. Fails explicitly (no partial text) on any malformed input shape via cheap, deterministic shape checks only — no duplicated upstream validation.
+* Added `tests/resume_text_renderer_test.py`, including one byte-for-byte golden-style expected-text fixture for the real default Winter Walk-only derivative.
+
+**Section-order decision (documented, no ambiguity found)**
+
+No schema, validator, or `.cursor/rules/*.mdc` file specifies an authoritative résumé section order — confirmed by inspection, consistent with the closed unified-model milestone's own deliberate choice not to assert one. Two pieces of real evidence in `BLUEPRINT.md` make a linear order reasonably derivable rather than invented: §2 introduces Bora's MSBA education before Winter Walk, and describes Winter Walk ("strongest current organizational evidence") before MarketMind ("supporting technical/project evidence"); §46's own illustrative patch-diff example lists SUMMARY first, then per-employer/project categories, then SKILLS last. Combined with `.cursor/rules/resume.mdc`'s existing "conventional headings"/"readable chronology" requirements, the order used is: `CONTACT → SUMMARY → EDUCATION → EXPERIENCE → PROJECTS → SKILLS` (contact unlabeled, matching every heading example given anywhere in this repository's own instructions). Recorded as the smallest reasonable, evidence-grounded choice for a TEST-ONLY renderer, not a locked final visual layout decision — no `ARCHITECTURE_DECISION_REQUIRED` stop was needed.
+
+**Not changed**
+
+* `resume_presentation.py`, `resume_experience_section.py`, `resume_project_bullet.py`, `resume_patch_apply.py`, `resume_validation.py` (no defect found requiring scope expansion), `resume_master.schema.json`, `resume_derivative.schema.json`, `claims/`, `evidence/`, `experiences/`, the protected master content, approved wording, `default_module_order`, job-analysis logic, immigration logic. Not wired into export approval, PDF/DOCX, Google Drive/Docs, job-specific derivative generation, or any browser workflow.
+
+**Tests / Verification**
+
+* Real default Winter Walk-only derivative renders valid text matching a byte-for-byte golden-style fixture exactly; explicit MarketMind selection renders PROJECTS while unselected MarketMind never appears; excluded Winter Walk bullet does not appear; exact WW and MarketMind wording preserved; employment and project bullet order preserved; skills order and contact preserved; empty education and absent summary create no heading; synthetic summary/education render only when present; no PROJECT_BULLET leaks into EXPERIENCE and no BULLET leaks into PROJECTS; no empty section headings; deterministic repeat output; no input mutation; eight distinct malformed-input adversarial cases each fail explicitly with no partial text.
+* 32/32 test suites — PASS (31 baseline + 1 new). Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Status**
+
+`TEST_ONLY_RESUME_TEXT_RENDERER_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not pushed. Test-only: not wired into export approval, PDF/DOCX, Google Drive/Docs, or job-specific derivative generation. No real résumé generated. No job-specific tailoring begun.
 
 ---
 
