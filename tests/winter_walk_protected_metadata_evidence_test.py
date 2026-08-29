@@ -212,7 +212,7 @@ print("PASS J: wording approval record remains valid.")
 
 
 # K. Winter Walk reusable Claims remain unchanged (6 reusable, lineage untouched)
-assert_true(claim_result["records_checked"] == 11, "claim count must be 11 after MarketMind drafting")
+assert_true(claim_result["records_checked"] == 13, "claim count must be 13 after MarketMind and TELUS drafting")
 ww_claim_ids = [f"CLAIM_WW_{i:03d}" for i in range(1, 7)]
 for claim_id in ww_claim_ids:
     claim = claim_result["index"][claim_id]

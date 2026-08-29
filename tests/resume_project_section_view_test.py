@@ -48,7 +48,7 @@ assert_true(ev_result["valid"] is True, "evidence repository invalid")
 assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")
+assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]

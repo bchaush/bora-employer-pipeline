@@ -1,0 +1,63 @@
+{
+  "draft_set_id": "TELUS_RESUME_MODULE_DRAFTS_V1",
+  "experience_id": "EXP_TELUS_001",
+  "status": "DRAFT_PENDING_HUMAN_REVIEW",
+  "human_approval": false,
+  "date": "2026-08-28",
+  "notes": "DRAFT ONLY -- not integrated into resume/master/RESUME_MASTER_WW_V1.json. Two draft bullet modules created from two draft TELUS Claims (CLAIM_TELUS_001, CLAIM_TELUS_002), both currently human_approval=false pending Bora's explicit wording review, following the same drafting-then-approval-then-master-integration sequencing already used for MarketMind (see resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json). No experience_sections entry or immutable_snapshot has been created for EXP_TELUS_001 in this milestone: TELUS's employer-issued formal title ('Digital Trust and Safety Analyst with English (tele-agent)'), department (Operations), and start date (15.11.2024) are VERIFIED, but the end period (Nov 2024 - May 2025) is sourced only to Bora's LinkedIn profile (evidence_state=OBSERVED, TELUS_LINKEDIN_PERIOD_001), not to any employer document -- constructing a master experience_sections date_range mixing a VERIFIED start with an OBSERVED-tier end, and choosing whether to present the employer-issued formal title as-is or introduce a shorter recruiter-facing display title (mirroring Winter Walk's display_title mechanism, given LinkedIn's shorter 'Content Safety Analyst' wording), are both presentation decisions reserved for a future, separately-scoped master-integration milestone requiring Bora's explicit approval -- not decided or invented here. CLAIM_TELUS_001 cites two OBSERVED-tier evidence records (TELUS_REVIEW_001, TELUS_VOLUME_001); the '500+ user cases weekly' figure is preserved exactly as Bora's self-reported LinkedIn statement and must never be presented as employer-verified or converted into a derived monthly/annual/percentage/productivity figure in any future module or master integration. CLAIM_TELUS_002 cites two OBSERVED-tier evidence records (TELUS_PATTERN_001, TELUS_COLLAB_001) and deliberately omits any causal 'improved workflows' outcome claim, consistent with TELUS_COLLAB_001's own limitation against upgrading collaboration into a measured process-improvement achievement.",
+  "modules": [
+    {
+      "module_id": "MOD_TELUS_001_REVIEW",
+      "module_type": "BULLET",
+      "experience_id": "EXP_TELUS_001",
+      "claim_ids": [
+        "CLAIM_TELUS_001"
+      ],
+      "evidence_ids": [
+        "TELUS_REVIEW_001",
+        "TELUS_VOLUME_001"
+      ],
+      "wording": "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across high-volume structured and unstructured data under time-sensitive conditions.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Implementation",
+        "Data Operations",
+        "Technical Operations"
+      ],
+      "capabilities": [
+        "high-volume review",
+        "policy/rule application",
+        "pattern recognition",
+        "SLA/time-sensitive execution"
+      ],
+      "status": "OPTIONAL",
+      "human_approval": false
+    },
+    {
+      "module_id": "MOD_TELUS_002_PATTERN",
+      "module_type": "BULLET",
+      "experience_id": "EXP_TELUS_001",
+      "claim_ids": [
+        "CLAIM_TELUS_002"
+      ],
+      "evidence_ids": [
+        "TELUS_PATTERN_001",
+        "TELUS_COLLAB_001"
+      ],
+      "wording": "Tracked and categorized enforcement decisions to support trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.",
+      "allowed_role_families": [
+        "Business Systems",
+        "Business Process",
+        "Data Operations"
+      ],
+      "capabilities": [
+        "categorization",
+        "consistency",
+        "trend-analysis support",
+        "cross-functional collaboration"
+      ],
+      "status": "OPTIONAL",
+      "human_approval": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "claim_id": "CLAIM_TELUS_002",
+  "wording": "Tracked and categorized enforcement decisions to support trend analysis and consistency, collaborating with policy, operations, and analytics teams to surface recurring risk patterns.",
+  "evidence_ids": [
+    "TELUS_PATTERN_001",
+    "TELUS_COLLAB_001"
+  ],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Business Process",
+    "Data Operations"
+  ],
+  "forbidden_contexts": [
+    "measured process-improvement outcome",
+    "team leadership",
+    "analytics team membership",
+    "BI ownership",
+    "policy authorship"
+  ],
+  "human_approval": false,
+  "date": "2026-08-28",
+  "version": "1"
+}

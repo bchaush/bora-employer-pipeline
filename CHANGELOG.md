@@ -19,6 +19,42 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add TELUS résumé claims and draft modules (`TELUS_RESUME_MODULES_V1`)
+
+**Reason**
+
+Move the truthful structured resume materially closer to recruiter-ready use by creating the smallest useful TELUS claim/module set -- approximately 1-2 strong bullets, evidence deciding the exact number, without bypassing any approval gate.
+
+**Architecture inspection**
+
+Confirmed no schema change or architecture blocker exists for Claim/module creation: the draft-then-approval convention already used for MarketMind (human_approval=false pending Bora review) applies directly, and claim_state_validation.py already permits an OBSERVED claim citing OBSERVED evidence. One real constraint was identified and deliberately deferred rather than invented: TELUS's VERIFIED start date vs. its OBSERVED-tier LinkedIn-sourced end date, and whether to introduce a recruiter-facing display title, are both presentation decisions requiring Bora's explicit approval -- deferred to a future master-integration milestone, not decided here.
+
+**Changed**
+
+* Added `claims/telus/CLAIM_TELUS_001.json` and `CLAIM_TELUS_002.json` (both OBSERVED, both human_approval=false draft). CLAIM_TELUS_001: 500+ weekly case review + policy-violation/pattern identification + time-sensitive high-volume execution. CLAIM_TELUS_002: enforcement categorization/trend-analysis support + cross-functional collaboration, deliberately omitting any "improved workflows" causal claim.
+* Added `resume/drafts/TELUS_RESUME_MODULE_DRAFTS_V1.json`: two draft BULLET modules, DRAFT_PENDING_HUMAN_REVIEW, human_approval=false throughout.
+* Added `tests/telus_resume_modules_v1_test.py` (12 checks).
+* Updated hardcoded total-Claim-count assertions (11->13) across 16 test files and the Golden runner's baseline check -- reusable-count assertions (still 11) untouched; all 15 fixture outcomes unchanged. Two tests' resume/ file-listing assertions updated to include the new draft file.
+
+**Not changed**
+
+* `schemas/`, `src/`, `evidence/`, `experiences/`, `resume/master/` (byte-unchanged -- no master integration), all 11 pre-existing Claims, Winter Walk/MarketMind/Education, `default_module_order`, job-analysis logic, immigration logic. Bulmarma and D Commerce Bank not started.
+
+**Truth / semantic safety**
+
+Formal TELUS title preserved unmutated; "500+ weekly" remains OBSERVED with an adversarial test proving the architecture rejects any attempt to declare it VERIFIED; no SQL, BI ownership, automation, systems implementation, policy creation, QA leadership, U.S.-experience implication, or invented metric anywhere.
+
+**Tests / Verification**
+
+* Valid Evidence lineage; no invented technology; no causal-improvement wording; title unmutated; 11 non-TELUS Claims byte-unchanged; WW/MM/Education unchanged; master module count intact; no TELUS module/experience_sections entry in the master; both drafts correctly fail production module-lineage validation (CLAIM_NOT_REUSABLE) while unapproved; renderer output deterministic and TELUS-free in the default resume.
+* 35/35 test suites -- PASS (34 baseline + 1 new). Golden 15/15 -- PASS. Repository: 4 Experience / 36 Evidence / 13 Claims / 11 reusable / 11 master modules.
+
+**Status**
+
+TELUS_RESUME_MODULES_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. No master integration. No Bulmarma. No D Commerce. No Summary. No PDF/DOCX. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close TELUS employment evidence milestone (`TELUS_EVIDENCE_V1`, CLOSED)
 
 **Reason**

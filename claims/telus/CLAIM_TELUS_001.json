@@ -1,0 +1,28 @@
+{
+  "claim_id": "CLAIM_TELUS_001",
+  "wording": "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across large volumes of structured and unstructured data under time-sensitive conditions.",
+  "evidence_ids": [
+    "TELUS_REVIEW_001",
+    "TELUS_VOLUME_001"
+  ],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Systems",
+    "Implementation",
+    "Data Operations",
+    "Technical Operations"
+  ],
+  "forbidden_contexts": [
+    "employer-verified productivity metric",
+    "quantified accuracy percentage",
+    "U.S. trust-and-safety operations experience",
+    "production QA ownership",
+    "policy authorship"
+  ],
+  "human_approval": false,
+  "date": "2026-08-28",
+  "version": "1"
+}

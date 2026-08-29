@@ -64,7 +64,7 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
         == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
     ):
         fail(f"Evidence regression failed: {ev}")
-    if not (cl.get("valid") is True and cl.get("records_checked") == 11):
+    if not (cl.get("valid") is True and cl.get("records_checked") == 13):
         fail(f"Claim regression failed: {cl}")
     reusable_count = sum(
         1 for claim in cl["index"].values() if claim.get("human_approval") is True
@@ -80,7 +80,7 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
                 fail(f"{claim_id} must be approved/reusable gate")
     print(
         "PASS 0: repository regression "
-        "(4 Experience / 36 Evidence / 11 Claims / 11 reusable)."
+        "(4 Experience / 36 Evidence / 13 Claims / 11 reusable)."
     )
     return ev["index"], cl["index"]
 

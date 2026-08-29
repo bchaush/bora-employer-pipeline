@@ -59,7 +59,7 @@ assert_true(
     ev["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
     "Evidence Experience integrity",
 )
-assert_true(cl["valid"] is True and cl["records_checked"] == 11, "Claim regression")
+assert_true(cl["valid"] is True and cl["records_checked"] == 13, "Claim regression")
 reusable_approved = [
     cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
 ]

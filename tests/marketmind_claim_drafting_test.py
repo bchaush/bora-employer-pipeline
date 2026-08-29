@@ -212,7 +212,7 @@ print("PASS 3: test claim avoids volatile exact-count wording.")
 # ---------------------------------------------------------------------------
 claim_result = validate_claim_repository(ROOT / "claims")
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 11, "expected 11 total claim records")
+assert_true(claim_result["records_checked"] == 13, "expected 13 total claim records")
 reusable = [
     cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True
 ]
@@ -231,7 +231,7 @@ for claim_id in MARKETMIND_CLAIM_IDS:
         f"{claim_id} must be Bora-approved",
     )
 
-print("PASS 4: 11 total claims; 11 reusable (Winter Walk + Bora-approved MarketMind).")
+print("PASS 4: 13 total claims; 11 reusable (Winter Walk + Bora-approved MarketMind).")
 
 
 # ---------------------------------------------------------------------------

@@ -162,7 +162,7 @@ assert_true(ev_result["valid"] is True, "evidence repository invalid")
 assert_true(len(ev_result["index"]) == 36, "Evidence count must remain 36")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 11, "Claim count must remain 11")
+assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
 reusable = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
 assert_true(len(reusable) == 11, f"reusable claim count must remain 11, got {len(reusable)}")
 
@@ -371,7 +371,7 @@ print("PASS: protected master (with MarketMind modules integrated) passes full v
 #     artifacts exist under resume/ beyond the master and drafts).
 resume_files = sorted(p.name for p in (ROOT / "resume").rglob("*.json"))
 assert_true(
-    resume_files == ["MARKETMIND_RESUME_MODULE_DRAFTS_V1.json", "RESUME_MASTER_WW_V1.json"],
+    resume_files == ["MARKETMIND_RESUME_MODULE_DRAFTS_V1.json", "RESUME_MASTER_WW_V1.json", "TELUS_RESUME_MODULE_DRAFTS_V1.json"],
     f"no export/derivative/resume output file may exist under resume/: found {resume_files}",
 )
 print("PASS 13: no resume output generated; only the protected master and the draft/audit record exist.")
