@@ -19,6 +19,43 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close TELUS employment evidence milestone (`TELUS_EVIDENCE_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of implementation commit `13269b7` passed: `CURSOR_TELUS_EVIDENCE_V1_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. No HIGH or MEDIUM findings.
+
+**Changed**
+
+* `CURRENT_STATE.md`: `TELUS_EVIDENCE_V1` marked CLOSED; corrected a documentation count (15 pre-existing test files changed, not 16); added a future résumé-module caution for the OBSERVED-tier "500+ weekly" figure.
+* `CHANGELOG.md`: closure entry recorded; same count correction applied here.
+
+**Not changed**
+
+* `src/`, `schemas/`, `claims/`, `evidence/`, `experiences/`, `resume/master/`, `resume/drafts/`, `tests/`, Golden fixture expectations -- zero diff from implementation commit `13269b7`.
+
+**Confirmed by the independent re-audit**
+
+* TELUS formal title remains exactly "Digital Trust and Safety Analyst with English (tele-agent)"; LinkedIn's shorter display title never overwrites it.
+* Employer-issued facts remain VERIFIED; LinkedIn/self-reported facts remain OBSERVED, never upgraded. "500+ weekly" remains OBSERVED, exact phrasing preserved, no derived figure.
+* No exact end day invented; no U.S. experience/location implication; no salary/benefits/private recruiter details committed. No TELUS Claims, modules, or master integration exist.
+* Winter Walk, MarketMind, Brandeis, immigration logic, and job-analysis semantics unchanged. No PDF/DOCX, Summary, or tailoring exists.
+* 34/34 tests PASS. Golden 15/15 PASS. Repository: 4 Experience / 36 Evidence (7 TELUS) / 11 Claims / 11 reusable / 11 master modules.
+
+**Documentation correction**
+
+Cursor verified the implementation commit's actual diff arithmetic: 27 files changed = 9 new + 18 modified (15 pre-existing test files plus 2 docs and the Golden runner). Corrected here from the originally-stated 16 test files; documentation-accuracy only, no implementation behavior changed.
+
+**INFO finding carried forward (not remediated now)**
+
+"500+ user cases weekly" (TELUS_REVIEW_001) is OBSERVED-tier, LinkedIn-sourced, not employer-verified. Any future TELUS Claim/module using this figure must preserve that evidence state and must not present it as employer-verified. No Claim or module created now.
+
+**Status**
+
+TELUS_EVIDENCE_V1_CLOSED_AND_PUSHED. No TELUS resume modules. No new Claims. No master integration. No Bulmarma. No D Commerce. No Summary. No PDF/DOCX. No tailoring.
+
+---
+
 ## 2026-08-28 — Add verified TELUS employment evidence (`TELUS_EVIDENCE_V1`)
 
 **Reason**
@@ -35,7 +72,7 @@ Ingest the minimum strong, verified TELUS Digital Bulgaria employment evidence n
 * Added `evidence/telus/TELUS_OFFER_001.json` and `TELUS_RECRUITING_001.json` (VERIFIED, employer-issued): formal title "Digital Trust and Safety Analyst with English (tele-agent)", Operations department, TELUS Tower Sofia Bulgaria, start date 15.11.2024, 8h/day. Salary/benefits/probation/notice/leave intentionally excluded.
 * Added `evidence/telus/TELUS_LINKEDIN_PERIOD_001.json`, `TELUS_REVIEW_001.json`, `TELUS_PATTERN_001.json`, `TELUS_COLLAB_001.json`, `TELUS_VOLUME_001.json` (OBSERVED, LinkedIn-sourced, each of Bora's four responsibility bullets a separate record): display title "Content Safety Analyst" distinguished from the formal title; Nov 2024 - May 2025 (7 months, end month LinkedIn-only, exact day UNKNOWN); "500+ weekly" case review preserved exactly, no derived figure; enforcement categorization; cross-functional collaboration with explicit limitation against causal-improvement-ownership upgrade; high-volume/time-sensitive execution, no numeric accuracy score.
 * Added `tests/telus_evidence_v1_test.py` (19 checks including adversarial traps for title substitution, derived-number fabrication, policy-creation upgrade, team-membership upgrade, causal-improvement upgrade).
-* Updated hardcoded repository-count assertions (Experience 3->4, Evidence 29->36) across 16 existing test files and the Golden runner's own baseline check -- count-baseline correction only; all 15 fixture outcomes unchanged.
+* Updated hardcoded repository-count assertions (Experience 3->4, Evidence 29->36) across 15 existing test files and the Golden runner's own baseline check -- count-baseline correction only; all 15 fixture outcomes unchanged. Commit 13269b7 totals exactly: 27 files changed = 9 new (1 Experience, 7 Evidence, 1 test) + 18 modified (2 docs, the Golden runner, and 15 existing test files). *(Corrected at closure: independent Cursor re-audit found this was 15 pre-existing test files, not 16 as originally recorded here -- a documentation-accuracy correction only, no implementation behavior changed.)*
 
 **Not changed**
 
