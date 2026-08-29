@@ -19,6 +19,42 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close Brandeis education evidence milestone (`EDUCATION_EVIDENCE_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of implementation commit `8e13a99` passed: `CURSOR_EDUCATION_EVIDENCE_V1_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. No HIGH or MEDIUM findings.
+
+**Changed**
+
+* `CURRENT_STATE.md`: `EDUCATION_EVIDENCE_V1` marked CLOSED; corrected a documentation count (14 pre-existing test files changed, not 13).
+* `CHANGELOG.md`: closure entry recorded; same count correction applied here.
+
+**Not changed**
+
+* `src/`, `schemas/`, `claims/`, `evidence/`, `experiences/`, `resume/master/`, `resume/drafts/`, `tests/` -- zero diff from implementation commit `8e13a99`.
+
+**Confirmed by the independent re-audit**
+
+* Brandeis education correctly evidence-controlled and flows through the existing, unmodified pipeline; renders as "Business Analytics (M.S.), Brandeis University, Fall 2025 - Summer 2026".
+* GPA 3.635 Evidence-only; STEM/CIP not ingested; degree conferral/graduation unclaimed; no Student ID or private transcript data anywhere in truth or output.
+* Winter Walk and MarketMind truth unchanged. No PDF/DOCX, Summary, TELUS work, or job-specific tailoring exists.
+* 33/33 tests PASS. Golden 15/15 PASS. Repository: 3 Experience / 29 Evidence / 11 Claims / 11 reusable / 11 master modules.
+
+**Documentation correction**
+
+Cursor found the implementation actually changed 14 pre-existing test files plus the Golden runner, not 13 as originally stated. Corrected here; documentation-accuracy only, no implementation behavior changed.
+
+**INFO finding not remediated (per instruction)**
+
+Cursor found a cosmetic stale "6 Claims" print string in `tests/marketmind_evidence_extraction_test.py`'s PASS message, while the actual assertion correctly checks 11 reusable Claims. Not a correctness defect; not remediated in this closure per explicit instruction. Recorded as an open, non-blocking hygiene note.
+
+**Status**
+
+EDUCATION_EVIDENCE_V1_CLOSED_AND_PUSHED. No TELUS. No STEM ingestion. No new Evidence. No Summary. No PDF/DOCX. No tailoring.
+
+---
+
 ## 2026-08-28 — Add verified Brandeis education evidence (`EDUCATION_EVIDENCE_V1`)
 
 **Reason**
@@ -34,7 +70,7 @@ Add the smallest evidence-controlled representation necessary for Brandeis educa
 * Added `experiences/EXP_EDU_BRANDEIS_001.json` and three `evidence/education/` records (identity/enrollment, GPA 3.635/43 units, 11/11 requirements-satisfied status).
 * `resume/master/RESUME_MASTER_WW_V1.json`: version 6->7; one `education[]` entry added (Brandeis University / Business Analytics (M.S.) / "Fall 2025 - Summer 2026" / location null). Contact, all 11 modules, experience_sections, default_module_order, and skills_order byte-unchanged.
 * Added `tests/education_evidence_v1_test.py`.
-* Updated hardcoded Experience/Evidence count assertions (2->3, 26->29) across 13 existing test files and the Golden runner's own baseline check -- a count-baseline correction only; all 15 individual Golden fixture routing outcomes unchanged.
+* Updated hardcoded Experience/Evidence count assertions (2->3, 26->29) across 14 existing test files and the Golden runner's own baseline check -- a count-baseline correction only; all 15 individual Golden fixture routing outcomes unchanged. *(Corrected at closure: independent Cursor re-audit found this was 14 pre-existing test files, not 13 as originally recorded here -- a documentation-accuracy correction only, no implementation behavior changed.)*
 * Updated two existing presentation/renderer tests whose "empty education" assertions described the prior real-data state; moved that coverage to an explicit empty-education derivative and added assertions for the new true default (education present). No invariant weakened.
 
 **Not changed**
