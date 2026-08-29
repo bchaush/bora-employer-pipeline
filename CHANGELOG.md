@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close test-only resume text renderer (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of implementation commit `a527522` passed: `CURSOR_TEST_ONLY_RESUME_TEXT_RENDERER_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. No HIGH or MEDIUM findings.
+
+**Changed**
+
+* `CURRENT_STATE.md`: `TEST_ONLY_RESUME_TEXT_RENDERER_V1` marked CLOSED.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `tests/`, `resume/master/`, `resume/drafts/`, approved wording, `default_module_order`, derivative selection semantics, unified presentation semantics, job-analysis logic, immigration logic.
+
+**Confirmed by the independent re-audit**
+
+* `render_resume_text()` faithfully renders the already-valid unified presentation envelope; preserves exact approved wording; performs only cheap deterministic shape validation; does not recreate upstream semantic logic.
+* Renderer is pure, deterministic, fail-closed, and non-mutating; remains strictly TEST-ONLY -- not wired into export approval, PDF/DOCX, Google Drive/Docs, application generation, job-specific derivative generation, or any browser workflow.
+* 32/32 tests PASS. Golden 15/15 PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged. Source-truth/protected paths remained unchanged.
+
+**Reviewer INFO observation (non-blocking, not remediated here)**
+
+* F-01: A manually crafted `valid=true` envelope with `formal_title=PENDING_BORA_REVIEW` could render the unresolved-title sentinel string. Not reachable through `build_resume_presentation_view()` on current repository data.
+
+**Status**
+
+TEST_ONLY_RESUME_TEXT_RENDERER_V1_CLOSED_AND_PUSHED. No PDF/DOCX export wired. No real resume generated. No job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Add test-only resume text renderer (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`)
 
 **Reason**

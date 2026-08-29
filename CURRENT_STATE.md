@@ -52,7 +52,7 @@ Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V
 
 Unified Résumé Presentation Model v1 (`UNIFIED_RESUME_PRESENTATION_MODEL_V1`) = **CLOSED** (`build_resume_presentation_view()` in `src/resume_presentation.py`: a pure runtime assembler composing the closed employment- and project-section transforms — plus verbatim contact/education/skills/summary reconciliation — into one renderer-ready presentation view over an already-built derivative; no new schema, no persistent presentation snapshot, no duplication of either closed transform's filtering/ordering/identity logic; explicitly fail-closed (any sub-view failure yields `valid=false`/`presentation=None`); documented, non-ambiguous selected-module-order precedence (`module_order` first, then remaining `included_module_ids` in inclusion order); education/summary keys present only when verified content exists, omitted otherwise, never fabricated; no top-level section order asserted (flat named-key object, not an opinionated ordered list); not wired into `build_resume_derivative()`, any schema, or a renderer — transform-only; independent Cursor final re-audit passed (`CURSOR_UNIFIED_RESUME_PRESENTATION_MODEL_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`; two LOW/non-blocking hardening observations only, not remediated in this closure); see below).
 
-Test-Only Résumé Text Renderer v1 (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`render_resume_text()` in new file `src/resume_text_renderer.py`: a pure, deterministic TEST-ONLY plain-text renderer over the full `build_resume_presentation_view()` envelope; renders only fields already present in a valid presentation, never invents/infers/re-filters/re-resolves anything; section order `CONTACT → SUMMARY → EDUCATION → EXPERIENCE → PROJECTS → SKILLS`, evidence-grounded in `BLUEPRINT.md` §2/§46 (documented in the module docstring, not an invented layout); absent sections omitted entirely, never emitted as empty headings or placeholders; explicitly fail-closed (`valid=false`/`text=None`) on any malformed input shape; TEST-ONLY — not wired into export approval, PDF/DOCX, Google Drive/Docs, job-specific derivative generation, or any browser workflow; see below).
+Test-Only Résumé Text Renderer v1 (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`) = **CLOSED** (`render_resume_text()` in `src/resume_text_renderer.py`: a pure, deterministic TEST-ONLY plain-text renderer over the full `build_resume_presentation_view()` envelope; renders only fields already present in a valid presentation, never invents/infers/re-filters/re-resolves anything; section order `CONTACT → SUMMARY → EDUCATION → EXPERIENCE → PROJECTS → SKILLS`, evidence-grounded in `BLUEPRINT.md` §2/§46 (documented in the module docstring, not an invented layout); absent sections omitted entirely, never emitted as empty headings or placeholders; explicitly fail-closed (`valid=false`/`text=None`) on any malformed input shape; TEST-ONLY — not wired into export approval, PDF/DOCX, Google Drive/Docs, job-specific derivative generation, or any browser workflow; independent Cursor adversarial re-audit of implementation commit `a527522` passed — `CURSOR_TEST_ONLY_RESUME_TEXT_RENDERER_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`; see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -339,7 +339,39 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-`TEST_ONLY_RESUME_TEXT_RENDERER_V1` is implemented pending independent Cursor re-audit; test-only, not wired into export approval, PDF/DOCX, Google Drive/Docs, or job-specific derivative generation; no résumé module was auto-selected, no real résumé generated, no job-specific tailoring begun.
+None assigned — await explicit Bora approval for the next bounded milestone. `TEST_ONLY_RESUME_TEXT_RENDERER_V1` is closed and pushed. No PDF/DOCX export, real résumé generation, or job-specific tailoring without separate approval.
+
+---
+
+## 2026-08-28 — Close test-only résumé text renderer (`TEST_ONLY_RESUME_TEXT_RENDERER_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor adversarial re-audit of implementation commit `a527522` passed: `CURSOR_TEST_ONLY_RESUME_TEXT_RENDERER_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`. No HIGH or MEDIUM findings.
+
+**Confirmed by the independent re-audit**
+
+* `render_resume_text()` faithfully renders the already-valid unified presentation envelope; preserves exact approved wording; performs only cheap deterministic shape validation; does not recreate upstream semantic logic.
+* Renderer is pure, deterministic, fail-closed (`valid=false`/`text=None` on malformed input), and non-mutating; remains strictly TEST-ONLY — not wired into export approval, PDF/DOCX, Google Drive/Docs, application generation, job-specific derivative generation, or any browser workflow.
+* Real default Winter Walk-only derivative and explicit MarketMind selection both render correctly; exact WW and MarketMind bullet wording preserved byte-for-byte; no cross-section leakage; no empty section headings.
+* 32/32 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged. Source-truth/protected paths remained unchanged.
+
+**Reviewer INFO observation (non-blocking, not remediated here)**
+
+* F-01: A manually crafted `valid=true` envelope with `formal_title=PENDING_BORA_REVIEW` could render the unresolved-title sentinel string. Not reachable through `build_resume_presentation_view()` on current repository data; noted as optional future hardening only.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: `TEST_ONLY_RESUME_TEXT_RENDERER_V1` marked `CLOSED`; phase summary and "Next Approved Task" updated.
+* `CHANGELOG.md`: closure entry recorded.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `tests/`, `resume/master/`, `resume/drafts/`, approved MarketMind/Winter Walk wording, `default_module_order`, derivative selection semantics, unified presentation semantics, job-analysis logic, immigration logic.
+
+**Status**
+
+`TEST_ONLY_RESUME_TEXT_RENDERER_V1_CLOSED_AND_PUSHED`. No PDF/DOCX export wired. No real résumé generated. No job-specific tailoring begun.
 
 ---
 
