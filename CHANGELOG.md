@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Fail closed on invalid project view (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`)
+
+**Reason**
+
+Independent Cursor re-audit of commit `2096494` found a MEDIUM fail-closed concern (F-1): when one project group resolved and another in the same call failed, `build_project_section_view()` returned the successful group alongside `valid=false`, creating a future misuse path for a caller that skips checking `valid`.
+
+**Changed**
+
+* `src/resume_project_bullet.py`: `build_project_section_view()` now always returns `groups: []` when `valid` is `False`, regardless of how many groups individually resolved; `errors` remains fully populated. `valid=true` now means all requested project groups resolved; `valid=false` means zero renderable groups, never a partial result.
+* `tests/resume_project_section_view_test.py`: added a mixed valid+invalid group adversarial test and an optional empty-`experience_name` case; all prior tests re-run unchanged.
+
+**Not changed**
+
+* Output schema, grouping, ordering, the PERSONAL_PROJECT guard, and display-name resolution are untouched -- only the fail/success envelope semantics changed. No schema, master, Claims, Evidence, Experiences, approved wording, or default_module_order touched.
+
+**Tests / Verification**
+
+* Directly reproduced the exact before/after behavior: a mix of one valid and one invalid group now yields valid=False, groups=[], with the unresolved-identity error still present.
+* 29/29 tests -- PASS. Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Status**
+
+PROJECT_SECTION_RENDERING_ALGORITHM_V1_REMEDIATED_PENDING_FINAL_REAUDIT. Not pushed. No renderer built, no resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Add project section view builder (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`)
 
 **Reason**

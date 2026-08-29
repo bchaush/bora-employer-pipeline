@@ -291,4 +291,62 @@ assert_true(len(post_selection_view["groups"]) == 1, "expected one project group
 print("PASS 12: explicit MarketMind selection still works before applying the view transform.")
 
 
+# 13. Fail-closed remediation: a mix of one valid PERSONAL_PROJECT group and
+#     one invalid/unresolved group must yield valid=False and groups=[] --
+#     never a partial result containing only the successfully-resolved group.
+valid_synthetic_group = {
+    "module_id": "MOD_SYN_VALID_MIX",
+    "module_type": "PROJECT_BULLET",
+    "wording": "Synthetic bullet for test coverage only.",
+    "experience_id": "EXP_MM_001",
+}
+invalid_synthetic_group = {
+    "module_id": "MOD_SYN_INVALID_MIX",
+    "module_type": "PROJECT_BULLET",
+    "wording": "Synthetic bullet for test coverage only.",
+    "experience_id": "EXP_DOES_NOT_EXIST",
+}
+mixed_result = build_project_section_view(
+    [MM_BY_ID["MOD_MM_001_SCOPE"], valid_synthetic_group, invalid_synthetic_group],
+    experience_index=EXPERIENCE_INDEX,
+)
+assert_false(mixed_result["valid"], "a mix of valid and invalid groups must be reported invalid overall")
+assert_true(
+    mixed_result["groups"] == [],
+    "an invalid overall view must never return a partial/successful group",
+)
+assert_true(
+    any(
+        e.get("code") == "PROJECT_DISPLAY_NAME_UNRESOLVED"
+        and e.get("experience_id") == "EXP_DOES_NOT_EXIST"
+        for e in mixed_result["errors"]
+    ),
+    "the specific unresolved-identity error must still be present in errors",
+)
+print("PASS 13: mixed valid+invalid groups fail closed (valid=False, groups=[], errors preserved).")
+
+
+# 14. Optional: explicit empty experience_name coverage.
+synthetic_experience_index = dict(EXPERIENCE_INDEX)
+synthetic_experience_index["EXP_SYN_EMPTY_NAME"] = {
+    "experience_id": "EXP_SYN_EMPTY_NAME",
+    "experience_name": "",
+    "experience_type": "PERSONAL_PROJECT",
+}
+empty_name_module = {
+    "module_id": "MOD_SYN_EMPTY_NAME",
+    "module_type": "PROJECT_BULLET",
+    "wording": "Synthetic bullet for test coverage only.",
+    "experience_id": "EXP_SYN_EMPTY_NAME",
+}
+empty_name_result = build_project_section_view([empty_name_module], experience_index=synthetic_experience_index)
+assert_false(empty_name_result["valid"], "an empty experience_name must not resolve")
+assert_true(empty_name_result["groups"] == [], "an empty experience_name must yield no groups")
+assert_true(
+    any(e.get("code") == "PROJECT_DISPLAY_NAME_UNRESOLVED" for e in empty_name_result["errors"]),
+    "empty experience_name must report PROJECT_DISPLAY_NAME_UNRESOLVED",
+)
+print("PASS 14: empty experience_name is treated as unresolved, not a blank display name.")
+
+
 print("PASS: project section view builder tests completed successfully.")

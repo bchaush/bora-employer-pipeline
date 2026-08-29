@@ -44,7 +44,7 @@ MarketMind Résumé Module Approval and Master Integration v1 (`MARKETMIND_RESUM
 
 Project Bullet Rendering Contract v1 (`PROJECT_BULLET_RENDERING_CONTRACT_V1`) = **CLOSED** (independent Cursor re-audit passed: `CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`; deterministic structural contract added: `PROJECT_BULLET` modules must not carry `immutable_snapshot` or appear in `experience_sections`; a verified-only project-display-name resolver added; no factual project-header data invented; see below).
 
-Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`build_project_section_view()` added: a pure, derived presentation transform grouping already-selected `PROJECT_BULLET` modules by `experience_id`, resolving display identity from `Experience.experience_name` only, preserving selected-order and exact approved wording; no new persistent schema/storage; unresolved identity fails explicitly rather than guessing; see below).
+Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`) = **REMEDIATED — PENDING FINAL REAUDIT** (`build_project_section_view()`: a pure, derived presentation transform grouping already-selected `PROJECT_BULLET` modules by `experience_id`, resolving display identity from `Experience.experience_name` only, preserving selected-order and exact approved wording; no new persistent schema/storage; explicitly fail-closed — any unresolved project identity yields `valid=false`/`groups=[]` with no partial renderable groups; see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -331,7 +331,33 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-None started. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` is implemented pending independent re-audit; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` is remediated (fail-closed on partial/invalid project views) pending final independent re-audit; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Fail closed on invalid project view (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`, REMEDIATED — PENDING FINAL REAUDIT)
+
+**Reason**
+
+Independent Cursor re-audit of commit `2096494` returned `CURSOR_PROJECT_SECTION_RENDERING_ALGORITHM_REAUDIT_PASS`/`SAFE_TO_CLOSE_AND_PUSH`, but identified one MEDIUM fail-closed concern (finding F-1): when multiple `PROJECT_BULLET` groups were supplied and one resolved successfully while another failed identity resolution, `build_project_section_view()` returned `valid=false` together with the *successfully-resolved* group still present in `groups`. No production renderer exists yet, so this was not a live consumer defect, but it created a future misuse path if a caller ever forgot to check `valid` before reading `groups`.
+
+**Changed**
+
+* `src/resume_project_bullet.py`: `build_project_section_view()` now returns `groups: []` whenever `valid` is `False`, regardless of how many groups individually resolved. `errors` remains fully populated in every case. New semantic contract: `valid=true` means *all* requested project groups resolved; `valid=false` means *zero* renderable groups, never a partial result. Docstring updated to state this explicitly.
+* `tests/resume_project_section_view_test.py`: added a targeted adversarial test (one valid `PERSONAL_PROJECT` group + one unresolved group in the same call) asserting `valid=False`, `groups=[]`, and that the specific `PROJECT_DISPLAY_NAME_UNRESOLVED` error is still present; added an optional empty-`experience_name` coverage case (also correctly unresolved, not a blank display name). All prior tests (grouping, ordering, exact wording, field-minimization, no-mutation, Winter-Walk-empty-view, default derivative/explicit-selection behavior) re-run unchanged and still pass.
+
+**Not changed**
+
+* Output schema, grouping logic, ordering logic, the `PERSONAL_PROJECT` guard, and display-name resolution are all untouched — only the fail/success envelope semantics changed. No schema, master, Claims, Evidence, Experiences, approved wording, or `default_module_order` touched.
+
+**Tests / Verification**
+
+* Directly reproduced the exact before/after behavior: a mix of one valid and one invalid group now yields `valid=False`, `groups=[]`, with the unresolved-identity error still present — confirmed no partial/successful group is ever returned when the overall view is invalid.
+* 29/29 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Status**
+
+`PROJECT_SECTION_RENDERING_ALGORITHM_V1_REMEDIATED_PENDING_FINAL_REAUDIT`. Not pushed. No renderer built. No résumé generated. No job-specific tailoring begun.
 
 ---
 

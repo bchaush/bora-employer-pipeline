@@ -158,18 +158,26 @@ def build_project_section_view(
 
     Any unresolved group (missing/unknown experience_id, missing/empty
     experience_name, or a non-PERSONAL_PROJECT Experience type) produces
-    a deterministic `PROJECT_DISPLAY_NAME_UNRESOLVED` error and the
-    function returns `valid: False` — it never guesses, never falls back
-    to "Personal Project"/"Untitled Project"/module wording, and never
-    silently drops the group.
+    a deterministic `PROJECT_DISPLAY_NAME_UNRESOLVED` error — it never
+    guesses, never falls back to "Personal Project"/"Untitled
+    Project"/module wording, and never silently drops the group.
 
-    Returns `{"valid": bool, "groups": [...], "errors": [...]}`. Each
-    group is `{"experience_id": str, "display_name": str, "bullets": [
-    {"module_id": str, "wording": str}, ...]}` — no date, location,
-    formal_title, employer/organization/client/sponsor, url,
-    technology_line, or subtitle field is ever included, even if the
-    source module happens to carry one; only `module_id` and `wording`
-    are copied out of each module.
+    Fail-closed contract: if ANY group fails to resolve, the whole view
+    is invalid. `valid: False` always means `groups: []` — there is no
+    partial result. A caller (or future renderer) that forgets to check
+    `valid` and reads `groups` directly still gets nothing renderable
+    rather than an incomplete project section. `errors` is always fully
+    populated with every discovered problem regardless of `valid`, so
+    callers that DO check `valid` can still see exactly what failed.
+
+    Returns `{"valid": bool, "groups": [...], "errors": [...]}`. When
+    `valid` is `True`, each group is `{"experience_id": str,
+    "display_name": str, "bullets": [{"module_id": str, "wording": str},
+    ...]}` — no date, location, formal_title,
+    employer/organization/client/sponsor, url, technology_line, or
+    subtitle field is ever included, even if the source module happens
+    to carry one; only `module_id` and `wording` are copied out of each
+    module. When `valid` is `False`, `groups` is always `[]`.
     """
     errors: list[dict[str, Any]] = []
     order: list[str] = []
@@ -222,4 +230,5 @@ def build_project_section_view(
             }
         )
 
-    return {"valid": len(errors) == 0, "groups": groups, "errors": errors}
+    valid = len(errors) == 0
+    return {"valid": valid, "groups": groups if valid else [], "errors": errors}
