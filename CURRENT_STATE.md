@@ -46,6 +46,10 @@ Project Bullet Rendering Contract v1 (`PROJECT_BULLET_RENDERING_CONTRACT_V1`) = 
 
 Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`) = **CLOSED** (`build_project_section_view()`: a pure, derived presentation transform grouping already-selected `PROJECT_BULLET` modules by `experience_id`, resolving display identity from `Experience.experience_name` only (restricted to `PERSONAL_PROJECT`-typed Experiences), preserving selected-order and exact approved wording; no new persistent schema/storage; explicitly fail-closed — any unresolved project identity yields `valid=false`/`groups=[]` with no partial renderable groups; not a renderer; independent Cursor final re-audit passed (`CURSOR_PROJECT_SECTION_RENDERING_ALGORITHM_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); see below).
 
+Résumé Presentation Pipeline Gap Analysis v1 (`RESUME_PRESENTATION_PIPELINE_GAP_ANALYSIS_V1`) = **COMPLETE** (read-only architecture/inventory review; identified the smallest next gap — `experience_sections[].bullet_module_ids` is never reconciled against a derivative's `included_module_ids` — and recommended `EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` as the next bounded milestone; no files changed).
+
+Employment Section Presentation View v1 (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`build_employment_section_view()` in new file `src/resume_experience_section.py`: a pure, derived presentation transform reconciling `experience_sections[].bullet_module_ids` against `included_module_ids`, including only currently-selected `BULLET` modules, in the section's own bullet order; reuses the existing, unmodified title-resolution architecture (`is_source_formal_title_unresolved()`/`has_approved_display_title()`) and the existing `UNRESOLVED_PROTECTED_METADATA` error taxonomy; explicitly fail-closed, mirroring the closed project-section-view contract; not wired into `build_resume_derivative()`, the derivative schema, or any renderer — transform-only, proven independently; see below).
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
@@ -331,7 +335,37 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-None started. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` is closed (fail-closed on partial/invalid project views; independent Cursor final re-audit passed); no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1` is implemented pending independent Cursor re-audit; not wired into production derivative-building; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Add employment section view builder (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+The read-only `RESUME_PRESENTATION_PIPELINE_GAP_ANALYSIS_V1` milestone identified one concrete correctness gap: `experience_sections[].bullet_module_ids` is never reconciled against a derivative's `included_module_ids` — `INCLUDE_MODULE`/`EXCLUDE_MODULE` patch operations only change `included_module_ids`, never `bullet_module_ids` (`resume_patch_apply.py`). A future naive renderer reading `bullet_module_ids` directly could present a `BULLET` module the derivative intentionally excluded. This milestone adds exactly one pure transform closing that gap, before any unified presentation model or renderer is built.
+
+**Changed**
+
+* Added `src/resume_experience_section.py`: `build_employment_section_view(experience_sections, modules, *, included_module_ids)`. Filters to `module_type == "BULLET"` modules that are both listed in a section's own `bullet_module_ids` and present in `included_module_ids`; preserves that section's `bullet_module_ids` order exactly (the field `REORDER_BULLETS` exists to adjust, and the field explicitly excluded from the protected/immutable field list — confirmed the architecture's intended adjustable intra-section ordering mechanism); does not consult top-level `module_order`/`default_module_order`, which governs a different concern. Section identity (`organization`, `date_range`, title) reuses the existing, unmodified title architecture (`is_source_formal_title_unresolved()`/`has_approved_display_title()` from `resume_title_metadata.py`) and the existing `UNRESOLVED_PROTECTED_METADATA` error code from `resume_protected_metadata.py`. A `bullet_module_ids` entry referencing a `module_id` absent from `modules` produces a new `EMPLOYMENT_BULLET_MODULE_NOT_FOUND` error. Fail-closed: any section identity/reference error invalidates the whole result (`valid=False`, `sections=[]`), mirroring the closed `build_project_section_view()` contract.
+* Added `tests/resume_employment_section_view_test.py`.
+
+**Not changed**
+
+* `resume_patch_apply.py`, `resume_validation.py`, `resume_project_bullet.py` (no defect found requiring scope expansion), `resume_master.schema.json`, `resume_derivative.schema.json`, `claims/`, `evidence/`, `experiences/`, the protected master content, approved MarketMind/Winter Walk wording, `default_module_order`, derivative selection semantics, job-analysis logic, immigration logic. The new transform is **not wired** into `build_resume_derivative()`, any schema, or any renderer/exporter — transform-only, proven independently first, per the milestone's explicit scope.
+
+**Ordering-precedence decision (documented, no ambiguity found)**
+
+Within one employment section, bullet order is governed solely by that section's own `bullet_module_ids` (filtered to selected `BULLET` modules); top-level `module_order` is a different concern (overall cross-module sequencing) and is not consulted, exactly as the closed project-section view also does not consult it. Section-level order (if more than one section exists) is simply input list order, which no patch operation currently reorders. No `ARCHITECTURE_DECISION_REQUIRED` stop was needed.
+
+**Tests / Verification**
+
+* New adversarial coverage: all-selected path; one excluded bullet correctly absent; a bullet listed in `bullet_module_ids` but not selected never renders; a selected `PROJECT_BULLET` referenced from `bullet_module_ids` is excluded, never rendered; a selected non-`BULLET` type (`SKILLS_BLOCK`) is excluded; custom bullet order preserved exactly; duplicate `module_id` in `bullet_module_ids` preserved (not deduplicated, matching existing unenforced-elsewhere behavior); exact wording preserved byte-for-byte; no input mutation; unresolved organization/title fails explicitly; a dangling bullet reference fails explicitly (`EMPLOYMENT_BULLET_MODULE_NOT_FOUND`); mixed valid+invalid sections fail closed with zero partial sections; MarketMind `PROJECT_BULLET` modules never leak in even when every master module is selected simultaneously; composes correctly against a real, unmodified `build_resume_derivative()` output.
+* 30/30 test suites — PASS (29 baseline + 1 new). Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Status**
+
+`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not pushed. Not wired into production. No renderer built. No résumé generated. No job-specific tailoring begun.
 
 ---
 

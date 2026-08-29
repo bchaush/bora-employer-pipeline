@@ -19,6 +19,36 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add employment section view builder (`EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1`)
+
+**Reason**
+
+The read-only RESUME_PRESENTATION_PIPELINE_GAP_ANALYSIS_V1 milestone found one concrete correctness gap: `experience_sections[].bullet_module_ids` is never reconciled against a derivative's `included_module_ids`. INCLUDE_MODULE/EXCLUDE_MODULE patch operations only change `included_module_ids`, never `bullet_module_ids`. A naive future renderer could therefore present a BULLET module the derivative excluded.
+
+**Changed**
+
+* Added `src/resume_experience_section.py`: `build_employment_section_view(experience_sections, modules, *, included_module_ids)`. Includes only `module_type == "BULLET"` modules that are both listed in a section's `bullet_module_ids` and present in `included_module_ids`; preserves that section's `bullet_module_ids` order exactly; does not consult top-level `module_order` (a separate concern). Reuses the existing title architecture (`is_source_formal_title_unresolved`/`has_approved_display_title`) and the existing `UNRESOLVED_PROTECTED_METADATA` error code unchanged; adds one new code `EMPLOYMENT_BULLET_MODULE_NOT_FOUND` for a dangling bullet reference. Fail-closed: any section error invalidates the whole result (valid=False, sections=[]), mirroring the closed project-section-view contract.
+* Added `tests/resume_employment_section_view_test.py`.
+
+**Not changed**
+
+* `resume_patch_apply.py`, `resume_validation.py`, `resume_project_bullet.py`, `resume_master.schema.json`, `resume_derivative.schema.json`, `claims/`, `evidence/`, `experiences/`, protected master content, approved wording, `default_module_order`, derivative selection semantics, job-analysis logic, immigration logic. Not wired into `build_resume_derivative()`, any schema, or any renderer -- transform-only, proven independently first.
+
+**Ordering decision**
+
+Bullet order within a section is governed solely by that section's own `bullet_module_ids` (filtered to selection); top-level `module_order` is not consulted, matching how the closed project-section view also ignores it. No architecture ambiguity found; no ARCHITECTURE_DECISION_REQUIRED stop needed.
+
+**Tests / Verification**
+
+* All-selected path; exclusion removes a bullet; a listed-but-unselected bullet never renders; a selected PROJECT_BULLET referenced from bullet_module_ids is excluded; a selected non-BULLET type is excluded; custom order preserved; duplicate module_id preserved (not deduplicated); exact wording byte-for-byte; no input mutation; unresolved organization/title fails explicitly; dangling bullet reference fails explicitly; mixed valid+invalid sections fail closed with zero partial sections; MarketMind never leaks in; composes correctly against a real build_resume_derivative() output.
+* 30/30 test suites -- PASS (29 baseline + 1 new). Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Status**
+
+EMPLOYMENT_SECTION_PRESENTATION_VIEW_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. Not wired into production. No renderer built, no resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close project section rendering algorithm (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`, CLOSED)
 
 **Reason**
