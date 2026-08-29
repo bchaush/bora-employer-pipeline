@@ -19,6 +19,40 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Close project section rendering algorithm (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor final re-audit of the implementation (`2096494`) plus fail-closed remediation (`647a4de`) returned `CURSOR_PROJECT_SECTION_RENDERING_ALGORITHM_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`, no remaining findings.
+
+**Changed**
+
+* `CURRENT_STATE.md`: `PROJECT_SECTION_RENDERING_ALGORITHM_V1` marked CLOSED.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, approved MarketMind wording, Winter Walk, `default_module_order`, derivative selection logic, job-analysis logic, immigration logic.
+
+**Confirmed by the independent re-audit**
+
+* `build_project_section_view()` is pure; only PROJECT_BULLET enters the view; grouping is strictly by `experience_id`; group order deterministic by first occurrence; bullet order preserved exactly.
+* Display name resolves from `Experience.experience_name` only; PERSONAL_PROJECT guard valid for current architecture.
+* Missing/unknown/wrong-type/empty project identity fails explicitly rather than guessing.
+* Fail-closed remediation confirmed: any error -> valid=false, groups=[], deterministic errors preserved; no partial successful groups survive invalid output.
+* Exact MarketMind wording byte-identical; Winter Walk, protected master, Claims, Evidence, Experiences, schemas, default_module_order, derivative selection all unchanged.
+* No renderer/exporter exists; no resume generated.
+* 29/29 tests -- PASS. Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Not claimed**
+
+This is a presentation-shaping transform only, not final resume rendering. No renderer/exporter was built. No resume was generated. No job-specific tailoring was started.
+
+**Status**
+
+PROJECT_SECTION_RENDERING_ALGORITHM_V1_CLOSED_AND_PUSHED. No resume generated. No job-specific tailoring begun. No new Experience started.
+
+---
+
 ## 2026-08-28 — Fail closed on invalid project view (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`)
 
 **Reason**

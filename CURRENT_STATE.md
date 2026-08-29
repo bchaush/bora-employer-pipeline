@@ -44,7 +44,7 @@ MarketMind Résumé Module Approval and Master Integration v1 (`MARKETMIND_RESUM
 
 Project Bullet Rendering Contract v1 (`PROJECT_BULLET_RENDERING_CONTRACT_V1`) = **CLOSED** (independent Cursor re-audit passed: `CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`; deterministic structural contract added: `PROJECT_BULLET` modules must not carry `immutable_snapshot` or appear in `experience_sections`; a verified-only project-display-name resolver added; no factual project-header data invented; see below).
 
-Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`) = **REMEDIATED — PENDING FINAL REAUDIT** (`build_project_section_view()`: a pure, derived presentation transform grouping already-selected `PROJECT_BULLET` modules by `experience_id`, resolving display identity from `Experience.experience_name` only, preserving selected-order and exact approved wording; no new persistent schema/storage; explicitly fail-closed — any unresolved project identity yields `valid=false`/`groups=[]` with no partial renderable groups; see below).
+Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`) = **CLOSED** (`build_project_section_view()`: a pure, derived presentation transform grouping already-selected `PROJECT_BULLET` modules by `experience_id`, resolving display identity from `Experience.experience_name` only (restricted to `PERSONAL_PROJECT`-typed Experiences), preserving selected-order and exact approved wording; no new persistent schema/storage; explicitly fail-closed — any unresolved project identity yields `valid=false`/`groups=[]` with no partial renderable groups; not a renderer; independent Cursor final re-audit passed (`CURSOR_PROJECT_SECTION_RENDERING_ALGORITHM_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); see below).
 
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
@@ -331,7 +331,42 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-None started. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` is remediated (fail-closed on partial/invalid project views) pending final independent re-audit; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` is closed (fail-closed on partial/invalid project views; independent Cursor final re-audit passed); no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Close project section rendering algorithm (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor final re-audit of the implementation (`2096494`) plus fail-closed remediation (`647a4de`) returned `CURSOR_PROJECT_SECTION_RENDERING_ALGORITHM_FINAL_REAUDIT_PASS`, push recommendation `SAFE_TO_CLOSE_AND_PUSH`, no remaining findings.
+
+**Confirmed by the independent re-audit**
+
+* `build_project_section_view()` is pure; only `PROJECT_BULLET` modules enter the view; grouping is strictly by `experience_id`; project-group order is deterministic by first occurrence; bullet order is preserved exactly.
+* Display name resolves from `Experience.experience_name` only; the `PERSONAL_PROJECT` guard is valid for the current architecture.
+* Missing, unknown, wrong-type, or empty project identity fails explicitly with `PROJECT_DISPLAY_NAME_UNRESOLVED`, never a guess.
+* Fail-closed remediation confirmed: any error yields `valid=false`, `groups=[]`, with deterministic errors preserved; no partial successful groups ever survive an invalid result.
+* Exact MarketMind wording remains byte-identical; Winter Walk, the protected master, Claims, Evidence, Experiences, schemas, `default_module_order`, and derivative selection all remain unchanged.
+* No renderer/exporter exists yet; no résumé was generated.
+* 29/29 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: `PROJECT_SECTION_RENDERING_ALGORITHM_V1` marked `CLOSED`; phase summary and "Next Approved Task" updated.
+* `CHANGELOG.md`: closure entry recorded.
+
+**Not changed**
+
+* `claims/`, `evidence/`, `experiences/`, `schemas/`, `src/`, `resume/master/`, `resume/drafts/`, all test files, approved MarketMind wording, Winter Walk, `default_module_order`, derivative selection logic, job-analysis logic, immigration logic.
+
+**Not claimed**
+
+This is a presentation-shaping transform only, not final résumé rendering. No renderer/exporter was built. No résumé was generated. No job-specific tailoring was started.
+
+**Status**
+
+`PROJECT_SECTION_RENDERING_ALGORITHM_V1_CLOSED_AND_PUSHED`. No résumé generated. No job-specific tailoring begun. No new Experience started.
 
 ---
 
