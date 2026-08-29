@@ -26,6 +26,7 @@ from typing import Any, Mapping, Sequence
 
 
 PROJECT_MODULE_TYPE = "PROJECT_BULLET"
+PROJECT_EXPERIENCE_TYPE = "PERSONAL_PROJECT"
 
 
 def _error(code: str, **fields: Any) -> dict[str, Any]:
@@ -115,3 +116,110 @@ def resolve_project_display_name(
         return None
     name = record.get("experience_name")
     return name if isinstance(name, str) and name else None
+
+
+def build_project_section_view(
+    modules: Sequence[Mapping[str, Any]],
+    *,
+    experience_index: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Build a pure, derived project-section presentation view.
+
+    Not a renderer and not a schema: this stores no new truth. It only
+    reshapes already-selected modules (e.g. a derivative's included
+    modules) into project groups for a future renderer to consume.
+
+    Input: `modules` is a sequence of already-selected module objects
+    (any module_type; non-PROJECT_BULLET entries are ignored). Duplicate
+    module_ids are not deduplicated here — master-level uniqueness
+    (`validate_master_module_ids_unique`) and `INCLUDE_MODULE`'s own
+    not-already-included check already prevent duplicates from reaching
+    this function in practice; if a caller passes one anyway, it is
+    preserved in place (not silently dropped), matching the existing
+    fail-closed-elsewhere-not-here division of responsibility.
+
+    Grouping: strictly by each module's own `experience_id`. Groups are
+    emitted in first-occurrence order; within a group, bullets preserve
+    the exact order they appeared in the input `modules` sequence
+    (never alphabetized or reordered by module ID, Evidence, Claim, or
+    Experience metadata).
+
+    Display identity: resolved only via `resolve_project_display_name()`,
+    which reads only `Experience.experience_name`. Additionally, the
+    resolved Experience record's own `experience_type` must equal
+    `PERSONAL_PROJECT` — a PROJECT_BULLET module whose `experience_id`
+    resolves to a non-project Experience (e.g. an ORGANIZATIONAL_ENGAGEMENT
+    like Winter Walk) is treated as unresolved, not silently grouped
+    under that Experience's identity. This does not modify
+    `resolve_project_display_name()` itself; it is an additional guard
+    applied here, since nothing upstream currently guarantees that a
+    future PROJECT_BULLET module's `experience_id` points at a
+    PERSONAL_PROJECT-typed Experience.
+
+    Any unresolved group (missing/unknown experience_id, missing/empty
+    experience_name, or a non-PERSONAL_PROJECT Experience type) produces
+    a deterministic `PROJECT_DISPLAY_NAME_UNRESOLVED` error and the
+    function returns `valid: False` — it never guesses, never falls back
+    to "Personal Project"/"Untitled Project"/module wording, and never
+    silently drops the group.
+
+    Returns `{"valid": bool, "groups": [...], "errors": [...]}`. Each
+    group is `{"experience_id": str, "display_name": str, "bullets": [
+    {"module_id": str, "wording": str}, ...]}` — no date, location,
+    formal_title, employer/organization/client/sponsor, url,
+    technology_line, or subtitle field is ever included, even if the
+    source module happens to carry one; only `module_id` and `wording`
+    are copied out of each module.
+    """
+    errors: list[dict[str, Any]] = []
+    order: list[str] = []
+    grouped: dict[str, list[Mapping[str, Any]]] = {}
+
+    for module in modules:
+        if not isinstance(module, Mapping):
+            continue
+        if module.get("module_type") != PROJECT_MODULE_TYPE:
+            continue
+        experience_id = module.get("experience_id")
+        key = experience_id if isinstance(experience_id, str) and experience_id else ""
+        if key not in grouped:
+            grouped[key] = []
+            order.append(key)
+        grouped[key].append(module)
+
+    groups: list[dict[str, Any]] = []
+    for key in order:
+        group_modules = grouped[key]
+        first_module = group_modules[0]
+
+        record = experience_index.get(key) if (key and experience_index) else None
+        experience_type = record.get("experience_type") if isinstance(record, Mapping) else None
+        display_name = resolve_project_display_name(first_module, experience_index=experience_index)
+
+        if not key or display_name is None or experience_type != PROJECT_EXPERIENCE_TYPE:
+            errors.append(
+                _error(
+                    "PROJECT_DISPLAY_NAME_UNRESOLVED",
+                    experience_id=first_module.get("experience_id"),
+                    module_ids=[m.get("module_id") for m in group_modules],
+                    detail=(
+                        "could not resolve a verified project display identity "
+                        "(missing/unknown experience_id, missing experience_name, "
+                        "or a non-PERSONAL_PROJECT Experience type); refusing to guess"
+                    ),
+                )
+            )
+            continue
+
+        groups.append(
+            {
+                "experience_id": key,
+                "display_name": display_name,
+                "bullets": [
+                    {"module_id": m.get("module_id"), "wording": m.get("wording")}
+                    for m in group_modules
+                ],
+            }
+        )
+
+    return {"valid": len(errors) == 0, "groups": groups, "errors": errors}

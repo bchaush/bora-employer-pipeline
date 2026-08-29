@@ -44,6 +44,8 @@ MarketMind Résumé Module Approval and Master Integration v1 (`MARKETMIND_RESUM
 
 Project Bullet Rendering Contract v1 (`PROJECT_BULLET_RENDERING_CONTRACT_V1`) = **CLOSED** (independent Cursor re-audit passed: `CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`; deterministic structural contract added: `PROJECT_BULLET` modules must not carry `immutable_snapshot` or appear in `experience_sections`; a verified-only project-display-name resolver added; no factual project-header data invented; see below).
 
+Project Section Rendering Algorithm v1 (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (`build_project_section_view()` added: a pure, derived presentation transform grouping already-selected `PROJECT_BULLET` modules by `experience_id`, resolving display identity from `Experience.experience_name` only, preserving selected-order and exact approved wording; no new persistent schema/storage; unresolved identity fails explicitly rather than guessing; see below).
+
 Canonical Experience records: **2** (`EXP_WW_001`, `EXP_MM_001`).
 
 Evidence records: **26** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`; Bora-approved Evidence only).
@@ -320,15 +322,54 @@ If another project file conflicts with the Blueprint, stop and surface the confl
 1. Bora explicitly approved the exact existing wording of `CLAIM_MM_001`–`CLAIM_MM_005` on 2026-08-28. All 11 Claims are now `human_approval=true` / reusable.
 2. Five MarketMind résumé-module bullet drafts created 2026-08-28, refined once per Bora's wording review, then explicitly approved by Bora for the exact five sentences on 2026-08-28 and integrated into `resume/master/RESUME_MASTER_WW_V1.json` (version 6, 11 total modules) as `PROJECT_BULLET` modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`). Independent Cursor re-audit passed (`CURSOR_MARKETMIND_MASTER_INTEGRATION_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); milestone closed and pushed. No `experience_sections` entry was created for `EXP_MM_001` — no verified `formal_title`/`date_range`/employer relationship exists for this `PERSONAL_PROJECT`. Modules are present in the master but excluded from `default_module_order`, so none appears in any derivative unless explicitly selected in a future job-tailoring milestone. `resume/drafts/MARKETMIND_RESUME_MODULE_DRAFTS_V1.json` preserved as the historical/audit record, wording byte-identical to the master.
 3. `PROJECT_BULLET_RENDERING_CONTRACT_V1` added a deterministic, tested structural contract (`src/resume_project_bullet.py`) for `PROJECT_BULLET` modules: they must not carry `immutable_snapshot` and must not be referenced by any `experience_sections[].bullet_module_ids`; a `resolve_project_display_name()` helper resolves only the already-verified `EXP_MM_001.experience_name` field ("MarketMind AI") for future rendering use, returning `None` (never a guess) when unresolved. No project date, location, technology-display-line, URL, or formal title was added — none is currently verified, and none was invented. Independent Cursor re-audit passed (`CURSOR_PROJECT_BULLET_RENDERING_CONTRACT_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH`); milestone closed and pushed.
-4. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` follow-up are both closed and pushed.
+4. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` added `build_project_section_view(modules, experience_index=...)` to `src/resume_project_bullet.py`: a pure derived-view transform over already-selected modules. Groups `PROJECT_BULLET` modules by `experience_id` (preserving first-occurrence group order and exact within-group input order), resolves each group's display name from `Experience.experience_name` only, and additionally requires the resolved Experience's own `experience_type == PERSONAL_PROJECT` (a module pointing at a non-project Experience, e.g. Winter Walk, is treated as unresolved, not silently grouped). Any unresolved group returns a deterministic `PROJECT_DISPLAY_NAME_UNRESOLVED` error rather than guessing. Output contains only `experience_id`, `display_name`, and per-bullet `{module_id, wording}` — no date/location/title/employer/URL/technology-line field is ever included, even if present on the source module. No new schema, no persistent `project_sections` storage, no renderer/exporter. Independent Cursor re-audit pending.
+5. No further semantic-guard or validator changes pending; `CLAIM_ACTOR_ATTRIBUTION_POLICY_V1` and its `CLAIM_ACTOR_ATTRIBUTION_SEMANTIC_GUARD_ACTION_TERM_COVERAGE_V1` follow-up are both closed and pushed.
 
 ## Do Not Start Yet
 
-Do not add MarketMind modules to `default_module_order`, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Résumé-module integration into the master is not résumé-generation approval, and it is not automatic inclusion in every future résumé. Actual document rendering/export of `PROJECT_BULLET` content (date/location/technology-line presentation) still requires a separate evidence/approval decision before it can be built.
+Do not add MarketMind modules to `default_module_order`, generate résumé output, ingest Market Empire/LoanIQ, or begin job-specific tailoring without explicit approval. Résumé-module integration into the master is not résumé-generation approval, and it is not automatic inclusion in every future résumé. Actual document rendering/export of `PROJECT_BULLET` content (date/location/technology-line presentation) still requires a separate evidence/approval decision before it can be built; `build_project_section_view()` is a data transform only, not a renderer.
 
 ## Next Approved Task
 
-None started. `PROJECT_BULLET_RENDERING_CONTRACT_V1` is closed; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+None started. `PROJECT_SECTION_RENDERING_ALGORITHM_V1` is implemented pending independent re-audit; no résumé module was auto-selected, no résumé generated, no job-specific tailoring begun.
+
+---
+
+## 2026-08-28 — Project section rendering algorithm (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+The prior read-only analysis (`PROJECT_SECTION_PRESENTATION_REQUIREMENTS_V1`) concluded that existing verified data is sufficient for a minimal, truthful "Projects" presentation, requiring no new stored schema — only a pure rendering-shaping algorithm. Implement exactly that algorithm, nothing more.
+
+**Changed**
+
+* `src/resume_project_bullet.py`: added `PROJECT_EXPERIENCE_TYPE = "PERSONAL_PROJECT"` and `build_project_section_view(modules, *, experience_index)`.
+  * Filters input to `module_type == "PROJECT_BULLET"` only.
+  * Groups by each module's own `experience_id`; groups emitted in first-occurrence order, bullets within a group preserved in exact input order (never alphabetized, never reordered by module ID/Evidence/Claim/Experience metadata).
+  * Resolves each group's display name via the existing `resolve_project_display_name()` (reads `Experience.experience_name` only).
+  * Additionally requires the resolved Experience record's own `experience_type == PERSONAL_PROJECT` — a `PROJECT_BULLET` module whose `experience_id` resolves to a non-project Experience (e.g. Winter Walk's `ORGANIZATIONAL_ENGAGEMENT`) is treated as unresolved, not silently grouped under that Experience's identity. This guard is added inside the new function only; `resolve_project_display_name()` itself was not modified.
+  * Any unresolved group (missing/unknown `experience_id`, missing `experience_name`, or a non-`PERSONAL_PROJECT` type) produces a deterministic `PROJECT_DISPLAY_NAME_UNRESOLVED` error; the function never guesses, never falls back to "Personal Project"/"Untitled Project"/module wording, and never silently drops the group.
+  * Returns `{"valid": bool, "groups": [...], "errors": [...]}`; each group is `{"experience_id", "display_name", "bullets": [{"module_id", "wording"}, ...]}` — no date, location, formal_title, employer/organization/client/sponsor, url, technology_line, or subtitle field is ever included, even if the source module happens to carry one (only `module_id`/`wording` are copied out).
+  * Duplicate module_ids are not deduplicated: master-level uniqueness (`validate_master_module_ids_unique`) and `INCLUDE_MODULE`'s own not-already-included check already prevent duplicates from occurring in real derivative-selected input; if a caller passes one anyway, it is preserved in place, documented as the chosen behavior (no new dedup system invented).
+* Added `tests/resume_project_section_view_test.py` (12 required proofs plus a duplicate-handling check).
+
+**Not changed**
+
+* No new schema, no `project_sections` storage anywhere, no persisted display-name duplication. `claims/`, `evidence/`, `experiences/`, `resume/master/`, `resume/drafts/`, approved wording, `default_module_order`, `skills_order` all unchanged. No renderer/exporter/PDF/DOCX code exists.
+
+**Tests / Verification**
+
+* Winter-Walk-only selection produces zero project groups; a single or multiple selected `PROJECT_BULLET` modules correctly group under `EXP_MM_001`, resolving `display_name = "MarketMind AI"` exactly.
+* Selected order preserved exactly (verified with an out-of-master-order synthetic selection); all five approved wordings preserved byte-for-byte.
+* Non-`PROJECT_BULLET` modules excluded even when mixed with `PROJECT_BULLET` ones in the same input.
+* Adversarially confirmed: missing `experience_id`, unknown `experience_id`, and a `PROJECT_BULLET` module pointing at `EXP_WW_001` (a real but non-`PERSONAL_PROJECT` Experience) all fail explicitly with `PROJECT_DISPLAY_NAME_UNRESOLVED` rather than guessing or silently grouping under the wrong identity.
+* Confirmed no forbidden field (date/location/title/employer/organization/client/sponsor/url/technology_line/subtitle) leaks into output even when artificially present on a source module; confirmed the function does not mutate its inputs.
+* Confirmed default derivative behavior and explicit MarketMind selection remain unchanged before/after applying the view transform.
+* 29/29 test suites — PASS. Golden 15/15 — PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules — unchanged.
+
+**Status**
+
+`PROJECT_SECTION_RENDERING_ALGORITHM_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not pushed. No renderer built. No résumé generated. No job-specific tailoring begun.
 
 ---
 

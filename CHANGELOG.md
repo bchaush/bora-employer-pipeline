@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-28 — Add project section view builder (`PROJECT_SECTION_RENDERING_ALGORITHM_V1`)
+
+**Reason**
+
+Implement the smallest pure presentation-shaping transform for `PROJECT_BULLET` modules, per the accepted `PROJECT_SECTION_PRESENTATION_REQUIREMENTS_V1` analysis: no new schema, no stored metadata, only a derived view over already-selected modules.
+
+**Changed**
+
+* `src/resume_project_bullet.py`: added `build_project_section_view(modules, *, experience_index)` and `PROJECT_EXPERIENCE_TYPE`. Groups `PROJECT_BULLET` modules by `experience_id`, preserving input order; resolves display name from `Experience.experience_name` only, additionally requiring `experience_type == PERSONAL_PROJECT`; returns `{"valid", "groups", "errors"}` with each group `{"experience_id", "display_name", "bullets": [{"module_id", "wording"}]}`; unresolved identity fails with `PROJECT_DISPLAY_NAME_UNRESOLVED` rather than guessing.
+* Added `tests/resume_project_section_view_test.py`.
+
+**Not changed**
+
+* No new schema, no `project_sections` storage. `claims/`, `evidence/`, `experiences/`, `resume/master/`, `resume/drafts/`, approved wording, `default_module_order`, `skills_order` unchanged. No renderer/exporter exists.
+
+**Tests / Verification**
+
+* WW-only selection -> zero groups; single/multiple MarketMind selections group correctly under EXP_MM_001 with display_name="MarketMind AI"; order and exact wording preserved; non-PROJECT_BULLET modules excluded; missing/unknown experience_id and cross-Experience-type (PROJECT_BULLET pointing at Winter Walk) all fail explicitly; no forbidden field leaks into output; function does not mutate inputs; default derivative and explicit selection unaffected.
+* 29/29 tests -- PASS. Golden 15/15 -- PASS. Repository: 2 Experience / 26 Evidence / 11 Claims / 11 reusable / 11 master modules -- unchanged.
+
+**Status**
+
+PROJECT_SECTION_RENDERING_ALGORITHM_V1_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT. Not pushed. No renderer built, no resume generated, no job-specific tailoring begun.
+
+---
+
 ## 2026-08-28 — Close project bullet rendering contract (`PROJECT_BULLET_RENDERING_CONTRACT_V1`, CLOSED)
 
 **Reason**
