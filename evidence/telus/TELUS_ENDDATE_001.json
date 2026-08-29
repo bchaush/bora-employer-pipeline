@@ -6,7 +6,7 @@
   "technologies": [],
   "evidence_state": "OBSERVED",
   "original_source": "Direct Bora human attestation (Bora-supplied statement; not an employer document, not stored as a separate artifact in the repository)",
-  "source_location": "Bora's direct statement supplied during TELUS master-integration presentation-decision review, 2026-08-28",
+  "source_location": "Bora's direct statement supplied during TELUS master-integration presentation-decision review, 2026-08-29",
   "safe_for_external_use": true,
   "notes": "Human-attested exact end date, not employer-verified. Distinct from and does not rewrite TELUS_LINKEDIN_PERIOD_001 (which independently establishes only the month-level 'May 2025' end period from Bora's LinkedIn profile, not an exact day). The employer offer (TELUS_OFFER_001) verifies only the start side of employment and establishes no end date. This record must never be presented as employer-VERIFIED; recruiter-facing résumé presentation uses only the month-level range 'Nov 2024 - May 2025', not this exact calendar day.",
   "limitations": [
