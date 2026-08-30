@@ -19,6 +19,34 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-30 — Close Application Gate v1 (`APPLICATION_GATE_V1_CLOSURE_AND_PUSH`, CLOSED)
+
+**Reason**
+
+Independent Cursor re-audit of the F-01/F-02 digest remediation returned `PASS_WITH_LOW_FINDINGS` / `APPROVE_FOR_CLOSURE`, independently confirming 42/42 repository suites and 15/15 Golden tests PASS, no HIGH/MEDIUM findings. One remaining LOW finding (F-03: two documentation blocks still describing the field by its obsolete name `evidence_version`) was fixed in this closure.
+
+**Closure record**
+
+`ApplicationAttempt`/`ApplicationQuestion`/`ApplicationAnswer`/`ApplicationQuestionEvaluation` primitives implemented; source/answer/evaluation separation preserved; exploratory answers excluded from submitted history; `ALWAYS_HUMAN` answer-policy behavior preserved; form-only clauses supported without fabricated Requirement records; deterministic ALL_OF/ANY_OF/AT_LEAST_N/NOT logic implemented; `evaluation_inputs_digest` covers both `evidence_index` and `claim_index`; Gate-1 routing (`job_decision.py`) unchanged; Gate 1.5 remains representation/evaluation primitives only -- not a full application orchestrator or persistence layer; no browser automation, no auto-submit, no immigration-answer automation. Independent Cursor audit completed across both rounds (initial `REMEDIATION_REQUIRED` -> remediated -> final `PASS_WITH_LOW_FINDINGS`/`APPROVE_FOR_CLOSURE`). F-01/F-02 remediated; F-03 (stale `evidence_version` documentation) corrected in this closure.
+
+**Changed**
+
+`CURRENT_STATE.md`, `CHANGELOG.md` only.
+
+**Not changed**
+
+Application Gate schemas/production logic, `job_decision.py`, `job_analysis.py`, requirements/evidence/claims/schemas, résumé pipeline, immigration logic, networking, Google Sheets architecture.
+
+**Final validation**
+
+42/42 repository test suites PASS. 15/15 Golden PASS.
+
+**Status**
+
+`APPLICATION_GATE_V1_CLOSED_AND_PUSHED`.
+
+---
+
 ## 2026-08-30 — Fix application evaluation input digest (`APPLICATION_GATE_V1_EVALUATION_INPUT_DIGEST_REMEDIATION`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
 
 **Reason**
@@ -54,7 +82,7 @@ A real LinkedIn Easy Apply exploration (Youth Enrichment Brands) exposed that a 
 * `schemas/application_attempt.schema.json` — `capture_status` (`PARTIAL`/`COMPLETE_HUMAN_CONFIRMED`, human-confirmed only) and `attempt_status` (`EXPLORATORY`/`IN_PROGRESS`/`SUBMITTED`/`ABANDONED`) per application route; not added to the Job record.
 * `schemas/application_question.schema.json` — immutable source-truth question record; `clauses[]` with `mapped_requirement_id` nullable (never a fabricated JD Requirement); recursive `logic_expression` (`ALL_OF`/`ANY_OF`/`AT_LEAST_N`/`NOT` only); `answer_policy` (`SAFE_REUSABLE`/`REVIEW`/`ALWAYS_HUMAN`) separate from evidence truth; `filter_risk` limited to `UNKNOWN`/`POTENTIAL_KNOCKOUT` (no `ACTUAL_KNOCKOUT_CONFIGURED`); `screening_materiality` kept separate from `filter_risk`.
 * `schemas/application_answer.schema.json` — `answer_status` ∈ {`EXPLORATORY_CAPTURE`, `INTENDED_ANSWER`, `SUBMITTED_ANSWER`}; correcting a value always creates a new event, never mutates a prior one.
-* `schemas/application_question_evaluation.schema.json` — derived analysis only; `support_state` (`SUPPORTED`/`PARTIAL`/`UNSUPPORTED`/`UNKNOWN`) never `YES`/`NO`; `predicate_result` (`TRUE`/`FALSE`/`UNCERTAIN`/`NOT_APPLICABLE`); `safe_boolean_answer` forced to `NOT_APPLICABLE` whenever `answer_policy=ALWAYS_HUMAN`; `evidence_version` reuses the existing `resume_digest.py`-style content-digest pattern.
+* `schemas/application_question_evaluation.schema.json` — derived analysis only; `support_state` (`SUPPORTED`/`PARTIAL`/`UNSUPPORTED`/`UNKNOWN`) never `YES`/`NO`; `predicate_result` (`TRUE`/`FALSE`/`UNCERTAIN`/`NOT_APPLICABLE`); `safe_boolean_answer` forced to `NOT_APPLICABLE` whenever `answer_policy=ALWAYS_HUMAN`. *(Superseded by the digest-remediation entry above, F-03 documentation cleanup: originally described here as `evidence_version`, a digest of the trusted Evidence index only -- stale. Now named `evaluation_inputs_digest`, a SHA-256 digest over canonical `{evidence_index, claim_index}`, both trusted indexes in full, reusing the `resume_digest.py`-style content-digest pattern.)*
 
 **Code**
 
