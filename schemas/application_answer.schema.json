@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/application_answer.schema.json",
+  "title": "Bora Employer Pipeline Application Answer",
+  "description": "One actual candidate selection/value event for an ApplicationQuestion. EXPLORATORY_CAPTURE, INTENDED_ANSWER, and SUBMITTED_ANSWER are materially different states that must never be collapsed or mutated into one another: correcting an exploratory or intended value requires recording a new ApplicationAnswer event, never mutating the prior one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "application_answer_id",
+    "application_question_id",
+    "answer_value",
+    "answer_status",
+    "recorded_at",
+    "notes"
+  ],
+  "properties": {
+    "application_answer_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent unique identifier for this answer event."
+    },
+    "application_question_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ApplicationQuestion this answer event responds to."
+    },
+    "answer_value": {
+      "type": ["string", "number", "boolean", "null"],
+      "description": "The selected/entered value for this event. Null only when a value was not actually captured."
+    },
+    "answer_status": {
+      "type": "string",
+      "enum": ["EXPLORATORY_CAPTURE", "INTENDED_ANSWER", "SUBMITTED_ANSWER"],
+      "description": "EXPLORATORY_CAPTURE: a placeholder selection made only to reveal subsequent screens; must never be treated as applicant history, submitted answer, evidence, or a reusable/truthful candidate assertion. INTENDED_ANSWER: a real draft answer not yet submitted; must not be treated as submitted history. SUBMITTED_ANSWER: historical applicant-submission state, subject to existing immutability protections."
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this answer event was recorded."
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional clarifications or provenance notes. Null when no note is needed."
+    }
+  }
+}

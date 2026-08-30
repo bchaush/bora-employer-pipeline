@@ -19,6 +19,37 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-30 — Implement corrected Application Gate v1 (`APPLICATION_GATE_V1_CORRECTED`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+A real LinkedIn Easy Apply exploration (Youth Enrichment Brands) exposed that a public job description and its actual application form are not the same thing, and that Bora's own exploratory clicks (made only to reveal later screens) must never be confused with real answers. This milestone implements the corrected, approved architecture: `Job → ApplicationAttempt → ApplicationQuestion → ApplicationAnswer`, plus a derived `ApplicationQuestionEvaluation`, as a new Gate 1.5 sitting between existing Gate 1 (JD qualification) and Gate 2 (résumé derivative).
+
+**Data model / schemas**
+
+* `schemas/application_attempt.schema.json` — `capture_status` (`PARTIAL`/`COMPLETE_HUMAN_CONFIRMED`, human-confirmed only) and `attempt_status` (`EXPLORATORY`/`IN_PROGRESS`/`SUBMITTED`/`ABANDONED`) per application route; not added to the Job record.
+* `schemas/application_question.schema.json` — immutable source-truth question record; `clauses[]` with `mapped_requirement_id` nullable (never a fabricated JD Requirement); recursive `logic_expression` (`ALL_OF`/`ANY_OF`/`AT_LEAST_N`/`NOT` only); `answer_policy` (`SAFE_REUSABLE`/`REVIEW`/`ALWAYS_HUMAN`) separate from evidence truth; `filter_risk` limited to `UNKNOWN`/`POTENTIAL_KNOCKOUT` (no `ACTUAL_KNOCKOUT_CONFIGURED`); `screening_materiality` kept separate from `filter_risk`.
+* `schemas/application_answer.schema.json` — `answer_status` ∈ {`EXPLORATORY_CAPTURE`, `INTENDED_ANSWER`, `SUBMITTED_ANSWER`}; correcting a value always creates a new event, never mutates a prior one.
+* `schemas/application_question_evaluation.schema.json` — derived analysis only; `support_state` (`SUPPORTED`/`PARTIAL`/`UNSUPPORTED`/`UNKNOWN`) never `YES`/`NO`; `predicate_result` (`TRUE`/`FALSE`/`UNCERTAIN`/`NOT_APPLICABLE`); `safe_boolean_answer` forced to `NOT_APPLICABLE` whenever `answer_policy=ALWAYS_HUMAN`; `evidence_version` reuses the existing `resume_digest.py`-style content-digest pattern.
+
+**Code**
+
+`src/application_logic.py` (deterministic three-valued ALL_OF/ANY_OF/AT_LEAST_N/NOT evaluator), `src/application_clause_match.py` (minimal adapter reusing `requirement_match.py`'s capability/Claim matching for application-only clauses without creating a JD Requirement), `src/application_answer.py` (exploratory/intended/submitted separation), `src/application_gate.py` (`evaluate_application_question()`, never mutates its input; `gate_1_5_applicable()`, short-circuits for `LANE_0_REJECT`).
+
+**Not changed**
+
+`job_decision.py`, `job_analysis.py`, lane vocabulary, résumé/master/derivative pipeline, all Evidence/Claim/Experience records, Golden `job_analysis` fixtures/outcomes, `BLUEPRINT.md`. No browser automation, auto-submit, immigration-answer automation, I-983/E-Verify-entity/staffing subsystems, location-restriction model, PDF/DOCX, résumé wording/skills/summary changes, or storage redesign.
+
+**Tests**
+
+Five new test files, including six named Golden/adversarial cases (`GT_APP_GATE_CLEAN`, `GT_APP_GATE_COMPOUND_UNSAFE`, `GT_APP_GATE_EXPLORATORY_ISOLATED`, `GT_APP_GATE_GATE0_SHORT_CIRCUIT`, `GT_APP_GATE_FORM_ONLY_CLAUSE`, `GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION`). 41/41 repository test suites pass (36 prior + 5 new). Golden job-analysis set: 15/15 pass, zero routing/outcome drift.
+
+**Status**
+
+`APPLICATION_GATE_V1_CORRECTED_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not closed. Not pushed.
+
+---
+
 ## 2026-08-29 — Close TELUS master integration milestone (`TELUS_MASTER_INTEGRATION_V1`, CLOSED)
 
 **Reason**

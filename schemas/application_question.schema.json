@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/application_question.schema.json",
+  "title": "Bora Employer Pipeline Application Question",
+  "description": "Immutable/append-oriented source-truth record of one question actually presented on an application route (may diverge from, or be absent from, the public job description). This record must never be mutated after capture; re-evaluation against changed Evidence produces a new ApplicationQuestionEvaluation, never a change to this record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "application_question_id",
+    "application_attempt_id",
+    "question_text",
+    "question_type",
+    "required",
+    "captured_at",
+    "clauses",
+    "logic_expression",
+    "answer_policy",
+    "screening_materiality",
+    "filter_risk",
+    "notes"
+  ],
+  "properties": {
+    "application_question_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent unique identifier for this application question."
+    },
+    "application_attempt_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ApplicationAttempt this question was captured from."
+    },
+    "question_text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact or faithfully captured source text of the question as presented by the employer/platform."
+    },
+    "question_type": {
+      "type": "string",
+      "enum": ["YES_NO", "SHORT_TEXT", "SELECT", "MULTI_SELECT", "NUMERIC", "UNSUPPORTED"],
+      "description": "Minimal V1 type vocabulary. UNSUPPORTED is used for any question shape V1 does not attempt to model; such questions must fail safely to manual review rather than being forced into a supported type."
+    },
+    "required": {
+      "type": "boolean",
+      "description": "Whether the application route marked this question as required."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this question's text was captured."
+    },
+    "clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["clause_id", "clause_text", "mapped_requirement_id"],
+        "properties": {
+          "clause_id": { "type": "string", "minLength": 1 },
+          "clause_text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Faithfully captured sub-requirement text extracted from question_text."
+          },
+          "mapped_requirement_id": {
+            "type": ["string", "null"],
+            "description": "An existing JD Requirement_ID this clause corresponds to, or null when the application route introduced this clause independently of the public job description. A fake JD Requirement must never be created merely to populate this field."
+          }
+        }
+      },
+      "description": "Minimal decomposition of question_text into evaluable sub-requirements. Empty array when the question is not a compound requirement (e.g. free-text or a single atomic fact)."
+    },
+    "logic_expression": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/logic_expression" }
+      ],
+      "description": "Recursive boolean-combination structure over clause_id leaves. Null when the question has zero or one clause (no compound logic to represent)."
+    },
+    "answer_policy": {
+      "type": "string",
+      "enum": ["SAFE_REUSABLE", "REVIEW", "ALWAYS_HUMAN"],
+      "description": "SAFE_REUSABLE: answer may be reused only where repository evidence and existing policy allow. REVIEW: requires human review before use. ALWAYS_HUMAN: machine must not decide/enter the final answer (work authorization, future sponsorship, visa/immigration, legal attestations, criminal/background attestations, EEO/demographic questions, and similarly consequential categories)."
+    },
+    "screening_materiality": {
+      "type": "string",
+      "enum": ["HIGH", "MEDIUM", "LOW", "UNKNOWN"],
+      "description": "How materially the truthful answer affects OUR OWN application evaluation. This is not a prediction of hidden employer/ATS behavior."
+    },
+    "filter_risk": {
+      "type": "string",
+      "enum": ["UNKNOWN", "POTENTIAL_KNOCKOUT"],
+      "description": "Conservative candidate-observable filter-risk signal only. Default is UNKNOWN. POTENTIAL_KNOCKOUT requires a stronger observable signal than merely 'question is required' and must never be escalated to an assertion of actual employer/ATS auto-reject configuration, which this schema deliberately does not represent."
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional clarifications or provenance notes. Null when no note is needed."
+    }
+  },
+  "$defs": {
+    "logic_expression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "terms"],
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": ["ALL_OF", "ANY_OF", "AT_LEAST_N", "NOT"]
+        },
+        "n": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Required positive integer threshold when op is AT_LEAST_N; null otherwise."
+        },
+        "terms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "$ref": "#/$defs/logic_expression" }
+            ]
+          },
+          "description": "Each term is either a clause_id (string leaf) or a nested logic_expression."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "op": { "const": "AT_LEAST_N" } },
+            "required": ["op"]
+          },
+          "then": {
+            "required": ["n"],
+            "properties": { "n": { "type": "integer", "minimum": 1 } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "op": { "const": "NOT" } },
+            "required": ["op"]
+          },
+          "then": {
+            "properties": {
+              "terms": { "type": "array", "minItems": 1, "maxItems": 1 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

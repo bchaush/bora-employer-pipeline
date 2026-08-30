@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/application_attempt.schema.json",
+  "title": "Bora Employer Pipeline Application Attempt",
+  "description": "One concrete route through which a job's application was inspected or pursued (e.g. LinkedIn Easy Apply, employer ATS, recruiter-submitted route). Application-specific state (capture completeness, submission status) belongs here, not on the Job record, because one Job may have multiple distinct application routes with independently different questions and capture states.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "application_attempt_id",
+    "job_id",
+    "source_platform",
+    "source_url",
+    "created_at",
+    "capture_status",
+    "attempt_status",
+    "notes"
+  ],
+  "properties": {
+    "application_attempt_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent unique identifier for this application attempt."
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Job_ID of the job this attempt applies to."
+    },
+    "source_platform": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Application route/platform, e.g. 'LinkedIn Easy Apply', 'Employer ATS', 'Recruiter-submitted'."
+    },
+    "source_url": {
+      "type": ["string", "null"],
+      "format": "job-url",
+      "description": "URL of the application route when available. Null if unavailable. Must be an absolute http or https URL without embedded credentials."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this application attempt was first inspected or started."
+    },
+    "capture_status": {
+      "type": "string",
+      "enum": ["PARTIAL", "COMPLETE_HUMAN_CONFIRMED"],
+      "description": "Whether all required application questions for this attempt are known to have been captured. Only explicit human confirmation may establish COMPLETE_HUMAN_CONFIRMED; completeness must never be inferred from reaching any particular screen."
+    },
+    "attempt_status": {
+      "type": "string",
+      "enum": ["EXPLORATORY", "IN_PROGRESS", "SUBMITTED", "ABANDONED"],
+      "description": "EXPLORATORY: route inspected to expose mechanics/questions without intent to submit at that moment. IN_PROGRESS: real application being prepared but not submitted. SUBMITTED: application actually submitted. ABANDONED: attempt intentionally stopped."
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional clarifications or provenance notes. Null when no note is needed."
+    }
+  }
+}

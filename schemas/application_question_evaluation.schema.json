@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/application_question_evaluation.schema.json",
+  "title": "Bora Employer Pipeline Application Question Evaluation",
+  "description": "Derived analysis of one ApplicationQuestion against a specific Evidence Repository state. This is deterministic derived analysis, not source truth: it must remain fully separate from and must never cause mutation of the immutable ApplicationQuestion record it evaluates. Re-running evaluation against a later Evidence Repository state produces a new evaluation record with the same application_question_id and a different evidence_version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "application_question_evaluation_id",
+    "application_question_id",
+    "evaluated_at",
+    "evidence_version",
+    "clause_evaluations",
+    "support_state",
+    "predicate_result",
+    "safe_boolean_answer",
+    "manual_review_required",
+    "warnings",
+    "notes"
+  ],
+  "properties": {
+    "application_question_evaluation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent unique identifier for this evaluation event."
+    },
+    "application_question_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ApplicationQuestion this evaluation was computed for."
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this evaluation was computed."
+    },
+    "evidence_version": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "description": "SHA-256 content digest of the trusted Evidence index used for this evaluation, mirroring the existing résumé validation-digest convention (src/resume_digest.py). Not a new global versioning subsystem; scoped to this evaluation only."
+    },
+    "clause_evaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["clause_id", "result", "evidence_ids", "claim_ids", "explanation"],
+        "properties": {
+          "clause_id": { "type": "string", "minLength": 1 },
+          "result": {
+            "type": "string",
+            "enum": ["STRONG", "SUPPORTED", "PARTIAL", "NONE", "UNKNOWN"],
+            "description": "Same result vocabulary as evidence_match.schema.json, reused for consistency; scoped to one ApplicationQuestion clause rather than a JD Requirement."
+          },
+          "evidence_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "claim_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "explanation": { "type": "string", "minLength": 1 }
+        }
+      },
+      "description": "Per-clause evidence-support results. Empty array when the question has no clauses to evaluate."
+    },
+    "support_state": {
+      "type": "string",
+      "enum": ["SUPPORTED", "PARTIAL", "UNSUPPORTED", "UNKNOWN"],
+      "description": "Aggregate evidence-support description across clause_evaluations. Deliberately not YES/NO: this describes evidence support, not a candidate truth assertion."
+    },
+    "predicate_result": {
+      "type": "string",
+      "enum": ["TRUE", "FALSE", "UNCERTAIN", "NOT_APPLICABLE"],
+      "description": "Deterministic three-valued evaluation of logic_expression over clause_evaluations. NOT_APPLICABLE for questions with no safe deterministic predicate (free text, no clauses, ambiguous multi-clause question with no logic_expression, or an unsupported question_type)."
+    },
+    "safe_boolean_answer": {
+      "type": "string",
+      "enum": ["YES", "NO", "UNKNOWN", "NOT_APPLICABLE"],
+      "description": "Deterministic derivation for YES_NO questions only; NOT_APPLICABLE for every other question_type. Must never be machine-finalized when answer_policy is ALWAYS_HUMAN -- forced to NOT_APPLICABLE in that case regardless of predicate_result."
+    },
+    "manual_review_required": {
+      "type": "boolean",
+      "description": "True whenever predicate_result is UNCERTAIN or NOT_APPLICABLE, or when answer_policy forces human finalization."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Optional clarifications. Null when no note is needed."
+    }
+  }
+}
