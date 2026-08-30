@@ -240,9 +240,15 @@ reeval_question = {
 }
 reeval_snapshot = copy.deepcopy(reeval_question)
 
-evidence_version_a_claims = {k: v for k, v in CLAIM_INDEX.items() if k != "CLAIM_WW_006"}
+# Day 1: a claim_index that legitimately lacks CLAIM_WW_006 (process_mapping
+# not yet supported). Day 2: the real, full, current trusted Claim index.
+# The evidence_index is held identical across both -- only claim_index (a
+# real evaluation input) changes -- to directly exercise the F-01 gap:
+# a Claim-only change must be visible in the recorded digest, not just in
+# clause_evaluations.
+claim_index_day1 = {k: v for k, v in CLAIM_INDEX.items() if k != "CLAIM_WW_006"}
 evaluation_a = evaluate_application_question(
-    reeval_question, claim_index=evidence_version_a_claims, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30", evaluation_index=1,
+    reeval_question, claim_index=claim_index_day1, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30", evaluation_index=1,
 )
 evaluation_b = evaluate_application_question(
     reeval_question, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30", evaluation_index=2,
@@ -250,8 +256,11 @@ evaluation_b = evaluate_application_question(
 assert_true(reeval_question == reeval_snapshot, "GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION: ApplicationQuestion must remain byte-identical")
 assert_true(evaluation_a["clause_evaluations"][0]["result"] == "NONE", "Evaluation A (claim not yet present) must be NONE")
 assert_true(evaluation_b["clause_evaluations"][0]["result"] in {"STRONG", "SUPPORTED"}, "Evaluation B (claim present) must become supported")
-assert_true(evaluation_a["evidence_version"] != evaluation_b["evidence_version"] or evidence_version_a_claims != CLAIM_INDEX, "distinct claim indexes must be genuinely distinct in this test")
-print("PASS: GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION -- ApplicationQuestion source byte-identical; only the derived evaluation changed across reevaluation.")
+assert_true(
+    evaluation_a["evaluation_inputs_digest"] != evaluation_b["evaluation_inputs_digest"],
+    "GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION: a legitimate claim_index change that changes the evaluation result must change evaluation_inputs_digest -- no OR fallback",
+)
+print("PASS: GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION -- ApplicationQuestion source byte-identical; evaluation_inputs_digest changed because a real evaluation input (claim_index) changed.")
 
 
 print("ALL SIX APPLICATION GATE GOLDEN CASES PASSED")

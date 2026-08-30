@@ -158,7 +158,7 @@ evaluation = {
     "application_question_evaluation_id": "AQE_AQ_YEB_EXCEL_01",
     "application_question_id": "AQ_YEB_EXCEL",
     "evaluated_at": "2026-08-30",
-    "evidence_version": "a" * 64,
+    "evaluation_inputs_digest": "a" * 64,
     "clause_evaluations": [
         {"clause_id": "C1", "result": "NONE", "evidence_ids": [], "claim_ids": [], "explanation": "no match"}
     ],

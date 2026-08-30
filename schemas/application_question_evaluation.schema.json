@@ -2,14 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://bora-employer-pipeline.local/schemas/application_question_evaluation.schema.json",
   "title": "Bora Employer Pipeline Application Question Evaluation",
-  "description": "Derived analysis of one ApplicationQuestion against a specific Evidence Repository state. This is deterministic derived analysis, not source truth: it must remain fully separate from and must never cause mutation of the immutable ApplicationQuestion record it evaluates. Re-running evaluation against a later Evidence Repository state produces a new evaluation record with the same application_question_id and a different evidence_version.",
+  "description": "Derived analysis of one ApplicationQuestion against a specific trusted Evidence+Claim state. This is deterministic derived analysis, not source truth: it must remain fully separate from and must never cause mutation of the immutable ApplicationQuestion record it evaluates. Re-running evaluation after a legitimate change to either the trusted Evidence index or the trusted Claim index produces a new evaluation record with the same application_question_id and a different evaluation_inputs_digest.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "application_question_evaluation_id",
     "application_question_id",
     "evaluated_at",
-    "evidence_version",
+    "evaluation_inputs_digest",
     "clause_evaluations",
     "support_state",
     "predicate_result",
@@ -34,11 +34,11 @@
       "format": "date",
       "description": "Date this evaluation was computed."
     },
-    "evidence_version": {
+    "evaluation_inputs_digest": {
       "type": "string",
       "minLength": 64,
       "maxLength": 64,
-      "description": "SHA-256 content digest of the trusted Evidence index used for this evaluation, mirroring the existing résumé validation-digest convention (src/resume_digest.py). Not a new global versioning subsystem; scoped to this evaluation only."
+      "description": "SHA-256 content digest of the combined trusted Evidence index AND trusted Claim index used for this evaluation (canonical JSON of {evidence_index, claim_index}, stable key ordering, no timestamps). Both inputs are hashed because evaluate_application_question() depends semantically on both: claim_index determines load_reusable_claims()/capability matching/evidence provenance/clause results, not evidence_index alone. Mirrors the existing résumé validation-digest convention (src/resume_digest.py) in spirit only; not a new global versioning subsystem; scoped to this evaluation's actual inputs only."
     },
     "clause_evaluations": {
       "type": "array",

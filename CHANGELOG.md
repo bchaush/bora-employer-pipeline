@@ -19,6 +19,30 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-30 — Fix application evaluation input digest (`APPLICATION_GATE_V1_EVALUATION_INPUT_DIGEST_REMEDIATION`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
+
+**Reason**
+
+Independent Cursor audit of `APPLICATION_GATE_V1_CORRECTED` returned `REMEDIATION_REQUIRED`: F-01 (MEDIUM) — the recorded `evidence_version` digest was derived only from `evidence_index`, but evaluation also depends semantically on `claim_index` via `load_reusable_claims()`; Cursor reproduced same-`evidence_index`-different-`claim_index` producing a different evaluation while the recorded digest stayed identical (audit-misleading). F-02 (LOW) — `GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION`'s OR-condition assertion could pass without the digest actually changing.
+
+**Fix**
+
+Renamed the field to `evaluation_inputs_digest` (`schemas/application_question_evaluation.schema.json`) and computed one combined SHA-256 digest over canonical JSON of `{evidence_index, claim_index}` (`src/application_gate.py::compute_evaluation_inputs_digest`) — the full trusted `claim_index`, not a hand-selected subset of Claim fields, to avoid the same class of hidden omission for any other Claim property. `GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION` now directly asserts the digest differs, no OR fallback. Added `tests/application_evaluation_digest_test.py` (four targeted cases: same-inputs→same digest, Evidence-only change→different digest, Claims-only change→different digest, insertion-order-only difference→same digest).
+
+**Not changed**
+
+ApplicationAttempt/ApplicationQuestion/ApplicationAnswer schemas, clause structure, logic operators, truth/support mapping, ALWAYS_HUMAN behavior, filter_risk, screening_materiality, gate_1_5_applicable, job_decision.py, job_analysis.py, job.schema.json, requirement.schema.json, evidence_match.schema.json, résumé pipeline, Evidence/Claim content, default_module_order, immigration logic. F-03 (submitted-history persistence immutability, Cursor-classified CONVENTION_ONLY/acceptable for V1) intentionally left as documented future storage-layer work — no persistence layer invented.
+
+**Tests**
+
+Targeted digest tests: 4/4 pass. All Application Gate tests pass. Full repository suites: 42/42 pass (41 prior + 1 new). Golden job-analysis set: 15/15 pass, zero routing/outcome drift.
+
+**Status**
+
+`APPLICATION_GATE_V1_EVALUATION_INPUT_DIGEST_REMEDIATION_IMPLEMENTED_PENDING_INDEPENDENT_REAUDIT`. Not closed. Not approved. Not pushed.
+
+---
+
 ## 2026-08-30 — Implement corrected Application Gate v1 (`APPLICATION_GATE_V1_CORRECTED`, IMPLEMENTED — PENDING INDEPENDENT REAUDIT)
 
 **Reason**

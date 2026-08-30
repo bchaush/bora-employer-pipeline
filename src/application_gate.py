@@ -49,14 +49,30 @@ def _error(code: str, **fields: Any) -> dict[str, Any]:
     return payload
 
 
-def compute_evidence_index_digest(evidence_index: Mapping[str, Any]) -> str:
-    """SHA-256 digest of the trusted Evidence index content.
+def compute_evaluation_inputs_digest(
+    evidence_index: Mapping[str, Any],
+    claim_index: Mapping[str, Any],
+) -> str:
+    """SHA-256 digest of every trusted input evaluate_application_question()
+    actually depends on: the trusted Evidence index AND the trusted Claim
+    index.
+
+    A digest of evidence_index alone is audit-misleading: `match_clause()`
+    is called with `load_reusable_claims(claim_index, evidence_index)`, so
+    a Claim-only change (wording, evidence_state, evidence_ids,
+    human_approval/reusable state) can change clause_evaluations and
+    predicate_result while evidence_index stays byte-identical. Hashing
+    the full trusted claim_index (not a hand-selected subset of Claim
+    fields) avoids re-introducing that same class of hidden omission for
+    any Claim property this evaluator does not yet obviously use.
 
     Mirrors the existing résumé validation-digest pattern
-    (`resume_digest.compute_derivative_validation_digest`): a scoped,
-    deterministic content digest, not a new global versioning subsystem.
+    (`resume_digest.compute_derivative_validation_digest`) in spirit only:
+    a scoped, deterministic content digest over this evaluation's actual
+    inputs, not a new global versioning subsystem.
     """
-    canonical = json.dumps(evidence_index, sort_keys=True, separators=(",", ":"))
+    payload = {"evidence_index": evidence_index, "claim_index": claim_index}
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
@@ -99,7 +115,7 @@ def evaluate_application_question(
     evaluation_id = f"AQE_{application_question_id}_{evaluation_index:02d}"
     warnings: list[str] = []
 
-    evidence_version = compute_evidence_index_digest(evidence_index)
+    evaluation_inputs_digest = compute_evaluation_inputs_digest(evidence_index, claim_index)
     question_type = question.get("question_type")
 
     if question_type not in SUPPORTED_QUESTION_TYPES:
@@ -107,7 +123,7 @@ def evaluate_application_question(
             "application_question_evaluation_id": evaluation_id,
             "application_question_id": application_question_id,
             "evaluated_at": evaluated_at,
-            "evidence_version": evidence_version,
+            "evaluation_inputs_digest": evaluation_inputs_digest,
             "clause_evaluations": [],
             "support_state": "UNKNOWN",
             "predicate_result": "NOT_APPLICABLE",
@@ -185,7 +201,7 @@ def evaluate_application_question(
         "application_question_evaluation_id": evaluation_id,
         "application_question_id": application_question_id,
         "evaluated_at": evaluated_at,
-        "evidence_version": evidence_version,
+        "evaluation_inputs_digest": evaluation_inputs_digest,
         "clause_evaluations": clause_evaluations,
         "support_state": support_state,
         "predicate_result": predicate_result,
