@@ -19,6 +19,42 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-29 — Close TELUS master integration milestone (`TELUS_MASTER_INTEGRATION_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor final adversarial re-audit passed: CURSOR_TELUS_MASTER_INTEGRATION_FINAL_REAUDIT_PASS, no HIGH or MEDIUM findings, SAFE_TO_CLOSE_AND_PUSH_TELUS_MASTER_INTEGRATION. Three non-blocking INFO findings fixed in this closure; a prior tiny correction (ec90534) had already fixed the end-date attestation's source_location field.
+
+**Info findings fixed**
+
+* F-01: CURRENT_STATE.md's Evidence-records summary said 36; corrected to 37.
+* F-02: experiences/EXP_TELUS_001.json's source_of_truth and notes still referenced 2026-08-28 for the direct end-date attestation; corrected both to 2026-08-29. Unrelated display-title-approval date (2026-08-28) left untouched. No other Experience content changed.
+* F-03: tests/telus_evidence_v1_test.py's PASS 8 message said the end period was "exclusively LinkedIn-sourced," stale since TELUS_ENDDATE_001 was added later. Updated the message and added a narrow assertion confirming TELUS_ENDDATE_001 exists as a distinct OBSERVED record outside this test's own scope. No assertion weakened.
+
+**Final closure record**
+
+* Display title: "Digital Trust and Safety Analyst with English". Formal title (unmutated): "Digital Trust and Safety Analyst with English (tele-agent)". Date range: "Nov 2024 - May 2025". Exact human-attested end date: 2025-05-01 (TELUS_ENDDATE_001, OBSERVED, never employer-verified). Exactly 2 approved TELUS bullets, byte-identical wording. "500+ weekly" remains OBSERVED; no unsupported outcomes/tools/ownership. TELUS integrated into the protected master (version 8).
+* Repository: 4 Experience / 37 Evidence / 13 Claims / 13 reusable / 13 master modules. 36/36 tests PASS. Golden 15/15 PASS.
+* The two resume_experience_section.py fixes (title precedence, empty-section omission) were independently re-verified by Cursor as necessary and minimal.
+* Winter Walk, MarketMind, and Brandeis Education remain byte-unchanged. No Summary, no Skills redesign, no PDF/DOCX, no job-specific tailoring.
+
+**Changed**
+
+* `CURRENT_STATE.md`: marked CLOSED; F-01 corrected; closure entry added.
+* `CHANGELOG.md`: closure entry recorded.
+* `experiences/EXP_TELUS_001.json`: F-02 date corrections.
+* `tests/telus_evidence_v1_test.py`: F-03 message/assertion update.
+
+**Not changed**
+
+* TELUS Claims, TELUS module wording, the TELUS master block's structural content, TELUS_ENDDATE_001's fact/evidence_state, `src/`, Winter Walk, MarketMind, Brandeis, job-analysis logic, immigration logic, Golden fixture outcomes.
+
+**Status**
+
+TELUS_MASTER_INTEGRATION_V1_CLOSED_AND_PUSHED. No Summary. No Skills redesign. No PDF/DOCX. No job-specific tailoring. No Bulmarma. No D Commerce.
+
+---
+
 ## 2026-08-28 — Integrate approved TELUS resume modules into the protected master (`TELUS_MASTER_INTEGRATION_V1`)
 
 **Reason**

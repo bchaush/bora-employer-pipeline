@@ -60,11 +60,11 @@ TELUS Evidence v1 (`TELUS_EVIDENCE_V1`) = **CLOSED** (added `EXP_TELUS_001` (`ex
 
 TELUS Résumé Modules v1 (`TELUS_RESUME_MODULES_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (Bora explicitly approved revised final wording for both Claims/modules on 2026-08-28; both Claims are `human_approval=true`, `version=2`, `evidence_state=OBSERVED`, and `reusable=true`; master integration has since been completed by `TELUS_MASTER_INTEGRATION_V1` below, pending its own independent audit).
 
-TELUS Master Integration v1 (`TELUS_MASTER_INTEGRATION_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT** (Bora explicitly resolved the previously-outstanding presentation decisions on 2026-08-28: display title `Digital Trust and Safety Analyst with English` (removes only the formal title's parenthetical `(tele-agent)` suffix), résumé date range `Nov 2024 – May 2025` (end month backed by Bora's direct human attestation of an exact last working day, `TELUS_ENDDATE_001`, `evidence_state=OBSERVED`, never presented as employer-verified and never rendered as the exact day); `resume/master/RESUME_MASTER_WW_V1.json` (version 7→8) gained a `SEC_TELUS_001` experience_sections entry (using the existing, unmodified `display_title`/`display_title_approval` mechanism — no schema change) and the two already-approved modules `MOD_TELUS_001_REVIEW`/`MOD_TELUS_002_PATTERN` (wording untouched), both added to `default_module_order` after Winter Walk's six; the default rendered résumé now correctly shows a compact TELUS block (`TELUS Digital Bulgaria, Digital Trust and Safety Analyst with English, Nov 2024 – May 2025` plus exactly the 2 approved bullets); employer-issued formal title `Digital Trust and Safety Analyst with English (tele-agent)` remains unmutated in `formal_title`; **two real defects were discovered and fixed in the previously-closed `resume_experience_section.py` transform** during this integration — see below — since TELUS was the first experience ever to expose either latent gap; Winter Walk, MarketMind, Brandeis, and all non-TELUS Claims/Evidence/Experiences remain byte-unchanged; see below).
+TELUS Master Integration v1 (`TELUS_MASTER_INTEGRATION_V1`) = **CLOSED** (Bora explicitly resolved the previously-outstanding presentation decisions on 2026-08-29: display title `Digital Trust and Safety Analyst with English` (removes only the formal title's parenthetical `(tele-agent)` suffix), résumé date range `Nov 2024 – May 2025` (end month backed by Bora's direct human attestation of an exact last working day, `2025-05-01`, `TELUS_ENDDATE_001`, `evidence_state=OBSERVED`, never presented as employer-verified and never rendered as the exact day); `resume/master/RESUME_MASTER_WW_V1.json` (version 7→8) gained a `SEC_TELUS_001` experience_sections entry (using the existing, unmodified `display_title`/`display_title_approval` mechanism — no schema change) and the two already-approved modules `MOD_TELUS_001_REVIEW`/`MOD_TELUS_002_PATTERN` (wording untouched, exactly 2 approved TELUS bullets only), both added to `default_module_order` after Winter Walk's six; the default rendered résumé shows a compact TELUS block (`TELUS Digital Bulgaria, Digital Trust and Safety Analyst with English, Nov 2024 – May 2025` plus exactly the 2 approved bullets); employer-issued formal title `Digital Trust and Safety Analyst with English (tele-agent)` remains unmutated in `formal_title`; `500+ weekly` remains OBSERVED; no unsupported outcomes/tools/ownership; two real defects independently verified as necessary/minimal were discovered and fixed in the previously-closed `resume_experience_section.py` transform during this integration (title-precedence and empty-section-omission — see the earlier dated entry below), since TELUS was the first experience ever to expose either latent gap; Winter Walk, MarketMind, and Brandeis remain byte-unchanged; independent Cursor final re-audit passed (`CURSOR_TELUS_MASTER_INTEGRATION_FINAL_REAUDIT_PASS`, `SAFE_TO_CLOSE_AND_PUSH_TELUS_MASTER_INTEGRATION`, no HIGH/MEDIUM findings); no Summary, no Skills redesign, no PDF/DOCX, no job-specific tailoring; see below).
 
 Canonical Experience records: **4** (`EXP_WW_001`, `EXP_MM_001`, `EXP_EDU_BRANDEIS_001`, `EXP_TELUS_001`).
 
-Evidence records: **36** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 3 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) plus 7 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`); Bora-approved Evidence only.
+Evidence records: **37** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 3 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) plus 8 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`, `TELUS_ENDDATE_001`); Bora-approved Evidence only.
 
 Claim records: **13** total, all `human_approval=true` and `reusable=true` *(corrected at TELUS approval time — Cursor F-01 finding: this line had gone stale after the Education/TELUS-evidence milestones; it previously still said 11)* — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable) plus 2 TELUS claims (`CLAIM_TELUS_001`–`CLAIM_TELUS_002`, both `evidence_state=OBSERVED`, reusable per the same rule) whose revised final wording Bora explicitly approved on 2026-08-28. Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. Five human-approved MarketMind résumé modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`) now exist in the protected master (`resume/master/RESUME_MASTER_WW_V1.json`, version 6, 11 total modules) and are available for controlled, explicit selection; they are not in `default_module_order` and are therefore not automatically included in any derivative. No job-specific résumé has yet been generated.
 
@@ -347,9 +347,9 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-`TELUS_MASTER_INTEGRATION_V1` is implemented pending independent Cursor re-audit; not pushed. TELUS is now fully integrated into the protected master (experience section + both approved modules, in `default_module_order`). No Bulmarma, no D Commerce Bank, no PDF/DOCX, no Summary, no real résumé generation, no job-specific tailoring begun.
+None assigned — await explicit Bora approval for the next bounded milestone. `TELUS_MASTER_INTEGRATION_V1` is closed and pushed. TELUS is fully integrated into the protected master (experience section + both approved modules, in `default_module_order`). No Bulmarma, no D Commerce Bank, no PDF/DOCX, no Summary, no real résumé generation, no job-specific tailoring without separate approval.
 
-## Human Presentation Decision Required — TELUS Master Integration (RESOLVED 2026-08-28)
+## Human Presentation Decision Required — TELUS Master Integration (RESOLVED 2026-08-29)
 
 Bora resolved both previously-outstanding presentation decisions on 2026-08-28:
 
@@ -365,6 +365,50 @@ TELUS is now integrated into the protected master accordingly; see `TELUS_MASTER
 ## Open Item Requiring Bora's Input (not a blocker for this milestone's scope)
 
 A message accompanying this milestone's instructions asserted that "official Brandeis program evidence independently establishes that the Master of Science in Business Analytics (MSBA) is STEM-designated" and proposed recording STEM as VERIFIED. No actual source document, URL, catalog page, or screenshot text for that claim was supplied in this milestone — only the assertion that such evidence exists. Per the Evidence_ID Rule (`BLUEPRINT.md` §10: "No Evidence_ID: NO NEW FACTUAL CLAIM") and `evidence.schema.json`'s required `original_source`/`source_location` fields, STEM designation was **not** added in this milestone. If Bora can supply the actual official Brandeis source (e.g. the specific catalog/CIP page, official program-designation letter, or a screenshot with its exact text), a follow-up milestone can add it as a proper, source-cited Evidence record. This does not block `EDUCATION_EVIDENCE_V1`, whose scope was education identity/GPA/requirements-satisfied only.
+
+---
+
+## 2026-08-29 — Close TELUS master integration milestone (`TELUS_MASTER_INTEGRATION_V1`, CLOSED)
+
+**Reason**
+
+Independent Cursor final adversarial re-audit passed: `CURSOR_TELUS_MASTER_INTEGRATION_FINAL_REAUDIT_PASS`, no HIGH or MEDIUM findings, `SAFE_TO_CLOSE_AND_PUSH_TELUS_MASTER_INTEGRATION`. Three non-blocking INFO findings were fixed as part of this closure; a prior, separately-committed tiny correction (`ec90534`) had already fixed the end-date attestation's `source_location` field.
+
+**Info findings fixed in this closure**
+
+* **F-01**: `CURRENT_STATE.md`'s top-level Evidence-records summary still said `36`; corrected to `37` (accounting for `TELUS_ENDDATE_001`).
+* **F-02**: `experiences/EXP_TELUS_001.json`'s `source_of_truth` and `notes` fields still referenced `2026-08-28` for Bora's direct end-date attestation; corrected both references to `2026-08-29` (the actual date the attestation was supplied). The unrelated display-title-approval date reference, correctly `2026-08-28`, was left untouched. No other Experience content (end date fact, evidence state, title, employer) was changed.
+* **F-03**: `tests/telus_evidence_v1_test.py`'s PASS 8 message stated the end period was "exclusively LinkedIn-sourced," which had become stale once `TELUS_ENDDATE_001` (a later, separately-scoped, distinct OBSERVED direct-attestation record) was added. Updated the message to accurately describe this milestone's own 7-record scope versus the repository's current full state, and added a narrow assertion confirming `TELUS_ENDDATE_001` exists as a distinct record outside this test's own scope, correctly OBSERVED. No existing assertion was weakened.
+
+**Final closure record**
+
+* TELUS display title: `Digital Trust and Safety Analyst with English`.
+* Protected formal title (unmutated): `Digital Trust and Safety Analyst with English (tele-agent)`.
+* Résumé date range: `Nov 2024 – May 2025`.
+* Exact human-attested end date: `2025-05-01` (`TELUS_ENDDATE_001`, `evidence_state=OBSERVED`, never employer-VERIFIED).
+* Exactly 2 approved TELUS bullets (`MOD_TELUS_001_REVIEW`, `MOD_TELUS_002_PATTERN`), wording byte-identical to Bora's approved text.
+* `500+ weekly` remains OBSERVED; no unsupported outcomes, tools, or ownership claims anywhere in the TELUS block.
+* TELUS is integrated into the protected master (`resume/master/RESUME_MASTER_WW_V1.json`, version 8).
+* Repository: 4 Experience / 37 Evidence / 13 Claims / 13 reusable / 13 master modules.
+* 36/36 repository test suites — PASS. Golden 15/15 — PASS.
+* The two `resume_experience_section.py` fixes made during implementation (title precedence, empty-section omission) were independently re-verified by Cursor as necessary and minimal — no further code change was required or made in this closure.
+* Winter Walk, MarketMind, and Brandeis Education remain byte-unchanged.
+* No Summary, no Skills redesign, no PDF/DOCX, no job-specific tailoring exist.
+
+**Changed in this closure commit**
+
+* `CURRENT_STATE.md`: `TELUS_MASTER_INTEGRATION_V1` marked `CLOSED`; the F-01 count corrected; this closure entry added.
+* `CHANGELOG.md`: matching closure entry recorded.
+* `experiences/EXP_TELUS_001.json`: F-02 date corrections.
+* `tests/telus_evidence_v1_test.py`: F-03 message/assertion update.
+
+**Not changed**
+
+* TELUS Claims, TELUS module wording, the TELUS master block's structural content, `TELUS_ENDDATE_001`'s fact/evidence_state, `src/`, Winter Walk, MarketMind, Brandeis, job-analysis logic, immigration logic, Golden fixture outcomes.
+
+**Status**
+
+`TELUS_MASTER_INTEGRATION_V1_CLOSED_AND_PUSHED`. No Summary. No Skills redesign. No PDF/DOCX. No job-specific tailoring. No Bulmarma. No D Commerce.
 
 ---
 

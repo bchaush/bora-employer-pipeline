@@ -132,11 +132,24 @@ assert_false(
 print("PASS 7: true Sofia, Bulgaria location recorded; no U.S. location anywhere.")
 
 
-# 8. No unsupported exact end day; end period is explicitly LinkedIn-sourced only.
+# 8. No unsupported exact end day within this milestone's own 7-record scope;
+#    end period is LinkedIn-sourced only among those 7 records. A later,
+#    separately-scoped milestone (TELUS_MASTER_INTEGRATION_V1) added a
+#    distinct, additional OBSERVED evidence record (TELUS_ENDDATE_001,
+#    outside this test's TELUS_EVIDENCE_IDS scope) recording Bora's own
+#    direct human attestation of the exact last working day -- itself never
+#    employer-verified either. Confirmed here as a distinct, separately
+#    tracked record, not conflated with this milestone's own LinkedIn-only
+#    evidence.
 assert_false('"end_date"' in json.dumps(telus_experience), "no end_date field may be fabricated on the Experience record")
 assert_true("May 2025" in linkedin_period["fact"], "May 2025 end period must be recorded, sourced to LinkedIn only")
 assert_false("May 2025" in offer["fact"], "the employer offer must never be the cited source for an end date it does not establish")
-print("PASS 8: no fabricated exact end day; end period correctly and exclusively LinkedIn-sourced.")
+assert_true(
+    "TELUS_ENDDATE_001" not in TELUS_EVIDENCE_IDS and "TELUS_ENDDATE_001" in EVIDENCE_INDEX,
+    "TELUS_ENDDATE_001 must exist in the repository as a distinct record outside this milestone's own 7-record scope",
+)
+assert_true(EVIDENCE_INDEX["TELUS_ENDDATE_001"]["evidence_state"] == "OBSERVED", "TELUS_ENDDATE_001 must remain OBSERVED, not employer-verified")
+print("PASS 8: no fabricated exact end day within this milestone's own scope; end period was LinkedIn-only here, with a separate, later, distinct OBSERVED direct-attestation record (TELUS_ENDDATE_001) now also present in the repository.")
 
 
 # 9. No salary/benefits/probation/notice-period leakage as asserted fact content.
