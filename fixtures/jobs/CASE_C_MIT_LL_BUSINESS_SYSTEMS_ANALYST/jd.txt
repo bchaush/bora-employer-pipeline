@@ -1,0 +1,102 @@
+SOURCE: https://careers.ll.mit.edu/job/Lexington-BusinessSystems-Analyst-MA-02420/1396804300/
+CAPTURE STATUS: Retrieved successfully via automated fetch (HTML converted to
+text/summarized by an intermediate model; not raw byte-for-byte HTML).
+Consolidated from three separate retrieval passes on 2026-08-31 (UTC), each
+requesting different levels of verbatim detail. Quoted fragments below are as
+returned by the retrieval tool; this is the complete set of content obtained
+across all three passes, nothing added beyond it.
+
+Employer / Department: MIT Lincoln Laboratory
+Title: Business/Systems Analyst
+Requisition ID: 43037
+Location: Lexington, MA, US
+Date Posted (as shown on page): "Aug 30, 2026" (observed identically across
+two independent fetch calls with different prompts, both on 2026-08-31)
+
+Position Description:
+"The Business/Systems Analyst will study the business and information needs
+of specific customer groups and of the Laboratory as a whole to develop
+information systems solutions."
+
+Primary Duties:
+
+Financial Systems Operational Support and Continuous Improvement
+- "Maintains high level of proficiency and knowledge of financial applications including SAP FI/CO functions"
+- "Identifies, analyzes, and documents business requirements, system functional requirements"
+- "Manages assigned projects by applying project management skills"
+- "Collaborates with Financial Business Process owners and documents overall solution design"
+- "Develops and communicates functional specifications for any required programming or reporting tasks"
+- "Tests functionality of enhancements, and new programs or functions"
+- "Maintains advanced proficiency of SAP FI/CO master data, transaction data and table structures"
+- "Monitors the health of critical interfaces between SAP FI/CO at Lincoln Laboratory and other systems"
+- "Identifies issues and potential improvements to existing business processes"
+- "Performs complex troubleshooting and analysis for issue correction"
+- "Collaborates with the Financial Services Department and Lincoln Laboratory Business Managers"
+- "Acts as the Financial Services Department's advocate to IT"
+
+Systems Upgrade and Implementation
+- "Maintains a set of regression test scenarios/scripts, performs testing"
+- "Identifies and documents impacts to end user processes"
+- "Documents all testing and results"
+
+Communication, Collaboration and Training
+- "Documents and communicates ongoing work and design changes"
+- "Collaborates across teams to ensure standard system functionality"
+- "Develops, publishes, and maintains documentation according to department standards"
+- "Develops and delivers training & user guides on applications capabilities"
+- "Prepares and delivers presentations at conferences or external meetings"
+
+Business Planning
+- "Assists in planning and in setting priorities for the Enterprise Applications Service Management Sector"
+- "Performs a variety of tasks and may direct the work of others"
+
+Minimum / Required Qualifications:
+"Bachelor's degree plus a minimum of seven years of experience OR a master's
+degree and minimum two years of experience OR equivalent"
+- "7+ years of SAP FI/CO experience in requirements gathering, deployment and support"
+- "7+ years of experience with SAP ERP business processes design, implementation and support"
+- "Working knowledge of the software lifecycle and methodologies"
+- "Strong and in-depth knowledge of SAP FI/CO"
+- "Ability to work independently under limited supervision"
+- "Ability to work analytically in a problem-solving environment"
+- "Skill in analyzing process and data flows"
+- "Skill in requirements collection and analysis to identify needs"
+- "Skill in building consensus among stakeholders and colleagues"
+- "Excellent customer service skills"
+- "Excellent verbal and written communication skills"
+- "Excellent business, functional, technical acumen"
+- "Project management skills to succeed in matrixed environment"
+
+Preferred / Additional Qualifications:
+- "Working knowledge of other SAP ERP related modules including but not limited to Funds Management, Grants Management, & Project Systems"
+- "Working knowledge of SAP BW and Business Objects reporting"
+- "Working knowledge of SAP Concur"
+- "Working knowledge of change management tools"
+- "Experience as a Project Manager for large IT projects"
+
+Citizenship / Security Clearance (exact quoted sentences, consistent across
+all three retrieval passes; the retrieval tool placed this sentence under
+"Preferred Qualifications" in one pass and under a separate
+"Citizenship/Clearance Requirements" grouping in another -- see
+capture_notes.md for this structural-placement ambiguity):
+"US citizenship required to obtain and maintain a security clearance"
+"Selected candidate will be subject to a pre-employment background
+investigation and must be able to obtain and maintain a Secret level DoD
+security clearance."
+
+Compensation (as observed in one retrieval pass; not independently cross-checked):
+Hiring range: $114,600 - $151,900 (base salary only)
+
+Remote Work / Location Restriction (exact quoted sentence):
+"THE SELECTED CANDIDATE CAN BE REMOTE BUT NEEDS TO BE WITHIN 100 MILES OF THE
+LAB IN LEXINGTON, MA."
+
+Apply control observed:
+Button text "Apply now »", linking to
+"/talentcommunity/apply/1396804300/?locale=en_US" (relative path as returned
+by the retrieval tool; not independently confirmed as a fully-resolved
+absolute URL).
+
+No sponsorship, OPT, E-Verify, or I-983 wording was observed anywhere in the
+retrieved content. Per the primary rule, this absence is not evidence that
+no such policy exists -- it means UNKNOWN, not "no restriction."

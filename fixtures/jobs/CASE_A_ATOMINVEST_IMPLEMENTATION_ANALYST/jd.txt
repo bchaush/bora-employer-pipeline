@@ -1,0 +1,105 @@
+SOURCE: https://jobs.ashbyhq.com/atominvest/c7469459-426c-405c-a178-db8421c8b3ec?embed=js
+CAPTURE STATUS: RECOVERED -- substantive posting content independently retrieved
+2026-08-31 (UTC), via a direct HTTP GET of the target URL (see
+capture_notes.md for the exact retrieval method and why the earlier attempt
+in this same fixture's history failed).
+
+The following is extracted verbatim from a server-embedded JSON payload on
+the target page (an `application/ld+json` JobPosting block, and a separate
+embedded application-bootstrap JSON block both confirming the same content),
+converted from HTML formatting to plain text. Nothing below was copied from
+any prompt navigation aid; every field was independently read from the
+retrieved page's own embedded data.
+
+Identifier (verbatim, exact match to the target job ID): c7469459-426c-405c-a178-db8421c8b3ec
+Title: Implementation Analyst
+Department / Team: Customer Success
+Primary location: New York City, New York, United States
+Secondary location: Boston
+Workplace type: Hybrid
+Employment type: Full-time (FullTime / FULL_TIME)
+isListed: true
+isConfidential: false
+Date posted: 2026-08-05
+Hiring organization: Atominvest (https://www.atominvest.co)
+
+Who is Atominvest
+Atominvest is the operating system for modern private markets asset
+managers. Our modular, flexible SaaS technology underpins key investor- and
+portfolio-management workflows.
+
+Our customers are sophisticated private equity, growth equity, and private
+credit firms managing billions in assets globally. We aim to deliver
+ongoing high-quality outcomes for them through a long-term partnership
+mindset.
+
+At Atominvest, you'll be working on something very exciting: the future of
+work, investments and sustainability/ethical investing for the world's best
+investors and delivering a positive impact through this. Based on the
+growth we are experiencing, we think we're on to something big.
+
+It won't be easy. Joining a scale up business is an amazing and rewarding
+challenge, pushing well beyond the boundaries of natural growth cycles.
+You'll move quicker than feels comfortable and be brilliant at continually
+re-prioritizing what must get done to keep Atominvest growing year over year
+at the pace of the best SaaS companies on the planet.
+
+We've gone from zero to ten, now we're looking to go from ten to one
+hundred!
+
+Role Overview
+As an Implementation Analyst at Atominvest, you will get hands-on with the
+data, systems, and workflows of some of the world's most sophisticated
+alternative investment managers, working alongside the rest of the Customer
+Success team to bring new clients onto the platform.
+
+You'll work directly with real fund structures, real investor data, and
+real operational challenges from day one -- a rare opportunity to build
+genuine private markets expertise while still early in your career, rather
+than learning the industry from the sidelines. This is a genuinely
+technical, detail-driven role -- you'll be in the data, in the
+configuration, and in the QA testing, not one step removed from it.
+
+It's also the natural starting point for a career in implementation: as you
+build fluency in private markets workflows, platform configuration, and
+client delivery, this role is designed to grow into more senior
+implementation and client-facing positions, including Implementation
+Manager.
+
+What You'll Be Doing
+- Get hands-on with customer data, requirements, and workflows -- configuring and implementing them directly within the Atominvest platform
+- Work alongside Implementation Managers to onboard customers onto the platform, supporting everything from data migration to UAT
+- Analyse real client datasets and fund structures -- gaining direct exposure to how leading private markets firms structure funds, manage investor relationships, and run their operations
+- Drive down time to value by ensuring a smooth, well-documented transition to ongoing customer lifecycle management
+- Liaise with Product and Engineering to complete extensive QA testing for new product features and bug fixes, and to help scope and troubleshoot integration or data issues
+- Field support tickets, ensuring customers and investors are kept up to date on progress toward resolution
+- Maintain technical documentation and internal knowledge base
+
+Requirements
+- Bachelor's Degree (or higher) from top-tier university
+- Proven interest in private markets -- you understand or are keen to quickly learn fund structures and investor reporting fundamentals
+- 0-2 years of work experience (experience in consulting, investment banking, private equity, or fund administration a plus)
+- Genuinely comfortable working with data: strong Excel skills, and an interest in getting into the technical detail of how systems and data structures fit together (any exposure to SQL or APIs is a plus, not a requirement)
+- Excellent verbal and written communication skills -- able to explain technical detail clearly to both colleagues and clients
+- Strong analytical skills and meticulous attention to detail
+- Comfortable working with large, complex datasets
+- Ability to prioritise tasks, communicate progress proactively, and meet established deadlines
+- Team player, keen to learn and share ideas, and motivated to grow into more senior implementation or client-facing work
+
+Application route: Not found as an explicit stated field on this page's
+embedded data. Ashby-hosted postings conventionally expose an application
+form at `{job_url}/application`; this is a platform-pattern inference, not
+an observed field, and is labeled as such.
+
+Immigration wording: A full-text search of the entire retrieved page
+(including all embedded scripts/JSON) found zero occurrences of "visa",
+"sponsor", "citizen", "authoriz[ation]", "E-Verify", or "clearance". This
+means no such wording is present on this specific page as retrieved -- it
+does NOT mean Atominvest has no sponsorship policy; per the primary rule,
+absence of evidence is not evidence of absence. UNKNOWN remains the correct
+status for any immigration/sponsorship/OPT/E-Verify policy question.
+
+See capture_notes.md for the full retrieval-method history (including the
+earlier incomplete capture attempt in this fixture's own timeline) and for
+the preserved, separate observation of a different Implementation Analyst
+posting (different job ID, London) on the same employer's board.
