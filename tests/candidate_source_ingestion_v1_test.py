@@ -85,10 +85,36 @@ assert_true("top-tier" not in unwe_claim["wording"].lower(), "undergraduate clai
 # The capability pattern must recognize the degree fact but must never fire
 # on institutional-quality language alone.
 degree_only = {"text": "Bachelor's degree required", "source_text": "Bachelor's degree required", "domain": None, "category": None, "technology": []}
-quality_only = {"text": "from a top-tier university", "source_text": "from a top-tier university", "domain": None, "category": None, "technology": []}
+# REQUIREMENT_QUALIFIER_SEMANTICS_V1 superseded this assertion's original
+# form twice: first it required frozenset() for "from a top-tier university"
+# alone (institutional-quality language completely invisible to capability
+# inference -- the OLD protection mechanism Q-1's audit found insufficient,
+# since it let a bundled "Bachelor's ... from top-tier university"
+# requirement silently resolve SUPPORTED once a plain degree claim was
+# approved). That was corrected to give institutional-quality language its
+# own dedicated qualifier tag. The regex-scope-tightening pass then narrowed
+# detection to require a credential word (degree/bachelor's/master's/
+# credential) connected via "from" to the institution phrase -- so
+# "from a top-tier university" with no credential word present in the same
+# text no longer matches by itself (this alone is correct: it mirrors real
+# false-positive JD phrasing like "customers include top-tier universities",
+# where an institution is merely an object, not a credential source -- see
+# tests/requirement_qualifier_semantics_v1_test.py PASS L). This control
+# text is updated to "degree from a top-tier university" -- a bare "degree"
+# (not "bachelor's degree") that still triggers the credential-connected
+# qualifier pattern while confirming it does NOT also manufacture the
+# bachelor's-specific bachelors_degree_credential tag (the invariant this
+# test exists to guard: institutional-quality language alone must never
+# produce a degree-credential claim by itself). See
+# tests/requirement_qualifier_semantics_v1_test.py for the full PARTIAL-path
+# and regex-scope-tightening regression coverage.
+quality_only = {"text": "degree from a top-tier university", "source_text": "degree from a top-tier university", "domain": None, "category": None, "technology": []}
 assert_true(infer_requirement_capabilities(degree_only) == frozenset({"bachelors_degree_credential"}), "degree-only text must produce the bachelors_degree_credential tag")
-assert_true(infer_requirement_capabilities(quality_only) == frozenset(), "institutional-quality language alone must never produce any capability tag")
-print("PASS 2: bachelor's-degree recognition never extends to unsupported institutional-quality ('top-tier university') claims.")
+assert_true(
+    infer_requirement_capabilities(quality_only) == frozenset({"institutional_quality_qualifier"}),
+    "institutional-quality language alone must produce only its own qualifier tag, never the bachelors_degree_credential tag",
+)
+print("PASS 2: bachelor's-degree recognition never extends to unsupported institutional-quality ('top-tier university') claims -- now represented as an explicit, never-claimed qualifier tag rather than blind non-recognition.")
 
 
 # ======================================================================
@@ -122,8 +148,17 @@ print("PASS 3: EXPLICIT_EXCEL, SPREADSHEET (Google Sheets), and CSV_OR_TABULAR_D
 # ======================================================================
 verb_text = {"text": "You will excel in a fast-paced environment", "source_text": "You will excel in a fast-paced environment", "domain": None, "category": None, "technology": []}
 assert_true(infer_requirement_capabilities(verb_text) == frozenset(), "the ordinary verb 'excel in' must never be recognized as Excel-tool proficiency")
-tool_text = {"text": "strong Excel skills", "source_text": "strong Excel skills", "domain": None, "category": None, "technology": []}
+tool_text = {"text": "Excel skills", "source_text": "Excel skills", "domain": None, "category": None, "technology": []}
 assert_true(infer_requirement_capabilities(tool_text) == frozenset({"excel_proficiency"}), "'Excel skills' (the tool) must be recognized")
+# REQUIREMENT_QUALIFIER_SEMANTICS_V1: this positive control previously used
+# the literal text "strong Excel skills" -- which is exactly Q-2's
+# demonstrated defect phrase, now intentionally changed to also carry
+# excel_elevated_proficiency_qualifier (see
+# tests/requirement_qualifier_semantics_v1_test.py). Switched the control
+# text here to plain "Excel skills" so this assertion continues to test only
+# what it originally intended (the tool name is recognized), without
+# colliding with the now-corrected qualifier behavior it was never meant to
+# exercise.
 print("PASS 4: Excel-verb usage ('excel in/at') does not false-positive as Excel-tool proficiency.")
 
 

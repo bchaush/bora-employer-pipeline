@@ -260,6 +260,107 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         re.compile(r"\bexcel\b(?!\s+(?:in|at)\b)", re.I),
         frozenset({"excel_proficiency"}),
     ),
+    # REQUIREMENT_QUALIFIER_SEMANTICS_V1 (Q-1): institutional-quality
+    # qualifier on a credential requirement. Emitted IN ADDITION TO
+    # bachelors_degree_credential (a separate pattern above), never instead
+    # of it -- a requirement bundling both concepts remains fully supported
+    # for the credential fact itself, while this tag separately marks that
+    # an institutional-ranking claim was also made.
+    #
+    # REQUIREMENT_QUALIFIER_SEMANTICS_V1 final Q-1 locality correction
+    # (independent Cursor review, FALSE_CREDENTIAL_SOURCE_LINKAGE): two
+    # prior versions both used an arbitrary bounded filler between the
+    # credential word and "from" -- first {0,6} arbitrary tokens, then
+    # {0,3} tokens additionally excluding clause-punctuation. Both were
+    # still token-count-bounded arbitrary-content windows, and Cursor
+    # demonstrated that ANY such window -- however short -- can be filled
+    # by a real intervening noun phrase that is not the credential's
+    # source: "Bachelor's degree required for candidates from top-tier
+    # universities" ("required for candidates" is 3 tokens, contains no
+    # punctuation, and fits inside {0,3} even though it names "candidates,"
+    # not the degree, as what comes from the university). The root problem
+    # was never the specific token count -- it was permitting ANY arbitrary
+    # semantic material between the credential word and "from" at all. The
+    # fix removes the arbitrary filler entirely. Between the credential
+    # word and "from" this pattern now permits only one narrowly literal,
+    # explicitly-tested credential-level modifier -- "(or higher)" -- and
+    # nothing else; if "from" is not the very next thing after the
+    # credential word (or after that one specific modifier), there is no
+    # match. This directly encodes "the credential itself is described as
+    # coming from this institution," not "an institution is mentioned
+    # somewhere near a credential word": "required for candidates from...",
+    # "preferred for graduates from...", "and experience with clients
+    # from...", "preferred; experience ... from...", "required. Candidates
+    # come from...", and "preferred, with customers from..." are all
+    # rejected, because in every one of them something other than "from"
+    # (or the one recognized modifier) immediately follows the credential
+    # word. A known, accepted bounded limitation of this locality-only
+    # design: "Bachelor's degree, from a top-tier university" (a comma
+    # directly after the credential word, before "from") also does not
+    # match -- an unusual formatting variant is missed in V1 rather than
+    # risk manufacturing a false qualifier; this is an intentional
+    # conservative trade-off, not an oversight. Still requires an
+    # education-context noun (university/institution/college/school)
+    # immediately after "top tier" so it cannot false-fire on unrelated
+    # uses of "top-tier" (e.g. "top-tier customer service"). _norm()
+    # already collapses "-" to " " before this runs, so "top tier" alone
+    # covers both the hyphenated and unhyphenated source spellings. No
+    # existing Claim carries this capability -- no evidence in this
+    # repository currently establishes institutional ranking for any
+    # candidate credential.
+    (
+        re.compile(
+            r"\b(?:degrees?|bachelor'?s?|master'?s?|credentials?)\b"
+            r"(?:\s*\(or\s+higher\))?\s+from\s+(?:an?\s+)?"
+            r"top\s+tier\s+(?:universit(?:y|ies)|institutions?|colleges?|schools?)\b",
+            re.I,
+        ),
+        frozenset({"institutional_quality_qualifier"}),
+    ),
+    # REQUIREMENT_QUALIFIER_SEMANTICS_V1 (Q-2): elevated Excel-proficiency
+    # qualifier. Emitted IN ADDITION TO excel_proficiency (the pattern
+    # above), never instead of it.
+    #
+    # REQUIREMENT_QUALIFIER_SEMANTICS_V1 final semantic correction
+    # (independent Cursor review, SEMANTIC_PROXIMITY_FALSE_POSITIVE): an
+    # earlier version allowed up to two arbitrary filler words between
+    # "strong" and "excel," plus a required skill/proficiency noun right
+    # after "excel." That still over-fired whenever the intervening filler
+    # was itself the noun "strong" actually modifies -- e.g. "strong
+    # interest in Excel skills development" ("interest in" sits in the
+    # filler window, and "skills" still immediately follows "excel," so
+    # both old constraints were satisfied even though "strong" modifies
+    # "interest," not Excel proficiency). Same failure for "strong
+    # preference for Excel skills training," "strong understanding of Excel
+    # skills requirements," and "strong candidates with Excel skills." The
+    # fix removes the arbitrary-filler window entirely: "strong" must now
+    # be followed immediately (optionally through the literal brand word
+    # "Microsoft" or "MS") by "excel," which must in turn be immediately
+    # followed by a skill/proficiency noun. There is no wildcard filler
+    # left for an intervening noun/preposition chain to hide in, so
+    # "strong interest/preference/understanding/candidates ... Excel
+    # skills" can never match regardless of what noun sits between "strong"
+    # and "Excel" -- the construction must be the direct "strong [Microsoft]
+    # Excel skills/proficiency/ability" phrase itself. This still matches
+    # "strong Excel skills," "strong Microsoft Excel skills," and "strong
+    # Excel proficiency," and still cannot match "strong communication/
+    # analytical skills" (no "excel" present at all) or "strong familiarity
+    # with Excel" (no skill/proficiency noun follows "excel"). V1
+    # intentionally targets only this narrow, directly-adjacent
+    # construction -- "advanced Excel", "expert Excel", and similar
+    # intensity language remain unmatched; extending to those requires its
+    # own demonstrated defect and evidence review, not silent expansion by
+    # analogy. No existing Claim carries this capability -- current Excel
+    # evidence establishes ordinary professional use, not independently
+    # established strong/advanced/expert-tier proficiency.
+    (
+        re.compile(
+            r"\bstrong\s+(?:(?:microsoft|ms)\s+)?excel\s+"
+            r"(?:skills?|proficienc(?:y|ies)|abilit(?:y|ies))\b",
+            re.I,
+        ),
+        frozenset({"excel_elevated_proficiency_qualifier"}),
+    ),
 )
 
 # Forced NONE traps for known unsupported upgrades (no positive transfer).
