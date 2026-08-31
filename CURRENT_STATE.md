@@ -64,6 +64,8 @@ TELUS Master Integration v1 (`TELUS_MASTER_INTEGRATION_V1`) = **CLOSED** (Bora e
 
 Application Gate v1 corrected (`APPLICATION_GATE_V1_CORRECTED`, including its F-01/F-02 digest remediation) = **CLOSED** (Gate 1.5 representation/evaluation primitives for real application-form questions, separate from public JD qualification: `Job → ApplicationAttempt → ApplicationQuestion → ApplicationAnswer`, plus derived `ApplicationQuestionEvaluation`; source/answer/evaluation separation preserved, exploratory answers excluded from submitted history, `ALWAYS_HUMAN` answer-policy behavior preserved, form-only clauses supported without fabricated Requirement records, deterministic `ALL_OF`/`ANY_OF`/`AT_LEAST_N`/`NOT` logic implemented, `evaluation_inputs_digest` covers both `evidence_index` and `claim_index`; Gate-1 routing (`job_decision.py`) unchanged; Gate 1.5 remains representation/evaluation primitives only, not a full application orchestrator; no browser automation, no auto-submit, no immigration-answer automation; independent Cursor audit completed (F-01/F-02 remediated, final re-audit `PASS_WITH_LOW_FINDINGS`/`APPROVE_FOR_CLOSURE`, no HIGH/MEDIUM findings; remaining LOW finding F-03, stale `evidence_version` documentation wording, corrected in this closure); 42/42 repository suites pass; 15/15 Golden pass; see the dated entries below for full implementation and remediation detail, and `APPLICATION_GATE_V1_CLOSURE_AND_PUSH` for the closure record).
 
+Application Gate NONE-is-not-FALSE remediation (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`) = **CLOSED** (`evidence_match.result = NONE` means "no supporting match found," not "factually false"; Application Gate candidate-truth mapping corrected to `STRONG`/`SUPPORTED` → `TRUE`, `PARTIAL`/`UNKNOWN`/`NONE` → `UNCERTAIN` in `src/application_logic.py`'s `RESULT_TO_LOGIC_VALUE` -- the Application Gate's own translation layer only; Gate 1 itself (`job_decision.py`, `job_analysis.py`, `requirement_match.py`, `evidence_match.schema.json`) is unchanged, confirmed by zero diff and by all 15 Golden job-analysis fixtures remaining byte-identical; independent adversarial re-audit returned `PASS_WITH_LOW_FINDINGS` / `APPROVE_FOR_CLOSURE`, no HIGH blocking finding; one non-blocking issue, `K-1` (an `AT_LEAST_N` threshold exceeding its term count), tracked separately below, not fixed in this closure; 42/42 repository suites pass; 15/15 Golden pass; see the dated entries below for full detail).
+
 Canonical Experience records: **4** (`EXP_WW_001`, `EXP_MM_001`, `EXP_EDU_BRANDEIS_001`, `EXP_TELUS_001`).
 
 Evidence records: **37** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 3 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) plus 8 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`, `TELUS_ENDDATE_001`); Bora-approved Evidence only.
@@ -370,6 +372,57 @@ A message accompanying this milestone's instructions asserted that "official Bra
 
 ---
 
+## 2026-08-30 — Close Application Gate NONE-is-not-FALSE remediation (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_CLOSURE`, CLOSED)
+
+**Reason**
+
+Independent adversarial re-audit of `APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1` (commit `5308d61681499a75f83f7b8640391893a0557846`) inspected the actual diff and returned:
+
+* Verdict: `PASS_WITH_LOW_FINDINGS`
+* Closure recommendation: `APPROVE_FOR_CLOSURE`
+* No HIGH finding. No blocking finding.
+
+The audit independently confirmed, directly from production code (not from documentation claims):
+
+* `src/application_logic.py`'s `RESULT_TO_LOGIC_VALUE` is exactly `STRONG`→`TRUE`, `SUPPORTED`→`TRUE`, `PARTIAL`→`UNCERTAIN`, `UNKNOWN`→`UNCERTAIN`, `NONE`→`UNCERTAIN`.
+* Zero diff in `src/job_decision.py`, `src/job_analysis.py`, `src/requirement_match.py`, `schemas/evidence_match.schema.json`, `schemas/requirement.schema.json` -- **Gate 1's own requirement-matching semantics are unchanged**. `evidence_match.result = NONE` still means, inside Gate 1, exactly what it always meant: *no supporting match found*. It does not mean, and has never been made to mean, *factually false*.
+* `result_to_logic_value()` has exactly one production consumer repository-wide (`src/application_gate.py`), unmodified in the remediation commit -- no other production consumer was unintentionally affected.
+* A bare `NONE` leaf, evaluated atomically or inside a well-formed `ALL_OF`/`ANY_OF`/`NOT` expression, can no longer produce `predicate_result=FALSE`, `safe_boolean_answer=NO`, or `manual_review_required=false`.
+* `ALWAYS_HUMAN` answer-policy behavior, exploratory-answer isolation, and source immutability are all unmodified (zero diff in `tests/application_answer_test.py`, `tests/application_gate_test.py`) and independently reconfirmed passing.
+* The three new Golden cases (`GT_APP_GATE_NONE_NOT_FALSE`, `GT_APP_GATE_NONE_PNL_NOT_FALSE`, `GT_APP_GATE_NONE_EXCEL_NOT_FALSE`) genuinely exercise the real `evaluate_application_question()` against the real trusted Evidence/Claim index -- no logic is duplicated or reimplemented inline in the tests.
+* Full repository suites and Golden job-analysis set independently rerun: 42/42 and 15/15, all fixture outcomes byte-identical to the pre-remediation baseline.
+
+**K-1 — AT_LEAST_N impossible threshold (tracked, non-blocking, NOT fixed in this closure)**
+
+The audit identified one residual issue, tracked here as a separate outstanding item rather than folded into the closed remediation:
+
+* If an `AT_LEAST_N` expression's threshold `n` exceeds its number of terms (`n > len(terms)`), the predicate is structurally impossible to satisfy regardless of what those terms' actual values are.
+* The current evaluator (`src/application_logic.py`) can deterministically return `FALSE` for this case -- correct, sound combinator arithmetic, not a truth-semantics error.
+* Downstream in `src/application_gate.py`, `manual_review_required = predicate_result in {"UNCERTAIN", "NOT_APPLICABLE"}` -- so when the impossible-threshold case yields `FALSE`, `manual_review_required` can come back `false`.
+* This can produce an overly confident application-answer outcome when the expression itself was malformed/unsatisfiable, not because any clause was genuinely established false.
+* This behavior pre-existed the NONE remediation (the same impossible-threshold arithmetic applied identically to `PARTIAL`/`UNKNOWN`-only term sets before this milestone) -- it is **not** caused by, and is **not specific to**, the `NONE → UNCERTAIN` change made here.
+* It did not affect any of the exercised YEB fixtures or any of the nine Application Gate Golden cases -- all use well-formed term counts.
+* Independent audit classified it **MEDIUM**, but explicitly **non-blocking** for closure of this narrowly-scoped remediation.
+* Candidate future remediation: bounded validation/fail-closed handling for `n > len(terms)` (e.g. reject at capture time, or route the impossible-threshold case to `UNCERTAIN` rather than `FALSE`). **Not implemented in this closure.** No new schema, subsystem, or architecture was created for it.
+
+**Changed in this closure commit**
+
+`CURRENT_STATE.md`, `CHANGELOG.md` only. No production code, schema, or test file was touched by this closure.
+
+**Not changed**
+
+Everything the remediation itself already left untouched: `job_decision.py`, `job_analysis.py`, `requirement_match.py`, `evidence_match.schema.json`, Gate-1 routing, ApplicationAttempt/ApplicationQuestion/ApplicationAnswer schemas, `ALWAYS_HUMAN` behavior, exploratory-answer isolation, form-only-clause handling, source immutability, résumé pipeline, immigration logic. `K-1` was recorded, not fixed.
+
+**Validation**
+
+42/42 repository suites PASS. 15/15 Golden PASS. All 9 Application Gate Golden cases PASS. No Gate-1 decision drift.
+
+**Status**
+
+`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_CLOSED`.
+
+---
+
 ## 2026-08-30 — Fix Application Gate NONE truth semantics (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
 
 **Reason**
@@ -378,7 +431,7 @@ A message accompanying this milestone's instructions asserted that "official Bra
 
 **Fix**
 
-Changed exactly one dictionary value in `src/application_logic.py`: `RESULT_TO_LOGIC_VALUE["NONE"]` from `FALSE` to `UNCERTAIN`. This is the Application Gate's own translation layer (`result_to_logic_value`, used only by `src/application_gate.py`); Gate-1's shared matcher (`requirement_match.py`, `evidence_match.schema.json`) and its meaning of `NONE` are completely untouched. Because `safe_boolean_answer`/`manual_review_required` derivation in `application_gate.py` already handled `UNCERTAIN` correctly, no other code change was needed: `NONE` coverage now correctly yields `predicate_result=UNCERTAIN`, `safe_boolean_answer=UNKNOWN`, `manual_review_required=true`. `FALSE` remains reachable only through legitimate deterministic-logic derivation (e.g. `NOT(TRUE)`, or an unsatisfiable `AT_LEAST_N` threshold) -- never from a bare `NONE` leaf. No negative-evidence subsystem, credential subsystem, or education-ingestion mechanism was added.
+Changed exactly one dictionary value in `src/application_logic.py`: `RESULT_TO_LOGIC_VALUE["NONE"]` from `FALSE` to `UNCERTAIN`. This is the Application Gate's own translation layer (`result_to_logic_value`, used only by `src/application_gate.py`); Gate-1's shared matcher (`requirement_match.py`, `evidence_match.schema.json`) and its meaning of `NONE` are completely untouched. Because `safe_boolean_answer`/`manual_review_required` derivation in `application_gate.py` already handled `UNCERTAIN` correctly, no other code change was needed: `NONE` coverage now correctly yields `predicate_result=UNCERTAIN`, `safe_boolean_answer=UNKNOWN`, `manual_review_required=true`. `FALSE` remains reachable through legitimate deterministic-logic derivation (e.g. `NOT(TRUE)`) -- never from a bare `NONE` leaf evaluated atomically or inside a well-formed compound expression. One exception was independently identified during audit and is tracked separately, not fixed here: an `AT_LEAST_N` expression whose threshold `n` exceeds its number of terms is structurally unsatisfiable and deterministically evaluates `FALSE` regardless of the terms' actual values, which can in turn suppress `manual_review_required` -- this is a mathematically sound but potentially unsafe edge case, not a NONE-specific regression; see `K-1` below. No negative-evidence subsystem, credential subsystem, or education-ingestion mechanism was added.
 
 **Tests**
 

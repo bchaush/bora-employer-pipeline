@@ -19,6 +19,34 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-30 — Close Application Gate NONE-is-not-FALSE remediation (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_CLOSURE`, CLOSED)
+
+**Reason**
+
+Independent adversarial re-audit of commit `5308d61681499a75f83f7b8640391893a0557846` returned `PASS_WITH_LOW_FINDINGS` / `APPROVE_FOR_CLOSURE`, no HIGH finding. Confirmed directly from production code: `RESULT_TO_LOGIC_VALUE` maps `STRONG`/`SUPPORTED`→`TRUE`, `PARTIAL`/`UNKNOWN`/`NONE`→`UNCERTAIN`; zero diff in `job_decision.py`/`job_analysis.py`/`requirement_match.py`/`evidence_match.schema.json` -- Gate 1 unchanged, `evidence_match.result=NONE` still means "no supporting match found," never "factually false"; the one production consumer of `result_to_logic_value()` (`application_gate.py`) is unaffected elsewhere; ALWAYS_HUMAN, exploratory isolation, and source immutability are all unmodified; all three new Golden cases genuinely exercise production code. 42/42 suites and 15/15 Golden independently reconfirmed, zero Gate-1 drift.
+
+**K-1 — AT_LEAST_N impossible threshold (tracked, non-blocking, NOT fixed here)**
+
+If `AT_LEAST_N(n > len(terms))`, the predicate is structurally impossible and the evaluator can deterministically return `FALSE` -- correct arithmetic, not a truth-semantics error -- but downstream `manual_review_required` can therefore be `false`, producing an overly confident outcome when the expression itself was malformed. Pre-existing behavior, not caused by and not specific to the `NONE→UNCERTAIN` change; did not affect the YEB fixtures or any of the 9 Golden cases. Classified MEDIUM, explicitly non-blocking for this closure. Candidate future fix: bounded validation/fail-closed handling for `n > len(terms)`. Not implemented here; no new subsystem created.
+
+**Changed**
+
+`CURRENT_STATE.md`, `CHANGELOG.md` only.
+
+**Not changed**
+
+Everything the remediation already left untouched (see prior entry); K-1 recorded, not fixed.
+
+**Validation**
+
+42/42 repository suites PASS. 15/15 Golden PASS. All 9 Application Gate Golden cases PASS.
+
+**Status**
+
+`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_CLOSED`.
+
+---
+
 ## 2026-08-30 — Fix Application Gate NONE truth semantics (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
 
 **Reason**
@@ -27,7 +55,7 @@ The real-world YEB vertical-slice exercise found that `application_logic.RESULT_
 
 **Fix**
 
-Changed `RESULT_TO_LOGIC_VALUE["NONE"]` from `FALSE` to `UNCERTAIN` in `src/application_logic.py` -- the Application Gate's own translation layer only; Gate-1's shared matcher (`requirement_match.py`, `evidence_match.schema.json`) is untouched, and its `NONE` still means "no supporting match found." Existing `safe_boolean_answer`/`manual_review_required` derivation already handled `UNCERTAIN` correctly, so no further code change was needed. `FALSE` remains reachable only via legitimate deterministic-logic derivation (e.g. `NOT(TRUE)`, unsatisfiable `AT_LEAST_N`), never from a bare `NONE` leaf.
+Changed `RESULT_TO_LOGIC_VALUE["NONE"]` from `FALSE` to `UNCERTAIN` in `src/application_logic.py` -- the Application Gate's own translation layer only; Gate-1's shared matcher (`requirement_match.py`, `evidence_match.schema.json`) is untouched, and its `NONE` still means "no supporting match found." Existing `safe_boolean_answer`/`manual_review_required` derivation already handled `UNCERTAIN` correctly, so no further code change was needed. `FALSE` remains reachable via legitimate deterministic-logic derivation (e.g. `NOT(TRUE)`), never from a bare `NONE` leaf evaluated atomically or inside a well-formed compound expression. One exception, an `AT_LEAST_N` threshold exceeding its term count, was identified during audit and is tracked separately as non-blocking (see `K-1` in the closure entry below), not fixed here -- that case can suppress `manual_review_required`, so it is not treated as harmless merely because the Boolean result is deterministic.
 
 **Tests**
 
