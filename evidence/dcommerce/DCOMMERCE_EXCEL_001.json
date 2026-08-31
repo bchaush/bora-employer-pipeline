@@ -1,0 +1,18 @@
+{
+  "evidence_id": "DCOMMERCE_EXCEL_001",
+  "experience_id": "EXP_DCOMMERCE_001",
+  "fact": "Bora's current professional-profile history states that in this role he prepared structured financial and statistical reports in Excel for submission to the Bulgarian National Bank, and reconciled 1,000+ monthly transactions in Excel.",
+  "capabilities": ["excel_proficiency"],
+  "technologies": ["Microsoft Excel"],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora-supplied current professional-profile screenshot (not stored in repository)",
+  "source_location": "D Commerce Bank experience entry, role-description bullets referencing Excel-based reporting and transaction reconciliation",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified or independently audited. Establishes substantive, sustained professional use of Microsoft Excel specifically (structured regulatory-style reporting and transaction-level reconciliation), distinct from and materially stronger than the repository's existing Google Sheets (spreadsheet-tier) and CSV/tabular-data-tier evidence, neither of which establishes Microsoft Excel use. This is Bulgarian National Bank regulatory reporting, not U.S. regulatory reporting; it must not be presented as U.S. GAAP, SEC, FINRA, or other U.S.-specific regulatory expertise. Does not establish 'advanced Excel' or expert-level formula/macro proficiency beyond structured reporting and reconciliation as described.",
+  "limitations": [
+    "Not independently verified by employer documentation",
+    "Does not establish 'advanced Excel' or expert-level formula/macro/VBA proficiency",
+    "Does not establish U.S. regulatory reporting experience (Bulgarian National Bank reporting is not a U.S. regulatory body)",
+    "Does not establish audit or risk-management ownership beyond the Excel-based reporting/reconciliation described"
+  ]
+}

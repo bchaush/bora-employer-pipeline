@@ -40,6 +40,9 @@ _CLAIM_CAPABILITIES: dict[str, frozenset[str]] = {
     ),
     "CLAIM_WW_005": frozenset({"uat", "pilot_testing", "test_documentation"}),
     "CLAIM_WW_006": frozenset({"process_mapping"}),
+    "CLAIM_EDU_UNWE_001": frozenset({"bachelors_degree_credential"}),
+    "CLAIM_DCOMMERCE_001": frozenset({"excel_proficiency"}),
+    "CLAIM_BULMARMA_001": frozenset({"excel_proficiency"}),
 }
 
 # Bounded JD-anchor → existing canonical capability mappings only.
@@ -237,6 +240,25 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             re.I,
         ),
         frozenset({"marketing_automation"}),
+    ),
+    # CANDIDATE_SOURCE_INGESTION_V1: bachelor's-degree credential recognition.
+    # Requires "bachelor" immediately followed by "degree"/"degrees" so a bare
+    # "bachelor" (e.g. an unrelated proper noun) never matches; does not
+    # attempt to recognize institutional-quality language ("top-tier
+    # university") at all -- a requirement bundling both concepts will still
+    # only ever be supported for the credential fact itself, never for
+    # unevidenced institutional ranking.
+    (
+        re.compile(r"\bbachelor'?s?\s+degrees?\b", re.I),
+        frozenset({"bachelors_degree_credential"}),
+    ),
+    # CANDIDATE_SOURCE_INGESTION_V1: Excel-proficiency recognition.
+    # Negative lookahead on "excel in"/"excel at" excludes the ordinary
+    # English verb usage ("excel in a fast-paced environment") from matching
+    # the Microsoft Excel product/tool reference this capability represents.
+    (
+        re.compile(r"\bexcel\b(?!\s+(?:in|at)\b)", re.I),
+        frozenset({"excel_proficiency"}),
     ),
 )
 

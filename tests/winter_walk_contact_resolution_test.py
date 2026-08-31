@@ -73,13 +73,13 @@ SECTION = MASTER["experience_sections"][0]
 
 experience_result = validate_experience_repository()
 assert_true(experience_result["valid"] is True, "experience repository invalid")
-assert_true(len(experience_result["index"]) == 4, "Experience count must be 4 after MarketMind, Brandeis education, and TELUS ingestion")
+assert_true(len(experience_result["index"]) == 7, "Experience count must be 7 after MarketMind, Brandeis education, TELUS, and CANDIDATE_SOURCE_INGESTION_V1 ingestion")
 evidence_result = validate_evidence_repository(experience_result=experience_result)
 assert_true(evidence_result["valid"] is True, "evidence repository invalid")
-assert_true(len(evidence_result["index"]) == 37, "Evidence count must be 37 after MarketMind, Brandeis education, and TELUS ingestion")
+assert_true(len(evidence_result["index"]) == 42, "Evidence count must be 42 after MarketMind, Brandeis education, TELUS, CANDIDATE_SOURCE_INGESTION_V1, and human-source-resolution ingestion")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 13, "claim repository must have 13 records")
+assert_true(claim_result["records_checked"] == 16, "claim repository must have 16 records")
 reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
 assert_true(len(reusable_claims) == 13, "reusable claim count must be 13 (6 Winter Walk + 5 Bora-approved MarketMind + 2 Bora-approved TELUS)")
 

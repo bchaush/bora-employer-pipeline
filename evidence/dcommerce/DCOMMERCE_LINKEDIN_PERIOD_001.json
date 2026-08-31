@@ -1,0 +1,17 @@
+{
+  "evidence_id": "DCOMMERCE_LINKEDIN_PERIOD_001",
+  "experience_id": "EXP_DCOMMERCE_001",
+  "fact": "Bora's LinkedIn professional profile lists a 'Junior Financial Data Analyst' position at 'D Commerce Bank', located in Sofia, Bulgaria, with a displayed period of Aug 2021 - Sep 2022.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's LinkedIn experience record (Bora-supplied screenshot; not stored in repository)",
+  "source_location": "Experience entry: title, employer, dates, and location fields",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified. 'Junior Financial Data Analyst' is Bora's current LinkedIn display wording, explicitly confirmed by Bora as his correct/current public presentation, and must not silently replace or be treated as equivalent to the employer-issued formal position in DCOMMERCE_REFERENCE_001 ('Junior expert'). The overall Aug 2021 - Sep 2022 period displayed here is corroborated by, but not independently required to establish, the VERIFIED overall relationship already established by DCOMMERCE_REFERENCE_001; this record's own evidence_state remains OBSERVED because it is self-reported profile content, not an employer document. An earlier résumé value (title 'Financial Reporting Analyst', dates beginning Oct 2021) has been explicitly superseded by this current LinkedIn history per Bora's direct correction and by the independently corroborating DCOMMERCE_REFERENCE_001 letter; the earlier résumé value covered only the later full-time phase, not the complete relationship, and is no longer treated as canonical.",
+  "limitations": [
+    "'Junior Financial Data Analyst' is a self-selected current display title, not the formal employer title",
+    "Does not itself independently verify the employment dates -- see DCOMMERCE_REFERENCE_001 for the VERIFIED-tier employer source",
+    "Does not establish U.S. work experience or U.S. work authorization"
+  ]
+}

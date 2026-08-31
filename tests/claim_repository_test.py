@@ -44,7 +44,15 @@ EXPECTED_TELUS_CLAIM_IDS = [
     "CLAIM_TELUS_002",
 ]
 
-EXPECTED_ALL_CLAIM_IDS = sorted(EXPECTED_CLAIM_IDS + EXPECTED_MM_CLAIM_IDS + EXPECTED_TELUS_CLAIM_IDS)
+EXPECTED_CANDIDATE_SOURCE_CLAIM_IDS = [
+    "CLAIM_EDU_UNWE_001",
+    "CLAIM_DCOMMERCE_001",
+    "CLAIM_BULMARMA_001",
+]
+
+EXPECTED_ALL_CLAIM_IDS = sorted(
+    EXPECTED_CLAIM_IDS + EXPECTED_MM_CLAIM_IDS + EXPECTED_TELUS_CLAIM_IDS + EXPECTED_CANDIDATE_SOURCE_CLAIM_IDS
+)
 
 
 def assert_true(condition: bool, message: str) -> None:
@@ -88,17 +96,17 @@ def write_json(path: Path, payload) -> None:
 # ---------------------------------------------------------------------------
 real = validate_claim_repository(CLAIMS_ROOT)
 assert_true(real["valid"] is True, f"real claim repository failed: {real['errors']}")
-assert_true(real["records_checked"] == 13, f"expected 13 claims, got {real['records_checked']}")
+assert_true(real["records_checked"] == 16, f"expected 16 claims, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_ALL_CLAIM_IDS,
     f"unexpected Claim_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
-    len(discover_claim_files(CLAIMS_ROOT)) == 13,
-    "discover_claim_files should find 13 claim files",
+    len(discover_claim_files(CLAIMS_ROOT)) == 16,
+    "discover_claim_files should find 16 claim files",
 )
-print("PASS 1: valid real claim repository (13 records: 6 Winter Walk + 5 MarketMind + 2 TELUS) passed.")
+print("PASS 1: valid real claim repository (16 records: 6 Winter Walk + 5 MarketMind + 2 TELUS + 3 CANDIDATE_SOURCE_INGESTION_V1) passed.")
 
 
 # ---------------------------------------------------------------------------

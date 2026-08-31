@@ -1,0 +1,19 @@
+{
+  "evidence_id": "EDU_UNWE_IDENTITY_001",
+  "experience_id": "EXP_EDU_UNWE_001",
+  "fact": "Bora's current résumé factual history states a Bachelor of Science in Finance and Accounting from the University of National and World Economy, Sep 2021 - Jun 2025.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora-supplied current résumé factual history (Bora-supplied professional-profile screenshot; not stored in repository)",
+  "source_location": "Education section -- institution, degree, field of study, and stated dates",
+  "safe_for_external_use": true,
+  "notes": "Candidate-supplied résumé/profile factual history, not an official university record -- no transcript, diploma, or registrar confirmation has been supplied for this credential. Establishes institution identity, degree level (Bachelor of Science), field of study, and stated enrollment/completion dates only. Does not establish GPA, honors, class rank, institutional accreditation or ranking (does not establish 'top-tier university' status), U.S. degree equivalency, credential evaluation, or independently verified degree conferral. Distinct from and does not derive from EDU_BRANDEIS_IDENTITY_001/EDU_BRANDEIS_PROGRESS_001/EDU_BRANDEIS_GPA_001, which document a separate, later, graduate-level Brandeis program; the Brandeis M.S. enrollment does not itself establish this undergraduate fact and this record does not rely on it.",
+  "limitations": [
+    "Does not establish GPA, honors, or class rank",
+    "Does not establish institutional accreditation or ranking ('top-tier university' is not established by this record)",
+    "Does not establish U.S. degree equivalency or credential evaluation",
+    "Does not establish independently verified degree conferral beyond this self-reported source",
+    "Source is candidate-supplied current résumé/profile factual history, not an official university record; an official transcript or diploma would be a stronger, independently verifiable source"
+  ]
+}

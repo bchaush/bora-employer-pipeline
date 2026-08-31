@@ -56,13 +56,13 @@ def assert_false(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4 -- this milestone adds no new Experience")
+assert_true(len(exp_result["index"]) == 7, "Experience count must be 7 (4 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records) -- this milestone itself adds no new Experience")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (36 prior + 1 TELUS end-date record added in the subsequent master-integration milestone)")
+assert_true(len(ev_result["index"]) == 42, "Evidence count must be 42 (36 prior + 1 TELUS end-date record added in the subsequent master-integration milestone + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 new draft TELUS claims)")
+assert_true(claim_result["records_checked"] == 16, "Claim count must be 16 (11 prior + 2 new draft TELUS claims + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims)")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]
@@ -156,7 +156,7 @@ print("PASS 5: historical formal title unmutated; LinkedIn display title never s
 
 # 6. Non-TELUS Claims remain byte-for-byte unchanged.
 NON_TELUS_CLAIM_COUNT = claim_result["records_checked"] - len(TELUS_CLAIM_IDS)
-assert_true(NON_TELUS_CLAIM_COUNT == 11, "exactly 11 non-TELUS claims must exist, byte-unchanged")
+assert_true(NON_TELUS_CLAIM_COUNT == 14, "exactly 14 non-TELUS claims must exist (11 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims), byte-unchanged")
 assert_true(
     CLAIM_INDEX["CLAIM_WW_001"]["wording"]
     == "Defined the Winter Walk OP Recommendation Adoption & Support System as an internal Google Workspace operating tool and documented explicit scope boundaries excluding CRM, public dashboard, partner ranking, AI auto-sending, and causal fundraising-impact modeling.",

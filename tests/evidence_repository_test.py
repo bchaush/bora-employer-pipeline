@@ -83,7 +83,17 @@ EXPECTED_TELUS_IDS = [
     "TELUS_VOLUME_001",
 ]
 
-EXPECTED_ALL_IDS = sorted(EXPECTED_WW_IDS + EXPECTED_MM_IDS + EXPECTED_EDU_IDS + EXPECTED_TELUS_IDS)
+EXPECTED_CANDIDATE_SOURCE_IDS = [
+    "EDU_UNWE_IDENTITY_001",
+    "DCOMMERCE_EXCEL_001",
+    "BULMARMA_EXCEL_001",
+    "DCOMMERCE_REFERENCE_001",
+    "DCOMMERCE_LINKEDIN_PERIOD_001",
+]
+
+EXPECTED_ALL_IDS = sorted(
+    EXPECTED_WW_IDS + EXPECTED_MM_IDS + EXPECTED_EDU_IDS + EXPECTED_TELUS_IDS + EXPECTED_CANDIDATE_SOURCE_IDS
+)
 
 
 def assert_true(condition: bool, message: str) -> None:
@@ -144,7 +154,7 @@ def write_temp_experience_root(base: Path, experience_id: str = "EXP_TEST_001") 
 # ---------------------------------------------------------------------------
 real = validate_evidence_repository(EVIDENCE_ROOT)
 assert_true(real["valid"] is True, "current evidence repository failed")
-assert_true(real["records_checked"] == 37, f"expected 37 records, got {real['records_checked']}")
+assert_true(real["records_checked"] == 42, f"expected 42 records, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_ALL_IDS,

@@ -1,0 +1,18 @@
+{
+  "evidence_id": "BULMARMA_EXCEL_001",
+  "experience_id": "EXP_BULMARMA_001",
+  "fact": "Bora's current professional-profile history states that in this role he built Excel-based reports tracking expenses, revenues, and cash flows, and managed monthly budget/cash-flow reporting of approximately $80K in Excel.",
+  "capabilities": ["excel_proficiency"],
+  "technologies": ["Microsoft Excel"],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora-supplied current professional-profile screenshot (not stored in repository)",
+  "source_location": "Bulmarma 2008 Ltd experience entry, role-description bullets referencing Excel-based expense/revenue/cash-flow reporting and budget management",
+  "safe_for_external_use": true,
+  "notes": "Self-reported professional-profile evidence, not employer-certified or independently audited. Establishes substantive, sustained professional use of Microsoft Excel specifically (financial report building and monthly budget/cash-flow reporting), distinct from and materially stronger than the repository's existing Google Sheets (spreadsheet-tier) and CSV/tabular-data-tier evidence, neither of which establishes Microsoft Excel use. The '$80K monthly budget' figure is preserved exactly as self-reported and must not be strengthened, restated as an audited figure, or converted into a different metric. Does not establish 'advanced Excel' or expert-level formula/macro proficiency beyond report building and budget/cash-flow tracking as described.",
+  "limitations": [
+    "Not independently verified by employer documentation",
+    "Does not establish 'advanced Excel' or expert-level formula/macro/VBA proficiency",
+    "The '$80K monthly budget' figure is self-reported and not independently audited",
+    "Does not establish U.S. regulatory or U.S. financial-reporting experience"
+  ]
+}

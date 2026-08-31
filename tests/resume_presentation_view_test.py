@@ -45,13 +45,13 @@ def assert_false(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 4, "Experience count must remain 4")
+assert_true(len(exp_result["index"]) == 7, "Experience count must be 7 (4 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records)")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 37, "Evidence count must be 37 (36 prior + 1 TELUS end-date record)")
+assert_true(len(ev_result["index"]) == 42, "Evidence count must be 42 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 13, "Claim count must be 13 (11 prior + 2 draft TELUS claims)")
+assert_true(claim_result["records_checked"] == 16, "Claim count must be 16 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims)")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]

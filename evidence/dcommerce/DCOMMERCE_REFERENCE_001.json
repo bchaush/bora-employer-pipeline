@@ -1,0 +1,18 @@
+{
+  "evidence_id": "DCOMMERCE_REFERENCE_001",
+  "experience_id": "EXP_DCOMMERCE_001",
+  "fact": "D Commerce Bank issued Bora Chaush an employer-issued Letter of Reference stating he joined D Commerce Bank as an intern on 09.08.2021, was appointed a full-time employee on 01.10.2021 in the formal position of Junior expert within the Management Information and Income and Costs Control Department (Planning, Control, Financial Reporting and General Accounting Directorate), and worked at D Commerce Bank until 19.09.2022; his work involved data extraction, processing, and preparation of daily, weekly, and monthly reports according to Bulgarian National Bank requirements.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "D Commerce Bank employer-issued Letter of Reference (Bora-supplied; not stored in repository)",
+  "source_location": "Employment dates, internship-to-full-time transition date, formal position title, organizational unit/directorate, and duties fields",
+  "safe_for_external_use": true,
+  "notes": "Documentary employment-reference evidence establishing the overall employment relationship, its internship-to-full-time phase transition, formal employer-side position title, and reporting/data-processing duties. Does not establish Microsoft Excel use or the 1,000+ monthly transaction figure specifically -- those remain sourced only to DCOMMERCE_EXCEL_001 (candidate-supplied, OBSERVED) and must not be upgraded to VERIFIED merely because the overall employment relationship is now VERIFIED. 'Junior expert' is the employer's own formal position wording and must not be silently merged with or replaced by Bora's current LinkedIn display title 'Junior Financial Data Analyst' (see DCOMMERCE_LINKEDIN_PERIOD_001); the two are recorded as distinct facts from distinct sources. This is Bulgarian professional experience; it does not establish U.S. GAAP, SEC, FINRA, U.S. banking regulation, U.S. tax, U.S. payroll, or other U.S.-specific regulatory expertise.",
+  "limitations": [
+    "Does not establish Microsoft Excel use or the 1,000+ monthly transaction figure",
+    "Does not establish an exact last day as intern -- only the 01.10.2021 transition date to full-time employment is documented; no separate internship end date is asserted",
+    "Does not establish U.S. work experience -- employment occurred in Sofia, Bulgaria",
+    "Does not establish the current LinkedIn display title 'Junior Financial Data Analyst', which is a separate, later, candidate-controlled presentation choice"
+  ]
+}

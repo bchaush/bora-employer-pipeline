@@ -1,0 +1,16 @@
+{
+  "claim_id": "CLAIM_BULMARMA_001",
+  "wording": "Built Excel-based reports for expenses, revenues, and cash flows, and managed monthly budget/cash-flow reporting of approximately $80K in Excel.",
+  "evidence_ids": ["BULMARMA_EXCEL_001"],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": ["resume", "interview", "networking", "Data Operations", "Business Systems", "Finance"],
+  "forbidden_contexts": [
+    "U.S. regulatory reporting experience",
+    "U.S. GAAP expertise",
+    "advanced Excel expert claim",
+    "audited financial figure claim"
+  ],
+  "human_approval": false,
+  "date": "2026-08-31",
+  "version": "1"
+}

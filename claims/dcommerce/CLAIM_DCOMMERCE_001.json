@@ -1,0 +1,17 @@
+{
+  "claim_id": "CLAIM_DCOMMERCE_001",
+  "wording": "Prepared structured financial reports in Excel for Bulgarian National Bank submission and reconciled 1,000+ monthly transactions in Excel.",
+  "evidence_ids": ["DCOMMERCE_EXCEL_001"],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": ["resume", "interview", "networking", "Data Operations", "Business Systems", "Finance"],
+  "forbidden_contexts": [
+    "U.S. regulatory reporting experience",
+    "U.S. GAAP expertise",
+    "advanced Excel expert claim",
+    "audit ownership",
+    "risk-management ownership"
+  ],
+  "human_approval": false,
+  "date": "2026-08-31",
+  "version": "1"
+}

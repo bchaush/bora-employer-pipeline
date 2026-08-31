@@ -19,6 +19,52 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-31 — Candidate source ingestion: D Commerce + Bulmarma + undergraduate credential (`CANDIDATE_SOURCE_INGESTION_V1`, IMPLEMENTED — NOT PUSHED)
+
+**Reason**
+
+A read-only audit (`EVIDENCE_INGESTION_V1`) found that Bora's real, source-backed undergraduate credential and Excel/spreadsheet-tier facts for D Commerce Bank and Bulmarma 2008 Ltd existed outside the repository but were unrepresented. A first implementation pass ingested them from candidate-supplied profile screenshots, then a corrective audit found that the repository's own broader project history (an older résumé factual record) genuinely conflicted with those screenshots for D Commerce and Bulmarma's chronology/title/org-name. Bora then supplied resolving human correction plus a new, stronger original source for D Commerce: an employer-issued Letter of Reference.
+
+**D Commerce Bank**
+
+New `evidence/dcommerce/DCOMMERCE_REFERENCE_001.json` (VERIFIED; renamed from an initial `DCOMMERCE_OFFER_001` working name to accurately reflect that the underlying document is an employer-issued Letter of Reference, not an offer letter) establishes: internship start 09 Aug 2021; full-time appointment 01 Oct 2021; employment end 19 Sep 2022 (overall Aug 2021 – Sep 2022; no separate intern-end date is asserted, only the transition date); formal title "Junior expert" within the Management Information and Income and Costs Control Department. `EXP_DCOMMERCE_001.experience_type` reclassified `ORGANIZATIONAL_ENGAGEMENT` → `EMPLOYMENT`, directly paralleling TELUS's own precedent (VERIFIED-tier employer document authorizes the classification, per `experience.schema.json`'s own evidentiary-authorization guidance). A second new record, `evidence/dcommerce/DCOMMERCE_LINKEDIN_PERIOD_001.json` (OBSERVED), documents Bora's current LinkedIn display title "Junior Financial Data Analyst" as a separate, non-authoritative fact, never merged with the formal employer title. The existing `DCOMMERCE_EXCEL_001` (OBSERVED: Excel-based reporting, 1,000+ monthly transactions) is unchanged and explicitly not upgraded to VERIFIED merely because the overall employment relationship now is.
+
+**Bulmarma 2008 Ltd**
+
+No employer document was supplied for Bulmarma. Bora's explicit correction resolves the current canonical chronology to Sep 2022 – Nov 2023 (superseding a stale "Nov 2024" résumé value) and organization display to "Bulmarma 2008 Ltd" (superseding "Bulmarma OOD," with no Ltd=OOD legal-entity equivalence asserted). `EXP_BULMARMA_001.json` notes were rewritten to record both the corrected and superseded values and to state explicitly that Bora's correction resolves which history the repository uses without itself constituting independent employer verification — Bulmarma evidence remains OBSERVED and `experience_type` remains `ORGANIZATIONAL_ENGAGEMENT` (evidence-authorization level only, not an assertion the work wasn't real employment).
+
+**Undergraduate credential**
+
+`EXP_EDU_UNWE_001` / `EDU_UNWE_IDENTITY_001` ingested conservatively as OBSERVED (candidate-supplied, no official transcript), kept fully independent of the Brandeis M.S. record.
+
+**Claims**
+
+Three draft claims (`CLAIM_EDU_UNWE_001`, `CLAIM_DCOMMERCE_001`, `CLAIM_BULMARMA_001`) created with `human_approval=false`/non-reusable and remain so; `load_reusable_claims()` continues to exclude them (reusable-claim count unchanged at 13).
+
+**Known open findings (NOT fixed in this milestone)**
+
+* **Q-1 (credential qualifier overmatch)** — approving `CLAIM_EDU_UNWE_001` would produce `SUPPORTED` for "Bachelor's degree from a top-tier university," silently treating the unaddressed "top-tier" qualifier as satisfied. Reconfirmed reproducible via in-memory-only simulation (disk state unaffected). **OPEN.**
+* **Q-2 (Excel proficiency qualifier overmatch)** — approving `CLAIM_DCOMMERCE_001` would similarly produce `SUPPORTED` for "strong Excel skills," treating "strong" as satisfied by ordinary Excel use. Reconfirmed reproducible. **OPEN.**
+* **`0–2 years` experience-range wrong-requirement-layer finding** — from the prior audit, not addressed here. **OPEN**, for separate remediation.
+
+**Not changed**
+
+TELUS/Winter Walk protected identity and résumé sections (byte-unchanged, independently reconfirmed), MIT/YEB fixtures, `job_decision.py`'s mandatory+HIGH+NONE hard-block policy, Gate 0/Gate 1.5 semantics, K-1, `src/requirement_match.py`'s SAP/enterprise-platform protection, `BLUEPRINT.md`, `AGENTS.md`, `GEMINI.md`. PwC not ingested (out of scope, noted only). No claim was approved.
+
+**Pre-commit cleanup (`CANDIDATE_SOURCE_INGESTION_V1_PRE_COMMIT_CLEANUP`)**
+
+Following independent Cursor review (`PASS_WITH_NONBLOCKING_FINDINGS`): renamed `DCOMMERCE_OFFER_001` → `DCOMMERCE_REFERENCE_001` throughout (Evidence file/ID, `EXP_DCOMMERCE_001.json` source_of_truth, `DCOMMERCE_LINKEDIN_PERIOD_001.json` cross-reference, and all test files/expected-ID inventories), since the underlying document is an employer-issued Letter of Reference, not an offer letter — no change to the fact, evidence state, or source strength. Fixed one stale human-readable test-prose string in `tests/claim_repository_test.py` (referred to "13 claim files" in printed text while its own assertions already correctly checked 16; assertions were untouched). Test-maintainability finding (recurring hardcoded evidence-count/ID-set churn across ~18 test files whenever a real Evidence record is added) — non-blocking, not remediated.
+
+**Validation**
+
+`candidate_source_ingestion_v1_test.py`: 9/9 checks pass. Full repository test suite: 44/44 files pass. Job Analysis Golden: 15/15 pass, zero routing drift. Application Gate Golden: 9/9 pass. SAP/platform-overmatch regression: 5/5 pass. Schema/integrity validation: 7 Experience / 42 Evidence / 16 Claim records, all valid. `git diff --check`: clean. Frozen Atominvest fixture (unmodified `job.json`/`jd.txt`/`structured_extraction.json`) rerun: `LANE_0_REJECT`/REJECT, same 5 hard blockers, unchanged — no unapproved-evidence leakage. Zero remaining references to `DCOMMERCE_OFFER_001` confirmed via full-repository grep.
+
+**Status**
+
+`CANDIDATE_SOURCE_INGESTION_V1_IMPLEMENTED`. Independent Cursor review: `PASS_WITH_NONBLOCKING_FINDINGS`. Not pushed.
+
+---
+
 ## 2026-08-30 — Close Application Gate NONE-is-not-FALSE remediation (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_CLOSURE`, CLOSED)
 
 **Reason**

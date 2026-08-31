@@ -1,0 +1,8 @@
+{
+  "experience_id": "EXP_EDU_UNWE_001",
+  "experience_name": "Finance and Accounting (B.S.), University of National and World Economy",
+  "experience_type": "EDUCATION",
+  "organization": "University of National and World Economy",
+  "source_of_truth": "Bora-supplied current résumé factual history (not stored in repository); evidence/education/ records referencing EXP_EDU_UNWE_001",
+  "notes": "Canonical identity for Bora's undergraduate education, distinct from and prior to EXP_EDU_BRANDEIS_001 (Brandeis M.S., graduate level). Sourced from candidate-supplied current résumé factual history, not an official university record -- no transcript or diploma has been supplied for this credential, unlike Brandeis. Field of study and exact dates are documented in evidence/education/ records, not restated here. This identity record does not itself assert GPA, honors, institutional ranking/accreditation status, degree conferral verification, or U.S. degree equivalency."
+}

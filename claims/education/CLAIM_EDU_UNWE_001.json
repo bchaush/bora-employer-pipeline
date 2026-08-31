@@ -1,0 +1,18 @@
+{
+  "claim_id": "CLAIM_EDU_UNWE_001",
+  "wording": "Holds a Bachelor of Science in Finance and Accounting from the University of National and World Economy.",
+  "evidence_ids": ["EDU_UNWE_IDENTITY_001"],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": ["resume", "education", "interview"],
+  "forbidden_contexts": [
+    "top-tier university",
+    "institutional ranking or accreditation claim",
+    "U.S. degree equivalency",
+    "credential evaluation",
+    "GPA or honors claim",
+    "independently verified degree conferral"
+  ],
+  "human_approval": false,
+  "date": "2026-08-31",
+  "version": "1"
+}

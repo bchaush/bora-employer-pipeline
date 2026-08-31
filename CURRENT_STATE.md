@@ -1,6 +1,6 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-08-28
+Updated: 2026-08-31
 
 ## Current Phase
 
@@ -66,11 +66,13 @@ Application Gate v1 corrected (`APPLICATION_GATE_V1_CORRECTED`, including its F-
 
 Application Gate NONE-is-not-FALSE remediation (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`) = **CLOSED** (`evidence_match.result = NONE` means "no supporting match found," not "factually false"; Application Gate candidate-truth mapping corrected to `STRONG`/`SUPPORTED` → `TRUE`, `PARTIAL`/`UNKNOWN`/`NONE` → `UNCERTAIN` in `src/application_logic.py`'s `RESULT_TO_LOGIC_VALUE` -- the Application Gate's own translation layer only; Gate 1 itself (`job_decision.py`, `job_analysis.py`, `requirement_match.py`, `evidence_match.schema.json`) is unchanged, confirmed by zero diff and by all 15 Golden job-analysis fixtures remaining byte-identical; independent adversarial re-audit returned `PASS_WITH_LOW_FINDINGS` / `APPROVE_FOR_CLOSURE`, no HIGH blocking finding; one non-blocking issue, `K-1` (an `AT_LEAST_N` threshold exceeding its term count), tracked separately below, not fixed in this closure; 42/42 repository suites pass; 15/15 Golden pass; see the dated entries below for full detail).
 
-Canonical Experience records: **4** (`EXP_WW_001`, `EXP_MM_001`, `EXP_EDU_BRANDEIS_001`, `EXP_TELUS_001`).
+Candidate Source Ingestion v1 (`CANDIDATE_SOURCE_INGESTION_V1`) = **IMPLEMENTED — PENDING INDEPENDENT REAUDIT / NOT PUSHED** (D Commerce Bank employer Letter of Reference ingested as VERIFIED-tier `DCOMMERCE_REFERENCE_001`; D Commerce reclassified `EMPLOYMENT`; Bulmarma corrected current chronology recorded as human-authorized, still OBSERVED-tier; undergraduate credential ingested conservatively OBSERVED; three new draft claims remain unapproved/non-reusable; Q-1/Q-2 qualifier-overmatch and the `0–2 years` wrong-layer finding remain OPEN; independent Cursor review `PASS_WITH_NONBLOCKING_FINDINGS`; see below).
 
-Evidence records: **37** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 3 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) plus 8 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`, `TELUS_ENDDATE_001`); Bora-approved Evidence only.
+Canonical Experience records: **7** (`EXP_WW_001`, `EXP_MM_001`, `EXP_EDU_BRANDEIS_001`, `EXP_TELUS_001`, `EXP_EDU_UNWE_001`, `EXP_DCOMMERCE_001`, `EXP_BULMARMA_001`).
 
-Claim records: **13** total, all `human_approval=true` and `reusable=true` *(corrected at TELUS approval time — Cursor F-01 finding: this line had gone stale after the Education/TELUS-evidence milestones; it previously still said 11)* — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable) plus 2 TELUS claims (`CLAIM_TELUS_001`–`CLAIM_TELUS_002`, both `evidence_state=OBSERVED`, reusable per the same rule) whose revised final wording Bora explicitly approved on 2026-08-28. Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. Five human-approved MarketMind résumé modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`) now exist in the protected master (`resume/master/RESUME_MASTER_WW_V1.json`, version 6, 11 total modules) and are available for controlled, explicit selection; they are not in `default_module_order` and are therefore not automatically included in any derivative. No job-specific résumé has yet been generated.
+Evidence records: **42** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 3 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) plus 8 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`, `TELUS_ENDDATE_001`) plus 5 `CANDIDATE_SOURCE_INGESTION_V1` records (`EDU_UNWE_IDENTITY_001`, `DCOMMERCE_EXCEL_001`, `BULMARMA_EXCEL_001`, `DCOMMERCE_REFERENCE_001`, `DCOMMERCE_LINKEDIN_PERIOD_001`); Bora-approved Evidence only (the 5 new candidate-source records are ingested/traceable but not yet independently re-audited).
+
+Claim records: **16** total — 13 `human_approval=true`/`reusable=true` *(corrected at TELUS approval time — Cursor F-01 finding: this line had gone stale after the Education/TELUS-evidence milestones; it previously still said 11)* — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable) plus 2 TELUS claims (`CLAIM_TELUS_001`–`CLAIM_TELUS_002`, both `evidence_state=OBSERVED`, reusable per the same rule) whose revised final wording Bora explicitly approved on 2026-08-28 — plus 3 new draft claims (`CLAIM_EDU_UNWE_001`, `CLAIM_DCOMMERCE_001`, `CLAIM_BULMARMA_001`), all `human_approval=false`/non-reusable, excluded from matching. Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. Five human-approved MarketMind résumé modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`) now exist in the protected master (`resume/master/RESUME_MASTER_WW_V1.json`, version 6, 11 total modules) and are available for controlled, explicit selection; they are not in `default_module_order` and are therefore not automatically included in any derivative. No job-specific résumé has yet been generated.
 
 No production engine yet.
 
@@ -351,7 +353,7 @@ Do not add MarketMind modules to `default_module_order`, generate résumé outpu
 
 ## Next Approved Task
 
-`APPLICATION_GATE_V1_CORRECTED` (including its F-01/F-02 digest remediation) is closed and pushed. Gate 1.5 exists only as representation/evaluation primitives, not a full application orchestrator. No further Application Gate work, no Bulmarma, no D Commerce Bank, no PDF/DOCX, no Summary, no real résumé generation, no job-specific tailoring without separate approval.
+`APPLICATION_GATE_V1_CORRECTED` (including its F-01/F-02 digest remediation) is closed and pushed. Gate 1.5 exists only as representation/evaluation primitives, not a full application orchestrator. `CANDIDATE_SOURCE_INGESTION_V1` has since ingested D Commerce Bank and Bulmarma 2008 Ltd as Evidence/Experience/draft-Claim records only (see above); no claim is approved, no résumé module or master integration exists for either, and no PDF/DOCX, no Summary, no job-specific tailoring is authorized without separate approval. No further Application Gate work.
 
 ## Human Presentation Decision Required — TELUS Master Integration (RESOLVED 2026-08-29)
 
@@ -369,6 +371,52 @@ TELUS is now integrated into the protected master accordingly; see `TELUS_MASTER
 ## Open Item Requiring Bora's Input (not a blocker for this milestone's scope)
 
 A message accompanying this milestone's instructions asserted that "official Brandeis program evidence independently establishes that the Master of Science in Business Analytics (MSBA) is STEM-designated" and proposed recording STEM as VERIFIED. No actual source document, URL, catalog page, or screenshot text for that claim was supplied in this milestone — only the assertion that such evidence exists. Per the Evidence_ID Rule (`BLUEPRINT.md` §10: "No Evidence_ID: NO NEW FACTUAL CLAIM") and `evidence.schema.json`'s required `original_source`/`source_location` fields, STEM designation was **not** added in this milestone. If Bora can supply the actual official Brandeis source (e.g. the specific catalog/CIP page, official program-designation letter, or a screenshot with its exact text), a follow-up milestone can add it as a proper, source-cited Evidence record. This does not block `EDUCATION_EVIDENCE_V1`, whose scope was education identity/GPA/requirements-satisfied only.
+
+---
+
+## 2026-08-31 — Candidate source ingestion: D Commerce + Bulmarma + undergraduate credential (`CANDIDATE_SOURCE_INGESTION_V1`, IMPLEMENTED — NOT PUSHED)
+
+**Reason**
+
+`EVIDENCE_INGESTION_V1` (read-only audit) found real, source-backed candidate facts unrepresented in the repository: an undergraduate credential (University of National and World Economy) and Excel/spreadsheet-tier evidence for two prior Bulgarian employers, D Commerce Bank and Bulmarma 2008 Ltd. A first implementation ingested these from candidate-supplied profile screenshots. A corrective audit then found that the repository's own broader project history (an older résumé record) genuinely conflicted with those screenshots on D Commerce's and Bulmarma's chronology, title, and organization display. Bora supplied resolving human correction, plus a new, stronger original source for D Commerce: an employer-issued Letter of Reference.
+
+**D Commerce Bank**
+
+`evidence/dcommerce/DCOMMERCE_REFERENCE_001.json` (VERIFIED) — an employer-issued Letter of Reference — establishes internship start 09 Aug 2021, full-time appointment 01 Oct 2021, employment end 19 Sep 2022 (overall Aug 2021 – Sep 2022; no separate intern-end date is asserted, only the transition date), and formal title "Junior expert" within the Management Information and Income and Costs Control Department. `EXP_DCOMMERCE_001.experience_type` reclassified `ORGANIZATIONAL_ENGAGEMENT` → `EMPLOYMENT`, directly paralleling TELUS's own VERIFIED-employer-document precedent. `evidence/dcommerce/DCOMMERCE_LINKEDIN_PERIOD_001.json` (OBSERVED) separately documents Bora's current LinkedIn display title "Junior Financial Data Analyst," never merged with the formal employer title. `DCOMMERCE_EXCEL_001` (OBSERVED: Excel-based reporting, 1,000+ monthly transactions) is unchanged and not upgraded to VERIFIED.
+
+**Bulmarma 2008 Ltd**
+
+No employer document exists for Bulmarma. Bora's explicit correction resolves the current canonical chronology to Sep 2022 – Nov 2023 (superseding a stale "Nov 2024" résumé value) and organization display to "Bulmarma 2008 Ltd" (superseding "Bulmarma OOD," no legal-entity equivalence asserted). `EXP_BULMARMA_001.json` notes record both values and state explicitly that the correction resolves which history is used without constituting independent verification; evidence stays OBSERVED, `experience_type` stays `ORGANIZATIONAL_ENGAGEMENT` (evidence-authorization level only).
+
+**Undergraduate credential**
+
+`EXP_EDU_UNWE_001` / `EDU_UNWE_IDENTITY_001` ingested conservatively as OBSERVED (candidate-supplied, no transcript), independent of the Brandeis M.S. record.
+
+**Claims**
+
+Three new draft claims (`CLAIM_EDU_UNWE_001`, `CLAIM_DCOMMERCE_001`, `CLAIM_BULMARMA_001`), `human_approval=false`/non-reusable; excluded from `load_reusable_claims()`; reusable-claim count unchanged at 13.
+
+**Known open findings (not fixed here)**
+
+* **Q-1** — approving `CLAIM_EDU_UNWE_001` would produce `SUPPORTED` for "Bachelor's degree from a top-tier university," silently treating "top-tier" as satisfied. Reconfirmed via in-memory simulation. **OPEN.**
+* **Q-2** — approving `CLAIM_DCOMMERCE_001` would similarly produce `SUPPORTED` for "strong Excel skills." Reconfirmed. **OPEN.**
+* **`0–2 years` wrong-requirement-layer finding** — carried forward from the prior audit. **OPEN.**
+
+**Pre-commit cleanup**
+
+Following independent Cursor review (`PASS_WITH_NONBLOCKING_FINDINGS`): renamed `DCOMMERCE_OFFER_001` → `DCOMMERCE_REFERENCE_001` throughout (Evidence file/ID, Experience source_of_truth, cross-referencing Evidence notes, and all tests/expected-ID inventories) since the source is an employer Letter of Reference, not an offer letter — fact/state/source-strength unchanged. Fixed stale "13 claim files" prose in `tests/claim_repository_test.py` (assertions already correctly checked 16). Test-maintainability finding (hardcoded evidence-count/ID-set churn across ~18 files per new real Evidence record) — non-blocking, not remediated.
+
+**Not changed**
+
+TELUS/Winter Walk protected identity and résumé sections, MIT/YEB fixtures, `job_decision.py`'s mandatory+HIGH+NONE policy, Gate 0/Gate 1.5 semantics, K-1, SAP/enterprise-platform protection, `BLUEPRINT.md`, `AGENTS.md`, `GEMINI.md`. PwC not ingested. No claim approved.
+
+**Validation**
+
+`candidate_source_ingestion_v1_test.py`: 9/9 pass. Full repository suite: 44/44 pass. Job Analysis Golden: 15/15 pass, zero drift. Application Gate Golden: 9/9 pass. SAP/platform-overmatch: 5/5 pass. Repository integrity: 7 Experience / 42 Evidence / 16 Claim, all valid. `git diff --check`: clean. Frozen Atominvest fixture rerun (unmodified files): `LANE_0_REJECT`/REJECT, same 5 hard blockers, unchanged. Zero remaining references to `DCOMMERCE_OFFER_001`.
+
+**Status**
+
+`CANDIDATE_SOURCE_INGESTION_V1_IMPLEMENTED`. Independent Cursor review: `PASS_WITH_NONBLOCKING_FINDINGS`. Not pushed.
 
 ---
 

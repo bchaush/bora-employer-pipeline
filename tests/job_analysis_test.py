@@ -53,13 +53,13 @@ def load_bsa_fixture() -> dict:
 exp = validate_experience_repository()
 ev = validate_evidence_repository()
 cl = validate_claim_repository()
-assert_true(exp["valid"] is True and exp["records_checked"] == 4, "Experience regression")
-assert_true(ev["valid"] is True and ev["records_checked"] == 37, "Evidence regression")
+assert_true(exp["valid"] is True and exp["records_checked"] == 7, "Experience regression")
+assert_true(ev["valid"] is True and ev["records_checked"] == 42, "Evidence regression")
 assert_true(
     ev["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
     "Evidence Experience integrity",
 )
-assert_true(cl["valid"] is True and cl["records_checked"] == 13, "Claim regression")
+assert_true(cl["valid"] is True and cl["records_checked"] == 16, "Claim regression")
 reusable_approved = [
     cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
 ]
