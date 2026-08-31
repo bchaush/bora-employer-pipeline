@@ -361,6 +361,94 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         ),
         frozenset({"excel_elevated_proficiency_qualifier"}),
     ),
+    # COMPOUND_REQUIREMENT_SEMANTICS_V1: customer/client onboarding onto a
+    # software platform/system/application/product, as an implementation
+    # duty. Emitted additively alongside any other capability tags the
+    # same requirement text also triggers (e.g. UAT) -- never in place of
+    # them. Root cause: "Work alongside Implementation Managers to onboard
+    # customers onto the platform, supporting everything from data
+    # migration to UAT" previously inferred only {uat, pilot_testing,
+    # test_documentation}, because no pattern recognized the onboarding
+    # duty at all -- so the existing subset-check saw req_caps already
+    # equal to claim_caps and reported SUPPORTED, even though onboarding
+    # and data migration were never evidenced.
+    #
+    # BOUNDED CORRECTION (independent Cursor review, before commit): an
+    # earlier version of this pattern fired on bare "onboard(ing)
+    # customer(s)/client(s)" or "customer/client onboarding" with no
+    # software/platform context requirement at all -- which over-fired on
+    # entirely non-software onboarding duties that happen to share the
+    # words "onboard"/"onboarding" + "customer"/"client": "client
+    # onboarding for KYC/compliance", "client onboarding documentation at
+    # a bank", "customer onboarding for account opening", "onboarding
+    # wealth-management/consulting/advertising clients", bare "onboard
+    # clients efficiently"/"onboard new customers"/"customer onboarding
+    # process". None of those describe onboarding a customer *onto a
+    # software system* -- they describe an entirely different (banking/
+    # compliance/account-opening/relationship-management) onboarding
+    # process this tag must never represent. The capability this milestone
+    # actually needs to name is narrower than "customer onboarding" in
+    # general: it is specifically "onboarding a customer/client onto a
+    # platform/software/system/application/product." The tag itself was
+    # renamed from the ambiguous `customer_onboarding` to
+    # `customer_platform_onboarding` to make that scope explicit in the
+    # capability name itself, since it was never committed and this is the
+    # only opportunity to avoid locking in a misleadingly generic name.
+    # The pattern now requires BOTH the customer/client onboarding
+    # language AND an explicit software/platform/system/application/
+    # product object, connected via a direct "onto"/"to" construction (with
+    # only an optional article in between) -- not merely co-occurring
+    # anywhere in the same sentence. This matches the frozen Atominvest
+    # wording ("onboard customers onto the platform") and close variants
+    # ("onboarding customers onto our platform", "onboard clients to the
+    # software", "client onboarding onto the system", "customer onboarding
+    # to the application") while refusing every reproduced non-software
+    # onboarding case above, since none of them names a platform/software/
+    # system/application/product as the destination of onboarding at all.
+    # Conservative false negatives (a real software-onboarding duty phrased
+    # without this exact "onto/to a platform-noun" construction) are an
+    # accepted V1 limitation -- precision was prioritized over recall.
+    # No existing Claim carries this capability -- no approved evidence in
+    # this repository currently establishes customer/platform onboarding
+    # work.
+    (
+        re.compile(
+            r"\bonboard(?:ing)?\s+(?:new\s+)?(?:customers?|clients?)\s+"
+            r"(?:onto|to)\s+(?:the\s+|our\s+|a\s+)?"
+            r"(?:platform|software|system|application|product)\b|"
+            r"\b(?:customer|client)\s+onboarding\s+"
+            r"(?:onto|to)\s+(?:the\s+|our\s+|a\s+)?"
+            r"(?:platform|software|system|application|product)\b",
+            re.I,
+        ),
+        frozenset({"customer_platform_onboarding"}),
+    ),
+    # COMPOUND_REQUIREMENT_SEMANTICS_V1: data migration duty. Emitted
+    # additively alongside any other capability tags the same requirement
+    # text also triggers -- same root cause and rationale as
+    # customer_platform_onboarding above ("...supporting everything from
+    # data migration to UAT" left this duty entirely unrepresented).
+    # Independent Cursor review found no material false-positive issue
+    # with this pattern and one accepted conservative false negative
+    # ("migrate customer records" -- "records," not "data," is named as
+    # what is migrated); left unchanged in this correction, per explicit
+    # scope. Bound to
+    # the literal phrase "data migration" or "migrat(e/ing/ion) ... data"
+    # (with a short bounded filler, e.g. "migrating customer data") so it
+    # cannot false-fire on unrelated, non-data migration language (e.g.
+    # "migrate the application to AWS", "system migration to a new
+    # server", "migrating to a new office") -- none of those name "data"
+    # as what is being migrated. No existing Claim carries this
+    # capability -- no approved evidence in this repository currently
+    # establishes customer/platform data-migration work.
+    (
+        re.compile(
+            r"\bdata\s+migration\b|"
+            r"\bmigrat(?:e|ing|ion)\s+(?:\w+\s+){0,2}data\b",
+            re.I,
+        ),
+        frozenset({"data_migration"}),
+    ),
 )
 
 # Forced NONE traps for known unsupported upgrades (no positive transfer).
