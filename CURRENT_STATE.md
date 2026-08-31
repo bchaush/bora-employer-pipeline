@@ -370,6 +370,34 @@ A message accompanying this milestone's instructions asserted that "official Bra
 
 ---
 
+## 2026-08-30 — Fix Application Gate NONE truth semantics (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
+
+**Reason**
+
+`REAL_WORLD_APPLICATION_VERTICAL_SLICE_V1`'s Case B (YEB) exercise exposed a truth-semantics defect: `application_logic.RESULT_TO_LOGIC_VALUE` mapped an `evidence_match.result` of `NONE` ("no supporting Evidence/Claim match was found," Gate-1's unchanged meaning) directly to the logic value `FALSE`. Absence of supporting evidence is not evidence of factual absence. This let a question the capability matcher has no domain vocabulary for at all (e.g. "Do you have a Bachelor's degree?" -- a credential fact, not a skill-capability claim) produce a confident, unflagged `safe_boolean_answer=NO` with `manual_review_required=false` -- a real false-negative safety risk.
+
+**Fix**
+
+Changed exactly one dictionary value in `src/application_logic.py`: `RESULT_TO_LOGIC_VALUE["NONE"]` from `FALSE` to `UNCERTAIN`. This is the Application Gate's own translation layer (`result_to_logic_value`, used only by `src/application_gate.py`); Gate-1's shared matcher (`requirement_match.py`, `evidence_match.schema.json`) and its meaning of `NONE` are completely untouched. Because `safe_boolean_answer`/`manual_review_required` derivation in `application_gate.py` already handled `UNCERTAIN` correctly, no other code change was needed: `NONE` coverage now correctly yields `predicate_result=UNCERTAIN`, `safe_boolean_answer=UNKNOWN`, `manual_review_required=true`. `FALSE` remains reachable only through legitimate deterministic-logic derivation (e.g. `NOT(TRUE)`, or an unsatisfiable `AT_LEAST_N` threshold) -- never from a bare `NONE` leaf. No negative-evidence subsystem, credential subsystem, or education-ingestion mechanism was added.
+
+**Tests**
+
+Added a direct unit test for `result_to_logic_value()` (`tests/application_logic_test.py`) and three new Golden cases (`tests/application_gate_golden_test.py`): `GT_APP_GATE_NONE_NOT_FALSE` (Bachelor's degree), `GT_APP_GATE_NONE_PNL_NOT_FALSE` (P&L ownership), `GT_APP_GATE_NONE_EXCEL_NOT_FALSE` (compound Excel question, all clauses unsupported). Tightened `GT_APP_GATE_COMPOUND_UNSAFE`'s existing assertions to require `predicate_result=UNCERTAIN` (not merely `!= TRUE`) and `safe_boolean_answer=UNKNOWN`. All other existing Application Gate tests needed no changes and continued passing unmodified.
+
+**Not changed**
+
+`job_decision.py`, `job_analysis.py`, `requirement_match.py`, `evidence_match.schema.json`, Gate-1 routing/lane vocabulary, `application_question`/`application_attempt`/`application_answer` schemas, `ALWAYS_HUMAN` behavior, exploratory-answer isolation, form-only-clause handling, source immutability, résumé pipeline, immigration logic.
+
+**Validation**
+
+Repository suites: 42/42 PASS. Golden job-analysis set: 15/15 PASS, all Gate-1 fixture outcomes byte-identical to baseline (proving zero Gate-1 regression).
+
+**Status**
+
+`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_IMPLEMENTED`. Not pushed.
+
+---
+
 ## 2026-08-30 — Close Application Gate v1 (`APPLICATION_GATE_V1_CLOSURE_AND_PUSH`, CLOSED)
 
 **Reason**

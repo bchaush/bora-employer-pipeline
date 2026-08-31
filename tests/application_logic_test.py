@@ -1,9 +1,11 @@
 """Unit tests for deterministic three-valued logic evaluation
-(src/application_logic.py), part of APPLICATION_GATE_V1_CORRECTED.
+(src/application_logic.py), part of APPLICATION_GATE_V1_CORRECTED
+(extended by APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1).
 
 Covers ALL_OF / ANY_OF / AT_LEAST_N / NOT semantics exactly as specified,
-nested expressions, invalid clause references, and invalid AT_LEAST_N
-thresholds (schema-level).
+nested expressions, invalid clause references, invalid AT_LEAST_N
+thresholds (schema-level), and the evidence-match-result -> logic-value
+translation (result_to_logic_value).
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ SRC_PATH = ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
-from application_logic import TRUE, FALSE, UNCERTAIN, evaluate_expression  # noqa: E402
+from application_logic import TRUE, FALSE, UNCERTAIN, evaluate_expression, result_to_logic_value  # noqa: E402
 from schema_validation import build_draft202012_validator  # noqa: E402
 
 
@@ -122,5 +124,19 @@ assert_true(
     "must report INVALID_AT_LEAST_N_THRESHOLD",
 )
 print("PASS: runtime invalid AT_LEAST_N threshold fails closed.")
+
+# --- result_to_logic_value: evidence-match-result -> logic-value translation
+# (APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1) ---
+assert_true(result_to_logic_value("STRONG") == TRUE, "STRONG must map to TRUE")
+assert_true(result_to_logic_value("SUPPORTED") == TRUE, "SUPPORTED must map to TRUE")
+assert_true(result_to_logic_value("PARTIAL") == UNCERTAIN, "PARTIAL must map to UNCERTAIN")
+assert_true(result_to_logic_value("UNKNOWN") == UNCERTAIN, "UNKNOWN must map to UNCERTAIN")
+assert_true(
+    result_to_logic_value("NONE") == UNCERTAIN,
+    "NONE must map to UNCERTAIN, not FALSE: 'no supporting match found' is not the same as "
+    "'the proposition is established false' -- absence of supporting evidence is not evidence "
+    "of factual absence (APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1)",
+)
+print("PASS: result_to_logic_value maps STRONG/SUPPORTED->TRUE, PARTIAL/UNKNOWN/NONE->UNCERTAIN; NONE is never FALSE.")
 
 print("ALL application_logic_test CHECKS PASSED")

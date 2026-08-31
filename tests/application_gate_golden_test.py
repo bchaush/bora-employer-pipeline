@@ -1,13 +1,14 @@
 """Application Gate (Gate 1.5) foundational Golden/adversarial cases
-(APPLICATION_GATE_V1_CORRECTED).
+(APPLICATION_GATE_V1_CORRECTED; extended by
+APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1).
 
-Six named cases, run as one deterministic script following this
+Nine named cases, run as one deterministic script following this
 repository's existing plain-test-script convention (assert_true/print
 PASS, `python tests/application_gate_golden_test.py`) rather than a new
-fixture-directory + runner + schema subsystem: these are six hand-crafted
+fixture-directory + runner + schema subsystem: these are hand-crafted
 logic-proof cases, not a large data-driven JD matrix like
 golden-tests/job_analysis, so a dedicated fixture-directory schema would
-be unused abstraction for six cases.
+be unused abstraction for this count.
 
   GT_APP_GATE_CLEAN
   GT_APP_GATE_COMPOUND_UNSAFE
@@ -15,10 +16,18 @@ be unused abstraction for six cases.
   GT_APP_GATE_GATE0_SHORT_CIRCUIT
   GT_APP_GATE_FORM_ONLY_CLAUSE
   GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION
+  GT_APP_GATE_NONE_NOT_FALSE
+  GT_APP_GATE_NONE_PNL_NOT_FALSE
+  GT_APP_GATE_NONE_EXCEL_NOT_FALSE
 
 Gate 1.5 must never change Gate-1 lane/decision routing (job_decision.py
 is never imported or modified by this file) and must never process a
 Gate-0-rejected job.
+
+The last three cases prove APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1:
+an evidence_match.result of NONE ("no supporting match found" -- Gate-1's
+unchanged meaning) must translate to UNCERTAIN candidate truth, never FALSE.
+Absence of supporting evidence is not evidence of factual absence.
 """
 
 from __future__ import annotations
@@ -152,7 +161,16 @@ assert_true(results_by_clause["B"] in {"STRONG", "SUPPORTED"}, "clause B (proces
 assert_true(results_by_clause["C"] == "NONE", "clause C (Salesforce) must be unsupported")
 assert_true(results_by_clause["D"] == "PARTIAL", "clause D (CSV + approval sync combined) must be only partially covered by any single Claim")
 assert_true(compound_evaluation["predicate_result"] != "TRUE", "GT_APP_GATE_COMPOUND_UNSAFE: predicate must never authorize YES")
+assert_true(
+    compound_evaluation["predicate_result"] == "UNCERTAIN",
+    "GT_APP_GATE_COMPOUND_UNSAFE (APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1): "
+    "a NONE clause (C, no supporting evidence found) combined with a PARTIAL clause (D) must "
+    "produce UNCERTAIN, not FALSE -- absence of supporting evidence for clause C is not evidence "
+    "that clause C's proposition is false",
+)
 assert_true(compound_evaluation["safe_boolean_answer"] != "YES", "GT_APP_GATE_COMPOUND_UNSAFE: safe_boolean_answer must never be YES")
+assert_true(compound_evaluation["safe_boolean_answer"] == "UNKNOWN", "GT_APP_GATE_COMPOUND_UNSAFE: safe_boolean_answer must be UNKNOWN, not a confident NO")
+assert_true(compound_evaluation["manual_review_required"] is True, "GT_APP_GATE_COMPOUND_UNSAFE: an UNCERTAIN predicate must require manual review")
 
 bsa_analysis_still = run_analysis("GT_BSA_STRONG")
 assert_true(bsa_analysis_still["lane"] != "LANE_0_REJECT", "GT_APP_GATE_COMPOUND_UNSAFE: an unsafe application answer must not automatically reject the role's Gate-1 lane")
@@ -263,4 +281,104 @@ assert_true(
 print("PASS: GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION -- ApplicationQuestion source byte-identical; evaluation_inputs_digest changed because a real evaluation input (claim_index) changed.")
 
 
-print("ALL SIX APPLICATION GATE GOLDEN CASES PASSED")
+# ======================================================================
+# GT_APP_GATE_NONE_NOT_FALSE
+# (APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1)
+# ======================================================================
+# "Do you have a Bachelor's degree?" is a credential/biographical fact the
+# capability matcher has no domain vocabulary for at all (it is not a
+# skill-capability claim); this is exactly the real-world YEB defect: NONE
+# coverage must never become a confident, unflagged "NO".
+degree_question = {
+    "application_question_id": "AQ_DEGREE",
+    "application_attempt_id": "ATT_CLEAN_001",
+    "question_text": "Do you have a Bachelor's degree?",
+    "question_type": "YES_NO",
+    "required": True,
+    "captured_at": "2026-08-30",
+    "clauses": [
+        {"clause_id": "C1", "clause_text": "Bachelor's degree", "mapped_requirement_id": None},
+    ],
+    "logic_expression": None,
+    "answer_policy": "SAFE_REUSABLE",
+    "screening_materiality": "MEDIUM",
+    "filter_risk": "UNKNOWN",
+    "notes": None,
+}
+degree_evaluation = evaluate_application_question(
+    degree_question, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30",
+)
+assert_true(degree_evaluation["clause_evaluations"][0]["result"] == "NONE", "no capability tag exists for a Bachelor's-degree fact; clause result must be NONE (no support found)")
+assert_true(degree_evaluation["predicate_result"] == "UNCERTAIN", "GT_APP_GATE_NONE_NOT_FALSE: NONE coverage must produce UNCERTAIN, never FALSE")
+assert_true(degree_evaluation["safe_boolean_answer"] == "UNKNOWN", "GT_APP_GATE_NONE_NOT_FALSE: safe_boolean_answer must be UNKNOWN, never a confident NO")
+assert_true(degree_evaluation["manual_review_required"] is True, "GT_APP_GATE_NONE_NOT_FALSE: manual_review_required must be true -- the prior defect was returning False here")
+print("PASS: GT_APP_GATE_NONE_NOT_FALSE -- 'Bachelor's degree?' with no matching evidence domain produces UNCERTAIN/UNKNOWN/manual-review-required, never a confident false NO.")
+
+
+# ======================================================================
+# GT_APP_GATE_NONE_PNL_NOT_FALSE
+# ======================================================================
+pnl_question = {
+    "application_question_id": "AQ_PNL",
+    "application_attempt_id": "ATT_CLEAN_001",
+    "question_text": "Do you have experience owning or supporting a full P&L?",
+    "question_type": "YES_NO",
+    "required": True,
+    "captured_at": "2026-08-30",
+    "clauses": [
+        {"clause_id": "C1", "clause_text": "owning or supporting a full P&L", "mapped_requirement_id": None},
+    ],
+    "logic_expression": None,
+    "answer_policy": "REVIEW",
+    "screening_materiality": "HIGH",
+    "filter_risk": "UNKNOWN",
+    "notes": None,
+}
+pnl_evaluation = evaluate_application_question(
+    pnl_question, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30",
+)
+assert_true(pnl_evaluation["clause_evaluations"][0]["result"] == "NONE", "no approved Claim/Evidence supports P&L ownership; clause result must be NONE (no support found)")
+assert_true(pnl_evaluation["predicate_result"] == "UNCERTAIN", "GT_APP_GATE_NONE_PNL_NOT_FALSE: no supporting evidence must not be reported as a factual NO")
+assert_true(pnl_evaluation["safe_boolean_answer"] == "UNKNOWN", "GT_APP_GATE_NONE_PNL_NOT_FALSE: safe_boolean_answer must be UNKNOWN, not NO")
+assert_true(pnl_evaluation["manual_review_required"] is True, "GT_APP_GATE_NONE_PNL_NOT_FALSE: manual review must be required")
+print("PASS: GT_APP_GATE_NONE_PNL_NOT_FALSE -- P&L-ownership question with no supporting evidence produces UNCERTAIN/UNKNOWN/manual-review-required, not a factual NO.")
+
+
+# ======================================================================
+# GT_APP_GATE_NONE_EXCEL_NOT_FALSE
+# ======================================================================
+excel_none_question = {
+    "application_question_id": "AQ_EXCEL_NONE",
+    "application_attempt_id": "ATT_CLEAN_001",
+    "question_text": "Advanced Excel proficiency including complex formulas, pivot tables, Power Query, and financial model building?",
+    "question_type": "YES_NO",
+    "required": True,
+    "captured_at": "2026-08-30",
+    "clauses": [
+        {"clause_id": "C1", "clause_text": "complex formulas", "mapped_requirement_id": None},
+        {"clause_id": "C2", "clause_text": "pivot tables", "mapped_requirement_id": None},
+        {"clause_id": "C3", "clause_text": "Power Query", "mapped_requirement_id": None},
+        {"clause_id": "C4", "clause_text": "financial model building", "mapped_requirement_id": None},
+    ],
+    "logic_expression": {"op": "ALL_OF", "terms": ["C1", "C2", "C3", "C4"]},
+    "answer_policy": "REVIEW",
+    "screening_materiality": "MEDIUM",
+    "filter_risk": "UNKNOWN",
+    "notes": None,
+}
+excel_none_evaluation = evaluate_application_question(
+    excel_none_question, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30",
+)
+excel_results = {c["clause_id"]: c["result"] for c in excel_none_evaluation["clause_evaluations"]}
+assert_true(all(r == "NONE" for r in excel_results.values()), "no Excel/Power-Query/pivot-table/financial-modeling evidence exists; every clause must be NONE (no support found)")
+assert_true(
+    excel_none_evaluation["predicate_result"] == "UNCERTAIN",
+    "GT_APP_GATE_NONE_EXCEL_NOT_FALSE: ALL_OF over four NONE (no-match, now UNCERTAIN) clauses must not authorize YES, "
+    "but must also not be reported as a definite FALSE -- there is no explicit negative evidence establishing Bora lacks Excel skills, only absence of positive support",
+)
+assert_true(excel_none_evaluation["safe_boolean_answer"] == "UNKNOWN", "GT_APP_GATE_NONE_EXCEL_NOT_FALSE: safe_boolean_answer must be UNKNOWN, not a confident NO")
+assert_true(excel_none_evaluation["manual_review_required"] is True, "GT_APP_GATE_NONE_EXCEL_NOT_FALSE: manual review must be required")
+print("PASS: GT_APP_GATE_NONE_EXCEL_NOT_FALSE -- compound Excel question with entirely unsupported clauses produces UNCERTAIN, not a fabricated factual NO.")
+
+
+print("ALL NINE APPLICATION GATE GOLDEN CASES PASSED")

@@ -24,14 +24,33 @@ UNCERTAIN = "UNCERTAIN"
 _VALUES = frozenset({TRUE, FALSE, UNCERTAIN})
 
 # Maps an evidence/clause-match result vocabulary (evidence_match.schema.json)
-# onto the three logic values. PARTIAL and UNKNOWN both mean "genuinely
-# unproven either way" -- neither is silently treated as FALSE nor as TRUE.
+# onto the three logic values used for ApplicationQuestion candidate-truth
+# evaluation.
+#
+# NONE -> UNCERTAIN, not FALSE (APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1).
+# In Gate-1's shared matcher, evidence_match.result=NONE means "no supporting
+# Evidence/Claim match was found" -- that meaning is unchanged and is not
+# touched here. But absence of supporting evidence is not evidence of
+# factual absence: a candidate-truth question with NONE coverage has not
+# been established FALSE, only unproven. Collapsing NONE into FALSE here
+# previously let an unanswerable question (e.g. "Do you have a Bachelor's
+# degree?", which the capability matcher has no domain vocabulary for at
+# all) produce a confident, unflagged "NO" -- exactly the false-negative
+# safety risk the real-world YEB exercise exposed. PARTIAL and UNKNOWN
+# already meant "genuinely unproven either way"; NONE now means the same
+# thing here. This module has no mechanism to reach FALSE from a clause's
+# evidence-match result alone -- FALSE remains reachable only when the
+# logic expression itself derives it deterministically from an already-true
+# ALL_OF/AT_LEAST_N/NOT combination that resolves to FALSE by construction
+# (e.g. NOT(TRUE), or ALL_OF including a genuinely FALSE term once one
+# becomes representable through a safe existing mechanism). No new
+# negative-evidence subsystem was introduced to manufacture FALSE.
 RESULT_TO_LOGIC_VALUE: dict[str, str] = {
     "STRONG": TRUE,
     "SUPPORTED": TRUE,
     "PARTIAL": UNCERTAIN,
     "UNKNOWN": UNCERTAIN,
-    "NONE": FALSE,
+    "NONE": UNCERTAIN,
 }
 
 

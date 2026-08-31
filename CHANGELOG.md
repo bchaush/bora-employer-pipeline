@@ -19,6 +19,34 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-08-30 — Fix Application Gate NONE truth semantics (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
+
+**Reason**
+
+The real-world YEB vertical-slice exercise found that `application_logic.RESULT_TO_LOGIC_VALUE` mapped `evidence_match.result=NONE` ("no supporting match found") directly to logic value `FALSE`, letting a question with no matching evidence domain at all (e.g. "Bachelor's degree?") produce a confident, unflagged `NO`. Absence of supporting evidence is not evidence of factual absence.
+
+**Fix**
+
+Changed `RESULT_TO_LOGIC_VALUE["NONE"]` from `FALSE` to `UNCERTAIN` in `src/application_logic.py` -- the Application Gate's own translation layer only; Gate-1's shared matcher (`requirement_match.py`, `evidence_match.schema.json`) is untouched, and its `NONE` still means "no supporting match found." Existing `safe_boolean_answer`/`manual_review_required` derivation already handled `UNCERTAIN` correctly, so no further code change was needed. `FALSE` remains reachable only via legitimate deterministic-logic derivation (e.g. `NOT(TRUE)`, unsatisfiable `AT_LEAST_N`), never from a bare `NONE` leaf.
+
+**Tests**
+
+Added `result_to_logic_value()` unit coverage; added three Golden cases (`GT_APP_GATE_NONE_NOT_FALSE`, `GT_APP_GATE_NONE_PNL_NOT_FALSE`, `GT_APP_GATE_NONE_EXCEL_NOT_FALSE`); tightened `GT_APP_GATE_COMPOUND_UNSAFE` to require `predicate_result=UNCERTAIN`/`safe_boolean_answer=UNKNOWN`. All other Application Gate tests passed unmodified.
+
+**Not changed**
+
+`job_decision.py`, `job_analysis.py`, `requirement_match.py`, `evidence_match.schema.json`, Gate-1 routing, ApplicationAttempt/ApplicationQuestion/ApplicationAnswer schemas, ALWAYS_HUMAN behavior, exploratory-answer isolation, form-only-clause handling, source immutability, résumé pipeline, immigration logic.
+
+**Validation**
+
+42/42 repository suites pass. 15/15 Golden pass, zero Gate-1 outcome drift.
+
+**Status**
+
+`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1_IMPLEMENTED`. Not pushed.
+
+---
+
 ## 2026-08-30 — Close Application Gate v1 (`APPLICATION_GATE_V1_CLOSURE_AND_PUSH`, CLOSED)
 
 **Reason**
