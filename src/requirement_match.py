@@ -520,12 +520,66 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     # EXPERIENCE_RANGE_SEMANTICS_V1 test phrase and every SAP-years
     # phrase. Supports digit and small written-number forms (one-ten,
     # matching the same style already used for senior-years detection in
-    # job_decision.py). Bound to "minimum"/"at least"/"N+" duration
-    # framing specifically so it cannot false-fire on unrelated numeric
-    # mentions that are not years-of-experience conditions at all (e.g.
-    # "managed seven projects," "minimum two certifications," "seven
-    # years since graduation," "$5+ million budget," "five years of data
-    # retention").
+    # job_decision.py).
+    #
+    # QUALIFIED_DEGREE_EXPERIENCE_DURATION_V1: a read-only audit
+    # (QUALIFIED_DEGREE_EXPERIENCE_DURATION_AUDIT_V1) proved the same
+    # false-SUPPORTED defect class recurs through two grammar gaps this
+    # pattern did not yet cover: (1) a bare cardinal/word number with no
+    # "minimum"/"at least"/"+" framing at all (e.g. "3 years of
+    # experience"), and (2) a small, real set of experience-qualifying
+    # adjectives between "of" and "experience" (e.g. "3 years of system
+    # analysis experience," a real MBTA-style substitution-path wording).
+    # The audit confirmed OR-safety is governed entirely by the separate
+    # local-connector anchor below (credential immediately followed by
+    # "and"/"plus", never "or") and is unaffected by how broad the
+    # duration-tail grammar itself is -- widening the tail does not
+    # reintroduce OR-disjoint false-PARTIAL risk.
+    #
+    # The qualifier list is a small, explicitly enumerated whitelist --
+    # NOT an open-ended wildcard -- limited to adjectives that describe
+    # the SAME semantic class ("explicit numeric years-of-experience"),
+    # never a different structure. Deliberately excluded, and confirmed
+    # via adversarial testing to remain excluded: education/experience
+    # combination-substitution phrasing ("combined education and
+    # experience," "training and experience," "education and
+    # experience," "equivalent combination of education and experience")
+    # -- these represent an equivalency/substitution structure, not a
+    # plain duration condition, and conflating them under this tag would
+    # be a semantically false classification even though the resulting
+    # PARTIAL would still be "safe" in isolation; and numeric ranges
+    # ("3-5+ years of related experience/training") -- a genuinely
+    # separate grammar shape (mirroring EXPERIENCE_RANGE_SEMANTICS_V1's
+    # own RANGE pattern) requiring its own dedicated extension, not
+    # solved here and explicitly out of scope.
+    #
+    # BOUNDED CORRECTION (independent Cursor review, before commit): the
+    # first version's negative lookahead, `experience\b(?!/)`, only
+    # blocked "experience" immediately followed by a slash with no space
+    # ("experience/training") -- it missed the spaced form ("experience /
+    # training") and the "or"/"and"/"plus"-connected forms ("experience
+    # or training," "experience and training," "experience plus
+    # training"), all of which are the SAME qualification-composition/
+    # alternative semantic as "experience/training" (training functioning
+    # as an alternative or additional *qualification concept* to
+    # experience, not as something the candidate *did*), and were
+    # therefore falsely pulled into this capability. The lookahead is now
+    # `experience\b(?!\s*(?:/\s*|(?:or|and|plus)\s+)training\b)` --
+    # explicitly excluding "experience" directly followed (after optional
+    # whitespace) by a slash-or-connector-then-"training" construction in
+    # any of those four surface forms. This deliberately does NOT exclude
+    # every occurrence of "training" after "experience": "training" used
+    # as a present-participle verb describing the work performed --
+    # "experience training users," "experience training staff on the
+    # application" -- has no slash/or/and/plus connector directly before
+    # it, so the lookahead does not match there and the tag still fires
+    # correctly (training-as-activity, not training-as-qualification-
+    # alternative). Bound to "minimum"/"at least"/"N+"/bare-number
+    # duration framing specifically so it still cannot false-fire on
+    # unrelated numeric mentions that are not years-of-experience
+    # conditions at all (e.g. "managed seven projects," "minimum two
+    # certifications," "seven years since graduation," "$5+ million
+    # budget," "five years of data retention").
     (
         re.compile(
             r"\b(?:degrees?|bachelor'?s?|master'?s?|credentials?)\s+"
@@ -533,12 +587,22 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             r"(?:"
             r"(?:a\s+)?minimum\s+(?:of\s+)?"
             r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
-            r"\s*\+?\s*years?\s+of\s+experience|"
+            r"\s*\+?\s*years?\s+of\s+"
+            r"(?:(?:related|relevant|professional|system\s+analysis|application\s+support)\s+)?"
+            r"experience\b(?!\s*(?:/\s*|(?:or|and|plus)\s+)training\b)|"
             r"at\s+least\s+"
             r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
-            r"\s*\+?\s*years?\s+of\s+experience|"
-            r"\d+\+\s*years?\s+of\s+experience"
-            r")\b",
+            r"\s*\+?\s*years?\s+of\s+"
+            r"(?:(?:related|relevant|professional|system\s+analysis|application\s+support)\s+)?"
+            r"experience\b(?!\s*(?:/\s*|(?:or|and|plus)\s+)training\b)|"
+            r"\d+\+\s*years?\s+of\s+"
+            r"(?:(?:related|relevant|professional|system\s+analysis|application\s+support)\s+)?"
+            r"experience\b(?!\s*(?:/\s*|(?:or|and|plus)\s+)training\b)|"
+            r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
+            r"\s*years?\s+of\s+"
+            r"(?:(?:related|relevant|professional|system\s+analysis|application\s+support)\s+)?"
+            r"experience\b(?!\s*(?:/\s*|(?:or|and|plus)\s+)training\b)"
+            r")",
             re.I,
         ),
         frozenset({"degree_experience_duration_conjunction"}),
