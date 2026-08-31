@@ -23,8 +23,22 @@ _MANDATORY_CUES = re.compile(
     r"(?<!not )\b(?:required|mandatory)\b",
     re.IGNORECASE,
 )
+# MANDATORY_PLUS_CONJUNCTION_SEMANTICS_V1: "plus" was previously matched
+# bare, intending to catch the bonus idiom ("SQL experience is a plus").
+# That also matched "plus" used as a conjunction ("Bachelor's degree plus
+# a minimum of seven years of experience" -- meaning "and"), which
+# co-occurring mandatory language (e.g. "minimum") then downgraded to
+# MIXED/UNCLEAR, silently removing a genuinely MANDATORY requirement from
+# hard-block and gap detection. Every reproduced bonus-idiom construction
+# ("is a plus", "would be a plus", "considered a plus", bare "a plus")
+# has the article "a" immediately before "plus"; every reproduced
+# conjunction use ("degree plus N years", "X plus Y") does not -- the
+# word immediately before "plus" is the first noun phrase, and "a" (if
+# present at all) follows "plus" rather than precedes it. Anchoring to
+# "a plus" as a bigram preserves every real bonus-idiom case while no
+# longer matching the conjunction case.
 _PREFERRED_CUES = re.compile(
-    r"\b(?:preferred|nice to have|bonus|plus|optional|ideally|"
+    r"\b(?:preferred|nice to have|bonus|a\s+plus|optional|ideally|"
     r"ideal candidate)\b",
     re.IGNORECASE,
 )
