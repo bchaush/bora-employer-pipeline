@@ -449,6 +449,100 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         ),
         frozenset({"data_migration"}),
     ),
+    # EXPERIENCE_DURATION_QUALIFIER_VISIBILITY_V1 (final, corrected form):
+    # marks that a Requirement contains a degree/credential condition
+    # DIRECTLY, LOCALLY conjoined (via "and"/"plus", not "or") with an
+    # explicit numeric years-of-experience condition -- e.g. "Bachelor's
+    # degree plus a minimum of seven years of experience." Emitted
+    # additively alongside whatever other capability tags the same
+    # requirement text also triggers (e.g. bachelors_degree_credential) --
+    # never in place of them.
+    #
+    # Root cause: frozen MIT's REQ_C_DEGREE_EXPERIENCE ("Bachelor's degree
+    # plus a minimum of seven years of experience OR a master's degree and
+    # minimum two years of experience OR equivalent") previously inferred
+    # only {bachelors_degree_credential} -- the "minimum of seven years"
+    # duration condition conjoined to it was entirely invisible, so
+    # approving only a bare bachelor's-degree claim (zero years-of-
+    # experience evidence at all) made the existing subset-check see
+    # req_caps already equal to claim_caps and report SUPPORTED.
+    #
+    # BOUNDED CORRECTION (independent Cursor review, before commit,
+    # OR_DISJUNCT_FALSE_PARTIAL): a first version of this tag matched any
+    # "minimum/at least/N+ years of experience" phrase ANYWHERE in the
+    # requirement text, with no connection to the credential at all. That
+    # over-fired on the mirror-image case: an OR-disjoint alternative path
+    # ("Bachelor's degree OR 5+ years of experience") where the duration
+    # condition is a genuinely SEPARATE, independently-sufficient
+    # alternative, not something the degree branch also requires -- an
+    # approved bachelor's claim there should fully satisfy that branch,
+    # not be demoted to PARTIAL merely because an unrelated duration
+    # alternative exists elsewhere in the sentence. A sentence-wide "does
+    # an AND/plus appear anywhere in this Requirement" gate (as
+    # independently proposed and rejected) would still be unsafe: a
+    # Requirement can contain both OR and AND while the duration remains
+    # inside only one alternative branch (e.g. "Bachelor's degree OR 5+
+    # years of experience, AND strong Excel skills" -- the trailing AND
+    # connects to an unrelated Excel clause, not to the degree-vs-
+    # experience alternative). The tag was therefore renamed from the
+    # ambiguous `experience_duration_qualifier` to
+    # `degree_experience_duration_conjunction` to make its narrower scope
+    # explicit, and the pattern now requires the credential word itself to
+    # be directly, locally followed by "and"/"plus" (never "or", and never
+    # merely co-occurring anywhere in the sentence) before the duration
+    # phrase -- mirroring the same local-connector-anchoring technique
+    # already used for Q-1's institutional-quality-qualifier fix
+    # (REQUIREMENT_QUALIFIER_SEMANTICS_V1). This correctly fires for the
+    # frozen MIT text and for "Bachelor's degree AND minimum 5 years of
+    # experience," and correctly does NOT fire for "Bachelor's degree OR
+    # 5+ years of experience" (in any of its adversarial variants,
+    # including ones with an unrelated trailing AND), because the word
+    # immediately after the credential is "or," not "and"/"plus."
+    #
+    # This tag is a visibility/completeness guard, not a candidate-
+    # duration evaluator: it does NOT mean "candidate has N years," does
+    # NOT mean "candidate lacks N years" (candidate duration remains
+    # CANDIDATE_EXPERIENCE_DURATION_NOT_YET_CANONICAL, unchanged), and
+    # does NOT attempt to choose between OR-branches (that qualification-
+    # path branch-selection question remains explicitly open, not solved
+    # here) -- it only prevents an independently-supported credential
+    # component from making a *locally, conjunctively attached* numeric-
+    # duration component look satisfied when it sits unrepresented. No
+    # existing Claim carries this capability -- no approved evidence in
+    # this repository establishes any specific years-of-experience
+    # threshold.
+    #
+    # Deliberately narrower than, and non-overlapping with, the generic
+    # "N years of work experience" band phrasing EXPERIENCE_RANGE_
+    # SEMANTICS_V1 already owns (that phrasing ends in "... work
+    # experience"; this pattern requires bare "... years of experience,"
+    # without "work"). Confirmed non-overlapping against every
+    # EXPERIENCE_RANGE_SEMANTICS_V1 test phrase and every SAP-years
+    # phrase. Supports digit and small written-number forms (one-ten,
+    # matching the same style already used for senior-years detection in
+    # job_decision.py). Bound to "minimum"/"at least"/"N+" duration
+    # framing specifically so it cannot false-fire on unrelated numeric
+    # mentions that are not years-of-experience conditions at all (e.g.
+    # "managed seven projects," "minimum two certifications," "seven
+    # years since graduation," "$5+ million budget," "five years of data
+    # retention").
+    (
+        re.compile(
+            r"\b(?:degrees?|bachelor'?s?|master'?s?|credentials?)\s+"
+            r"(?:and|plus)\s+"
+            r"(?:"
+            r"(?:a\s+)?minimum\s+(?:of\s+)?"
+            r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
+            r"\s*\+?\s*years?\s+of\s+experience|"
+            r"at\s+least\s+"
+            r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
+            r"\s*\+?\s*years?\s+of\s+experience|"
+            r"\d+\+\s*years?\s+of\s+experience"
+            r")\b",
+            re.I,
+        ),
+        frozenset({"degree_experience_duration_conjunction"}),
+    ),
 )
 
 # Forced NONE traps for known unsupported upgrades (no positive transfer).
