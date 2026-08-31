@@ -47,6 +47,38 @@ Everything the remediation already left untouched (see prior entry); K-1 recorde
 
 ---
 
+## 2026-08-31 — Prevent platform-specific evidence overmatch (`JOB_ANALYSIS_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
+
+**Reason**
+
+Real-world vertical-slice execution against the frozen MIT Lincoln Laboratory fixture found "7+ years of SAP FI/CO experience in requirements gathering, deployment and support" matching `STRONG` via Winter Walk's `CLAIM_WW_001`, driven entirely by the generic phrase "requirements gathering" -- "SAP FI/CO" and "7+ years" were never considered.
+
+**Fix**
+
+Extended the existing Workday/ServiceNow enterprise-platform regex in `src/requirement_match.py` to also match `sap`, reusing the existing `enterprise_platform_specialization` tag and its existing `_NONE_TRAPS` entry (`enterprise_platform_unsupported`) rather than inventing a new tag/trap/subsystem. Empirically confirmed this same trap-first mechanism already protects Salesforce/Workday/ServiceNow/GCP against this identical overmatch class by construction. A focused regression test (`tests/requirement_match_platform_overmatch_test.py`) was written and confirmed failing before the fix, and passing after.
+
+**Structured extraction freeze**
+
+Added `structured_extraction.json` to both `fixtures/jobs/CASE_A_ATOMINVEST_IMPLEMENTATION_ANALYST/` and `fixtures/jobs/CASE_C_MIT_LL_BUSINESS_SYSTEMS_ANALYST/`, validated against the existing `schemas/requirement.schema.json`, with every `source_text` traced to the already-frozen `jd.txt`. No source snapshot changed.
+
+**Post-remediation rerun (frozen fixtures only)**
+
+Case C: SAP FI/CO requirement now `NONE` (was `STRONG`); MIT remains REJECT via independent citizenship/clearance/seniority blockers. Case A: unchanged, still REJECT via 5 independent unsupported-mandatory-HIGH blockers; its remaining false-negative behavior was intentionally left unaddressed.
+
+**Not changed**
+
+`resume/`, `claims/`, `evidence/`, `experiences/`, `schemas/`, Application Gate/Answer logic, Gate-0/Gate-1.5 semantics, the mandatory+HIGH+NONE hard-block policy, seniority/credential evaluation, K-1, `BLUEPRINT.md`, `AGENTS.md`, `GEMINI.md`, YEB fixtures, Atominvest/MIT source snapshots.
+
+**Validation**
+
+Targeted regression: 5/5 pass. Application Gate Golden: 9/9 pass. Job-analysis Golden: 15/15 pass, zero drift. Full repository suites: 43/43 pass. `git diff --check`: clean.
+
+**Status**
+
+`JOB_ANALYSIS_REMEDIATION_V1_IMPLEMENTED`. Not pushed.
+
+---
+
 ## 2026-08-30 — Fix Application Gate NONE truth semantics (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
 
 **Reason**

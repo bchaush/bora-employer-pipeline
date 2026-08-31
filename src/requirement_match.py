@@ -191,7 +191,7 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         frozenset({"salesforce_administration"}),
     ),
     (
-        re.compile(r"\bworkday\b|\bservicenow\b|\bsnow\b", re.I),
+        re.compile(r"\bworkday\b|\bservicenow\b|\bsnow\b|\bsap\b", re.I),
         frozenset({"enterprise_platform_specialization"}),
     ),
     (
@@ -250,7 +250,14 @@ _NONE_TRAPS: tuple[tuple[str, frozenset[str], str], ...] = (
     (
         "enterprise_platform_unsupported",
         frozenset({"enterprise_platform_specialization"}),
-        "No approved Evidence/Claim supports Workday/ServiceNow specialization.",
+        "No approved Evidence/Claim supports Workday/ServiceNow/SAP specialization. "
+        "A named enterprise-platform requirement (e.g. a specific SAP module such as "
+        "FI/CO) is never satisfied by generic transferable-capability overlap alone "
+        "(e.g. 'requirements gathering' text coincidentally matching Winter Walk's "
+        "requirements-elicitation capability) -- this trap fires on any capability "
+        "overlap that includes a named-platform tag, before any claim is considered, "
+        "regardless of what other generic capabilities are also present in the same "
+        "requirement text.",
     ),
     (
         "google_cloud_vs_apps_script",

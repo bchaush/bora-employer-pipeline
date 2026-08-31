@@ -423,6 +423,47 @@ Everything the remediation itself already left untouched: `job_decision.py`, `jo
 
 ---
 
+## 2026-08-31 — Prevent platform-specific evidence overmatch (`JOB_ANALYSIS_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
+
+**Reason**
+
+`REAL_WORLD_APPLICATION_VERTICAL_SLICE_V1_RERUN`'s Case C (MIT Lincoln Laboratory) execution exposed a HIGH-severity false-positive: "7+ years of SAP FI/CO experience in requirements gathering, deployment and support" matched `STRONG` against Winter Walk's `CLAIM_WW_001`/`WW_ARCH_001` solely because the phrase "requirements gathering" hit the generic `requirements_elicitation` capability pattern -- the matcher never considered "SAP FI/CO" or "7+ years" at all. This did not flip Case C's REJECT outcome only because independent citizenship/seniority blockers fired first; in a role without those, it could have surfaced an unsupported STRONG match.
+
+**Fix**
+
+Reproduced the defect directly against the real matcher (`requirement_match.match_requirement`) before any code change, with a focused regression test (`tests/requirement_match_platform_overmatch_test.py`) added first and confirmed failing on unmodified code. The fix extends exactly one existing pattern in `src/requirement_match.py`: the enterprise-platform regex already covering Workday/ServiceNow (tag `enterprise_platform_specialization`, trapped to `NONE` by the existing `enterprise_platform_unsupported` `_NONE_TRAPS` entry) now also matches `\bsap\b`. This reuses the architecture's own established, already-correct mechanism -- confirmed empirically that `_NONE_TRAPS` already protects Salesforce/Workday/ServiceNow/GCP against this exact coincidental-generic-overlap bug class by construction (the trap check runs before any claim-matching and fires on any capability intersection regardless of what else is present) -- rather than inventing a new tag, trap, or platform-ontology subsystem. No raw `"SAP"` string trap was added in isolation; the capability-recognition pattern was extended so the trap can actually fire, per the explicit warning against a trap that cannot be reached.
+
+**Semantic probes (all against the real production matcher)**
+
+1. Generic "Gather business requirements from stakeholders" (no named platform) still matches `STRONG` via `CLAIM_WW_001` -- transferability preserved.
+2. "7+ years of SAP FI/CO experience in requirements gathering, deployment and support" now resolves `NONE` -- the demonstrated defect is fixed.
+3. "Work with teams implementing Salesforce workflows, gathering requirements from stakeholders" resolves `NONE` -- confirms the existing Salesforce trap already handled this combination correctly (unaffected by this change).
+4. "Exposure to SAP is a plus" (soft/preferred, no SAP evidence) resolves `NONE` -- no false direct positive, consistent with existing conservative behavior for soft platform mentions.
+5. Workday and Google Cloud requirements independently reconfirmed `NONE` -- existing platform traps unaffected.
+
+**Structured extraction freeze**
+
+Added `fixtures/jobs/CASE_A_ATOMINVEST_IMPLEMENTATION_ANALYST/structured_extraction.json` and `fixtures/jobs/CASE_C_MIT_LL_BUSINESS_SYSTEMS_ANALYST/structured_extraction.json`, using the exact extractions built and reviewed during the completed vertical-slice rerun as the starting point, validated against the existing, unmodified `schemas/requirement.schema.json` (all 20 requirement records valid). Every `source_text` traces directly to the already-frozen `jd.txt` in the same directory; no source snapshot was refreshed or altered. Both extractions were reviewed for requirement boundaries, mandatory/preferred classification, relevance, seniority, experience_level, and technology fields before freezing; no field was tuned to produce a particular APPLY/REJECT outcome (the extraction was built and reviewed before the post-remediation rerun was observed).
+
+**Real-world rerun (frozen fixtures only, no hand-editing)**
+
+* Case C: `REQ_C_SAP_FICO` now `NONE` (was `STRONG` pre-fix); MIT Lincoln Laboratory remains `LANE_0_REJECT`/REJECT via independent, source-grounded blockers (citizenship/clearance, seniority-years, and now also the SAP-specialization trap itself as an explicit additional hard blocker).
+* Case A: unchanged -- still `LANE_0_REJECT`/REJECT via 5 independent "unsupported core mandatory HIGH requirement" blockers (degree, Excel, 0-2 years, config/implementation, QA/troubleshooting), with the one legitimate UAT/data-migration match (`CLAIM_WW_005`/`WW_TEST_001`) intact and unaffected. Atominvest's remaining false-negative behavior was explicitly NOT addressed in this milestone -- recorded as a separate future finding.
+
+**Not changed**
+
+`resume/`, `claims/`, `evidence/`, `experiences/`, `schemas/`, Application Gate semantics, Application Answer logic, `job_decision.py`'s mandatory+HIGH+NONE hard-block policy, seniority/credential evaluation, Gate 0/Gate 1.5 semantics, K-1, `BLUEPRINT.md`, `AGENTS.md`, `GEMINI.md`, YEB fixtures, Atominvest/MIT source snapshots (`job.json`/`jd.txt`/`capture_notes.md` untouched).
+
+**Validation**
+
+Targeted regression test: 5/5 probes pass. `application_logic_test.py`, `application_gate_test.py`: pass. Application Gate Golden: 9/9 pass. Job-analysis Golden: 15/15 pass, zero routing drift. Full repository suites: 43/43 pass (42 prior + 1 new). `git diff --check`: clean.
+
+**Status**
+
+`JOB_ANALYSIS_REMEDIATION_V1_IMPLEMENTED`. Not pushed.
+
+---
+
 ## 2026-08-30 — Fix Application Gate NONE truth semantics (`APPLICATION_GATE_NONE_IS_NOT_FALSE_REMEDIATION_V1`, IMPLEMENTED — NOT PUSHED)
 
 **Reason**
