@@ -18,9 +18,13 @@ from typing import Any, Mapping, Optional
 
 from claim_repository import validate_claim_repository
 from evidence_repository import validate_evidence_repository
+from experience_range import (
+    evaluate_generic_experience_range,
+    is_generic_experience_range_requirement,
+)
 from job_decision import decide_lane_and_decision
 from job_id import generate_job_id
-from requirement_match import match_requirements
+from requirement_match import infer_requirement_capabilities, match_requirements
 from requirement_normalize import normalize_structured_requirements
 from schema_validation import build_draft202012_validator
 
@@ -207,9 +211,32 @@ def analyze_job(
     warnings.extend(normalized.get("warnings") or [])
 
     requirements = normalized["requirements"]
+
+    # EXPERIENCE_RANGE_SEMANTICS_V1: route GENERIC numeric experience-range
+    # requirements (e.g. "0-2 years of work experience") to their own
+    # narrow, honest evaluator instead of the generic capability matcher.
+    # A requirement is routed here only when it names no technology, the
+    # existing capability matcher recognizes nothing for it, and its text
+    # is an exact match for a narrowly enumerated "years of work
+    # experience" phrasing -- domain/platform-specific years requirements
+    # (SAP, Salesforce, UAT, "customer-facing implementation experience",
+    # etc.) are never routed and remain entirely owned by the unmodified
+    # capability matcher below, including the closed named-platform
+    # NONE_TRAPS protection. requirement_match.py itself is not modified.
+    generic_range_requirements: list[dict[str, Any]] = []
+    remaining_requirements: list[dict[str, Any]] = []
+    for requirement in requirements:
+        inferred_caps = infer_requirement_capabilities(requirement)
+        if is_generic_experience_range_requirement(
+            requirement, inferred_capabilities=inferred_caps
+        ):
+            generic_range_requirements.append(requirement)
+        else:
+            remaining_requirements.append(requirement)
+
     match_result = match_requirements(
         job_id=job_id,
-        requirements=requirements,
+        requirements=remaining_requirements,
         claim_index=claim_index,
         evidence_index=evidence_index,
     )
@@ -217,7 +244,27 @@ def analyze_job(
         empty["errors"].extend(match_result["errors"])
         return empty
 
-    matches = match_result["matches"]
+    experience_range_matches = [
+        evaluate_generic_experience_range(
+            job_id=job_id, requirement=requirement, match_index=index
+        )
+        for index, requirement in enumerate(generic_range_requirements)
+    ]
+
+    # Restore normalized-Requirement order (partitioning above splits the
+    # single ordered `requirements` list in two): downstream consumers key
+    # everything by requirement_id and are order-independent, but returning
+    # `evidence_matches` in the same order as `requirements` keeps the two
+    # arrays in deterministic external correspondence.
+    combined_matches_by_req = {
+        m["requirement_id"]: m
+        for m in match_result["matches"] + experience_range_matches
+    }
+    matches = [
+        combined_matches_by_req[requirement["requirement_id"]]
+        for requirement in requirements
+        if requirement["requirement_id"] in combined_matches_by_req
+    ]
     gaps, unknowns = _build_gaps_and_unknowns(requirements, matches)
 
     decision = decide_lane_and_decision(
