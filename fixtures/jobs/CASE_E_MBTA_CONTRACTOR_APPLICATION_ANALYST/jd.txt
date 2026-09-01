@@ -1,0 +1,52 @@
+Application Analyst - Digital Workplace (Contractor Position)
+Massachusetts Bay Transportation Authority (posting organization)
+Job Number: 20260804A-ITS87
+10 Park Plaza, Boston (hybrid, at least two (2) days per week in-office)
+
+Employment Type: Contractor (term-limited and project-specific)
+Compensation: $48.00 hourly
+Opening Date: 08/04/2026
+Closing Date: Continuous
+
+EMPLOYMENT STATUS CLARIFICATION
+
+This is a term-limited and project-specific contractor position. This
+worker is not employed directly by the MBTA.
+
+MINIMUM QUALIFICATIONS
+
+Bachelor's degree from an accredited institution.
+
+Three (3) years of experience in system analysis, including enterprise
+application design, configuration/development, implementation, and
+support.
+
+Ability to map and document complex business processes.
+
+Experience identifying and documenting business rules and technical
+requirements.
+
+Foundational knowledge of cloud-based application delivery models such as
+Software as a Service (SaaS).
+
+Experience with IT service management/ticketing systems.
+
+Strong interpersonal and communication skills.
+
+Microsoft Office suite proficiency.
+
+WORK AUTHORIZATION
+
+Candidates must be legally authorized to work in the United States on an
+unrestricted basis. The MBTA does not have an employer work sponsorship
+program.
+
+--
+NOTE ON CAPTURE METHOD: this text was reconstructed from a tool-mediated
+fetch of the official governmentjobs.com contractor-position posting (not
+a raw HTTP GET / raw HTML capture). The retrieval method and exact
+extraction prompt are recorded in capture_notes.md in this same directory.
+This is a separately captured page from CASE_D -- no text was copied
+between the two fixtures; the substantive overlap in minimum-qualification
+content reflects the two postings' genuinely similar duties, independently
+observed on each posting's own page.
