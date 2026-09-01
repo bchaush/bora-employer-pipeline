@@ -44,6 +44,12 @@ def load_bsa_fixture() -> dict:
         "jd_text": jd_text,
         "fixture_key": "FIXTURE_BSA_001",
         "structured_extraction": extraction,
+        # POSTING_STATE_DECISION_WIRING_V1: explicitly synthetic fixture
+        # ("Synthetic Fixture" in its own company name); this suite tests
+        # qualification/actionability, not posting-freshness verification.
+        # VERIFIED_LIVE is the correct explicit fixture state for that
+        # intent (Bounded Correction Section 3).
+        "role_status": "VERIFIED_LIVE",
     }
 
 
@@ -1124,6 +1130,9 @@ for family, title in [
         "role": title,
         "jd_text": f"{title} supporting internal applications.",
         "fixture_key": f"UNIT_FAMILY_{family.replace(' ', '_').upper()}",
+        # POSTING_STATE_DECISION_WIRING_V1: synthetic unit fixture testing
+        # role-family qualification/actionability, not posting freshness.
+        "role_status": "VERIFIED_LIVE",
         "structured_extraction": {
             "role_family": family,
             "seniority": "EARLY_CAREER",
@@ -1232,6 +1241,9 @@ ba_job = {
     "role": "Business Applications Analyst",
     "jd_text": "Business Applications Analyst supporting internal apps.",
     "fixture_key": "UNIT_BUSINESS_APPLICATIONS_ANALYST",
+    # POSTING_STATE_DECISION_WIRING_V1: synthetic unit fixture testing
+    # role-family qualification/actionability, not posting freshness.
+    "role_status": "VERIFIED_LIVE",
     "structured_extraction": {
         "role_family": "Business Applications Analyst",
         "seniority": "EARLY_CAREER",
@@ -1410,6 +1422,10 @@ p2_fixture = {
         encoding="utf-8"
     ),
     "fixture_key": "GT_PROCESS_MAP_P2",
+    # POSTING_STATE_DECISION_WIRING_V1: mirrors the synthetic Golden fixture
+    # of the same id, testing qualification/actionability, not posting
+    # freshness.
+    "role_status": "VERIFIED_LIVE",
     "structured_extraction": json.loads(
         (
             ROOT / "golden-tests/job_analysis/GT_PROCESS_MAP_P2/structured_extraction.json"

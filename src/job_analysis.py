@@ -22,7 +22,7 @@ from experience_range import (
     evaluate_generic_experience_range,
     is_generic_experience_range_requirement,
 )
-from job_decision import decide_lane_and_decision
+from job_decision import apply_posting_state_routing, decide_lane_and_decision
 from job_id import generate_job_id
 from requirement_match import infer_requirement_capabilities, match_requirements
 from requirement_normalize import normalize_structured_requirements
@@ -278,6 +278,28 @@ def analyze_job(
         jd_text=jd_text,
     )
 
+    # POSTING_STATE_DECISION_WIRING_V1: consume the canonical, already-classified
+    # posting-state fields (schemas/job.schema.json, Schema Milestone 1) if the
+    # caller supplied them on job_input. role_status is passed through to
+    # apply_posting_state_routing() exactly as supplied -- including None,
+    # an unrecognized string, or a non-canonical type -- and that function
+    # treats anything other than an explicit "VERIFIED_LIVE"/"LIKELY_LIVE"
+    # string as unverified, downgrading an APPLY-like decision to WATCH.
+    # This means a caller that supplies no role_status at all is NOT
+    # byte-identical to pre-milestone routing: an otherwise APPLY-like
+    # qualification now routes to WATCH by default (permanent project
+    # rule -- missing/invalid posting-state evidence must never silently
+    # become a favorable actionable state). The surfaced role_status
+    # output field is a separate concern: it is only ever the raw string
+    # the caller supplied, or None -- never fabricated, never coerced to
+    # a canonical value here. Posting state never alters qualification
+    # evidence, requirement-level matches, gaps, unknowns, or
+    # hard_blockers, and it never upgrades a decision or converts REJECT.
+    role_status = job_input.get("role_status")
+    source_verification_status = job_input.get("source_verification_status")
+    date_last_verified = job_input.get("date_last_verified")
+    decision = apply_posting_state_routing(base_result=decision, role_status=role_status)
+
     analysis = {
         "job_id": job_id,
         "company": company.strip(),
@@ -293,6 +315,11 @@ def analyze_job(
         "warnings": warnings,
         "extraction_mode": "STRUCTURED_EXTRACTION_PROVIDED",
         "decision_rationale": decision["decision_rationale"],
+        "role_status": role_status if isinstance(role_status, str) else None,
+        "source_verification_status": (
+            source_verification_status if isinstance(source_verification_status, str) else None
+        ),
+        "date_last_verified": date_last_verified if isinstance(date_last_verified, str) else None,
     }
 
     # Schema-validate nested requirement + match records already validated;

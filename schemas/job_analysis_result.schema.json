@@ -18,7 +18,10 @@
     "lane",
     "decision",
     "warnings",
-    "extraction_mode"
+    "extraction_mode",
+    "role_status",
+    "source_verification_status",
+    "date_last_verified"
   ],
   "properties": {
     "job_id": { "type": "string", "minLength": 1 },
@@ -82,6 +85,33 @@
     "decision_rationale": {
       "type": "string",
       "minLength": 1
+    },
+    "role_status": {
+      "type": ["string", "null"],
+      "enum": [
+        "VERIFIED_LIVE",
+        "LIKELY_LIVE",
+        "UNCLEAR",
+        "POSSIBLY_STALE",
+        "CONFIRMED_CLOSED",
+        null
+      ],
+      "description": "POSTING_STATE_DECISION_WIRING_V1: caller-supplied role freshness classification (schemas/job.schema.json, Blueprint Section 20/21), passed through unchanged. Null when not supplied by the caller -- never fabricated as VERIFIED_LIVE."
+    },
+    "source_verification_status": {
+      "type": ["string", "null"],
+      "enum": [
+        "VERIFIED_DIRECT",
+        "SOURCE_VERIFICATION_REQUIRED",
+        "DIRECT_SOURCE_UNAVAILABLE",
+        "UNKNOWN",
+        null
+      ],
+      "description": "POSTING_STATE_DECISION_WIRING_V1: caller-supplied direct-source verification axis (schemas/job.schema.json, Blueprint Section 19), passed through unchanged and independently of role_status. Null when not supplied."
+    },
+    "date_last_verified": {
+      "type": ["string", "null"],
+      "description": "POSTING_STATE_DECISION_WIRING_V1: caller-supplied most-recent verification date, passed through unchanged. No freshness-threshold or date-arithmetic logic is applied to it. Null when not supplied."
     }
   }
 }

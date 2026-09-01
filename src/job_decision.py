@@ -196,6 +196,81 @@ def is_information_deficit(
     return False
 
 
+_APPLY_LIKE_DECISIONS = frozenset({"PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"})
+_POSTING_WATCH_STATES = frozenset({"UNCLEAR", "POSSIBLY_STALE", "CONFIRMED_CLOSED"})
+# Only these two canonical strings represent verified/likely-live posting
+# reality; everything else -- None, any other canonical value, an
+# unrecognized string, or a non-string type -- must never preserve an
+# APPLY-like decision (SECOND BOUNDED CORRECTION).
+_LIVE_ROLE_STATES = frozenset({"VERIFIED_LIVE", "LIKELY_LIVE"})
+
+
+def apply_posting_state_routing(
+    *,
+    base_result: Mapping[str, Any],
+    role_status: Any,
+) -> dict[str, Any]:
+    """Apply Blueprint Section 30 posting-state downgrade to an already-computed
+    qualification decision (POSTING_STATE_DECISION_WIRING_V1).
+
+    Posting reality and qualification truth are separate axes. This function
+    runs strictly AFTER decide_lane_and_decision() has already produced its
+    qualification-only result:
+
+      - a qualification REJECT is never touched (a genuinely unqualified role
+        stays REJECT regardless of posting freshness or its absence);
+      - a decision that is already non-APPLY-like (e.g. an unrelated WATCH
+        from information deficit) is never touched either -- posting-state
+        routing only ever downgrades an APPLY-like result, and never
+        rewrites an existing rationale;
+      - role_status="VERIFIED_LIVE" or "LIKELY_LIVE" (and only those two
+        exact strings) preserve an APPLY-like result unchanged;
+      - every other role_status value downgrades an APPLY-like result
+        (PRIORITY_APPLY/APPLY/EFFICIENT_APPLY) to WATCH -- never to REJECT.
+        This deliberately includes: None/absent; the other canonical
+        values UNCLEAR/POSSIBLY_STALE/CONFIRMED_CLOSED; an unrecognized
+        string (e.g. "BOGUS"); and any non-string type (int/list/dict/
+        bool). Missing or malformed posting-state evidence is treated the
+        same as an explicit UNCLEAR -- the absence or invalidity of
+        verification must not silently become a favorable actionable
+        state (permanent project rule).
+      - role_status is a str check gate BEFORE any set-membership test, so
+        an unhashable raw value (e.g. a list) can never reach a hash-based
+        lookup -- this function never raises for any input type. It never
+        coerces or rewrites role_status itself; the surfaced role_status
+        value is owned entirely by job_analysis.py.
+      - Requirement-level matches, gaps, unknowns, and hard_blockers are
+        never modified; only lane/decision/decision_rationale may change.
+    """
+    result = dict(base_result)
+
+    if result.get("decision") not in _APPLY_LIKE_DECISIONS:
+        return result
+    if isinstance(role_status, str) and role_status in _LIVE_ROLE_STATES:
+        return result
+
+    if isinstance(role_status, str) and role_status in _POSTING_WATCH_STATES:
+        reason = f"role_status={role_status}"
+    elif isinstance(role_status, str):
+        reason = f"role_status={role_status!r} is not a recognized posting-state value"
+    elif role_status is None:
+        reason = "role_status missing (no posting-state verification supplied)"
+    else:
+        reason = (
+            f"role_status is not a valid posting-state string (got {type(role_status).__name__})"
+        )
+
+    result["lane"] = "WATCH"
+    result["decision"] = "WATCH"
+    result["decision_rationale"] = (
+        f"{result.get('decision_rationale', '')} "
+        f"Downgraded to WATCH: {reason} "
+        "(Blueprint Section 30 -- posting status uncertain, unverified, or "
+        "role not currently active; qualification result unchanged)."
+    ).strip()
+    return result
+
+
 def decide_lane_and_decision(
     *,
     requirements: Sequence[Mapping[str, Any]],

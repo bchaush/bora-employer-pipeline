@@ -74,6 +74,13 @@ def load_job_input(fixture_id: str) -> dict:
         "jd_text": jd_text,
         "structured_extraction": extraction,
         "fixture_key": fixture_id,
+        # POSTING_STATE_DECISION_WIRING_V1: this fixture is an explicitly
+        # synthetic company; this suite tests Application Gate (Gate 1.5)
+        # behavior against the underlying Gate-1 lane, not posting-freshness
+        # verification. VERIFIED_LIVE is the correct explicit fixture state
+        # for that intent, per the same rationale applied in
+        # golden-tests/run_job_analysis_golden_set.py.
+        "role_status": "VERIFIED_LIVE",
     }
 
 

@@ -123,6 +123,19 @@ def evaluate_fixture(
         "structured_extraction": {
             k: v for k, v in extraction.items() if not str(k).startswith("_")
         },
+        # POSTING_STATE_DECISION_WIRING_V1: every fixture in this Golden set
+        # is an explicitly synthetic company ("Synthetic Golden Co") whose
+        # purpose is qualification/actionability routing, not posting-
+        # freshness verification -- there is no real employer or real
+        # posting whose live status is being claimed here. VERIFIED_LIVE is
+        # the correct explicit fixture state for that intent (Bounded
+        # Correction Section 3: "For synthetic fixtures, VERIFIED_LIVE may
+        # be used as explicit fixture state when the test is intentionally
+        # testing qualification/actionability under a live-posting
+        # condition"). Real-employer fixtures (fixtures/jobs/CASE_A_*,
+        # CASE_C_*) are NOT touched by this change and carry no fabricated
+        # live-status claim.
+        "role_status": "VERIFIED_LIVE",
     }
     # Prefer explicit role title from extraction metadata.
     meta_role = extraction.get("_role_title")
