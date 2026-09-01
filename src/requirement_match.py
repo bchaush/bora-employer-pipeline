@@ -58,10 +58,64 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             r"(?:stakeholder|business)\s+requirements?\b|"
             r"(?:stakeholder|business)\s+needs?\s+into\s+documented\s+requirements?\b|"
             r"clarify(?:ing)?\s+(?:\w+\s+){0,4}(?:requirements?|needs?|scope|changes?)\b|"
-            r"scope\s+boundar|clarify(?:ing)?\s+scope",
+            r"scope\s+boundar|clarify(?:ing)?\s+scope|"
+            # BUSINESS_RULES_TECHNICAL_REQUIREMENTS_COMPOUND_COMPLETION_V1:
+            # narrow, phrase-aware branch so the existing (unchanged)
+            # requirements_elicitation capability reaches "technical
+            # requirements" when coordinated with "business rules and" in
+            # the same real employer sentence (e.g. MBTA's "identifying
+            # and documenting business rules and technical requirements").
+            # Deliberately NOT a generic word-gap widening -- the optional
+            # "business rules and" infix is the only additional context
+            # permitted, so arbitrary distant "requirements" mentions
+            # still cannot become requirements_elicitation through this
+            # branch. No new technical_requirements capability, no
+            # candidate-mapping change.
+            r"(?:identify(?:ing)?|document(?:ing)?|defin(?:e|ing)|captur(?:e|ing)|"
+            r"elicit(?:ing)?|clarify(?:ing)?|gather(?:ing)?|translat(?:e|ing))"
+            r"(?:\s+and\s+(?:identify(?:ing)?|document(?:ing)?|defin(?:e|ing)|"
+            r"captur(?:e|ing)|elicit(?:ing)?|clarify(?:ing)?|gather(?:ing)?|"
+            r"translat(?:e|ing)))?"
+            r"\s+(?:business\s+rules?\s+and\s+)?technical\s+requirements?\b",
             re.I,
         ),
         frozenset({"requirements_elicitation", "scope_boundary"}),
+    ),
+    # BUSINESS_RULES_TECHNICAL_REQUIREMENTS_COMPOUND_COMPLETION_V1: a
+    # distinct, narrowly-scoped capability -- explicit professional work
+    # identifying, defining, capturing, or documenting governing business
+    # rules/decision conditions/business constraints. This is NOT merely
+    # knowing, following, adhering to, implementing, configuring, or
+    # enforcing business rules (a different professional act -- see
+    # CLAIM_WW_002, whose fail-closed conditional controls implement
+    # rule-like logic but do not claim to have identified/documented the
+    # rules as a specification deliverable), and it is NEVER inferred
+    # from the bare noun phrase "business rules" alone. Zero-word-gap by
+    # design: the verb (or verb + "and" + verb) must directly govern
+    # "business rules", not merely co-occur nearby.
+    # Deliberately assigned to ZERO Claims: no current approved evidence
+    # establishes this distinct professional act.
+    #
+    # BUSINESS_RULE_OBJECT_BOUNDARY_BOUNDED_CORRECTION_V1 (Cursor
+    # external-review BLOCKING FINDING #1): a bounded negative-lookahead
+    # object-boundary exclusion directly after "business rules?" blocks
+    # false-fire when those words are actually a modifier inside a
+    # longer product/tool/system noun phrase ("business rules engine
+    # configuration" names an ENGINE, not the rules themselves).
+    # tool/tools/system/systems were added to the exclusion list only
+    # after direct probes confirmed they produce the same material
+    # false-positive pattern as engine/software/platform/application --
+    # not included by assumption.
+    (
+        re.compile(
+            r"\b(?:identify(?:ing)?|document(?:ing)?|defin(?:e|ing)|captur(?:e|ing))"
+            r"(?:\s+and\s+(?:identify(?:ing)?|document(?:ing)?|defin(?:e|ing)|"
+            r"captur(?:e|ing)))?"
+            r"\s+business\s+rules?\b"
+            r"(?!\s+(?:engine|software|platform|application|tool|tools|system|systems)s?\b)",
+            re.I,
+        ),
+        frozenset({"business_rule_identification_documentation"}),
     ),
     (
         re.compile(
