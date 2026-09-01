@@ -19,6 +19,28 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-01 — AI/tool operating-model governance role sync (`GOVERNANCE_ROLE_SYNC_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+Bora explicitly authorized a default operating-role realignment so the repository's authoritative governance documents match the current workflow: ChatGPT Work for architecture/adjudication, Claude Code for bounded implementation, Cursor for mandatory adversarial review of consequential uncommitted diffs before commit/push, and Gemini for optional non-coding second opinions only.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.1 → v3.2; updated locked tool-architecture sections (§54–§62, §69, §102, §119–§123, §131) to reflect the new roles and pre-commit review flow.
+* `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules/architecture.mdc`, `CURRENT_STATE.md`.
+* Added `CURRENT_MILESTONE.md` pointer for `APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1` (`READ_ONLY_AUDIT`, baseline `01142d19fa80400ce94db5f5fa2e85ea01f23e1c`).
+
+**Not changed**
+
+Truth, Evidence, Claim, immigration, testing, stop-condition, and human-approval rules; production code; schemas; Claims; Evidence; Experiences; fixtures; tests; golden expectations.
+
+**Validation**
+
+Documentation-only change. No tests run for this milestone.
+
+---
+
 ## 2026-08-31 — Candidate source ingestion: D Commerce + Bulmarma + undergraduate credential (`CANDIDATE_SOURCE_INGESTION_V1`, IMPLEMENTED — NOT PUSHED)
 
 **Reason**

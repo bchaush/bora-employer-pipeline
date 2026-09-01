@@ -20,10 +20,10 @@ BLUEPRINT.md is the strategic, product, reliability, implementation, and coding 
 - If a materially better approach is discovered: surface risks/tradeoffs and wait for explicit approval from Bora before modifying code.
 
 ## Locked AI / Tool Roles
-- **ChatGPT**: primary architect, research, reasoning, sequencing, and final decision guidance.
-- **Cursor**: primary builder.
-- **Claude Code**: independent coding/evidence reviewer, milestone auditor, and harder-code escalation (not a second primary builder).
-- **Gemini**: occasional non-coding strategic/directional/research second opinion only; not part of the coding execution or coding-review loop.
+- **ChatGPT Work**: primary architect, research, semantic adjudication, truth/calibration, priority selection, market/career/application guidance, reasoning, sequencing, and final decision guidance.
+- **Claude Code**: primary bounded implementation agent.
+- **Cursor**: mandatory independent adversarial reviewer of consequential uncommitted diffs before commit/push; not the default primary builder after governance sync.
+- **Gemini**: optional non-coding strategic/directional second opinion only; not part of the coding execution or coding-review loop.
 - No runtime workflow may depend on multi-model agreement. Deterministic validators enforce invariants. Evidence wins over model opinion. Bora retains consequential approval.
 
 ## Truth Rules
@@ -41,10 +41,12 @@ Substantive Evidence in `evidence_ids` establishes what happened. Bora's explici
 - **Rule**: If an operation can be calculated or validated deterministically, fail closed if validation fails. Never use AI for deterministic tasks.
 
 ## Pre-Execution & Schema Discipline
-Before modifying or creating code, Cursor Agent MUST:
+Before modifying or creating code, the active bounded implementation agent MUST:
 1. Inspect `schemas/` and relevant existing files first.
 2. Verify existing data models to prevent duplicate/conflicting types.
 3. Perform the minimal required change without unrelated refactoring.
+
+Consequential uncommitted diffs require Cursor adversarial review before commit/push unless Bora explicitly waives review for a specific task.
 
 ## Data Integrity & PII
 - Missing fields must remain explicit (`null`, `UNKNOWN`, or `NOT_FOUND_IN_PUBLIC_SEARCH`). Never fill missing fields with plausible assumptions.

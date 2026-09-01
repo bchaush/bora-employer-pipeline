@@ -1,12 +1,14 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.1**.
+Governing Blueprint: **Final Locked Blueprint v3.2**.
 
-AI/tool operating-model governance synchronization = **CLOSED**.
+AI/tool operating-model governance synchronization (`GOVERNANCE_ROLE_SYNC_V1`) = **CLOSED** (documentation-only role realignment; no production code, schemas, Claims, Evidence, Experiences, fixtures, or tests changed).
+
+Active milestone pointer: see `CURRENT_MILESTONE.md` (`APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1`, `READ_ONLY_AUDIT`, baseline `01142d19fa80400ce94db5f5fa2e85ea01f23e1c`; no implementation until audit adjudication is complete).
 
 Claim Validation hardening = **CLOSED**.
 
@@ -78,7 +80,7 @@ No production engine yet.
 
 ## Completed
 
-* Locked Blueprint loaded into repository; governing version now **v3.1**.
+* Locked Blueprint loaded into repository; governing version now **v3.2**.
 * Blueprint hardenings added for:
 
   * market-softness diagnostic handling;
@@ -86,11 +88,16 @@ No production engine yet.
   * strict structured-output schema validation.
 * Git repository initialized.
 * `AGENTS.md` created and locked.
-* Cursor selected as the primary builder.
-* ChatGPT selected as primary architect/research/reasoning/sequencing and final-decision-guidance layer.
-* Claude Code designated as independent coding/evidence reviewer, milestone auditor, and harder-code escalation.
-* Gemini designated as occasional non-coding strategic/directional/research second opinion only (not part of the coding execution or coding-review loop).
-* AI/tool operating-model governance sync closed:
+* ChatGPT Work selected as primary architect/research/semantic-adjudication/truth-calibration/priority-selection/market-career-application-guidance/reasoning/sequencing and final-decision-guidance layer.
+* Claude Code designated as primary bounded implementation agent.
+* Cursor designated as mandatory independent adversarial reviewer of consequential uncommitted diffs before commit/push (not the default primary builder after governance sync).
+* Gemini designated as optional non-coding strategic/directional second opinion only (not part of the coding execution or coding-review loop).
+* AI/tool operating-model governance sync closed (`GOVERNANCE_ROLE_SYNC_V1`, 2026-09-01):
+
+  * synchronized `BLUEPRINT.md` (v3.1 → v3.2), `AGENTS.md`, `.cursor/rules/architecture.mdc`, `GEMINI.md`, `CLAUDE.md`, `CURRENT_STATE.md`, `CHANGELOG.md`, and new `CURRENT_MILESTONE.md`;
+  * realigned roles: ChatGPT Work (architect/adjudication), Claude Code (bounded implementation), Cursor (adversarial review before commit/push), Gemini (optional non-coding second opinion);
+  * no production architecture, evidence semantics, schemas, Claims, Evidence, Experiences, fixtures, or tests changed.
+* Prior AI/tool operating-model governance sync (2026-08) also closed:
 
   * synchronized `BLUEPRINT.md`, `AGENTS.md`, `.cursor/rules/architecture.mdc`, `GEMINI.md`, and `CLAUDE.md`;
   * Blueprint bumped v3.0 → v3.1;

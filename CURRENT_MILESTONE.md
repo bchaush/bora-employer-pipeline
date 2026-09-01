@@ -1,0 +1,4 @@
+Status: READ_ONLY_AUDIT
+Task: APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1
+Baseline: 01142d19fa80400ce94db5f5fa2e85ea01f23e1c
+No implementation until audit adjudication is complete.
