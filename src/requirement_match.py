@@ -456,6 +456,46 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         ),
         frozenset({"institutional_quality_qualifier"}),
     ),
+    # ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1: institutional-
+    # accreditation qualifier on a credential requirement. Emitted IN
+    # ADDITION TO bachelors_degree_credential (a separate pattern above),
+    # never instead of it -- a requirement bundling both concepts remains
+    # fully supported for the credential fact itself, while this tag
+    # separately marks that an accreditation claim was also made.
+    #
+    # Reuses REQUIREMENT_QUALIFIER_SEMANTICS_V1's Q-1 locality-only
+    # design exactly (institutional_quality_qualifier, above), for the
+    # same reason Cursor's FALSE_CREDENTIAL_SOURCE_LINKAGE finding
+    # established there: any arbitrary filler window between the
+    # credential word and "from" -- however short -- can be filled by a
+    # real intervening noun phrase that is not the credential's source
+    # ("degree required for applicants from an accredited institution").
+    # The credential word must be directly, immediately followed by
+    # "from" (optionally through the same single literal "(or higher)"
+    # modifier Q-1 permits), which must in turn be immediately followed
+    # by "accredited" and an institution/university/college/school noun.
+    # No arbitrary filler is permitted anywhere in the construction. This
+    # correctly excludes "accreditation mentioned elsewhere in the
+    # clause," "experience working with accredited institutions," and
+    # "accredited educational program" (no institution/university/
+    # college/school noun follows "accredited" there). Same known,
+    # accepted locality-only limitation as Q-1: a comma directly after
+    # the credential word before "from" is not matched (unusual
+    # formatting variant, intentionally conservative rather than risk a
+    # false qualifier). No existing Claim carries this capability --
+    # CLAIM_EDU_UNWE_001's own forbidden_contexts explicitly exclude
+    # "institutional ranking or accreditation claim," and
+    # EDU_UNWE_IDENTITY_001 explicitly documents that accreditation is
+    # not established.
+    (
+        re.compile(
+            r"\b(?:degrees?|bachelor'?s?|master'?s?|associate'?s?|credentials?)\b"
+            r"(?:\s*\(or\s+higher\))?\s+from\s+(?:an?\s+)?"
+            r"accredited\s+(?:universit(?:y|ies)|institutions?|colleges?|schools?)\b",
+            re.I,
+        ),
+        frozenset({"institutional_accreditation_qualifier"}),
+    ),
     # REQUIREMENT_QUALIFIER_SEMANTICS_V1 (Q-2): elevated Excel-proficiency
     # qualifier. Emitted IN ADDITION TO excel_proficiency (the pattern
     # above), never instead of it.
