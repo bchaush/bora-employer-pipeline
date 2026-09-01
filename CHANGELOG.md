@@ -19,6 +19,30 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-01 — Accredited institution qualifier semantics (`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1`, CLOSED)
+
+**Reason**
+
+Real-fixture work on the MBTA direct/contractor postings found that requirement-capability inference silently dropped the explicit "from an accredited institution" qualifier from "Bachelor's degree from an accredited institution," inferring only the bare credential fact.
+
+**Changed**
+
+Added additive requirement-side `institutional_accreditation_qualifier` recognition for directly bound credential-source constructions (`src/requirement_match.py`); no candidate Claim maps to the qualifier; `CLAIM_EDU_UNWE_001` does not establish accreditation. Bachelor-only evidence can reach at most `PARTIAL` against the compound accredited-degree requirement. MBTA `CASE_D` and `CASE_E` remain `REJECT` with their existing degree and system-analysis-experience blockers. The main-requirement/questionnaire source discrepancy remains preserved. Added focused adversarial and real-fixture regression coverage (`tests/accredited_institution_qualifier_semantics_v1_test.py`).
+
+**Not changed**
+
+Production requirement-matching architecture beyond the one additive pattern; Claims; Evidence; Experiences; fixtures; schemas; résumé/immigration material; unrelated tests.
+
+**Validation**
+
+All tests and golden suites passed. Inventories and human approvals remain unchanged.
+
+**Status**
+
+`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1_CLOSED`. Canonical implementation commit `9950c7c3eacdebf741c2e6a990a5b391adba3c44`.
+
+---
+
 ## 2026-09-01 — AI/tool operating-model governance role sync (`GOVERNANCE_ROLE_SYNC_V1`, DOCUMENTATION ONLY)
 
 **Reason**

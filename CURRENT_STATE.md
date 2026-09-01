@@ -8,7 +8,9 @@ Governing Blueprint: **Final Locked Blueprint v3.2**.
 
 AI/tool operating-model governance synchronization (`GOVERNANCE_ROLE_SYNC_V1`) = **CLOSED** (documentation-only role realignment; no production code, schemas, Claims, Evidence, Experiences, fixtures, or tests changed).
 
-Active milestone pointer: see `CURRENT_MILESTONE.md` (`APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1`, `READ_ONLY_AUDIT`, baseline `01142d19fa80400ce94db5f5fa2e85ea01f23e1c`; no implementation until audit adjudication is complete).
+Accredited Institution Qualifier Semantics v1 (`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1`) = **CLOSED** (canonical implementation commit `9950c7c3eacdebf741c2e6a990a5b391adba3c44`; see the dated entry below for full detail).
+
+Active milestone pointer: see `CURRENT_MILESTONE.md` (`Status: COMPLETE_CANONICAL`; completed task `ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1`, canonical SHA `9950c7c3eacdebf741c2e6a990a5b391adba3c44`; next action `RETURN_TO_CHATGPT_WORK_FOR_REAL_JOB_PRIORITY_SELECTION`; no new implementation authorized, next matcher fix not preselected). Prior pointer `APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1` remains `COMPLETE_ADJUDICATED` (baseline `01142d19fa80400ce94db5f5fa2e85ea01f23e1c`; adjudication result: do not wire MM/TELUS Claims yet).
 
 Claim Validation hardening = **CLOSED**.
 
@@ -378,6 +380,46 @@ TELUS is now integrated into the protected master accordingly; see `TELUS_MASTER
 ## Open Item Requiring Bora's Input (not a blocker for this milestone's scope)
 
 A message accompanying this milestone's instructions asserted that "official Brandeis program evidence independently establishes that the Master of Science in Business Analytics (MSBA) is STEM-designated" and proposed recording STEM as VERIFIED. No actual source document, URL, catalog page, or screenshot text for that claim was supplied in this milestone — only the assertion that such evidence exists. Per the Evidence_ID Rule (`BLUEPRINT.md` §10: "No Evidence_ID: NO NEW FACTUAL CLAIM") and `evidence.schema.json`'s required `original_source`/`source_location` fields, STEM designation was **not** added in this milestone. If Bora can supply the actual official Brandeis source (e.g. the specific catalog/CIP page, official program-designation letter, or a screenshot with its exact text), a follow-up milestone can add it as a proper, source-cited Evidence record. This does not block `EDUCATION_EVIDENCE_V1`, whose scope was education identity/GPA/requirements-satisfied only.
+
+---
+
+## 2026-09-01 — Accredited institution qualifier semantics (`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1`, CLOSED)
+
+**Reason**
+
+Real-fixture causality work on the MBTA direct/contractor postings found that `infer_requirement_capabilities()` silently dropped the explicit "from an accredited institution" qualifier from `"Bachelor's degree from an accredited institution"`, inferring only `bachelors_degree_credential`. `CLAIM_EDU_UNWE_001` (the only candidate degree Claim, `human_approval=false`) supports only the bare credential fact; its `forbidden_contexts` explicitly exclude "institutional ranking or accreditation claim," and `EDU_UNWE_IDENTITY_001` explicitly documents that accreditation is not established.
+
+**Changed**
+
+* `src/requirement_match.py`: added one new, narrowly-scoped requirement-side capability, `institutional_accreditation_qualifier`, reusing `REQUIREMENT_QUALIFIER_SEMANTICS_V1`'s Q-1 (`institutional_quality_qualifier`) locality-only design exactly — the credential word must be directly, immediately followed by "from," then immediately "accredited" and an institution/university/college/school noun, with no arbitrary filler window (mirrors Cursor's `FALSE_CREDENTIAL_SOURCE_LINKAGE` hardening on Q-1). Emitted additively alongside `bachelors_degree_credential`, never instead of it. Assigned to **zero** Claims.
+* `tests/accredited_institution_qualifier_semantics_v1_test.py` (new): positive/negative/additive/claim-safety/isolated-match/real-fixture coverage, including Cursor-requested table-driven negatives (`"...required for candidates from an accredited institution"`, `"...experience working with accredited institutions"`, `"Degree preferred; candidates from accredited universities"`) and exact hard-blocker-list assertions for both real MBTA fixtures.
+
+**Semantic result**
+
+* `"Bachelor's degree from an accredited institution"` now infers both `bachelors_degree_credential` and `institutional_accreditation_qualifier`.
+* The qualifier is requirement-side only; no current Claim maps to it; `CLAIM_EDU_UNWE_001` does not establish accreditation.
+* A bachelor-only Claim (hypothetically approved, in-memory-only simulation, disk state reconfirmed unaffected) produces at most `PARTIAL` against the compound accredited-degree requirement — never `SUPPORTED`/`STRONG`.
+* `CASE_D`/`CASE_E` (`REQ_D_DEGREE`/`REQ_E_DEGREE`) remain `NONE` under current (unapproved) Claim state. Both MBTA final decisions remain `REJECT`. Exact hard blockers, both fixtures: `[*_DEGREE, *_SYS_ANALYSIS_EXP]` — unchanged from before this milestone.
+
+**Source-consistency result**
+
+The real MBTA direct posting's own source discrepancy is preserved, not harmonized: the Minimum Qualifications section explicitly requires "an accredited institution," while the same posting's supplemental-questionnaire Bachelor+3yr branch omits that phrase entirely. Neither statement was erased, harmonized, or interpreted as cancelling the other — the questionnaire-branch text is verified by dedicated test coverage to correctly not infer the new qualifier, exactly as its own wording dictates, with no qualification-branch logic touched.
+
+**Not changed**
+
+Production requirement-matching architecture beyond the one additive pattern; Claims; Evidence; Experiences; fixtures; schemas; résumé/immigration material; `BLUEPRINT.md`/`AGENTS.md`/`CLAUDE.md`/`GEMINI.md`/`.cursor/rules`; unrelated tests.
+
+**Prior Claim-capability audit**
+
+`APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1` remains `COMPLETE_ADJUDICATED` (baseline `01142d19fa80400ce94db5f5fa2e85ea01f23e1c`). Adjudication result: do not wire MM/TELUS Claims yet. Not reopened by this milestone.
+
+**Validation**
+
+Focused test: 10/10 pass. Full repository suite: all pass. Job Analysis Golden: 15/15 pass. Application Gate Golden: 9/9 pass. `git diff --check`: clean. Repository integrity unchanged: 7 Experience / 42 Evidence / 16 Claim (13 reusable). `CLAIM_EDU_UNWE_001`, `CLAIM_DCOMMERCE_001`, `CLAIM_BULMARMA_001` remain `human_approval=false`.
+
+**Status**
+
+`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1_CLOSED`. Canonical implementation commit `9950c7c3eacdebf741c2e6a990a5b391adba3c44`, pushed. Next action: return to ChatGPT Work for real-job priority selection; no new implementation authorized; next matcher fix not preselected.
 
 ---
 
