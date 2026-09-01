@@ -132,9 +132,28 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
     ),
     # Process / workflow mapping — bounded; domain text like "Business Process"
     # alone cannot false-fire without mapping/documentation verbs.
+    #
+    # PROCESS_MAPPING_REAL_GRAMMAR_V1 (MBTA_REAL_FIXTURE_CAUSALITY_AUDIT_V1):
+    # the zero-word-gap branches below correctly recognize synthetic/golden
+    # phrasing but missed real, natural employer wording -- MBTA's own
+    # "map and document complex business processes" -- because a single
+    # intervening adjective ("complex") or a compound "map and document"
+    # verb pair defeated every zero-gap alternative. The added branch is a
+    # small, bounded grammatical extension only: verb (map/mapping/
+    # document/documenting), an optional "and map"/"and document"
+    # compound-verb suffix, then AT MOST two modifier words, then
+    # "business process(es)" -- mirroring this repository's established
+    # {0,N}-bounded-word-gap discipline (e.g. requirements_elicitation's
+    # {0,3}) rather than an unbounded wildcard or broad proximity match.
+    # Also closes a pre-existing false positive on the bare
+    # "process mapping" branch ("process mapping software" is a product
+    # category, not a candidate/employer-required act) via a narrow,
+    # explicitly enumerated negative lookahead -- not a broad exclusion.
     (
         re.compile(
-            r"\bprocess\s+map(?:ping)?\b|\bworkflow\s+map(?:ping)?\b|"
+            r"\bprocess\s+map(?:ping)?\b"
+            r"(?!\s+(?:software|tool|tools|platform|application|solution))|"
+            r"\bworkflow\s+map(?:ping)?\b|"
             r"\bbusiness[- ]process\s+map(?:ping)?\b|"
             r"\bmap(?:ping)?\s+existing\s+business\s+processes?\b|"
             r"\bmap(?:ping)?\s+current[- ]state\s+workflows?\b|"
@@ -146,10 +165,76 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
             r"\bdocument(?:ing)?\s+business\s+processes?\b|"
             r"\bdocument(?:ing)?\s+(?:as[- ]is\s+|to[- ]be\s+|"
             r"current[- ]state\s+and\s+future[- ]state\s+)?"
-            r"(?:workflows?|business\s+processes?)\b",
+            r"(?:workflows?|business\s+processes?)\b|"
+            r"\b(?:map(?:ping)?|document(?:ing)?)"
+            r"(?:\s+and\s+(?:map(?:ping)?|document(?:ing)?))?"
+            r"\s+(?:\w+\s+){0,2}business\s+processes?\b",
             re.I,
         ),
         frozenset({"process_mapping"}),
+    ),
+    # PROCESS_MAPPING_COMPOUND_COMPLETION_V1 (PROCESS_MAPPING_COMPOUND_
+    # READ_ONLY_ADJUDICATION_V1): a distinct, narrowly-scoped ANALYTICAL
+    # capability -- explicitly identifying/evaluating where a business
+    # process, workflow, or assigned application could be optimized or
+    # automated. This is NOT process_mapping (faithfully documenting a
+    # process as-is), NOT workflow_automation (implementing automation
+    # with operational governance -- fail-closed/approval/audit context),
+    # and not generic "optimization"/"automation"/"improvement" language
+    # naming a topic without an explicit identification/evaluation verb.
+    #
+    # PROCESS_OPTIMIZATION_OPPORTUNITY_GRAMMAR_BOUNDED_CORRECTION_V1
+    # (Cursor external-review BLOCKING FINDING #1): the original grammar
+    # accepted ANY "identify(ing) opportunit(y|ies) for/to [<=3 words]
+    # optimiz.../automat..." with no requirement that the thing being
+    # optimized/automated actually be a business process, workflow, or
+    # application -- generic commercial/financial/unrelated "optimization"
+    # language false-fired (e.g. "cost optimization", "portfolio
+    # optimization", "automation companies"). The correction requires a
+    # genuine ANCHOR -- process(es)/business process(es)/workflow(s)/
+    # application(s) -- connected to the optimiz/automat word one of three
+    # ways; bare "business"/"automation"/"optimization" is NEVER itself a
+    # sufficient anchor:
+    #   (1a) noun-compound: anchor immediately precedes the optimiz/automat
+    #        word ("process optimization", "workflow automation");
+    #   (1b) verb-object: optimiz/automat directly followed by the anchor
+    #        as its object ("optimize or automate business processes",
+    #        "automate workflows");
+    #   (1c) trailing-application-tail: the generic "opportunit(y|ies) for
+    #        ... optimiz.../automat..." phrasing (CASE_D's actual real
+    #        wording) is scoped by an explicit trailing "within
+    #        [<=2 words] application(s)" clause;
+    #   (2)  "identify(ing) areas where [the] <anchor> [<=2 words]
+    #        can/could/may/might be optimiz.../automat..." -- the anchor
+    #        must now appear as the explicit subject right after "where"
+    #        (previously any words were allowed there, which let "the
+    #        automation platform can be optimized" false-fire on the bare
+    #        word "automation").
+    # Deliberately assigned to ZERO Claims: no current approved evidence
+    # establishes independently identifying such an opportunity --
+    # implementing automation (CLAIM_WW_002/CLAIM_WW_004) does not prove
+    # that Bora was the one who identified the opportunity for it.
+    (
+        re.compile(
+            r"\bidentify(?:ing)?\s+(?:\w+\s+){0,2}opportunit(?:y|ies)\s+"
+            r"(?:for|to)\s+(?:\w+\s+){0,2}"
+            r"(?:business\s+process(?:es)?|process(?:es)?|workflow(?:s)?|application(?:s)?)"
+            r"\s+(?:optimiz\w*|automat\w*)\b|"
+            r"\bidentify(?:ing)?\s+(?:\w+\s+){0,2}opportunit(?:y|ies)\s+to\s+"
+            r"(?:\w+\s+){0,2}(?:optimiz\w*|automat\w*)"
+            r"(?:\s+or\s+(?:optimiz\w*|automat\w*))?\s+"
+            r"(?:business\s+process(?:es)?|process(?:es)?|workflow(?:s)?|application(?:s)?)\b|"
+            r"\bidentify(?:ing)?\s+(?:\w+\s+){0,2}opportunit(?:y|ies)\s+for\s+"
+            r"(?:\w+\s+){0,3}(?:optimiz\w*|automat\w*)"
+            r"(?:\s+or\s+(?:optimiz\w*|automat\w*))?\s+within\s+"
+            r"(?:\w+\s+){0,2}application(?:s)?\b|"
+            r"\bidentify(?:ing)?\s+(?:\w+\s+){0,2}areas\s+where\s+(?:the\s+)?"
+            r"(?:business\s+process(?:es)?|process(?:es)?|workflow(?:s)?|application(?:s)?)"
+            r"\s+(?:\w+\s+){0,2}(?:can|could|may|might)\s+be\s+"
+            r"(?:optimiz\w*|automat\w*)\b",
+            re.I,
+        ),
+        frozenset({"process_optimization_opportunity_identification"}),
     ),
     (
         re.compile(
