@@ -144,8 +144,10 @@ remains CLOSED):
 PURSUIT_APPROVAL_BOUNDARY_ARCHITECTURE_V1
 
 Canonical ADR:
-docs/decisions/ADR-PURSUIT-APPROVAL-BOUNDARY-V1.md (untracked, reviewed,
-accepted, not yet committed)
+docs/decisions/ADR-PURSUIT-APPROVAL-BOUNDARY-V1.md (committed, canonical)
+
+Canonical architecture SHA:
+6a6a1da8b3ed2ddf6c6cf86b708d74bf2e0e0644
 
 Architecture adjudication:
 ACCEPTED -- IMPLEMENTATION DEFERRED
