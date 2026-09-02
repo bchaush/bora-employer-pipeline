@@ -1,10 +1,24 @@
-Status: ARCHITECTURE_RECORDED_AWAITING_IMPLEMENTATION_AUTHORIZATION
+Status: IMPLEMENTATION_AUTHORIZED
 Active task:
 REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1
+Canonical architecture SHA:
+d8826aa368e5dbfafb80531f03913bd43cd00713
 Canonical ADR:
 docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md
-ADR status: PROPOSED_FOR_IMPLEMENTATION_REVIEW (Cursor adversarial review
-pending; no implementation authorized yet)
+ADR status: CANONICAL. Cursor adversarial review COMPLETED --
+SAFE_TO_COMMIT_ADR (after one prior REQUIRES_CORRECTION verdict on the
+canonical verification command's ambiguous phase structure, corrected
+before this second review). Independently verified by ChatGPT Work on
+GitHub: commit d8826aa368e5dbfafb80531f03913bd43cd00713, parent
+cc496a0e456bd2d3dbc01337ed6b54e41bc8ec26, exactly three architecture/
+governance files changed (CURRENT_MILESTONE.md, CURRENT_STATE.md,
+docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md).
+
+Authorization:
+ChatGPT Work/Bora explicitly authorizes bounded implementation only within
+the canonical ADR's locked surface below. Cursor review is NOT pending --
+it is complete. No implementation exists yet as of this pointer commit;
+this turn authorizes it for a future, separate implementation turn.
 
 Selection provenance:
 ChatGPT Work/Bora selected this milestone after
@@ -13,11 +27,12 @@ POST_QUALIFICATION_GATE_REAL_MARKET_BOTTLENECK_AUDIT_V1
 DEGREE_CREDENTIAL_CANDIDATE_EVIDENCE_ADJUDICATION_V1 (read-only complete),
 and SYSTEM_WIDE_TRUST_AND_CONSISTENCY_AUDIT_V1 (read-only complete)
 converged on assurance/reproducibility debt -- not a reproduced business-
-logic defect -- as the highest-earned next action. This step recorded the
-already-adjudicated architecture faithfully as an ADR and this pointer; it
-did NOT implement it. No CI workflow, dependency file, verification
-runner, or new test file has been created. No production code, schema,
-Claim, Evidence, Experience, or resume was touched.
+logic defect -- as the highest-earned next action. The prior architecture-
+recording step authored the ADR and pointer faithfully without
+implementing it; this step authorizes bounded implementation only. No CI
+workflow, dependency file, verification runner, or new test file has been
+created yet. No production code, schema, Claim, Evidence, Experience, or
+resume has been touched.
 
 Locked terminology: REPRODUCIBILITY_UNVERIFIED (not
 REPRODUCIBILITY_BROKEN) -- current development-machine assurance already
@@ -55,9 +70,17 @@ employer-market expansion; branch-protection/required-status-check
 change; OS test matrix; .gitattributes addition; any packaging-tool
 adoption beyond a requirements.in/requirements-lock.txt pair.
 
-No implementation authorization exists yet. Next action is Cursor
-adversarial review of this ADR, then a separate, explicit implementation
-authorization turn.
+Implementation is now authorized, bounded strictly to the locked surface
+above (A-F) and the locked implementation principles carried in the
+canonical ADR (three-phase canonical verification command; exact Python
+3.14.6 runtime truth with STOP AND REPORT if unavailable on GitHub-hosted
+CI; requirements.in/requirements-lock.txt with a complete resolved
+transitive environment, no packaging-tool conversion, no hash-enforcement
+in V1; immutable full-commit-SHA-pinned GitHub Actions; least privilege;
+BRANCH_PROTECTION_UNVERIFIED unchanged; zero new business/Employer/
+Candidate/Match/Pursuit/Application semantics). Any implementation need
+outside the locked surface: STOP AND REPORT before expanding scope. This
+pointer commit itself performs no implementation.
 
 Historical closed milestone (superseded as the active pointer by the
 above, record preserved below):
