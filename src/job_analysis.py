@@ -17,6 +17,10 @@ from pathlib import Path
 from typing import Any, Mapping, Optional
 
 from claim_repository import validate_claim_repository
+from domain_qualified_duration import (
+    evaluate_domain_qualified_duration_requirement,
+    is_domain_qualified_duration_requirement,
+)
 from evidence_repository import validate_evidence_repository
 from experience_range import (
     evaluate_generic_experience_range,
@@ -384,7 +388,21 @@ def analyze_job(
     # etc.) are never routed and remain entirely owned by the unmodified
     # capability matcher below, including the closed named-platform
     # NONE_TRAPS protection. requirement_match.py itself is not modified.
+    # DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1: route domain-QUALIFIED
+    # numeric experience-duration requirements (e.g. "Three (3) years of
+    # experience in system analysis, including...") to their own narrow,
+    # honest evaluator, alongside (never merged into) the existing generic
+    # (domain-free) experience-range path above. A requirement is routed
+    # here only when it names a domain, names no technology, the existing
+    # capability matcher recognizes nothing for it, and its text is an
+    # exact match for a narrowly enumerated "N years of experience in
+    # <domain>" phrasing -- named-platform requirements (SAP, Salesforce,
+    # Workday, etc.) always have non-empty inferred capabilities and can
+    # never reach this evaluator, so their NONE_TRAPS-backed
+    # correctly-disproven NONE is never weakened. requirement_match.py and
+    # experience_range.py are not modified.
     generic_range_requirements: list[dict[str, Any]] = []
+    domain_qualified_duration_requirements: list[dict[str, Any]] = []
     remaining_requirements: list[dict[str, Any]] = []
     for requirement in requirements:
         inferred_caps = infer_requirement_capabilities(requirement)
@@ -392,6 +410,10 @@ def analyze_job(
             requirement, inferred_capabilities=inferred_caps
         ):
             generic_range_requirements.append(requirement)
+        elif is_domain_qualified_duration_requirement(
+            requirement, inferred_capabilities=inferred_caps
+        ):
+            domain_qualified_duration_requirements.append(requirement)
         else:
             remaining_requirements.append(requirement)
 
@@ -411,6 +433,12 @@ def analyze_job(
         )
         for index, requirement in enumerate(generic_range_requirements)
     ]
+    domain_qualified_duration_matches = [
+        evaluate_domain_qualified_duration_requirement(
+            job_id=job_id, requirement=requirement, match_index=index
+        )
+        for index, requirement in enumerate(domain_qualified_duration_requirements)
+    ]
 
     # Restore normalized-Requirement order (partitioning above splits the
     # single ordered `requirements` list in two): downstream consumers key
@@ -419,7 +447,9 @@ def analyze_job(
     # arrays in deterministic external correspondence.
     combined_matches_by_req = {
         m["requirement_id"]: m
-        for m in match_result["matches"] + experience_range_matches
+        for m in match_result["matches"]
+        + experience_range_matches
+        + domain_qualified_duration_matches
     }
     matches = [
         combined_matches_by_req[requirement["requirement_id"]]

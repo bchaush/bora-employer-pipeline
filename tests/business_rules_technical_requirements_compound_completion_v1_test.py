@@ -399,9 +399,12 @@ assert_true(
     f"CASE_D final decision must remain REJECT (independent blockers persist), got {direct_analysis['decision']}",
 )
 direct_blockers = sorted(b.rsplit(": ", 1)[-1] for b in direct_result["hard_blockers"])
+# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
+# milestone): REQ_D_SYS_ANALYSIS_EXP no longer independently hard-blocks
+# (resolves UNKNOWN); only REQ_D_DEGREE remains.
 assert_true(
-    direct_blockers == ["REQ_D_DEGREE", "REQ_D_SYS_ANALYSIS_EXP"],
-    f"CASE_D hard blockers must be exactly the 2 remaining independent ones, got {direct_blockers}",
+    direct_blockers == ["REQ_D_DEGREE"],
+    f"CASE_D hard blockers must be exactly the 1 remaining independent one, got {direct_blockers}",
 )
 print(f"PASS L1: CASE_D (direct) -- REQ_D_BUSINESS_RULES=PARTIAL via CLAIM_WW_001; final decision=REJECT; blockers={direct_blockers}.")
 
@@ -422,9 +425,11 @@ assert_true(
     f"CASE_E final decision must remain REJECT (independent blockers persist), got {contractor_analysis['decision']}",
 )
 contractor_blockers = sorted(b.rsplit(": ", 1)[-1] for b in contractor_result["hard_blockers"])
+# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
+# milestone): REQ_E_SYS_ANALYSIS_EXP no longer independently hard-blocks.
 assert_true(
-    contractor_blockers == ["REQ_E_DEGREE", "REQ_E_SYS_ANALYSIS_EXP"],
-    f"CASE_E hard blockers must be exactly the 2 remaining independent ones, got {contractor_blockers}",
+    contractor_blockers == ["REQ_E_DEGREE"],
+    f"CASE_E hard blockers must be exactly the 1 remaining independent one, got {contractor_blockers}",
 )
 print(f"PASS L2: CASE_E (contractor) -- REQ_E_BUSINESS_RULES=PARTIAL via CLAIM_WW_001; final decision=REJECT; blockers={contractor_blockers}.")
 

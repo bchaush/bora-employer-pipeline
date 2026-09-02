@@ -490,8 +490,11 @@ result_e = analyze_job(_load_job_input(FIXTURE_E))
 assert_true(result_d["valid"] is True and result_e["valid"] is True, "MBTA D/E analyses must be valid")
 blockers_d = {b.rsplit(": ", 1)[-1] for b in result_d["hard_blockers"]}
 blockers_e = {b.rsplit(": ", 1)[-1] for b in result_e["hard_blockers"]}
-assert_true(blockers_d == {"REQ_D_DEGREE", "REQ_D_SYS_ANALYSIS_EXP"}, f"MBTA direct blockers must not regress, got {blockers_d}")
-assert_true(blockers_e == {"REQ_E_DEGREE", "REQ_E_SYS_ANALYSIS_EXP"}, f"MBTA contractor blockers must not regress, got {blockers_e}")
+# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
+# milestone): REQ_D/E_SYS_ANALYSIS_EXP no longer independently hard-block
+# (resolve UNKNOWN, not NONE); only REQ_D/E_DEGREE remain.
+assert_true(blockers_d == {"REQ_D_DEGREE"}, f"MBTA direct blockers must not regress, got {blockers_d}")
+assert_true(blockers_e == {"REQ_E_DEGREE"}, f"MBTA contractor blockers must not regress, got {blockers_e}")
 assert_true(
     result_d["analysis"]["decision"] == "REJECT" and result_e["analysis"]["decision"] == "REJECT",
     "MBTA D/E decisions must not regress from REJECT",

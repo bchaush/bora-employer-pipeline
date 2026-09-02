@@ -339,8 +339,11 @@ assert_true(
     # (not NONE), so it no longer appears as a hard blocker. See
     # tests/business_rules_technical_requirements_compound_completion_v1_test.py
     # for dedicated coverage of that capability.
-    direct_blockers == ["REQ_D_DEGREE", "REQ_D_SYS_ANALYSIS_EXP"],
-    f"CASE_D hard blockers must be exactly the 2 remaining independent ones (degree, sys-analysis duration), got {direct_blockers}",
+    # SUPERSEDED BY DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1:
+    # REQ_D_SYS_ANALYSIS_EXP no longer independently hard-blocks (resolves
+    # UNKNOWN, not NONE); only REQ_D_DEGREE remains.
+    direct_blockers == ["REQ_D_DEGREE"],
+    f"CASE_D hard blockers must be exactly the 1 remaining independent one (degree), got {direct_blockers}",
 )
 print(f"PASS J1: CASE_D (direct) -- REQ_D_PROCESS_MAPPING=PARTIAL via CLAIM_WW_006; final decision=REJECT; blockers={direct_blockers}.")
 
@@ -360,8 +363,10 @@ contractor_blockers = sorted(b.rsplit(": ", 1)[-1] for b in contractor_result["h
 assert_true(
     # SUPERSEDED BY BUSINESS_RULES_TECHNICAL_REQUIREMENTS_COMPOUND_
     # COMPLETION_V1: REQ_E_BUSINESS_RULES now correctly resolves PARTIAL.
-    contractor_blockers == ["REQ_E_DEGREE", "REQ_E_SYS_ANALYSIS_EXP"],
-    f"CASE_E hard blockers must be exactly the 2 remaining independent ones, got {contractor_blockers}",
+    # SUPERSEDED BY DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1:
+    # REQ_E_SYS_ANALYSIS_EXP no longer independently hard-blocks.
+    contractor_blockers == ["REQ_E_DEGREE"],
+    f"CASE_E hard blockers must be exactly the 1 remaining independent one, got {contractor_blockers}",
 )
 print(f"PASS J2: CASE_E (contractor) -- REQ_E_PROCESS_MAPPING=STRONG via CLAIM_WW_006 (atomic requirement, unaffected); final decision=REJECT; blockers={contractor_blockers}.")
 

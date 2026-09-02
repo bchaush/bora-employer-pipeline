@@ -294,9 +294,16 @@ def _load_real_job_input(fixture_dir_name: str) -> dict:
     return job_input
 
 
+# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
+# milestone): REQ_D/E_SYS_ANALYSIS_EXP are domain-qualified duration
+# requirements with empty inferred capabilities and no longer
+# independently hard-block (they resolve UNKNOWN, not NONE); only the
+# genuine REQ_D/E_DEGREE blocker remains. This assertion is about THIS
+# milestone (accredited-institution-qualifier semantics) not changing the
+# blocker set any further -- updated to the current adjudicated baseline.
 for fixture_name, req_id, expected_blockers in (
-    ("CASE_D_MBTA_DIRECT_APPLICATION_ANALYST", "REQ_D_DEGREE", ["REQ_D_DEGREE", "REQ_D_SYS_ANALYSIS_EXP"]),
-    ("CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST", "REQ_E_DEGREE", ["REQ_E_DEGREE", "REQ_E_SYS_ANALYSIS_EXP"]),
+    ("CASE_D_MBTA_DIRECT_APPLICATION_ANALYST", "REQ_D_DEGREE", ["REQ_D_DEGREE"]),
+    ("CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST", "REQ_E_DEGREE", ["REQ_E_DEGREE"]),
 ):
     result = analyze_job(_load_real_job_input(fixture_name))
     assert_true(result["valid"] is True, f"{fixture_name} analysis must be valid: {result.get('errors')}")
