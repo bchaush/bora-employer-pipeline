@@ -1,24 +1,75 @@
-Status: IMPLEMENTATION_AUTHORIZED
-Active task:
+Status: CLOSED
+Closed task:
 REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1
 Canonical architecture SHA:
 d8826aa368e5dbfafb80531f03913bd43cd00713
+Authorization SHA:
+4a5ea68736f4c82274283ff154c7e53492320fba
+Canonical implementation SHA:
+b05c39022f791e3b6ef3f605f535a66620cd7c2a
 Canonical ADR:
 docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md
-ADR status: CANONICAL. Cursor adversarial review COMPLETED --
-SAFE_TO_COMMIT_ADR (after one prior REQUIRES_CORRECTION verdict on the
-canonical verification command's ambiguous phase structure, corrected
-before this second review). Independently verified by ChatGPT Work on
-GitHub: commit d8826aa368e5dbfafb80531f03913bd43cd00713, parent
-cc496a0e456bd2d3dbc01337ed6b54e41bc8ec26, exactly three architecture/
-governance files changed (CURRENT_MILESTONE.md, CURRENT_STATE.md,
-docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md).
+
+Implementation commit provenance:
+Parent authorization SHA 4a5ea68736f4c82274283ff154c7e53492320fba; commit
+message "REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1: implement
+reproducible assurance baseline"; exactly five implementation files
+changed (.github/workflows/assurance-baseline.yml, requirements.in,
+requirements-lock.txt, scripts/verify_assurance_baseline.py,
+tests/p0_causal_invariants_v1_test.py); no business, production, schema,
+Claim, Evidence, Experience, résumé, fixture, or governance file was part
+of the implementation commit; independently verified on GitHub by ChatGPT
+Work. Preceded by one narrow test-only correction (Cursor M-01: the
+original P0 §A only proved gated-leaf exclusion from hard_blockers/
+qualification_gaps/qualification_unknowns via a BLOCKED_BY_MATCHING_POLICY
+gate scenario, which exits decide_lane_and_decision() before its
+high_none-sensitive branch is reached; corrected by adding P0 §A2, an
+UNRESOLVED-gate scenario plus an ungrouped control, isolating and proving
+the SEPARATE gated-exclusion inside decide_lane_and_decision()'s own
+mandatory/preferred list comprehensions) -- second Cursor review verdict
+SAFE_TO_COMMIT_AND_PUSH, M-01 CLOSED.
+
+Hosted assurance evidence (independently verified by ChatGPT Work):
+- GitHub Actions workflow: Assurance Baseline
+- run id: 33678696541
+- event: push
+- head SHA: b05c39022f791e3b6ef3f605f535a66620cd7c2a
+- conclusion: success
+- hosted OS: Ubuntu 24.04
+- exact Python: 3.14.6
+- Phase 1 PASS (compile/syntax)
+- Phase 2: 60/60 PASS, all mandatory coverage anchors present
+  (application_gate_golden_test.py, posting_state_decision_wiring_v1_test.py,
+  alternative_qualification_branch_representation_v1_test.py, all six
+  schema smoke tests, p0_causal_invariants_v1_test.py)
+- Phase 3 Job Analysis Golden 15/15 PASS
+- final canonical verifier result: ALL PHASES PASSED
+
+REPRODUCIBILITY_UNVERIFIED is CLOSED for this canonical assurance
+baseline: dependencies reconstructed solely from requirements-lock.txt on
+a clean GitHub-hosted runner, Python 3.14.6 successfully resolved via the
+full-commit-SHA-pinned actions/setup-python, and the canonical verifier
+(python scripts/verify_assurance_baseline.py) reproduced the identical
+result set independently proven locally (see the prior turn's byte-for-
+byte-identical-output verification). This closure is bounded strictly to
+this canonical baseline and this exact hosted environment (Ubuntu 24.04,
+Python 3.14.6, this exact dependency lock) -- it does NOT establish that
+every OS is verified, that every Python version is supported, that branch
+protection exists, or that every future dependency change is automatically
+reproducible. Any of those remains a separate, future, evidence-gated
+claim.
+
+BRANCH_PROTECTION_UNVERIFIED is preserved unchanged. CI existence and CI
+success do not prove merge enforcement; branch-protection state is not
+touched by this closure and requires separate evidence to change.
 
 Authorization:
-ChatGPT Work/Bora explicitly authorizes bounded implementation only within
-the canonical ADR's locked surface below. Cursor review is NOT pending --
-it is complete. No implementation exists yet as of this pointer commit;
-this turn authorizes it for a future, separate implementation turn.
+ChatGPT Work/Bora explicitly authorized bounded implementation only within
+the canonical ADR's locked surface below; implementation completed exactly
+within that surface (items A-D of the locked surface; E and F were not
+built -- no concrete need for the optional newline/provenance test was
+demonstrated, and F's documentation requirement is satisfied by the ADR
+and this closure record, not a new file).
 
 Selection provenance:
 ChatGPT Work/Bora selected this milestone after
@@ -70,17 +121,22 @@ employer-market expansion; branch-protection/required-status-check
 change; OS test matrix; .gitattributes addition; any packaging-tool
 adoption beyond a requirements.in/requirements-lock.txt pair.
 
-Implementation is now authorized, bounded strictly to the locked surface
-above (A-F) and the locked implementation principles carried in the
-canonical ADR (three-phase canonical verification command; exact Python
-3.14.6 runtime truth with STOP AND REPORT if unavailable on GitHub-hosted
+Implementation was completed strictly within the locked surface above
+(A-F) and the locked implementation principles carried in the canonical
+ADR (three-phase canonical verification command; exact Python 3.14.6
+runtime truth, independently confirmed available and used on GitHub-hosted
 CI; requirements.in/requirements-lock.txt with a complete resolved
-transitive environment, no packaging-tool conversion, no hash-enforcement
+transitive environment -- attrs, jsonschema, jsonschema-specifications,
+referencing, rpds-py -- no packaging-tool conversion, no hash-enforcement
 in V1; immutable full-commit-SHA-pinned GitHub Actions; least privilege;
 BRANCH_PROTECTION_UNVERIFIED unchanged; zero new business/Employer/
-Candidate/Match/Pursuit/Application semantics). Any implementation need
-outside the locked surface: STOP AND REPORT before expanding scope. This
-pointer commit itself performs no implementation.
+Candidate/Match/Pursuit/Application semantics). No implementation need
+arose outside the locked surface.
+
+NO NEW ACTIVE IMPLEMENTATION MILESTONE IS CURRENTLY SELECTED. The next
+action is a fresh, read-only bottleneck/system/real-market prioritization
+audit by ChatGPT Work/Bora -- not preselected here. No new business
+implementation is authorized by this closure.
 
 Historical closed milestone (superseded as the active pointer by the
 above, record preserved below):
@@ -424,6 +480,29 @@ independently verified on GitHub by ChatGPT Work. TOTAL=59 FAILED=0; Golden
 15/15; Application Gate Golden 9/9; posting-state PASS. See the detailed
 closure record above for CASE_D/CASE_E results, the mid-milestone
 provenance-lesson correction, and carried-forward exclusions.
+
+Task: REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1
+Status: CLOSED
+Architecture SHA: d8826aa368e5dbfafb80531f03913bd43cd00713
+Authorization SHA: 4a5ea68736f4c82274283ff154c7e53492320fba
+Implementation SHA: b05c39022f791e3b6ef3f605f535a66620cd7c2a
+Adjudication result: assurance/reproducibility debt (not a reproduced
+business-logic defect) closed via a bounded requirements.in/requirements-
+lock.txt pair, scripts/verify_assurance_baseline.py (three-phase canonical
+command), .github/workflows/assurance-baseline.yml (SHA-pinned Actions),
+and tests/p0_causal_invariants_v1_test.py (P0 integration invariants A-E,
+including the M-01-corrected A2 high_none-counting isolation case); one
+prior ADR-phase REQUIRES_CORRECTION (ambiguous verification-command phase
+structure) and one prior implementation-phase M-01 correction (P0 §A
+narrow gap), both corrected and re-reviewed SAFE_TO_COMMIT before
+proceeding. Hosted GitHub Actions run (id 33678696541, head SHA
+b05c39022f791e3b6ef3f605f535a66620cd7c2a, Ubuntu 24.04, Python 3.14.6)
+independently verified: ALL PHASES PASSED (60/60 Phase 2, Application Gate
+9/9, Job Analysis Golden 15/15). REPRODUCIBILITY_UNVERIFIED closed for
+this exact canonical baseline/hosted environment only; BRANCH_PROTECTION_
+UNVERIFIED unchanged. No business/production/schema/Claim/Evidence/
+Experience/résumé semantics were touched at any stage. No new
+implementation milestone auto-selected.
 
 Historical anchors:
 Governance role-sync commit: 4b55448a8d189fe29344aded3d883a2fb35e9b5a
