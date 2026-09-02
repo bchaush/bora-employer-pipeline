@@ -16,7 +16,12 @@
       "domain": "Business Process",
       "relevance": "HIGH",
       "source_text": "Map existing business processes and produce process maps for stakeholder review is required",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P2_REQ",
@@ -30,7 +35,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Gather requirements and clarify scope boundaries is required",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P2_UAT",
@@ -44,7 +54,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Document user acceptance testing outcomes is required",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: duty-verb-led).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

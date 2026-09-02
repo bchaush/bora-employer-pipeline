@@ -15,6 +15,12 @@
     "evidence_matches",
     "gaps",
     "unknowns",
+    "qualification_gaps",
+    "qualification_unknowns",
+    "responsibility_observations",
+    "responsibility_evidence_unknowns",
+    "application_or_legal_gate_observations",
+    "unresolved_gate_observations",
     "lane",
     "decision",
     "warnings",
@@ -43,11 +49,115 @@
     },
     "gaps": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 }
+      "items": { "type": "string", "minLength": 1 },
+      "description": "UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: a compatibility-NAME alias for `qualification_gaps` (the identical list object) -- kept for callers written before SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1. Its content is NOT preserved byte-for-byte relative to that milestone: a ROLE_RESPONSIBILITY/AMBIGUOUS/APPLICATION_OR_LEGAL_GATE requirement is now explicitly excluded, where it was previously included under deficiency framing. See `qualification_gaps` for the authoritative description."
     },
     "unknowns": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 }
+      "items": { "type": "string", "minLength": 1 },
+      "description": "UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: a compatibility-NAME alias for `qualification_unknowns` (the identical list object); not byte-identical to its pre-milestone content. See `qualification_unknowns` for the authoritative description."
+    },
+    "qualification_gaps": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (authoritative name): unsupported (NONE) mandatory/preferred requirements whose derived qualification_gate is YES only. Never includes a ROLE_RESPONSIBILITY/AMBIGUOUS/APPLICATION_OR_LEGAL_GATE row. `gaps` is a compatibility-name alias for this exact field (same list object), not an independently-populated, pre-milestone-identical value."
+    },
+    "qualification_unknowns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (authoritative name): UNKNOWN-result requirements whose derived qualification_gate is YES only. `unknowns` is a compatibility-name alias for this exact field (same list object), not an independently-populated, pre-milestone-identical value."
+    },
+    "responsibility_observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requirement_id",
+          "text",
+          "source_semantic_role",
+          "result",
+          "evidence_ids",
+          "claim_ids",
+          "explanation",
+          "human_review_required",
+          "capability_inference_state"
+        ],
+        "properties": {
+          "requirement_id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "source_semantic_role": {
+            "type": "string",
+            "enum": ["ROLE_RESPONSIBILITY", "AMBIGUOUS"]
+          },
+          "result": {
+            "type": "string",
+            "enum": ["STRONG", "SUPPORTED", "PARTIAL", "NONE", "UNKNOWN"]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "claim_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "explanation": { "type": "string", "minLength": 1 },
+          "human_review_required": { "type": "boolean" },
+          "capability_inference_state": {
+            "type": "string",
+            "enum": [
+              "NO_CAPABILITIES_INFERRED",
+              "CAPABILITIES_INFERRED_NO_APPROVED_MATCH",
+              "APPROVED_MATCH_ESTABLISHED"
+            ],
+            "description": "SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: distinguishes the matcher never recognizing any capability concept in this text (a much weaker 'no evidence' state) from capabilities being recognized but no approved Claim matching, from an established STRONG/SUPPORTED/PARTIAL match. Never collapses these into one undifferentiated absence claim."
+          }
+        }
+      },
+      "description": "SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1: every ROLE_RESPONSIBILITY (and AMBIGUOUS, since AMBIGUOUS never independently gates either) requirement, with its already-established match result and cited evidence/claim information, reported without qualification-deficiency language. Never a candidate-gap or candidate-weakness statement."
+    },
+    "responsibility_evidence_unknowns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: responsibility rows (result=NONE/UNKNOWN with no cited evidence_ids/claim_ids at all) for which no established current approved match exists. Explicitly matcher-bounded wording -- never claims no adjacent evidence exists, that the candidate lacks the capability, or that this is a development need or qualification gap."
+    },
+    "application_or_legal_gate_observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requirement_id",
+          "text",
+          "dedicated_consumer",
+          "consumer_covers_this_row",
+          "consumer_fired_for_this_job"
+        ],
+        "properties": {
+          "requirement_id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "dedicated_consumer": { "type": "string", "minLength": 1 },
+          "consumer_covers_this_row": { "type": "boolean" },
+          "consumer_fired_for_this_job": { "type": "boolean" }
+        }
+      },
+      "description": "SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: every APPLICATION_OR_LEGAL_GATE requirement, with proof (re-checked here, not merely asserted at classification time) that the named job_decision.py JD-text-level citizenship/clearance consumer actually covers it. Never redesigns application_gate.py or immigration/work-authorization logic."
+    },
+    "unresolved_gate_observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "text", "basis", "human_review_required"],
+        "properties": {
+          "requirement_id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "basis": { "type": "string", "minLength": 1 },
+          "human_review_required": { "type": "boolean" }
+        }
+      },
+      "description": "SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: a citizenship/clearance/work-authorization/legal-access requirement whose classification could not be proven covered by any named dedicated consumer -- resolved to AMBIGUOUS rather than an unproven APPLICATION_OR_LEGAL_GATE, and surfaced here so it can never simply disappear from every consequential view."
     },
     "lane": {
       "type": "string",

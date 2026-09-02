@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Collect stakeholder requirements and document scope boundaries",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P1_WF",
@@ -30,7 +35,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Build controlled operational workflow automation with approval checkpoints",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: duty-verb-led).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P1_DATA",
@@ -46,7 +56,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Import CSV / spreadsheet data feeds with logging and validation",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P1_UAT",
@@ -60,7 +75,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Facilitate user acceptance testing and capture pilot results",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P1_CTRL",
@@ -74,7 +94,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Maintain fail-closed outbound send controls",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: duty-verb-led).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_P1_SF",
@@ -90,7 +115,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Salesforce administration experience is preferred, but not required",
-      "source_location": "Preferred qualifications"
+      "source_location": "Preferred qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

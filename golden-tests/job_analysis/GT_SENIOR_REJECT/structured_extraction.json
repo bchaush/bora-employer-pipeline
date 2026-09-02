@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Requires 7+ years leading enterprise systems programs",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_SEN_REQ",
@@ -30,7 +35,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Gather and clarify business requirements",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_SEN_WF",
@@ -44,7 +54,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Configure operational workflow automation with approval controls",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: duty-verb-led).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

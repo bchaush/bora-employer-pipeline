@@ -314,11 +314,14 @@ assert_true(
     match_exp_level["result"] == "UNKNOWN",
     f"REQ_A_EXPERIENCE_LEVEL must remain UNKNOWN, unaffected by this milestone; got {match_exp_level['result']}",
 )
+# SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (post-dates this milestone):
+# REQ_A_CONFIG_IMPLEMENTATION and REQ_A_QA_TROUBLESHOOTING are
+# responsibility-sourced and no longer independently hard-block; updated
+# to the current adjudicated baseline -- this assertion is about THIS
+# milestone not changing the blocker set any further.
 expected_blockers = {
-    "REQ_A_CONFIG_IMPLEMENTATION",
     "REQ_A_DEGREE",
     "REQ_A_EXCEL_DATA",
-    "REQ_A_QA_TROUBLESHOOTING",
 }
 actual_blocked_ids = {b.rsplit(": ", 1)[-1] for b in result_a["hard_blockers"]}
 assert_true(

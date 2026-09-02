@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Document requirements after stakeholder workshops",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: duty-verb-led).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_QA_WF",
@@ -30,7 +35,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Operate controlled workflow automation with approval sync points",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_QA_DATA",
@@ -46,7 +56,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Validate CSV / file imports for production intakes",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_QA_UAT",
@@ -60,7 +75,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Run user acceptance testing and archive pilot notes",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_QA_CTRL",
@@ -74,7 +94,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Keep fail-closed send controls healthy",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_QA_ENT",
@@ -88,7 +113,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Preferred: Enterprise QA engineering ownership experience",
-      "source_location": "Preferred"
+      "source_location": "Preferred",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

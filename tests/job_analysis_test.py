@@ -20,7 +20,30 @@ from evidence_repository import validate_evidence_repository  # noqa: E402
 from experience_repository import validate_experience_repository  # noqa: E402
 from job_analysis import analyze_job  # noqa: E402
 from requirement_normalize import classify_importance_from_source  # noqa: E402
+from requirement_source_role import classify_source_semantic_roles  # noqa: E402
 from schema_validation import build_draft202012_validator  # noqa: E402
+
+
+def _stamp_source_roles(requirements: list[dict]) -> list[dict]:
+    """UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: simulate ingestion-
+    time classification for a test-only synthetic requirement list before
+    handing it to analyze_job() -- ordinary analysis only ever CONSUMES a
+    persisted source_semantic_role, it never computes one. Uses the real
+    classifier against each row's real source_text/source_location, so a
+    row's actual content decides its role (this is not a blanket
+    ENTRY_QUALIFICATION stamp)."""
+    classifications = classify_source_semantic_roles(requirements)
+    for row, classification in zip(requirements, classifications):
+        row["source_semantic_role"] = classification["source_semantic_role"]
+        row["source_semantic_role_basis"] = classification["source_semantic_role_basis"]
+        row["explicit_prerequisite_language_present"] = classification[
+            "explicit_prerequisite_language_present"
+        ]
+        row["duplicated_under_requirements"] = classification["duplicated_under_requirements"]
+        row["source_semantic_role_classifier_version"] = classification[
+            "source_semantic_role_classifier_version"
+        ]
+    return requirements
 
 
 def assert_true(condition: bool, message: str) -> None:
@@ -176,6 +199,7 @@ senior["structured_extraction"]["requirements"].append(
         "source_location": "Minimum qualifications (required)",
     }
 )
+_stamp_source_roles(senior["structured_extraction"]["requirements"])
 senior_result = analyze_job(
     senior,
     claim_index=CLAIM_INDEX,
@@ -246,6 +270,7 @@ ml["structured_extraction"]["requirements"] = [
 ]
 ml["structured_extraction"]["role_family"] = "Machine Learning Engineering"
 ml["structured_extraction"]["seniority"] = "MID"
+_stamp_source_roles(ml["structured_extraction"]["requirements"])
 ml_result = analyze_job(ml, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
 assert_true(ml_result["valid"] is True, ml_result["errors"])
 ml_match = ml_result["analysis"]["evidence_matches"][0]
@@ -339,6 +364,7 @@ orphan_job["structured_extraction"]["requirements"] = [
         "source_location": "Minimum qualifications (required)",
     }
 ]
+_stamp_source_roles(orphan_job["structured_extraction"]["requirements"])
 orphan_result = analyze_job(
     orphan_job,
     claim_index=orphan_claim_index,
@@ -486,6 +512,7 @@ pm = {
         ],
     },
 }
+_stamp_source_roles(pm["structured_extraction"]["requirements"])
 pm_result = analyze_job(pm, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
 assert_true(pm_result["valid"] is True, pm_result["errors"])
 assert_true(
@@ -551,6 +578,7 @@ core_none["structured_extraction"]["requirements"].append(
         "source_location": "Minimum qualifications (required)",
     }
 )
+_stamp_source_roles(core_none["structured_extraction"]["requirements"])
 core_result = analyze_job(
     core_none,
     claim_index=CLAIM_INDEX,
@@ -891,6 +919,7 @@ vague = {
         ],
     },
 }
+_stamp_source_roles(vague["structured_extraction"]["requirements"])
 vague_result = analyze_job(vague, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
 assert_true(vague_result["valid"] is True, vague_result["errors"])
 assert_true(
@@ -986,6 +1015,7 @@ dup_job = {
         ],
     },
 }
+_stamp_source_roles(dup_job["structured_extraction"]["requirements"])
 dup_result = analyze_job(dup_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
 assert_true(dup_result["valid"] is True, dup_result["errors"])
 assert_true(
@@ -1155,6 +1185,7 @@ for family, title in [
             ],
         },
     }
+    _stamp_source_roles(app_job["structured_extraction"]["requirements"])
     app_result = analyze_job(
         app_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
     )
@@ -1266,6 +1297,7 @@ ba_job = {
         ],
     },
 }
+_stamp_source_roles(ba_job["structured_extraction"]["requirements"])
 ba_result = analyze_job(ba_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
 assert_true(ba_result["valid"] is True, ba_result["errors"])
 assert_true(
@@ -1326,6 +1358,7 @@ for title, family in [
             ],
         },
     }
+    _stamp_source_roles(swe_app["structured_extraction"]["requirements"])
     swe_result = analyze_job(
         swe_app, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
     )

@@ -18,7 +18,12 @@
       "domain": "Data Operations",
       "relevance": "HIGH",
       "source_text": "Ingest spreadsheet data feeds and CSV imports with validation logging",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_DO_UAT",
@@ -32,7 +37,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Document pilot testing notes when intake rules change",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: duty-verb-led).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_DO_SQL",
@@ -48,7 +58,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Preferred: SQL querying experience",
-      "source_location": "Preferred"
+      "source_location": "Preferred",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_DO_DASH",
@@ -62,7 +77,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Preferred: Dashboarding experience",
-      "source_location": "Preferred"
+      "source_location": "Preferred",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

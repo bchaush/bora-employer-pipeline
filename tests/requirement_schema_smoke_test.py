@@ -29,7 +29,12 @@ valid_requirement = {
     "domain": "Business Analytics",
     "relevance": "HIGH",
     "source_text": "Strong SQL skills required for analysis of structured business data.",
-    "source_location": "Qualifications"
+    "source_location": "Qualifications",
+    "source_semantic_role": "ENTRY_QUALIFICATION",
+    "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section and source_text is credential-shaped.",
+    "explicit_prerequisite_language_present": True,
+    "duplicated_under_requirements": False,
+    "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
 }
 
 

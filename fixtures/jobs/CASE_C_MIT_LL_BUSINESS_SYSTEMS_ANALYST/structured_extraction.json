@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Bachelor's degree plus a minimum of seven years of experience OR a master's degree and minimum two years of experience OR equivalent",
-      "source_location": "Minimum / Required Qualifications"
+      "source_location": "Minimum / Required Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_SAP_FICO",
@@ -25,12 +30,19 @@
       "category": "TECHNICAL",
       "importance": "MANDATORY",
       "seniority_implication": "SENIOR",
-      "technology": ["SAP FI/CO"],
+      "technology": [
+        "SAP FI/CO"
+      ],
       "experience_level": "7+ years",
       "domain": "Finance Systems",
       "relevance": "HIGH",
       "source_text": "7+ years of SAP FI/CO experience in requirements gathering, deployment and support",
-      "source_location": "Minimum / Required Qualifications"
+      "source_location": "Minimum / Required Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "explicit prerequisite/prior-possession language present in source_text (heading=REQUIREMENTS_HEADING); OVERRIDE applied -- promoted to ENTRY_QUALIFICATION regardless of section heading.",
+      "explicit_prerequisite_language_present": true,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_SAP_ERP",
@@ -39,12 +51,19 @@
       "category": "TECHNICAL",
       "importance": "MANDATORY",
       "seniority_implication": "SENIOR",
-      "technology": ["SAP ERP"],
+      "technology": [
+        "SAP ERP"
+      ],
       "experience_level": "7+ years",
       "domain": "Finance Systems",
       "relevance": "HIGH",
       "source_text": "7+ years of experience with SAP ERP business processes design, implementation and support",
-      "source_location": "Minimum / Required Qualifications"
+      "source_location": "Minimum / Required Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "explicit prerequisite/prior-possession language present in source_text (heading=REQUIREMENTS_HEADING); OVERRIDE applied -- promoted to ENTRY_QUALIFICATION regardless of section heading.",
+      "explicit_prerequisite_language_present": true,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_CITIZENSHIP_CLEARANCE",
@@ -58,7 +77,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "US citizenship required to obtain and maintain a security clearance. Selected candidate will be subject to a pre-employment background investigation and must be able to obtain and maintain a Secret level DoD security clearance.",
-      "source_location": "Citizenship / Security Clearance"
+      "source_location": "Citizenship / Security Clearance",
+      "source_semantic_role": "APPLICATION_OR_LEGAL_GATE",
+      "source_semantic_role_basis": "citizenship/clearance/work-authorization signal present (heading=LEGAL_HEADING) and provably covered by the named job_decision.py JD-text-level citizenship/clearance consumer -- handled there, not by ordinary qualification blocking.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_REQUIREMENTS_ANALYSIS",
@@ -72,7 +96,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Identifies, analyzes, and documents business requirements, system functional requirements",
-      "source_location": "Primary Duties -- Financial Systems Operational Support and Continuous Improvement"
+      "source_location": "Primary Duties -- Financial Systems Operational Support and Continuous Improvement",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_REGRESSION_TESTING",
@@ -86,7 +115,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Maintains a set of regression test scenarios/scripts, performs testing",
-      "source_location": "Primary Duties -- Systems Upgrade and Implementation"
+      "source_location": "Primary Duties -- Systems Upgrade and Implementation",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_TRAINING_DOCS",
@@ -100,7 +134,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Develops and delivers training & user guides on applications capabilities",
-      "source_location": "Primary Duties -- Communication, Collaboration and Training"
+      "source_location": "Primary Duties -- Communication, Collaboration and Training",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_SW_LIFECYCLE",
@@ -114,7 +153,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Working knowledge of the software lifecycle and methodologies",
-      "source_location": "Minimum / Required Qualifications"
+      "source_location": "Minimum / Required Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_REMOTE_100MI",
@@ -128,7 +172,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "THE SELECTED CANDIDATE CAN BE REMOTE BUT NEEDS TO BE WITHIN 100 MILES OF THE LAB IN LEXINGTON, MA.",
-      "source_location": "Remote Work / Location Restriction"
+      "source_location": "Remote Work / Location Restriction",
+      "source_semantic_role": "AMBIGUOUS",
+      "source_semantic_role_basis": "source_location did not match any recognized Responsibilities/Requirements/Legal heading pattern, and no prerequisite-language or duplication override applied; resolved to AMBIGUOUS pending human review.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_C_SAP_MODULES_PREFERRED",
@@ -137,12 +186,21 @@
       "category": "TECHNICAL",
       "importance": "PREFERRED",
       "seniority_implication": null,
-      "technology": ["SAP BW", "SAP Business Objects", "SAP Concur"],
+      "technology": [
+        "SAP BW",
+        "SAP Business Objects",
+        "SAP Concur"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "LOW",
       "source_text": "Working knowledge of other SAP ERP related modules including but not limited to Funds Management, Grants Management, & Project Systems; Working knowledge of SAP BW and Business Objects reporting; Working knowledge of SAP Concur",
-      "source_location": "Preferred / Additional Qualifications"
+      "source_location": "Preferred / Additional Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

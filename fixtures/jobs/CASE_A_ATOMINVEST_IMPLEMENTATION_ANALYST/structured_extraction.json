@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Bachelor's Degree (or higher) from top-tier university",
-      "source_location": "Requirements"
+      "source_location": "Requirements",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_PM_INTEREST",
@@ -30,7 +35,12 @@
       "domain": "Private Markets",
       "relevance": "MEDIUM",
       "source_text": "Proven interest in private markets -- you understand or are keen to quickly learn fund structures and investor reporting fundamentals",
-      "source_location": "Requirements"
+      "source_location": "Requirements",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_EXPERIENCE_LEVEL",
@@ -44,7 +54,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "0-2 years of work experience",
-      "source_location": "Requirements"
+      "source_location": "Requirements",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "explicit prerequisite/prior-possession language present in source_text (heading=REQUIREMENTS_HEADING); OVERRIDE applied -- promoted to ENTRY_QUALIFICATION regardless of section heading.",
+      "explicit_prerequisite_language_present": true,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_INDUSTRY_EXP_PLUS",
@@ -58,7 +73,12 @@
       "domain": "Private Markets",
       "relevance": "MEDIUM",
       "source_text": "experience in consulting, investment banking, private equity, or fund administration a plus",
-      "source_location": "Requirements"
+      "source_location": "Requirements",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_EXCEL_DATA",
@@ -67,12 +87,19 @@
       "category": "DATA",
       "importance": "MANDATORY",
       "seniority_implication": null,
-      "technology": ["Excel"],
+      "technology": [
+        "Excel"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Genuinely comfortable working with data: strong Excel skills, and an interest in getting into the technical detail of how systems and data structures fit together",
-      "source_location": "Requirements"
+      "source_location": "Requirements",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_SQL_API_PLUS",
@@ -81,12 +108,20 @@
       "category": "TECHNICAL",
       "importance": "PREFERRED",
       "seniority_implication": null,
-      "technology": ["SQL", "API"],
+      "technology": [
+        "SQL",
+        "API"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "any exposure to SQL or APIs is a plus, not a requirement",
-      "source_location": "Requirements"
+      "source_location": "Requirements",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_CONFIG_IMPLEMENTATION",
@@ -100,7 +135,12 @@
       "domain": "Implementation",
       "relevance": "HIGH",
       "source_text": "Get hands-on with customer data, requirements, and workflows -- configuring and implementing them directly within the Atominvest platform",
-      "source_location": "What You'll Be Doing"
+      "source_location": "What You'll Be Doing",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_ONBOARDING_MIGRATION_UAT",
@@ -114,7 +154,12 @@
       "domain": "Implementation",
       "relevance": "HIGH",
       "source_text": "Work alongside Implementation Managers to onboard customers onto the platform, supporting everything from data migration to UAT",
-      "source_location": "What You'll Be Doing"
+      "source_location": "What You'll Be Doing",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_QA_TROUBLESHOOTING",
@@ -128,7 +173,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Liaise with Product and Engineering to complete extensive QA testing for new product features and bug fixes, and to help scope and troubleshoot integration or data issues",
-      "source_location": "What You'll Be Doing"
+      "source_location": "What You'll Be Doing",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_A_DOCUMENTATION",
@@ -142,7 +192,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Maintain technical documentation and internal knowledge base",
-      "source_location": "What You'll Be Doing"
+      "source_location": "What You'll Be Doing",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

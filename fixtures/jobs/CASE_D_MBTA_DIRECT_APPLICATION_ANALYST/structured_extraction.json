@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Bachelor's degree from an accredited institution.",
-      "source_location": "Minimum Qualifications"
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_SYS_ANALYSIS_EXP",
@@ -30,7 +35,12 @@
       "domain": "System Analysis",
       "relevance": "HIGH",
       "source_text": "Three (3) years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support.",
-      "source_location": "Minimum Qualifications"
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_PROCESS_MAPPING",
@@ -44,7 +54,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Proven ability to map and document complex business processes and identify opportunities for optimization or automation within assigned applications.",
-      "source_location": "Required Skills"
+      "source_location": "Required Skills",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "explicit prerequisite/prior-possession language present in source_text (heading=REQUIREMENTS_HEADING); OVERRIDE applied -- promoted to ENTRY_QUALIFICATION regardless of section heading.",
+      "explicit_prerequisite_language_present": true,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_BUSINESS_RULES",
@@ -58,7 +73,12 @@
       "domain": null,
       "relevance": "HIGH",
       "source_text": "Experience identifying and documenting business rules and technical requirements.",
-      "source_location": "Required Skills"
+      "source_location": "Required Skills",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_SAAS_CLOUD",
@@ -67,12 +87,19 @@
       "category": "TECHNICAL",
       "importance": "MANDATORY",
       "seniority_implication": null,
-      "technology": ["SaaS"],
+      "technology": [
+        "SaaS"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Foundational knowledge of cloud-based application delivery models such as Software as a Service (SaaS) and / or technology infrastructure concepts.",
-      "source_location": "Required Skills"
+      "source_location": "Required Skills",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_ITSM",
@@ -86,7 +113,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Experience with IT service management / ticketing systems.",
-      "source_location": "Required Skills"
+      "source_location": "Required Skills",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_MSOFFICE",
@@ -95,12 +127,20 @@
       "category": "TECHNICAL",
       "importance": "MANDATORY",
       "seniority_implication": null,
-      "technology": ["Microsoft Office", "Excel"],
+      "technology": [
+        "Microsoft Office",
+        "Excel"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Strong Microsoft Office proficiency (Word, Excel, Outlook, PowerPoint, Teams).",
-      "source_location": "Required Skills"
+      "source_location": "Required Skills",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_POWER_PLATFORM_PLUS",
@@ -109,12 +149,21 @@
       "category": "TECHNICAL",
       "importance": "PREFERRED",
       "seniority_implication": null,
-      "technology": ["Power Platform", "Power Automate", "Power Apps"],
+      "technology": [
+        "Power Platform",
+        "Power Automate",
+        "Power Apps"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Power Platform Proficiency: Direct experience developing, governing, or administering solutions using the Microsoft Power Platform.",
-      "source_location": "Preferred Qualifications"
+      "source_location": "Preferred Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_D_NAMED_SYSTEMS_PLUS",
@@ -123,12 +172,19 @@
       "category": "TECHNICAL",
       "importance": "PREFERRED",
       "seniority_implication": null,
-      "technology": ["Comply365"],
+      "technology": [
+        "Comply365"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "LOW",
       "source_text": "Direct experience with Comply365, Document Management Systems, HR, LMS, IDP.",
-      "source_location": "Preferred Qualifications"
+      "source_location": "Preferred Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

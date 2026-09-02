@@ -18,7 +18,12 @@
       "domain",
       "relevance",
       "source_text",
-      "source_location"
+      "source_location",
+      "source_semantic_role",
+      "source_semantic_role_basis",
+      "explicit_prerequisite_language_present",
+      "duplicated_under_requirements",
+      "source_semantic_role_classifier_version"
     ],
   
     "properties": {
@@ -101,6 +106,39 @@
       "source_location": {
         "type": ["string", "null"],
         "description": "Location of the supporting wording within the job description, such as Qualifications, Responsibilities, Preferred Qualifications, or another identifiable section. Null only when the source structure does not provide a usable location."
+      },
+
+      "source_semantic_role": {
+        "type": "string",
+        "enum": [
+          "ENTRY_QUALIFICATION",
+          "ROLE_RESPONSIBILITY",
+          "APPLICATION_OR_LEGAL_GATE",
+          "AMBIGUOUS"
+        ],
+        "description": "SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1: where and how the employer positioned this requirement, independent of `importance`. Computed deterministically by src/requirement_source_role.py from source_text/source_location; never supplied directly by structured extraction input. Not a substitute for `importance` (MANDATORY/PREFERRED/UNCLEAR remains a separate, orthogonal dimension) and never itself a hard-blocker gate -- qualification eligibility is always derived, never read from this field directly by consuming code."
+      },
+
+      "source_semantic_role_basis": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Deterministic, human-readable explanation of which signals (section-heading category, content shape, prerequisite-language override, duplication override) produced source_semantic_role. Auditable provenance, not a free-form summary."
+      },
+
+      "explicit_prerequisite_language_present": {
+        "type": "boolean",
+        "description": "True when source_text contains explicit prior-possession/prerequisite language (e.g. \"must have\", \"required experience\", \"minimum N years\", \"demonstrated/proven ability\", \"prerequisite\", \"certification required\"). Drives the prerequisite-language override in src/requirement_source_role.py."
+      },
+
+      "duplicated_under_requirements": {
+        "type": "boolean",
+        "description": "True when this requirement's source_text is a near-exact-wording match (conservative containment, not semantic similarity) for another requirement in the same job whose source_location is classified as a Requirements/Qualifications heading. Drives the duplication override in src/requirement_source_role.py."
+      },
+
+      "source_semantic_role_classifier_version": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Identifies which classifier version produced source_semantic_role/source_semantic_role_basis, for auditable lineage (currently SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1)."
       }
     }
   }

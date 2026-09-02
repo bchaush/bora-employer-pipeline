@@ -245,11 +245,16 @@ print("PASS G: no existing Claim capability set carries customer_platform_onboar
 # ======================================================================
 match_excel = next(m for m in analysis["evidence_matches"] if m["requirement_id"] == "REQ_A_EXCEL_DATA")
 assert_true(match_excel["result"] == "NONE", f"REQ_A_EXCEL_DATA must remain NONE, unaffected by this milestone; got {match_excel['result']}")
+# SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (post-dates this milestone):
+# REQ_A_CONFIG_IMPLEMENTATION and REQ_A_QA_TROUBLESHOOTING are
+# responsibility-sourced (source_location="What You'll Be Doing") and no
+# longer independently hard-block; only the two genuine
+# Requirements-section blockers remain. This assertion is about THIS
+# milestone (compound requirement semantics) not changing the blocker set
+# any further -- updated to the current adjudicated baseline.
 expected_blockers = {
-    "REQ_A_CONFIG_IMPLEMENTATION",
     "REQ_A_DEGREE",
     "REQ_A_EXCEL_DATA",
-    "REQ_A_QA_TROUBLESHOOTING",
 }
 actual_blocked_ids = {b.rsplit(": ", 1)[-1] for b in result["hard_blockers"]}
 assert_true(

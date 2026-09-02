@@ -124,11 +124,13 @@ for req_id in ("REQ_A_INDUSTRY_EXP_PLUS", "REQ_A_SQL_API_PLUS"):
         req["importance"] == "PREFERRED",
         f"{req_id} (real Atominvest 'a plus' wording) must remain PREFERRED, got {req['importance']}",
     )
+# SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (post-dates this milestone):
+# REQ_A_CONFIG_IMPLEMENTATION and REQ_A_QA_TROUBLESHOOTING are
+# responsibility-sourced and no longer independently hard-block; updated
+# to the current adjudicated baseline.
 expected_blockers = {
-    "REQ_A_CONFIG_IMPLEMENTATION",
     "REQ_A_DEGREE",
     "REQ_A_EXCEL_DATA",
-    "REQ_A_QA_TROUBLESHOOTING",
 }
 actual_blocked_ids = {b.rsplit(": ", 1)[-1] for b in result_atominvest["hard_blockers"]}
 assert_true(

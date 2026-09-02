@@ -16,7 +16,12 @@
       "domain": null,
       "relevance": "LOW",
       "source_text": "Must be a self-starter and team player who thrives in a fast-paced environment",
-      "source_location": "About you"
+      "source_location": "About you",
+      "source_semantic_role": "AMBIGUOUS",
+      "source_semantic_role_basis": "source_location did not match any recognized Responsibilities/Requirements/Legal heading pattern, and no prerequisite-language or duplication override applied; resolved to AMBIGUOUS pending human review.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_V_VAGUE",
@@ -30,7 +35,12 @@
       "domain": null,
       "relevance": "LOW",
       "source_text": "Excited about process, data, and making an impact",
-      "source_location": "About you"
+      "source_location": "About you",
+      "source_semantic_role": "AMBIGUOUS",
+      "source_semantic_role_basis": "source_location did not match any recognized Responsibilities/Requirements/Legal heading pattern, and no prerequisite-language or duplication override applied; resolved to AMBIGUOUS pending human review.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_V_AMBIG",
@@ -44,7 +54,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Comfortable with vague priorities and evolving scope",
-      "source_location": "About you"
+      "source_location": "About you",
+      "source_semantic_role": "AMBIGUOUS",
+      "source_semantic_role_basis": "source_location did not match any recognized Responsibilities/Requirements/Legal heading pattern, and no prerequisite-language or duplication override applied; resolved to AMBIGUOUS pending human review.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_V_TOOLS",
@@ -58,7 +73,12 @@
       "domain": null,
       "relevance": "LOW",
       "source_text": "Nice to have: some exposure to modern tools",
-      "source_location": "Nice to have"
+      "source_location": "Nice to have",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

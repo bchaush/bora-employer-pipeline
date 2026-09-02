@@ -15,7 +15,12 @@
       "domain": "Business Systems",
       "relevance": "HIGH",
       "source_text": "Experience gathering requirements and clarifying scope boundaries",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_002",
@@ -29,7 +34,12 @@
       "domain": "Business Process",
       "relevance": "HIGH",
       "source_text": "Experience with workflow automation and approval-synchronized evidence mapping",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_003",
@@ -38,12 +48,20 @@
       "category": "DATA",
       "importance": "MANDATORY",
       "seniority_implication": null,
-      "technology": ["CSV", "Google Sheets"],
+      "technology": [
+        "CSV",
+        "Google Sheets"
+      ],
       "experience_level": null,
       "domain": "Data Operations",
       "relevance": "HIGH",
       "source_text": "Hands-on data ingestion / validation work (CSV, spreadsheets, or similar)",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_004",
@@ -57,7 +75,12 @@
       "domain": "Implementation",
       "relevance": "HIGH",
       "source_text": "Comfort documenting UAT or pilot test outcomes",
-      "source_location": "Minimum qualifications (required)"
+      "source_location": "Minimum qualifications (required)",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_005",
@@ -66,12 +89,19 @@
       "category": "PLATFORM",
       "importance": "PREFERRED",
       "seniority_implication": null,
-      "technology": ["Salesforce"],
+      "technology": [
+        "Salesforce"
+      ],
       "experience_level": null,
       "domain": "CRM",
       "relevance": "MEDIUM",
       "source_text": "Preferred qualifications: Salesforce administration experience",
-      "source_location": "Preferred qualifications"
+      "source_location": "Preferred qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_006",
@@ -85,7 +115,12 @@
       "domain": "U.S. Regulatory Reporting",
       "relevance": "MEDIUM",
       "source_text": "Familiarity with U.S. regulatory reporting packages (SEC / SOX-style controls)",
-      "source_location": "Preferred qualifications"
+      "source_location": "Preferred qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_007",
@@ -94,12 +129,19 @@
       "category": "TECHNOLOGY",
       "importance": "PREFERRED",
       "seniority_implication": null,
-      "technology": ["Google Cloud"],
+      "technology": [
+        "Google Cloud"
+      ],
       "experience_level": null,
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Exposure to Google Cloud infrastructure is a plus",
-      "source_location": "Also desired"
+      "source_location": "Also desired",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_008",
@@ -113,7 +155,12 @@
       "domain": null,
       "relevance": "MEDIUM",
       "source_text": "Enterprise QA engineering ownership experience is a bonus",
-      "source_location": "Also desired"
+      "source_location": "Also desired",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_009",
@@ -127,7 +174,12 @@
       "domain": null,
       "relevance": "LOW",
       "source_text": "Team player who thrives in a fast-paced environment",
-      "source_location": "Nice to have marketing language"
+      "source_location": "Nice to have marketing language",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
       "requirement_id": "REQ_BSA_010",
@@ -141,7 +193,12 @@
       "domain": "Technical Operations",
       "relevance": "HIGH",
       "source_text": "Support fail-closed operational controls for outbound follow-up communications",
-      "source_location": "Responsibilities"
+      "source_location": "Responsibilities",
+      "source_semantic_role": "ROLE_RESPONSIBILITY",
+      "source_semantic_role_basis": "source_location indicates a Responsibilities/Duties section and source_text is duty-shaped (leading action verb or future-duty marker) with no prerequisite language and no duplication under Requirements/Qualifications.",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     }
   ]
 }

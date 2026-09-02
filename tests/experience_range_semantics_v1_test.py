@@ -62,7 +62,10 @@ def _load_job_input(fixture_dir: Path) -> dict:
 # ======================================================================
 # A. Frozen Atominvest REQ_A_EXPERIENCE_LEVEL through the real analyze_job()
 #    path resolves UNKNOWN, and no longer contributes a hard blocker; the
-#    other four genuine blockers remain; overall routing is unchanged
+#    other genuine blockers remain (SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1,
+#    post-dating this milestone, later removed REQ_A_CONFIG_IMPLEMENTATION/
+#    REQ_A_QA_TROUBLESHOOTING as responsibility-sourced false blockers,
+#    leaving REQ_A_DEGREE/REQ_A_EXCEL_DATA); overall routing is unchanged
 #    (LANE_0_REJECT/REJECT), because claims remain unapproved.
 # ======================================================================
 result_a = analyze_job(_load_job_input(FIXTURE_A))
@@ -83,10 +86,8 @@ assert_true(
     f"REQ_A_EXPERIENCE_LEVEL must no longer appear as a hard blocker; got {hard_blockers}",
 )
 expected_remaining = {
-    "REQ_A_CONFIG_IMPLEMENTATION",
     "REQ_A_DEGREE",
     "REQ_A_EXCEL_DATA",
-    "REQ_A_QA_TROUBLESHOOTING",
 }
 remaining_blocked_ids = {b.rsplit(": ", 1)[-1] for b in hard_blockers}
 assert_true(
@@ -129,15 +130,28 @@ print("PASS B: all 7 required generic experience-range positive parsing cases re
 #    the generic evaluator.
 # ======================================================================
 def _req(text: str, technology: list | None = None, domain: str | None = None) -> dict:
+    # SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: this file's synthetic
+    # rows are all years-of-experience/domain-specific-experience wording --
+    # genuine entry-qualification territory, unrelated to responsibility-duty
+    # semantics. Stamped ENTRY_QUALIFICATION explicitly (a missing role now
+    # derives AMBIGUOUS/non-blocking, which would hide this file's actual
+    # subject -- generic-experience-range routing -- behind an unrelated
+    # classification gap).
     return {
         "requirement_id": "REQ_ROUTING_TEST",
         "text": text,
         "source_text": text,
+        "source_location": "Requirements",
         "domain": domain,
         "category": "EXPERIENCE",
         "technology": technology or [],
         "relevance": "HIGH",
         "importance": "MANDATORY",
+        "source_semantic_role": "ENTRY_QUALIFICATION",
+        "source_semantic_role_basis": "legacy test fixture -- pre-migration adjudication for a years-of-experience-style requirement.",
+        "explicit_prerequisite_language_present": True,
+        "duplicated_under_requirements": False,
+        "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1",
     }
 
 

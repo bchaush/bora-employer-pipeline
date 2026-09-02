@@ -1,12 +1,27 @@
-"""One-shot generator for Job Analysis Golden fixtures (remediated wording)."""
+"""One-shot generator for Job Analysis Golden fixtures (remediated wording).
+
+UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: this is the real,
+pre-existing extraction/ingestion writer for the 15-case Job Analysis
+Golden suite -- the explicit, authorized place source_semantic_role
+classification runs (requirement_source_role.classify_source_semantic_roles,
+called once per fixture's full requirement set in write_fixture() so
+duplicated_under_requirements can see sibling rows). Ordinary analyze_job()
+never classifies; it only consumes what this script persists.
+"""
 
 from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "golden-tests" / "job_analysis"
+SRC_ROOT = Path(__file__).resolve().parents[1] / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from requirement_source_role import classify_source_semantic_roles  # noqa: E402
 
 
 def req(
@@ -44,6 +59,23 @@ def write_fixture(fid, role_title, role_family, seniority, jd, requirements, exp
         shutil.rmtree(d)
     d.mkdir(parents=True, exist_ok=True)
     (d / "jd.txt").write_text(jd.strip() + "\n", encoding="utf-8")
+
+    # Extraction/ingestion-time classification: the ONE place
+    # source_semantic_role is computed for this fixture corpus.
+    # classify_source_semantic_roles() needs the full row list (not one row
+    # in isolation) so duplicated_under_requirements can see sibling rows.
+    classifications = classify_source_semantic_roles(requirements)
+    for row, classification in zip(requirements, classifications):
+        row["source_semantic_role"] = classification["source_semantic_role"]
+        row["source_semantic_role_basis"] = classification["source_semantic_role_basis"]
+        row["explicit_prerequisite_language_present"] = classification[
+            "explicit_prerequisite_language_present"
+        ]
+        row["duplicated_under_requirements"] = classification["duplicated_under_requirements"]
+        row["source_semantic_role_classifier_version"] = classification[
+            "source_semantic_role_classifier_version"
+        ]
+
     extraction = {
         "_role_title": role_title,
         "role_family": role_family,
@@ -486,18 +518,26 @@ Required
             ),
         ],
         {
-            "purpose": "P-2 process mapping remains NONE without Claim/Evidence changes -> REJECT.",
+            "purpose": "Corrected CLAIM_WW_006 reapproved; REQ_P2_MAP matches with provenance -> APPLY.",
             "role_family": "Business Process",
-            "acceptable_decisions": ["REJECT"],
-            "forbidden_decisions": ["PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"],
-            "key_matches": {"REQ_P2_MAP": {"result": "NONE"}},
-            "expect_gap_substrings": ["process"],
-            "require_hard_blockers": True,
+            "acceptable_decisions": ["APPLY"],
+            "forbidden_decisions": ["REJECT", "PRIORITY_APPLY", "EFFICIENT_APPLY"],
+            "key_matches": {
+                "REQ_P2_MAP": {
+                    "result": "STRONG",
+                    "require_provenance": True,
+                    "acceptable_results": ["STRONG", "SUPPORTED"],
+                }
+            },
+            "expect_gap_substrings": [],
+            "require_hard_blockers": False,
             "semantic_boundaries": [
-                "P-2 process mapping has no approved Claim capability provenance"
+                "process mapping supported via reapproved CLAIM_WW_006 / WW_PROC_001"
             ],
-            "known_limitations": ["P-2"],
-            "notes": [],
+            "known_limitations": ["NONE"],
+            "notes": [
+                "Bora explicitly reapproved corrected CLAIM_WW_006 for reusable use after evidence-bounded wording fix."
+            ],
         },
     )
 

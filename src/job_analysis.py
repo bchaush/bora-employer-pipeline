@@ -26,6 +26,12 @@ from job_decision import apply_posting_state_routing, decide_lane_and_decision
 from job_id import generate_job_id
 from requirement_match import infer_requirement_capabilities, match_requirements
 from requirement_normalize import normalize_structured_requirements
+from requirement_source_role import (
+    CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN,
+    derive_human_review_required,
+    derive_qualification_gate,
+    is_covered_by_citizenship_clearance_consumer,
+)
 from schema_validation import build_draft202012_validator
 
 
@@ -41,15 +47,46 @@ def _error(code: str, **fields: Any) -> dict[str, Any]:
     return payload
 
 
+def _unique(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            out.append(item)
+    return out
+
+
 def _build_gaps_and_unknowns(
     requirements: list[dict[str, Any]],
     matches: list[dict[str, Any]],
 ) -> tuple[list[str], list[str]]:
+    """`gaps`/`unknowns` -- a compatibility-name ALIAS for
+    `qualification_gaps`/`qualification_unknowns` (same list objects; see
+    analyze_job()). Their pre-SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1
+    content is NOT preserved byte-for-byte: a ROLE_RESPONSIBILITY/AMBIGUOUS/
+    APPLICATION_OR_LEGAL_GATE requirement is now explicitly excluded and
+    must never be described here as an "unsupported mandatory requirement"
+    or any other qualification-deficiency phrasing -- see
+    _build_responsibility_views for its non-deficiency-framed output
+    instead. Only requirements whose derived qualification_gate is YES
+    participate. UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: a
+    requirement with a missing/null/invalid source_semantic_role derives
+    qualification_gate=AMBIGUOUS, never YES -- it does NOT participate here
+    either (its ordinary canonical-artifact path is stopped even earlier,
+    at requirement_normalize.py's ingestion gate, before this function ever
+    runs; only a direct low-level caller that bypasses that gate could
+    reach this function with such a row, and even then it is excluded, not
+    silently gated).
+    """
     match_by_req = {m["requirement_id"]: m for m in matches}
     gaps: list[str] = []
     unknowns: list[str] = []
 
     for requirement in requirements:
+        if derive_qualification_gate(requirement.get("source_semantic_role")) != "YES":
+            continue
+
         req_id = requirement["requirement_id"]
         match = match_by_req.get(req_id)
         importance = requirement.get("importance")
@@ -92,17 +129,141 @@ def _build_gaps_and_unknowns(
                 f"{req_id}: unsupported technology {tech} for requirement - {text}"
             )
 
-    # De-duplicate while preserving order.
-    def _unique(items: list[str]) -> list[str]:
-        seen: set[str] = set()
-        out: list[str] = []
-        for item in items:
-            if item not in seen:
-                seen.add(item)
-                out.append(item)
-        return out
-
     return _unique(gaps), _unique(unknowns)
+
+
+def _build_responsibility_views(
+    requirements: list[dict[str, Any]],
+    matches: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """responsibility_observations / responsibility_evidence_unknowns
+    (SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1).
+
+    Every ROLE_RESPONSIBILITY or AMBIGUOUS requirement is preserved here
+    with its already-established match result and cited evidence/claim
+    information, never phrased as a candidate-entry deficiency. Each
+    observation additionally carries capability_inference_state, a
+    structured, matcher-bounded distinction between three genuinely
+    different epistemic states -- NO_CAPABILITIES_INFERRED (the matcher
+    never recognized any capability concept in this text at all; a much
+    weaker "no evidence" claim than the next state),
+    CAPABILITIES_INFERRED_NO_APPROVED_MATCH (capabilities were recognized
+    and compared against approved Claims, with no match found), or
+    APPROVED_MATCH_ESTABLISHED (a STRONG/SUPPORTED/PARTIAL match exists).
+    A row with no cited evidence_ids/claim_ids at all (result NONE or
+    UNKNOWN) is additionally surfaced in responsibility_evidence_unknowns,
+    using explicitly matcher-bounded wording ("no established current
+    approved match for this responsibility") -- never claiming no
+    adjacent evidence exists, that the candidate lacks the capability, or
+    that this is a development need or qualification gap. This module
+    does not implement the global NONE-vs-UNKNOWN correction; it only
+    ensures a responsibility row's current, bounded match state is never
+    overstated.
+    """
+    match_by_req = {m["requirement_id"]: m for m in matches}
+    observations: list[dict[str, Any]] = []
+    evidence_unknowns: list[str] = []
+
+    for requirement in requirements:
+        role = requirement.get("source_semantic_role")
+        if role not in ("ROLE_RESPONSIBILITY", "AMBIGUOUS"):
+            continue
+
+        req_id = requirement["requirement_id"]
+        match = match_by_req.get(req_id)
+        text = requirement.get("text")
+        result = match.get("result") if isinstance(match, Mapping) else "UNKNOWN"
+        evidence_ids = list(match.get("evidence_ids") or []) if isinstance(match, Mapping) else []
+        claim_ids = list(match.get("claim_ids") or []) if isinstance(match, Mapping) else []
+        explanation = (
+            match.get("explanation") if isinstance(match, Mapping) else None
+        ) or "no match produced"
+
+        if result in ("STRONG", "SUPPORTED", "PARTIAL"):
+            capability_inference_state = "APPROVED_MATCH_ESTABLISHED"
+        elif not infer_requirement_capabilities(requirement):
+            capability_inference_state = "NO_CAPABILITIES_INFERRED"
+        else:
+            capability_inference_state = "CAPABILITIES_INFERRED_NO_APPROVED_MATCH"
+
+        observations.append(
+            {
+                "requirement_id": req_id,
+                "text": text,
+                "source_semantic_role": role,
+                "result": result,
+                "evidence_ids": evidence_ids,
+                "claim_ids": claim_ids,
+                "explanation": explanation,
+                "human_review_required": derive_human_review_required(requirement),
+                "capability_inference_state": capability_inference_state,
+            }
+        )
+
+        if result in ("NONE", "UNKNOWN") and not evidence_ids and not claim_ids:
+            evidence_unknowns.append(
+                f"{req_id}: no established current approved match for this "
+                f"responsibility - {text}"
+            )
+
+    return observations, _unique(evidence_unknowns)
+
+
+def _build_legal_gate_views(
+    requirements: list[dict[str, Any]],
+    jd_text: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """application_or_legal_gate_observations / unresolved_gate_observations
+    (SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1).
+
+    Every APPLICATION_OR_LEGAL_GATE requirement is surfaced with proof that
+    the named, tested job_decision.py JD-text-level citizenship/clearance
+    consumer actually covers it for THIS job (re-checked here, not merely
+    asserted at classification time). Every AMBIGUOUS requirement whose
+    classification basis names it an unresolved legal/access gate (see
+    requirement_source_role.py's UNRESOLVED_LEGAL_OR_ACCESS_GATE marker) is
+    separately surfaced, human-review-required, never silently dropped from
+    every consequential view. This module does not redesign
+    application_gate.py or any immigration/work-authorization logic --
+    application-form questions remain entirely owned by that separate
+    system.
+    """
+    gate_observations: list[dict[str, Any]] = []
+    unresolved_observations: list[dict[str, Any]] = []
+    consumer_fired = bool(CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN.search(jd_text or ""))
+
+    for requirement in requirements:
+        role = requirement.get("source_semantic_role")
+        req_id = requirement["requirement_id"]
+        text = requirement.get("text")
+
+        if role == "APPLICATION_OR_LEGAL_GATE":
+            row_covered = is_covered_by_citizenship_clearance_consumer(
+                requirement.get("source_text") or ""
+            )
+            gate_observations.append(
+                {
+                    "requirement_id": req_id,
+                    "text": text,
+                    "dedicated_consumer": "job_decision.detect_hard_blockers "
+                    "citizenship/clearance JD-text check",
+                    "consumer_covers_this_row": row_covered,
+                    "consumer_fired_for_this_job": consumer_fired,
+                }
+            )
+        elif role == "AMBIGUOUS" and isinstance(
+            requirement.get("source_semantic_role_basis"), str
+        ) and "UNRESOLVED_LEGAL_OR_ACCESS_GATE" in requirement["source_semantic_role_basis"]:
+            unresolved_observations.append(
+                {
+                    "requirement_id": req_id,
+                    "text": text,
+                    "basis": requirement["source_semantic_role_basis"],
+                    "human_review_required": True,
+                }
+            )
+
+    return gate_observations, unresolved_observations
 
 
 def analyze_job(
@@ -265,7 +426,25 @@ def analyze_job(
         for requirement in requirements
         if requirement["requirement_id"] in combined_matches_by_req
     ]
+    # `gaps`/`unknowns` are a compatibility-NAME alias for
+    # `qualification_gaps`/`qualification_unknowns` (the same list objects)
+    # -- NOT a claim that their pre-SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1
+    # content is preserved byte-for-byte. Their meaning is now explicitly
+    # qualification-scoped: a ROLE_RESPONSIBILITY/AMBIGUOUS/
+    # APPLICATION_OR_LEGAL_GATE requirement is excluded from both names,
+    # where pre-milestone `gaps` included every such row under deficiency
+    # framing. Responsibility and unresolved-gate content lives in the
+    # separate responsibility_observations/responsibility_evidence_unknowns/
+    # application_or_legal_gate_observations/unresolved_gate_observations
+    # outputs below, never folded back into `gaps`/`unknowns`.
     gaps, unknowns = _build_gaps_and_unknowns(requirements, matches)
+    qualification_gaps, qualification_unknowns = gaps, unknowns
+    responsibility_observations, responsibility_evidence_unknowns = (
+        _build_responsibility_views(requirements, matches)
+    )
+    application_or_legal_gate_observations, unresolved_gate_observations = (
+        _build_legal_gate_views(requirements, jd_text)
+    )
 
     decision = decide_lane_and_decision(
         requirements=requirements,
@@ -310,6 +489,12 @@ def analyze_job(
         "evidence_matches": matches,
         "gaps": gaps,
         "unknowns": unknowns,
+        "qualification_gaps": qualification_gaps,
+        "qualification_unknowns": qualification_unknowns,
+        "responsibility_observations": responsibility_observations,
+        "responsibility_evidence_unknowns": responsibility_evidence_unknowns,
+        "application_or_legal_gate_observations": application_or_legal_gate_observations,
+        "unresolved_gate_observations": unresolved_gate_observations,
         "lane": decision["lane"],
         "decision": decision["decision"],
         "warnings": warnings,

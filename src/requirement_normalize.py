@@ -12,6 +12,7 @@ import re
 from pathlib import Path
 from typing import Any, Mapping
 
+from requirement_source_role import SOURCE_SEMANTIC_ROLES, resolve_persisted_or_fallback
 from schema_validation import build_draft202012_validator
 
 
@@ -272,17 +273,6 @@ def normalize_structured_requirements(
         if requirement.get("technology") is None:
             requirement["technology"] = []
 
-        schema_errors = [err.message for err in validator.iter_errors(requirement)]
-        if schema_errors:
-            result["errors"].append(
-                _error(
-                    "REQUIREMENT_SCHEMA_INVALID",
-                    requirement_id=req_id,
-                    details=schema_errors,
-                )
-            )
-            continue
-
         if (
             requirement.get("category") == "HR_NOISE"
             and requirement.get("importance") == "UNCLEAR"
@@ -293,6 +283,102 @@ def normalize_structured_requirements(
             continue
 
         normalized.append(requirement)
+
+    if result["errors"]:
+        result["valid"] = False
+        result["requirements"] = []
+        return result
+
+    # SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: CONSUME each
+    # requirement's persisted source_semantic_role/provenance -- never
+    # recompute it here. classify_source_semantic_roles() (the classifier
+    # itself) is reserved for extraction/ingestion-time authoring and
+    # explicit backfill tooling; ordinary analysis must never silently
+    # overwrite a valid persisted classification, and must never treat a
+    # missing/invalid one as an implicit entry-qualification gate --
+    # resolve_persisted_or_fallback() enforces both by applying the safe
+    # AMBIGUOUS default per-row when no valid persisted role exists.
+    # Schema validation is deliberately deferred to the loop below, after
+    # these fields are merged in, since source_semantic_role/
+    # source_semantic_role_basis/explicit_prerequisite_language_present/
+    # duplicated_under_requirements/source_semantic_role_classifier_version
+    # are required requirement.schema.json fields that do not exist on a
+    # requirement dict until this step runs.
+    # UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: a canonical artifact
+    # entering ORDINARY analyze_job() production routing must never
+    # silently synthesize a classification for a missing/null/invalid
+    # persisted source_semantic_role and continue to a consequential
+    # APPLY/WATCH/REJECT result. This is deliberately distinct from
+    # resolve_persisted_or_fallback()'s low-level, direct-caller-facing
+    # safe-AMBIGUOUS behavior (job_decision.py callers that bypass this
+    # function entirely still degrade safely, never to a silent YES/
+    # blocker -- see requirement_source_role.py) -- HERE, at the canonical-
+    # artifact ingestion gate, an unmigrated row stops the whole analysis
+    # visibly instead.
+    for requirement in normalized:
+        req_id = requirement["requirement_id"]
+        raw_role = requirement.get("source_semantic_role")
+        if raw_role not in SOURCE_SEMANTIC_ROLES:
+            missing_fields = [
+                field
+                for field in (
+                    "source_semantic_role",
+                    "source_semantic_role_basis",
+                    "explicit_prerequisite_language_present",
+                    "duplicated_under_requirements",
+                    "source_semantic_role_classifier_version",
+                )
+                if field not in requirement or requirement.get(field) is None
+            ]
+            result["errors"].append(
+                _error(
+                    "SOURCE_SEMANTIC_ROLE_NOT_MIGRATED",
+                    job_id=job_id,
+                    requirement_id=req_id,
+                    invalid_or_missing_role=raw_role,
+                    missing_fields=missing_fields,
+                    detail=(
+                        f"Requirement {req_id!r} in job {job_id!r} has no "
+                        f"valid persisted source_semantic_role (found "
+                        f"{raw_role!r}). Ordinary analyze_job() routing "
+                        "refuses to silently synthesize a classification "
+                        "and continue to a consequential decision. "
+                        "Required action: run the explicit source-role "
+                        "classification/backfill step "
+                        "(requirement_source_role.classify_source_semantic_roles) "
+                        "for this artifact and persist the 5 required "
+                        "fields before re-running analysis."
+                    ),
+                )
+            )
+            continue
+        resolved = resolve_persisted_or_fallback(requirement)
+        requirement["source_semantic_role"] = resolved["source_semantic_role"]
+        requirement["source_semantic_role_basis"] = resolved["source_semantic_role_basis"]
+        requirement["explicit_prerequisite_language_present"] = resolved[
+            "explicit_prerequisite_language_present"
+        ]
+        requirement["duplicated_under_requirements"] = resolved["duplicated_under_requirements"]
+        requirement["source_semantic_role_classifier_version"] = resolved[
+            "source_semantic_role_classifier_version"
+        ]
+
+    if result["errors"]:
+        result["valid"] = False
+        result["requirements"] = []
+        return result
+
+    for requirement in normalized:
+        req_id = requirement["requirement_id"]
+        schema_errors = [err.message for err in validator.iter_errors(requirement)]
+        if schema_errors:
+            result["errors"].append(
+                _error(
+                    "REQUIREMENT_SCHEMA_INVALID",
+                    requirement_id=req_id,
+                    details=schema_errors,
+                )
+            )
 
     if result["errors"]:
         result["valid"] = False

@@ -10,6 +10,11 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping, Sequence
 
+from requirement_source_role import (
+    CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN,
+    derive_qualification_gate,
+)
+
 
 SUPPORTED_ROLE_FAMILY_TOKENS = (
     "business systems",
@@ -94,11 +99,11 @@ def detect_hard_blockers(
         detect_seniority_signals(role=role, jd_text=jd_text, seniority=seniority)
     )
 
-    if re.search(
-        r"\b(us\s+citizen|u\.s\.\s+citizen|security clearance|secret clearance|"
-        r"top secret|must be a citizen)\b",
-        jd,
-    ):
+    # SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: this pattern is now
+    # the single source of truth shared with requirement_source_role.py's
+    # is_covered_by_citizenship_clearance_consumer() -- classification and
+    # this blocker check can never drift apart.
+    if CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN.search(jd):
         blockers.append("Citizenship or clearance requirement present in JD")
 
     match_by_req = {
@@ -109,6 +114,26 @@ def detect_hard_blockers(
         if requirement.get("importance") != "MANDATORY":
             continue
         if requirement.get("relevance") != "HIGH":
+            continue
+        # SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 /
+        # UNMIGRATED_EXTRACTION_AND_GOLDEN_COMPLETION_V1: a requirement is
+        # only eligible to independently produce a candidate-entry hard
+        # blocker when its derived qualification gate is YES, which
+        # requires an explicit, valid, persisted source_semantic_role ==
+        # ENTRY_QUALIFICATION. A missing/null/invalid role derives
+        # AMBIGUOUS here, NOT YES -- there is no backward-compatibility
+        # carve-out; an absent role never independently gates, for any
+        # caller (including one that bypasses
+        # requirement_normalize.py/schema validation entirely). A
+        # canonical artifact reaching ordinary analyze_job() production
+        # routing with a missing/invalid role is stopped even earlier, at
+        # requirement_normalize.py's ingestion gate, before this function
+        # ever runs. ROLE_RESPONSIBILITY/APPLICATION_OR_LEGAL_GATE/
+        # AMBIGUOUS rows never independently gate here either;
+        # APPLICATION_OR_LEGAL_GATE rows remain covered by the separate,
+        # pre-existing JD-text-level citizenship/clearance check below,
+        # unchanged.
+        if derive_qualification_gate(requirement.get("source_semantic_role")) != "YES":
             continue
         req_id = requirement.get("requirement_id")
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
