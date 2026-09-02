@@ -1,0 +1,13 @@
+# Human-maintained DIRECT dependencies only.
+#
+# REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1, per
+# docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md §3.
+#
+# Derived from actual repository imports (confirmed by full grep across
+# src/, tests/, scripts/ at ADR-authoring time) -- no speculative package
+# is added. The complete resolved transitive environment (including
+# jsonschema's and referencing's own dependencies) is pinned separately in
+# requirements-lock.txt; this file is not itself installed directly by CI.
+
+jsonschema
+referencing

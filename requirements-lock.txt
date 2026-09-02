@@ -1,0 +1,24 @@
+# Complete resolved transitive dependency environment, exact versions.
+#
+# REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1, per
+# docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md §3.
+#
+# Resolved from requirements.in (jsonschema, referencing) against the
+# verified development environment. This is the COMPLETE set -- direct
+# dependencies plus every transitive dependency they require -- not merely
+# the two direct pins; a partially pinned dependency set must never be
+# labeled reproducible. Confirmed complete by direct `pip show` inspection
+# of each package's own `Requires:` line at ADR-authoring time:
+#   jsonschema requires: attrs, jsonschema-specifications, referencing, rpds-py
+#   referencing requires: attrs, rpds-py
+#   jsonschema-specifications requires: referencing
+#   attrs requires: (none)
+#   rpds-py requires: (none)
+# No hash enforcement in V1 (deferred until clean cross-platform
+# environment reconstruction is first proven).
+
+attrs==26.1.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==2026.6.3

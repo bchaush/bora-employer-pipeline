@@ -1,0 +1,38 @@
+# REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1
+# Canonical ADR: docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md
+#
+# CI runs exactly one verification command:
+#   python scripts/verify_assurance_baseline.py
+#
+# Action SHA provenance (verified via GitHub API against official repos):
+#   actions/checkout@v7.0.1 -> 3d3c42e5aac5ba805825da76410c181273ba90b1
+#   actions/setup-python@v7.0.0 -> 5fda3b95a4ea91299a34e894583c3862153e4b97
+
+name: Assurance Baseline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.14.6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14.6"
+
+      - name: Install locked dependencies
+        run: python -m pip install -r requirements-lock.txt
+
+      - name: Run canonical assurance verification
+        run: python scripts/verify_assurance_baseline.py
