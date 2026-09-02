@@ -138,6 +138,69 @@ action is a fresh, read-only bottleneck/system/real-market prioritization
 audit by ChatGPT Work/Bora -- not preselected here. No new business
 implementation is authorized by this closure.
 
+Architecture record (not an implementation milestone; Status above
+remains CLOSED):
+
+PURSUIT_APPROVAL_BOUNDARY_ARCHITECTURE_V1
+
+Canonical ADR:
+docs/decisions/ADR-PURSUIT-APPROVAL-BOUNDARY-V1.md (untracked, reviewed,
+accepted, not yet committed)
+
+Architecture adjudication:
+ACCEPTED -- IMPLEMENTATION DEFERRED
+
+Preceding audit:
+PURSUIT_APPROVAL_BOUNDARY_ARCHITECTURE_AUDIT_V1
+
+Audit result:
+ARCHITECTURE_CONTRACT_JUSTIFIED_IMPLEMENTATION_DEFERRED
+
+Second Cursor review:
+ACCEPT_ADR_DRAFT (one residual exploratory/consequential-boundary
+scoping note adjudicated ACCEPTABLE_ARCHITECTURE_DEFERRAL, not a
+contradiction)
+
+Core invariant:
+system recommendation (Job.decision / Job.lane, fully system-derived)
+must never silently become Bora's human pursuit authorization.
+
+What the ADR locks (semantics only -- no schema, enum, state machine,
+persistence, or code authorized): pursuit authorization is an
+opportunity-level human-authorization slice within the broader Blueprint
+Section 132 Pursuit truth layer, distinct from Employer truth, Candidate
+truth, Match truth, posting/actionability truth, Job.application_status,
+Job.network_action, ApplicationAttempt, Application Gate, résumé/package
+truth, submission authorization, and outcome truth; read-only/
+decision-support analysis (e.g. analyze_job re-analysis, exploratory
+application-route inspection) may occur before pursuit authorization when
+it does not materially advance pursuit; a materially changed opportunity
+must not silently inherit stale authorization merely because Job_ID is
+unchanged; the exact future representation/enforcement mechanism is
+explicitly deferred.
+
+PURSUIT_APPROVAL_BOUNDARY_ARCHITECTURE_AUDIT_V1 did not reproduce a
+current downstream pursuit-authorization bypass; no pursuit-production
+consumer currently exists; no current production defect is being fixed by
+this architecture record; pursuit authorization remains distinct from
+final submission authorization.
+
+Implementation status:
+NONE AUTHORIZED.
+
+Future activation condition:
+a concrete downstream pursuit consumer must be separately earned,
+architected, reviewed, and explicitly authorized before this boundary
+receives implementation.
+
+Expected first consumer under current product direction:
+résumé/package generation -- not locked as the only possible first
+consumer.
+
+This architecture record does not select, open, or imply a new active
+implementation milestone. The Status/Closed-task pointer at the top of
+this file remains authoritative.
+
 Historical closed milestone (superseded as the active pointer by the
 above, record preserved below):
 
