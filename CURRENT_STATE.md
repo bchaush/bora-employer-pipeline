@@ -4,9 +4,11 @@ Updated: 2026-09-02 (DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 closure)
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.2**.
+Governing Blueprint: **Final Locked Blueprint v3.3**.
 
 AI/tool operating-model governance synchronization (`GOVERNANCE_ROLE_SYNC_V1`) = **CLOSED** (documentation-only role realignment; no production code, schemas, Claims, Evidence, Experiences, fixtures, or tests changed).
+
+Candidate-facing real-world standard sync (`CANDIDATE_FACING_REAL_WORLD_STANDARD_SYNC_V1`) = **CLOSED** (documentation-only: `BLUEPRINT.md` bumped v3.2 → v3.3 and gained a new locked Section 132 recording the permanent product goal, build philosophy, five-layer real-world truth model, research standard (market/trend research guides ranking/prioritization only; an employer-specific decision must use employer-specific evidence when available), candidate-facing writing standard, Bora's explicit no-em-dash punctuation preference, and reinforced resume/package safety (candidate-facing claims must respect each Claim's `forbidden_contexts`, limitations, `human_approval` state, and reuse scope, not merely be traceable to a `Claim_ID`); `.cursor/rules/resume.mdc` gained matching operational sections (Claim boundary respect, Candidate-Facing Style, punctuation, and a sentence making the no-AI-detector-evasion rule operational); `CHANGELOG.md` recorded this sync per the version-bump requirement; no production code, schemas, Claims, Evidence, Experiences, résumé data, fixtures, or tests changed; no implementation milestone selected).
 
 Accredited Institution Qualifier Semantics v1 (`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1`) = **CLOSED** (canonical implementation commit `9950c7c3eacdebf741c2e6a990a5b391adba3c44`; see the dated entry below for full detail).
 

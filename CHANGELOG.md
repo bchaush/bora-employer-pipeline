@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-01 — Candidate-facing real-world standard sync (`CANDIDATE_FACING_REAL_WORLD_STANDARD_SYNC_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+Bora explicitly approved a permanent set of product and candidate-facing standards and asked that they be made durable across future chats and agents rather than repeatedly restated.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.2 → v3.3; added new locked Section 132 recording: the permanent product goal (evidence-controlled employer/application OS, not a Simplify/mass-apply/ATS-optimizer/keyword-stuffing tool); the build philosophy (return to real bottlenecks after each closed milestone, stop improving an area once further work no longer materially improves outcomes); the five-layer real-world truth model (employer / candidate / match / pursuit / package truth); the research standard, including that market/trend research guides ranking and prioritization only, while a current employer-specific decision must use employer-specific evidence whenever it is available; the candidate-facing writing standard; Bora's explicit no-em-dash punctuation preference; reinforced resume/package safety, including that candidate-facing Claim use must respect each Claim's `forbidden_contexts`, limitations, `human_approval` state, and reuse scope, not merely be traceable to a `Claim_ID`; and the UX/practical-value standard.
+* `.cursor/rules/resume.mdc` gained matching operational sections: Claim-boundary respect (forbidden contexts/limitations/approval/reuse scope), a Candidate-Facing Style section (plain natural business English, no AI/corporate hype, no invented metrics, avoid repetitive AI-like sentence structures, optimize for truthful natural evidence-backed communication rather than defeating AI detectors), and the punctuation rule.
+* `CURRENT_STATE.md`: added a documentation-only closure record for this sync.
+
+**Not changed**
+
+Production code; tests; schemas; Claims; Evidence; Experiences; résumé data; fixtures; `AGENTS.md`; `CURRENT_MILESTONE.md`. No implementation milestone selected.
+
+**Validation**
+
+Documentation-only change. `git diff --check` clean. No tests run for this milestone.
+
+**Status**
+
+`CANDIDATE_FACING_REAL_WORLD_STANDARD_SYNC_V1_CLOSED`.
+
+---
+
 ## 2026-09-01 — Accredited institution qualifier semantics (`ACCREDITED_INSTITUTION_QUALIFIER_SEMANTICS_V1`, CLOSED)
 
 **Reason**

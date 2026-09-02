@@ -95,6 +95,39 @@ No lineage:
 
 Do not export the resume.
 
+Traceability to a `Claim_ID` is necessary but not sufficient. A
+candidate-facing statement must also respect that Claim's own recorded
+boundaries:
+
+* `forbidden_contexts`;
+* documented limitations;
+* current `human_approval` state;
+* intended reuse scope (`reusable`, allowed contexts).
+
+A Claim that is traceable but forbidden in the requested context, not yet
+approved, or outside its reuse scope may not be used as-is.
+
+## Candidate-Facing Style
+
+Applies to resume text, cover letters, application answers, recruiter
+messages, and networking outreach.
+
+Use plain, natural American business English: professional, calm,
+specific, concrete nouns and real systems/actions/outcomes. No inflated
+AI/corporate hype, no unnecessary jargon, no fake enthusiasm, no
+unsupported adjectives or grandiose transformation language. Metrics must
+be verified or safely deterministic only, never invented because
+quantified bullets are preferred.
+
+**Punctuation (Bora's explicit preference):** do not use em dashes (—) in
+candidate-facing text. Prefer ordinary punctuation. When a dash is
+genuinely useful, use the normal hyphen character: -. This is a style
+preference, not a claim that em dashes prove AI authorship.
+
+Do not optimize candidate-facing text to defeat AI detectors; avoid
+repetitive AI-like sentence structures; optimize for truthful, natural,
+evidence-backed communication instead.
+
 ## Keyword Rule
 
 Job-description terminology may be used only when it truthfully describes existing evidence.

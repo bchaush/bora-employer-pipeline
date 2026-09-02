@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.2**
+**Final Locked Blueprint v3.3**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -3473,4 +3473,104 @@ increase throughput. Never silently change architecture. If a locked rule
 blocks implementation, return ARCHITECTURE_DECISION_REQUIRED with the
 conflict and alternatives. Make the smallest reliable change, test it,
 preserve rollback, and record material changes.**
+
+**132. CANDIDATE-FACING REAL-WORLD STANDARD (LOCKED)**
+
+Bora has explicitly approved the following as permanent product and
+candidate-facing standards, durable across future chats and agents.
+
+**Permanent product goal (reinforced).** This is Bora's
+evidence-controlled employer/application operating system. It is not
+another Simplify, a mass-apply bot, an ATS-score optimizer, a generic AI
+resume writer, a keyword-stuffing system, or an engineering project whose
+goal is to perfect matcher logic forever. Its purpose is to materially
+reduce Bora's manual job-search workload and produce real-world results:
+interviews, offers, income, experience, references, and useful
+professional relationships.
+
+**Build philosophy.** After each closed milestone, return to real jobs
+and end-to-end controls. Identify the largest materially wrong or missing
+real-world outcome. Do not preselect another code patch. Stop improving
+an area once further work no longer materially improves application
+decisions or job-search outcomes. Attack the common weaknesses of generic
+AI/vibe-coded tools: invented facts, false confidence, fragile
+happy-path behavior, generic output, hidden assumptions, stale employer
+information, unclear provenance, overfitting to keywords, inability to
+distinguish UNKNOWN from disproven facts, poor handling of real-world
+application gates, difficult manual review, and automation without
+validation. Prefer the smallest useful reliable system over feature
+volume.
+
+**Real-world truth model.** Five layers: (1) **Employer truth** — what
+the employer actually says, whether the role is really open, who the
+legal employer is, requirements/preferences, location/work mode,
+application gates, verified compensation, and public
+work-authorization/sponsorship information. (2) **Candidate truth** —
+verified Evidence, Experiences, approved Claims/modules, known
+constraints, and explicit UNKNOWNs. (3) **Match truth** — what is
+actually supported, unsupported, adjacent, or UNKNOWN between employer
+and candidate truth. (4) **Pursuit truth** — whether the opportunity is
+worth Bora's time given realistic hiring probability, hiring speed,
+work-authorization practicality, income, location/work mode, evidence
+strength, U.S. credibility, learning/network value, longer-term
+direction, and opportunity cost. (5) **Package truth** — the strongest
+honest presentation of already-supported candidate truth for a role Bora
+has decided to pursue. Package generation must never repair a bad match
+by inventing or silently upgrading candidate capability.
+
+**Research standard.** Ground material employer/market conclusions in
+current, verifiable evidence when practical, per the source tiers in
+Section 80. Distinguish verified fact, source-reported claim, inference,
+recommendation, and UNKNOWN. Do not turn expert opinion, a market trend,
+or recruiter commentary into a universal employer rule. Market/trend
+research may guide ranking and prioritization, but a current
+employer-specific decision must use employer-specific evidence whenever
+it is available — broad recruiter or market trends must never override a
+real posting's own terms.
+
+**Candidate-facing writing standard.** Applies to resumes, cover letters,
+application answers, recruiter messages, networking outreach,
+professional summaries, and other candidate-facing application text. Use
+plain, natural American business English: professional, calm, specific,
+concrete nouns and real systems/actions/outcomes, concise enough for a
+busy hiring manager to understand quickly, employer terminology only when
+truthful, no inflated AI/corporate hype, no unnecessary jargon, no fake
+enthusiasm, no unsupported adjectives or grandiose transformation
+language, and avoid repetitive AI-like sentence structures. Metrics must
+be verified or safely deterministic only — never invented merely because
+quantified bullets are preferred. Optimize for truthful, natural
+communication by a real candidate, not for defeating AI detectors; the
+goal is evidence-backed authenticity, not detector evasion.
+
+**Punctuation — Bora's explicit preference.** Do not use em dashes (—) in
+candidate-facing resume/application text. Prefer ordinary punctuation.
+When a dash is genuinely useful, use the normal hyphen character: -. Do
+not replace ordinary punctuation with decorative em dashes. This is
+Bora's explicit style preference, not a claim that em dashes universally
+prove AI authorship.
+
+**Resume/package safety (reinforces Sections 42–51 and
+`.cursor/rules/resume.mdc`).** Every meaningful factual candidate-facing
+statement must remain traceable to approved evidence/Claims/modules under
+the existing architecture. Tailoring may select, reorder, emphasize,
+truthfully reword, choose projects, and reorder supported skills.
+Tailoring may not manufacture fit, convert adjacency into equivalence,
+turn UNKNOWN into competency, add unsupported technologies, invent
+achievements/metrics, or rewrite formal history for keyword matching.
+Candidate-facing claims must additionally respect each Claim's
+`forbidden_contexts`, limitations, human-approval state, and intended
+reuse scope — traceability to a `Claim_ID` is necessary but not
+sufficient; the claim's own boundaries govern whether and how it may be
+used. The resume/package generator must not override qualification
+truth.
+
+**UX / practical value.** The system must be easy for Bora to review and
+operate. Prefer clear reasons, visible evidence, visible UNKNOWNs/gaps, a
+concise recommended action, fast diffs, exact submitted-version
+traceability, minimal repeated manual entry, and deterministic validation
+where possible. Success is not "generated lots of text." Success is less
+manual work, fewer materially wrong decisions, faster identification of
+real worthwhile roles, credible application packages, better ability to
+act on opportunities, and real interviews, offers, income, experience,
+references, and useful professional relationships.
 
