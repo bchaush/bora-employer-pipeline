@@ -1,4 +1,67 @@
-Status: CLOSED
+Status: ARCHITECTURE_RECORDED_AWAITING_IMPLEMENTATION_AUTHORIZATION
+Active task:
+REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1
+Canonical ADR:
+docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md
+ADR status: PROPOSED_FOR_IMPLEMENTATION_REVIEW (Cursor adversarial review
+pending; no implementation authorized yet)
+
+Selection provenance:
+ChatGPT Work/Bora selected this milestone after
+POST_QUALIFICATION_GATE_REAL_MARKET_BOTTLENECK_AUDIT_V1
+(NO_IMPLEMENTATION_MILESTONE_JUSTIFIED),
+DEGREE_CREDENTIAL_CANDIDATE_EVIDENCE_ADJUDICATION_V1 (read-only complete),
+and SYSTEM_WIDE_TRUST_AND_CONSISTENCY_AUDIT_V1 (read-only complete)
+converged on assurance/reproducibility debt -- not a reproduced business-
+logic defect -- as the highest-earned next action. This step recorded the
+already-adjudicated architecture faithfully as an ADR and this pointer; it
+did NOT implement it. No CI workflow, dependency file, verification
+runner, or new test file has been created. No production code, schema,
+Claim, Evidence, Experience, or resume was touched.
+
+Locked terminology: REPRODUCIBILITY_UNVERIFIED (not
+REPRODUCIBILITY_BROKEN) -- current development-machine assurance already
+passes; a clean GitHub-hosted environment has not yet reconstructed it
+from repo-declared dependencies alone and reproduced the same results.
+
+Locked bounded implementation surface (future step only, not yet
+authorized):
+A. requirements.in / requirements-lock.txt
+B. scripts/verify_assurance_baseline.py
+C. .github/workflows/assurance-baseline.yml
+D. tests/p0_causal_invariants_v1_test.py
+E. optional narrow newline/provenance test, only if independently
+   necessary and deterministic
+F. minimal documentation (canonical verification command,
+   analyze_job() outer runtime-envelope contract, milestone/state
+   bookkeeping)
+Any implementation need outside this surface: STOP AND REPORT before
+expanding scope.
+
+Directly observed facts recorded in the ADR: Python 3.14.6 verified
+runtime; third-party dependencies are exactly jsonschema and referencing;
+no requirements/pyproject/setup.py/Pipfile exists; no .github/workflows
+exists; no .gitattributes exists; exactly 59 tests/*_test.py files exist
+today.
+
+Explicit exclusions (not reopened by this milestone): Master's credential
+capability/matcher; Bachelor's-abbreviation parsing; experience-grammar
+broadening; global NONE-vs-UNKNOWN remediation; immigration/work-
+authorization decision consumer; legal-employer schema redesign;
+E-Verify/sponsorship/I-983 policy; Claim creation/approval/capability
+wiring; resume/package generation; follow-up/networking automation;
+outcome learning; new pursuit thresholds; role-discovery changes;
+employer-market expansion; branch-protection/required-status-check
+change; OS test matrix; .gitattributes addition; any packaging-tool
+adoption beyond a requirements.in/requirements-lock.txt pair.
+
+No implementation authorization exists yet. Next action is Cursor
+adversarial review of this ADR, then a separate, explicit implementation
+authorization turn.
+
+Historical closed milestone (superseded as the active pointer by the
+above, record preserved below):
+
 Closed task:
 ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1
 Canonical implementation SHA:
@@ -215,9 +278,12 @@ Carried-forward exclusions/conclusions (not reopened):
 - Immigration/work-authorization and posting-state logic remain separate
   and conservative -- unchanged.
 
-NO NEW ACTIVE IMPLEMENTATION MILESTONE IS CURRENTLY SELECTED.
-The next action is a fresh, read-only real-market/system bottleneck audit
-and prioritization by ChatGPT Work/Bora -- not preselected here.
+This closure's own "no new active implementation milestone" statement was
+superseded by REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1 above, after
+POST_QUALIFICATION_GATE_REAL_MARKET_BOTTLENECK_AUDIT_V1,
+DEGREE_CREDENTIAL_CANDIDATE_EVIDENCE_ADJUDICATION_V1, and
+SYSTEM_WIDE_TRUST_AND_CONSISTENCY_AUDIT_V1 ran and converged. See the
+active pointer at the top of this file for current status.
 
 Locked conclusions (carried forward, not reopened):
 
