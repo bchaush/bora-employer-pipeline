@@ -43,6 +43,120 @@
       "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
+      "requirement_id": "REQ_D_DEGREE_HS_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "A High School Diploma or GED",
+      "category": "EDUCATION",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "A High School Diploma or GED with an additional seven (7) years of directly related experience substitutes for the Bachelor's degree requirement.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_D_SYS_ANALYSIS_10Y_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "10 years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support",
+      "category": "EXPERIENCE",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": "10 years",
+      "domain": "System Analysis",
+      "relevance": "HIGH",
+      "source_text": "High School Diploma/ equivalent with ten (10) or more years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_D_DEGREE_ASSOC_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "An Associate's degree from an accredited institution",
+      "category": "EDUCATION",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "An Associate's degree from an accredited institution an additional three (3) years of directly related experience substitutes for the Bachelor's degree requirement.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_D_SYS_ANALYSIS_6Y_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "6 years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support",
+      "category": "EXPERIENCE",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": "6 years",
+      "domain": "System Analysis",
+      "relevance": "HIGH",
+      "source_text": "An associates degree from an accredited institution with six (6) or more years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_D_DEGREE_MASTERS_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "A Master's degree in a related subject",
+      "category": "EDUCATION",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "A Master's degree in a related subject substitute for two (2) years of general experience.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_D_SYS_ANALYSIS_1Y_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "1 year of experience in system analysis, including enterprise application design, configuration / development, implementation, and support",
+      "category": "EXPERIENCE",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": "1 year",
+      "domain": "System Analysis",
+      "relevance": "HIGH",
+      "source_text": "A master's degree and one (1) or more years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
       "requirement_id": "REQ_D_PROCESS_MAPPING",
       "job_id": "PLACEHOLDER",
       "text": "Proven ability to map and document complex business processes and identify opportunities for optimization or automation within assigned applications",
@@ -185,6 +299,30 @@
       "explicit_prerequisite_language_present": false,
       "duplicated_under_requirements": false,
       "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    }
+  ],
+  "qualification_gates": [
+    {
+      "qualification_gate_id": "GATE_D_DEGREE_EXPERIENCE",
+      "job_id": "PLACEHOLDER",
+      "source_text": [
+        "Bachelor's degree from an accredited institution.",
+        "Three (3) years of experience in system analysis, including enterprise application design, configuration / development, implementation, and support.",
+        "A High School Diploma or GED with an additional seven (7) years of directly related experience substitutes for the Bachelor's degree requirement.",
+        "An Associate's degree from an accredited institution an additional three (3) years of directly related experience substitutes for the Bachelor's degree requirement.",
+        "A Master's degree in a related subject substitute for two (2) years of general experience."
+      ],
+      "source_location": "Minimum Qualifications + Substitutions",
+      "logic_expression": {
+        "op": "ANY_OF",
+        "terms": [
+          {"op": "ALL_OF", "terms": ["REQ_D_DEGREE_HS_BRANCH", "REQ_D_SYS_ANALYSIS_10Y_BRANCH"]},
+          {"op": "ALL_OF", "terms": ["REQ_D_DEGREE_ASSOC_BRANCH", "REQ_D_SYS_ANALYSIS_6Y_BRANCH"]},
+          {"op": "ALL_OF", "terms": ["REQ_D_DEGREE", "REQ_D_SYS_ANALYSIS_EXP"]},
+          {"op": "ALL_OF", "terms": ["REQ_D_DEGREE_MASTERS_BRANCH", "REQ_D_SYS_ANALYSIS_1Y_BRANCH"]}
+        ]
+      },
+      "unmodeled_branches_note": "Certification branch ('A nationally recognized certification, or statewide/professional certification in a related field substitutes for one year of experience.') intentionally not modeled: the employer source does not state the resulting base-experience arithmetic explicitly, and it must not be invented."
     }
   ]
 }

@@ -399,12 +399,17 @@ assert_true(
     f"CASE_D final decision must remain REJECT (independent blockers persist), got {direct_analysis['decision']}",
 )
 direct_blockers = sorted(b.rsplit(": ", 1)[-1] for b in direct_result["hard_blockers"])
-# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
-# milestone): REQ_D_SYS_ANALYSIS_EXP no longer independently hard-blocks
-# (resolves UNKNOWN); only REQ_D_DEGREE remains.
+# ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (post-dates and
+# SUPERSEDES the DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 comment
+# below): REQ_D_DEGREE is now referenced by GATE_D_DEGREE_EXPERIENCE
+# (the employer's real HS/Associate's/Bachelor's/Master's alternative
+# branches) and is no longer independently hard-blocked -- the gate
+# itself currently resolves UNRESOLVED on current evidence, never a
+# blocker. CASE_D remains REJECT via unrelated, unaffected ungrouped
+# gaps (ITSM/SaaS/MS Office), so hard_blockers is now empty.
 assert_true(
-    direct_blockers == ["REQ_D_DEGREE"],
-    f"CASE_D hard blockers must be exactly the 1 remaining independent one, got {direct_blockers}",
+    direct_blockers == [],
+    f"CASE_D hard blockers must be exactly empty (degree gated, resolves UNRESOLVED), got {direct_blockers}",
 )
 print(f"PASS L1: CASE_D (direct) -- REQ_D_BUSINESS_RULES=PARTIAL via CLAIM_WW_001; final decision=REJECT; blockers={direct_blockers}.")
 
@@ -420,18 +425,24 @@ assert_true(
     "REQ_E_BUSINESS_RULES" not in [b.rsplit(": ", 1)[-1] for b in contractor_result["hard_blockers"]],
     "REQ_E_BUSINESS_RULES must no longer appear as a hard blocker",
 )
+# ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (post-dates and
+# SUPERSEDES the previous REJECT/single-blocker expectation): REQ_E_DEGREE
+# is now referenced by GATE_E_DEGREE_EXPERIENCE and no longer
+# independently hard-blocks; with that fabricated blocker removed, CASE_E's
+# actual underlying state (one genuinely SUPPORTED requirement -- process
+# mapping -- alongside unrelated MEDIUM-relevance NONE gaps) does not meet
+# any REJECT threshold in the existing, unmodified decision routing --
+# decision is now UNDECIDED, an honest consequence, not manufactured.
 assert_true(
-    contractor_analysis["decision"] == "REJECT",
-    f"CASE_E final decision must remain REJECT (independent blockers persist), got {contractor_analysis['decision']}",
+    contractor_analysis["decision"] == "UNDECIDED",
+    f"CASE_E final decision must be UNDECIDED (fabricated degree blocker removed), got {contractor_analysis['decision']}",
 )
 contractor_blockers = sorted(b.rsplit(": ", 1)[-1] for b in contractor_result["hard_blockers"])
-# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
-# milestone): REQ_E_SYS_ANALYSIS_EXP no longer independently hard-blocks.
 assert_true(
-    contractor_blockers == ["REQ_E_DEGREE"],
-    f"CASE_E hard blockers must be exactly the 1 remaining independent one, got {contractor_blockers}",
+    contractor_blockers == [],
+    f"CASE_E hard blockers must be exactly empty (degree gated, resolves UNRESOLVED), got {contractor_blockers}",
 )
-print(f"PASS L2: CASE_E (contractor) -- REQ_E_BUSINESS_RULES=PARTIAL via CLAIM_WW_001; final decision=REJECT; blockers={contractor_blockers}.")
+print(f"PASS L2: CASE_E (contractor) -- REQ_E_BUSINESS_RULES=PARTIAL via CLAIM_WW_001; final decision=UNDECIDED (degree gated, no longer a fabricated blocker); blockers={contractor_blockers}.")
 
 
 # ======================================================================

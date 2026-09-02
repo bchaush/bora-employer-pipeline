@@ -304,11 +304,24 @@ blockers_d = {b.rsplit(": ", 1)[-1] for b in result_d["hard_blockers"]}
 blockers_e = {b.rsplit(": ", 1)[-1] for b in result_e["hard_blockers"]}
 assert_true("REQ_D_SYS_ANALYSIS_EXP" not in blockers_d, f"REQ_D_SYS_ANALYSIS_EXP must no longer independently hard-block, got {blockers_d}")
 assert_true("REQ_E_SYS_ANALYSIS_EXP" not in blockers_e, f"REQ_E_SYS_ANALYSIS_EXP must no longer independently hard-block, got {blockers_e}")
-assert_true(blockers_d == {"REQ_D_DEGREE"}, f"MBTA direct blockers must be exactly REQ_D_DEGREE, got {blockers_d}")
-assert_true(blockers_e == {"REQ_E_DEGREE"}, f"MBTA contractor blockers must be exactly REQ_E_DEGREE, got {blockers_e}")
+# ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (post-dates and
+# SUPERSEDES this milestone's own locked counterfactual): REQ_D_DEGREE/
+# REQ_E_DEGREE are now referenced by a qualification_gate representing the
+# employer's real alternative education/experience branches and are no
+# longer independently hard-blocked -- both gates currently resolve
+# UNRESOLVED on current evidence. hard_blockers is now empty for both.
+assert_true(blockers_d == set(), f"MBTA direct blockers must be exactly empty (degree gated), got {blockers_d}")
+assert_true(blockers_e == set(), f"MBTA contractor blockers must be exactly empty (degree gated), got {blockers_e}")
 
-assert_true(analysis_d["decision"] == "REJECT" and analysis_d["lane"] == "LANE_0_REJECT", f"MBTA direct must remain REJECT (locked counterfactual), got {analysis_d['decision']}")
-assert_true(analysis_e["decision"] == "REJECT" and analysis_e["lane"] == "LANE_0_REJECT", f"MBTA contractor must remain REJECT (locked counterfactual), got {analysis_e['decision']}")
+# CASE_D remains REJECT via unrelated, unaffected ungrouped gaps
+# (ITSM/SaaS/MS Office). CASE_E's decision changes to UNDECIDED: with the
+# fabricated degree-only blocker removed, CASE_E's actual underlying state
+# (one genuinely SUPPORTED requirement -- process mapping -- alongside
+# unrelated MEDIUM-relevance NONE gaps) does not meet any REJECT threshold
+# in the existing, unmodified decision routing -- an honest consequence,
+# not manufactured by either milestone.
+assert_true(analysis_d["decision"] == "REJECT" and analysis_d["lane"] == "LANE_0_REJECT", f"MBTA direct must remain REJECT (unrelated ungrouped gaps), got {analysis_d['decision']}")
+assert_true(analysis_e["decision"] == "UNDECIDED", f"MBTA contractor decision must be UNDECIDED (fabricated degree blocker removed), got {analysis_e['decision']}")
 for decision in (analysis_d["decision"], analysis_e["decision"]):
     assert_true(decision not in ("APPLY", "EFFICIENT_APPLY", "PRIORITY_APPLY"), f"no APPLY-like decision is expected from this milestone, got {decision}")
 

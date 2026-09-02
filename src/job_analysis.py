@@ -28,6 +28,12 @@ from experience_range import (
 )
 from job_decision import apply_posting_state_routing, decide_lane_and_decision
 from job_id import generate_job_id
+from qualification_gate import (
+    all_gates_leaf_ids,
+    evaluate_qualification_gate,
+    validate_gate_requirement_references,
+    validate_gate_source_traceability,
+)
 from requirement_match import infer_requirement_capabilities, match_requirements
 from requirement_normalize import normalize_structured_requirements
 from requirement_source_role import (
@@ -43,6 +49,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS_SCHEMA_PATH = ROOT / "schemas" / "job_analysis_result.schema.json"
 REQUIREMENT_SCHEMA_PATH = ROOT / "schemas" / "requirement.schema.json"
 EVIDENCE_MATCH_SCHEMA_PATH = ROOT / "schemas" / "evidence_match.schema.json"
+QUALIFICATION_GATE_SCHEMA_PATH = ROOT / "schemas" / "qualification_gate.schema.json"
 
 
 def _error(code: str, **fields: Any) -> dict[str, Any]:
@@ -64,6 +71,7 @@ def _unique(items: list[str]) -> list[str]:
 def _build_gaps_and_unknowns(
     requirements: list[dict[str, Any]],
     matches: list[dict[str, Any]],
+    gated_requirement_ids: frozenset[str] = frozenset(),
 ) -> tuple[list[str], list[str]]:
     """`gaps`/`unknowns` -- a compatibility-name ALIAS for
     `qualification_gaps`/`qualification_unknowns` (same list objects; see
@@ -82,6 +90,15 @@ def _build_gaps_and_unknowns(
     runs; only a direct low-level caller that bypasses that gate could
     reach this function with such a row, and even then it is excluded, not
     silently gated).
+
+    ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (additive):
+    ``gated_requirement_ids`` are excluded from independent gap/unknown
+    emission here entirely (load-bearing output-suppression requirement --
+    see the ADR's Verification Required). Their qualification-relevant
+    output is instead the gate-level entries analyze_job() appends
+    separately from each gate's own SUPPORTED/UNRESOLVED/
+    BLOCKED_BY_MATCHING_POLICY result. Defaults to empty, so every existing
+    caller/ungrouped requirement behaves byte-identically to before.
     """
     match_by_req = {m["requirement_id"]: m for m in matches}
     gaps: list[str] = []
@@ -90,8 +107,9 @@ def _build_gaps_and_unknowns(
     for requirement in requirements:
         if derive_qualification_gate(requirement.get("source_semantic_role")) != "YES":
             continue
-
         req_id = requirement["requirement_id"]
+        if req_id in gated_requirement_ids:
+            continue
         match = match_by_req.get(req_id)
         importance = requirement.get("importance")
         relevance = requirement.get("relevance")
@@ -377,6 +395,49 @@ def analyze_job(
 
     requirements = normalized["requirements"]
 
+    # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: qualification_gates
+    # is an additive, optional top-level array in structured_extraction.json
+    # (Employer truth only -- see src/qualification_gate.py and the ADR).
+    # Absent/empty for every job without alternative-branch employer logic
+    # -- zero migration, zero behavior change for the 17 unaffected
+    # fixtures. Each gate is validated here, fail-closed, before any
+    # evaluation: schema shape, raw-source traceability against jd_text,
+    # and referential integrity against this job's own Requirement IDs.
+    qualification_gates_raw = structured.get("qualification_gates")
+    qualification_gates: list[dict[str, Any]] = (
+        list(qualification_gates_raw) if isinstance(qualification_gates_raw, list) else []
+    )
+    if qualification_gates:
+        gate_validator = build_draft202012_validator(QUALIFICATION_GATE_SCHEMA_PATH)
+        known_requirement_ids = [r["requirement_id"] for r in requirements]
+        for gate in qualification_gates:
+            if not isinstance(gate, Mapping):
+                empty["errors"].append(
+                    _error(
+                        "MALFORMED_QUALIFICATION_GATE",
+                        detail=f"qualification_gate must be a mapping; got {type(gate).__name__}",
+                    )
+                )
+                continue
+            schema_errors = [err.message for err in gate_validator.iter_errors(gate)]
+            if schema_errors:
+                empty["errors"].append(
+                    _error(
+                        "QUALIFICATION_GATE_SCHEMA_INVALID",
+                        qualification_gate_id=gate.get("qualification_gate_id"),
+                        details=schema_errors,
+                    )
+                )
+                continue
+            empty["errors"].extend(
+                validate_gate_requirement_references(gate, known_requirement_ids)
+            )
+            empty["errors"].extend(validate_gate_source_traceability(gate, jd_text))
+        if empty["errors"]:
+            return empty
+
+    gated_requirement_ids = all_gates_leaf_ids(qualification_gates)
+
     # EXPERIENCE_RANGE_SEMANTICS_V1: route GENERIC numeric experience-range
     # requirements (e.g. "0-2 years of work experience") to their own
     # narrow, honest evaluator instead of the generic capability matcher.
@@ -467,7 +528,9 @@ def analyze_job(
     # separate responsibility_observations/responsibility_evidence_unknowns/
     # application_or_legal_gate_observations/unresolved_gate_observations
     # outputs below, never folded back into `gaps`/`unknowns`.
-    gaps, unknowns = _build_gaps_and_unknowns(requirements, matches)
+    gaps, unknowns = _build_gaps_and_unknowns(
+        requirements, matches, gated_requirement_ids=gated_requirement_ids
+    )
     qualification_gaps, qualification_unknowns = gaps, unknowns
     responsibility_observations, responsibility_evidence_unknowns = (
         _build_responsibility_views(requirements, matches)
@@ -475,6 +538,47 @@ def analyze_job(
     application_or_legal_gate_observations, unresolved_gate_observations = (
         _build_legal_gate_views(requirements, jd_text)
     )
+
+    # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: evaluate each
+    # qualification_gate against the just-computed match state (Match
+    # truth), independently -- satisfaction of one gate never suppresses
+    # or erases another. Gate SUPPORTED emits no gap/unknown noise for its
+    # failed alternative branches (the employer only required one branch);
+    # gate UNRESOLVED emits one qualification_unknowns entry; gate
+    # BLOCKED_BY_MATCHING_POLICY emits one qualification_gaps entry AND one
+    # hard_blockers entry (via qualification_gate_blockers below) -- never
+    # one entry per underlying gated row.
+    matches_by_req = {m["requirement_id"]: m for m in matches}
+    qualification_gate_results: list[dict[str, Any]] = []
+    qualification_gate_blockers: list[str] = []
+    for gate in qualification_gates:
+        gate_outcome = evaluate_qualification_gate(gate, matches_by_req)
+        gate_id = gate.get("qualification_gate_id")
+        source_text = gate.get("source_text")
+        source_summary = " / ".join(source_text) if isinstance(source_text, list) else ""
+        qualification_gate_results.append(
+            {
+                "qualification_gate_id": gate_id,
+                "result": gate_outcome["result"],
+                "leaf_support": gate_outcome["leaf_support"],
+                "source_text": source_text,
+                "source_location": gate.get("source_location"),
+            }
+        )
+        if gate_outcome["result"] == "BLOCKED_BY_MATCHING_POLICY":
+            blocker_text = (
+                f"{gate_id}: qualification gate blocked by matching policy - "
+                f"{source_summary} (branch leaf states: {gate_outcome['leaf_support']})"
+            )
+            qualification_gate_blockers.append(blocker_text)
+            qualification_gaps.append(blocker_text)
+        elif gate_outcome["result"] == "UNRESOLVED":
+            qualification_unknowns.append(
+                f"{gate_id}: qualification gate unresolved - {source_summary} "
+                f"(branch leaf states: {gate_outcome['leaf_support']})"
+            )
+        # SUPPORTED: no gap/unknown entry -- the employer only required one
+        # branch, and it was cleared; failed alternatives are not gaps.
 
     decision = decide_lane_and_decision(
         requirements=requirements,
@@ -485,6 +589,8 @@ def analyze_job(
         role_family=normalized.get("role_family"),
         role=role,
         jd_text=jd_text,
+        gated_requirement_ids=gated_requirement_ids,
+        qualification_gate_blockers=qualification_gate_blockers,
     )
 
     # POSTING_STATE_DECISION_WIRING_V1: consume the canonical, already-classified
@@ -525,6 +631,7 @@ def analyze_job(
         "responsibility_evidence_unknowns": responsibility_evidence_unknowns,
         "application_or_legal_gate_observations": application_or_legal_gate_observations,
         "unresolved_gate_observations": unresolved_gate_observations,
+        "qualification_gate_results": qualification_gate_results,
         "lane": decision["lane"],
         "decision": decision["decision"],
         "warnings": warnings,

@@ -934,6 +934,9 @@ def match_requirement(
     req_caps = infer_requirement_capabilities(requirement)
 
     # Forced NONE traps (including U.S. regulatory with current repository).
+    # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: evaluation_path
+    # ="NONE_TRAP" identifies this as a deliberately-designed, evidence-
+    # independent structural refusal (see src/qualification_gate.py).
     for rule_id, trap_caps, explanation in _NONE_TRAPS:
         if req_caps.intersection(trap_caps):
             return {
@@ -948,6 +951,7 @@ def match_requirement(
                     f"canonical={sorted(req_caps)}; {explanation}"
                 ),
                 "transfer_note": None,
+                "evaluation_path": "NONE_TRAP",
             }
 
     if not req_caps:
@@ -965,6 +969,10 @@ def match_requirement(
                 "refusing generic lexical overmatch."
             ),
             "transfer_note": None,
+            # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: nothing
+            # about this text was recognized at all -- never negative-
+            # sufficient for a qualification-gate leaf.
+            "evaluation_path": "NO_CAPABILITY_COVERAGE",
         }
 
     best_claim: Mapping[str, Any] | None = None
@@ -990,6 +998,13 @@ def match_requirement(
                 "No approved Claim capability intersection."
             ),
             "transfer_note": None,
+            # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: a
+            # capability WAS recognized, but zero approved Claim overlap
+            # exists -- proven NOT negative-sufficient for a
+            # qualification-gate leaf (the same capability signature can
+            # arise from both a complete and an incomplete compound
+            # requirement; see src/qualification_gate.py).
+            "evaluation_path": "NO_CAPABILITY_OVERLAP",
         }
 
     claim_id = best_claim.get("claim_id")
@@ -1013,6 +1028,7 @@ def match_requirement(
             f"raw={req_text!r}; canonical={sorted(best_overlap)}; "
             f"provenance claim={claim_id} evidence={evidence_ids}."
         )
+        evaluation_path = "FULL_CAPABILITY_MATCH"
     else:
         result = "PARTIAL"
         transfer_note = (
@@ -1023,11 +1039,22 @@ def match_requirement(
             f"raw={req_text!r}; PARTIAL canonical overlap {sorted(best_overlap)}; "
             f"missing {sorted(req_caps - claim_caps)}; claim={claim_id}."
         )
+        evaluation_path = "PARTIAL_CAPABILITY_MATCH"
 
     if result in {"STRONG", "SUPPORTED", "PARTIAL"} and not (claim_ids or evidence_ids):
+        # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: a nominally
+        # positive match whose provenance vanished is a distinct failure
+        # class from the seven ordinary evaluation_path values (see the
+        # ADR's explicit disposition for this edge) -- evaluation_path is
+        # deliberately left unset (None) rather than assigned a new named
+        # value, so a qualification-gate leaf reading it falls through to
+        # the existing "missing evaluation_path -> UNRESOLVED" rule
+        # (smallest safe choice; no new enum value invented for a case
+        # this code path should never actually produce).
         result = "NONE"
         transfer_note = None
         explanation = "Positive match rejected: missing Evidence/Claim provenance."
+        evaluation_path = None
 
     return {
         "match_id": match_id,
@@ -1038,6 +1065,7 @@ def match_requirement(
         "claim_ids": claim_ids,
         "explanation": explanation,
         "transfer_note": transfer_note,
+        "evaluation_path": evaluation_path,
     }
 
 

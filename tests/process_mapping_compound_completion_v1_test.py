@@ -341,9 +341,12 @@ assert_true(
     # for dedicated coverage of that capability.
     # SUPERSEDED BY DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1:
     # REQ_D_SYS_ANALYSIS_EXP no longer independently hard-blocks (resolves
-    # UNKNOWN, not NONE); only REQ_D_DEGREE remains.
-    direct_blockers == ["REQ_D_DEGREE"],
-    f"CASE_D hard blockers must be exactly the 1 remaining independent one (degree), got {direct_blockers}",
+    # UNKNOWN, not NONE).
+    # SUPERSEDED BY ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1:
+    # REQ_D_DEGREE is now referenced by GATE_D_DEGREE_EXPERIENCE and no
+    # longer independently hard-blocks (gate resolves UNRESOLVED).
+    direct_blockers == [],
+    f"CASE_D hard blockers must be exactly empty (degree gated, resolves UNRESOLVED), got {direct_blockers}",
 )
 print(f"PASS J1: CASE_D (direct) -- REQ_D_PROCESS_MAPPING=PARTIAL via CLAIM_WW_006; final decision=REJECT; blockers={direct_blockers}.")
 
@@ -355,19 +358,22 @@ assert_true(
     contractor_pm["result"] == "STRONG" and contractor_pm.get("claim_ids") == ["CLAIM_WW_006"],
     f"CASE_E REQ_E_PROCESS_MAPPING (atomic requirement) must remain STRONG via CLAIM_WW_006, got {contractor_pm}",
 )
+# SUPERSEDED BY ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: with
+# REQ_E_DEGREE now gated (no longer independently hard-blocking), CASE_E's
+# actual underlying state (this very requirement, REQ_E_PROCESS_MAPPING,
+# genuinely STRONG, alongside unrelated MEDIUM-relevance NONE gaps) does
+# not meet any REJECT threshold in the existing, unmodified decision
+# routing -- decision is now UNDECIDED, an honest consequence, not
+# manufactured.
 assert_true(
-    contractor_analysis["decision"] == "REJECT",
-    f"CASE_E final decision must remain REJECT (independent blockers persist), got {contractor_analysis['decision']}",
+    contractor_analysis["decision"] == "UNDECIDED",
+    f"CASE_E final decision must be UNDECIDED (fabricated degree blocker removed), got {contractor_analysis['decision']}",
 )
 contractor_blockers = sorted(b.rsplit(": ", 1)[-1] for b in contractor_result["hard_blockers"])
 assert_true(
-    # SUPERSEDED BY BUSINESS_RULES_TECHNICAL_REQUIREMENTS_COMPOUND_
-    # COMPLETION_V1: REQ_E_BUSINESS_RULES now correctly resolves PARTIAL.
-    # SUPERSEDED BY DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1:
-    # REQ_E_SYS_ANALYSIS_EXP no longer independently hard-blocks.
-    contractor_blockers == ["REQ_E_DEGREE"],
-    f"CASE_E hard blockers must be exactly the 1 remaining independent one, got {contractor_blockers}",
+    contractor_blockers == [],
+    f"CASE_E hard blockers must be exactly empty (degree gated, resolves UNRESOLVED), got {contractor_blockers}",
 )
-print(f"PASS J2: CASE_E (contractor) -- REQ_E_PROCESS_MAPPING=STRONG via CLAIM_WW_006 (atomic requirement, unaffected); final decision=REJECT; blockers={contractor_blockers}.")
+print(f"PASS J2: CASE_E (contractor) -- REQ_E_PROCESS_MAPPING=STRONG via CLAIM_WW_006 (atomic requirement, unaffected); final decision=UNDECIDED (degree gated, no longer a fabricated blocker); blockers={contractor_blockers}.")
 
 print("ALL process_mapping_compound_completion_v1_test CHECKS PASSED")

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/qualification_gate.schema.json",
+  "title": "Bora Employer Pipeline Qualification Gate Record",
+  "description": "ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: an Employer-truth record representing employer-stated alternative qualification-branch composition (e.g. 'any ONE of these education/experience combinations satisfies this posting's degree gate'). Requirement rows remain atomic and unmodified; this record composes them via logic_expression only. Carries NO candidate Evidence/Claim/match-specific state -- distinct from src/requirement_source_role.py's per-row derive_qualification_gate() eligibility view (see the ADR's permanent terminology note).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "qualification_gate_id",
+    "job_id",
+    "source_text",
+    "source_location",
+    "logic_expression"
+  ],
+  "properties": {
+    "qualification_gate_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent identifier for this gate within the analyzed job."
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Job_ID of the job record this gate belongs to."
+    },
+    "source_text": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Array of exact raw-source excerpts, not a single synthetic combined sentence. Each excerpt must be deterministically traceable (exact substring after whitespace-only normalization) to the job's captured jd.txt -- see src/qualification_gate.py::validate_gate_source_traceability. Never paraphrased or merged into invented connective wording."
+    },
+    "source_location": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Location of the supporting wording within the job description (e.g. 'Minimum Qualifications + Substitutions')."
+    },
+    "logic_expression": {
+      "$ref": "#/$defs/expression",
+      "description": "Recursive boolean expression over Requirement IDs. Terms reference existing requirement_id values only -- referential integrity is validated separately (fail-closed) against the job's own Requirement rows, not by this schema."
+    },
+    "unmodeled_branches_note": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional, bounded note recording an employer-stated qualification branch this gate deliberately does not model (e.g. a certification branch whose exact remaining-experience arithmetic the employer source does not state explicitly). Must never be used to invent the unmodeled branch's arithmetic."
+    }
+  },
+  "$defs": {
+    "expression": {
+      "description": "A leaf is a bare requirement_id string. A non-leaf node is {op, terms}. V1 conservative scope: CASE_D/CASE_E author only ALL_OF/ANY_OF, per the ADR's locked operator-scope decision -- AT_LEAT_N/NOT remain part of the shared shape (for schema/evaluator reuse) but must not be authored for any qualification_gate until a real employer source requires them.",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["op", "terms"],
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": ["ALL_OF", "ANY_OF", "AT_LEAST_N", "NOT"]
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Required only when op == AT_LEAST_N."
+            },
+            "terms": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/expression" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

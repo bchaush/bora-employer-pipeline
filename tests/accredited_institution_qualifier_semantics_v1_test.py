@@ -297,13 +297,26 @@ def _load_real_job_input(fixture_dir_name: str) -> dict:
 # DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
 # milestone): REQ_D/E_SYS_ANALYSIS_EXP are domain-qualified duration
 # requirements with empty inferred capabilities and no longer
-# independently hard-block (they resolve UNKNOWN, not NONE); only the
-# genuine REQ_D/E_DEGREE blocker remains. This assertion is about THIS
-# milestone (accredited-institution-qualifier semantics) not changing the
-# blocker set any further -- updated to the current adjudicated baseline.
-for fixture_name, req_id, expected_blockers in (
-    ("CASE_D_MBTA_DIRECT_APPLICATION_ANALYST", "REQ_D_DEGREE", ["REQ_D_DEGREE"]),
-    ("CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST", "REQ_E_DEGREE", ["REQ_E_DEGREE"]),
+# independently hard-block (they resolve UNKNOWN, not NONE).
+#
+# ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (SUPERSEDES the
+# previous baseline recorded above): REQ_D_DEGREE/REQ_E_DEGREE are now
+# referenced by a qualification_gate (GATE_D_DEGREE_EXPERIENCE /
+# GATE_E_DEGREE_EXPERIENCE) representing the employer's real alternative
+# education/experience branches (HS/Associate's/Bachelor's/Master's). Both
+# rows are therefore no longer independently hard-blocked (evaluated only
+# through their gate, which currently resolves UNRESOLVED on current
+# evidence -- not a blocker). CASE_D remains REJECT via unrelated,
+# unaffected ungrouped gaps (ITSM/SaaS/MS Office). CASE_E's own decision
+# changes from REJECT to UNDECIDED: with the fabricated degree-only
+# blocker removed, CASE_E's actual underlying state (one genuinely
+# SUPPORTED requirement -- process mapping -- alongside unrelated
+# MEDIUM-relevance NONE gaps) does not meet any REJECT threshold in the
+# existing, unmodified decision routing; this is an honest consequence,
+# not manufactured by this milestone.
+for fixture_name, req_id, expected_blockers, expected_decision in (
+    ("CASE_D_MBTA_DIRECT_APPLICATION_ANALYST", "REQ_D_DEGREE", [], "REJECT"),
+    ("CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST", "REQ_E_DEGREE", [], "UNDECIDED"),
 ):
     result = analyze_job(_load_real_job_input(fixture_name))
     assert_true(result["valid"] is True, f"{fixture_name} analysis must be valid: {result.get('errors')}")
@@ -314,8 +327,8 @@ for fixture_name, req_id, expected_blockers in (
         f"{fixture_name} {req_id} must remain NONE (current approved Claim state unchanged), got {degree_match['result']}",
     )
     assert_true(
-        analysis["decision"] == "REJECT",
-        f"{fixture_name} final decision must remain REJECT, got {analysis['decision']}",
+        analysis["decision"] == expected_decision,
+        f"{fixture_name} final decision must be {expected_decision}, got {analysis['decision']}",
     )
     actual_blockers = sorted(b.rsplit(": ", 1)[-1] for b in result["hard_blockers"])
     assert_true(

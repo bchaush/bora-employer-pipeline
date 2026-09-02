@@ -48,6 +48,20 @@
     "transfer_note": {
       "type": ["string", "null"],
       "description": "Explicit transfer boundary when result is PARTIAL. Null otherwise."
+    },
+    "evaluation_path": {
+      "type": ["string", "null"],
+      "enum": [
+        "NONE_TRAP",
+        "NO_CAPABILITY_OVERLAP",
+        "NO_CAPABILITY_COVERAGE",
+        "FULL_CAPABILITY_MATCH",
+        "PARTIAL_CAPABILITY_MATCH",
+        "EXPERIENCE_RANGE_EVALUATOR",
+        "DOMAIN_QUALIFIED_DURATION_EVALUATOR",
+        null
+      ],
+      "description": "ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: additive, stable, machine-readable identification of which deterministic evaluation path produced this result -- Match truth, never Employer truth. A closed V1 enumeration of currently-real paths only, not a general ontology. Human-readable `explanation` text must never control consequential (qualification-gate) logic; this field is the only machine-readable signal consumers may use for that purpose. Null/absent for match records not produced by one of the enumerated paths (e.g. synthetic/test-constructed records) -- consumers must treat a missing/unrecognized value as UNRESOLVED, never as an authoritative negative."
     }
   },
   "allOf": [

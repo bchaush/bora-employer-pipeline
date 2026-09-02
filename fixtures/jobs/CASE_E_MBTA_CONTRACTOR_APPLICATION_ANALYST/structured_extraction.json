@@ -43,6 +43,82 @@
       "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
     },
     {
+      "requirement_id": "REQ_E_DEGREE_HS_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "A high school diploma or GED",
+      "category": "EDUCATION",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "A high school diploma or GED with an additional seven (7) years of directly related experience substitutes for the bachelor's degree requirement.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_E_RELATED_EXPERIENCE_7Y_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "seven years of directly related experience",
+      "category": "EXPERIENCE",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": "7 years",
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "A high school diploma or GED with an additional seven (7) years of directly related experience substitutes for the bachelor's degree requirement.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_E_DEGREE_ASSOC_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "An associate's degree from an accredited institution",
+      "category": "EDUCATION",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": null,
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "An associate's degree from an accredited institution and an additional three (3) years of directly related experience substitutes for the bachelor's degree requirement.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
+      "requirement_id": "REQ_E_RELATED_EXPERIENCE_3Y_BRANCH",
+      "job_id": "PLACEHOLDER",
+      "text": "three years of directly related experience",
+      "category": "EXPERIENCE",
+      "importance": "MANDATORY",
+      "seniority_implication": null,
+      "technology": [],
+      "experience_level": "3 years",
+      "domain": null,
+      "relevance": "HIGH",
+      "source_text": "An associate's degree from an accredited institution and an additional three (3) years of directly related experience substitutes for the bachelor's degree requirement.",
+      "source_location": "Minimum Qualifications",
+      "source_semantic_role": "ENTRY_QUALIFICATION",
+      "source_semantic_role_basis": "source_location indicates a Requirements/Qualifications section with no future-tense duty marker; the section heading is authoritative (content shape: credential-shaped).",
+      "explicit_prerequisite_language_present": false,
+      "duplicated_under_requirements": false,
+      "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    },
+    {
       "requirement_id": "REQ_E_PROCESS_MAPPING",
       "job_id": "PLACEHOLDER",
       "text": "Ability to map and document complex business processes",
@@ -159,6 +235,34 @@
       "explicit_prerequisite_language_present": false,
       "duplicated_under_requirements": false,
       "source_semantic_role_classifier_version": "SOURCE_SEMANTIC_ROLE_CLASSIFIER_V1"
+    }
+  ],
+  "qualification_gates": [
+    {
+      "qualification_gate_id": "GATE_E_DEGREE_COMPONENT",
+      "job_id": "PLACEHOLDER",
+      "source_text": [
+        "Bachelor's degree from an accredited institution.",
+        "Three (3) years of experience in system analysis, including enterprise application design, configuration/development, implementation, and support.",
+        "A high school diploma or GED with an additional seven (7) years of directly related experience substitutes for the bachelor's degree requirement.",
+        "An associate's degree from an accredited institution and an additional three (3) years of directly related experience substitutes for the bachelor's degree requirement."
+      ],
+      "source_location": "Minimum Qualifications + Substitutions",
+      "logic_expression": {
+        "op": "ALL_OF",
+        "terms": [
+          "REQ_E_SYS_ANALYSIS_EXP",
+          {
+            "op": "ANY_OF",
+            "terms": [
+              "REQ_E_DEGREE",
+              {"op": "ALL_OF", "terms": ["REQ_E_DEGREE_HS_BRANCH", "REQ_E_RELATED_EXPERIENCE_7Y_BRANCH"]},
+              {"op": "ALL_OF", "terms": ["REQ_E_DEGREE_ASSOC_BRANCH", "REQ_E_RELATED_EXPERIENCE_3Y_BRANCH"]}
+            ]
+          }
+        ]
+      },
+      "unmodeled_branches_note": "ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 BOUNDED CORRECTION: only the degree-component substitution is modeled here. The two modeled substitution sentences ('A high school diploma or GED with an additional seven (7) years of directly related experience substitutes for the bachelor's degree requirement.'; 'An associate's degree from an accredited institution and an additional three (3) years of directly related experience substitutes for the bachelor's degree requirement.') each explicitly state they substitute 'for the bachelor's degree requirement' only -- the separately-stated 'Three (3) years of experience in system analysis...' requirement is therefore unaffected by either substitution and remains independently mandatory, represented here as a top-level ALL_OF term alongside the degree-component ANY_OF. The Master's-degree substitution ('A master's degree in a related subject substitutes for two (2) years of general experience.') and the certification substitution ('A nationally recognized certification, or statewide/professional certification in a related field substitutes for one (1) year of experience.') are intentionally NOT modeled: neither sentence states what specific Minimum-Qualifications component ('the bachelor's degree requirement', the system-analysis-experience requirement, or an independent, undefined 'general experience' concept) it substitutes for. Unlike CASE_D, whose own supplemental questionnaire (Q1) directly and explicitly resolves this ambiguity ('A master's degree and one (1) or more years of experience in system analysis...'), CASE_E's own restored jd.txt and its own supplemental questionnaire (a single fixed 'at least three (3) years of experience in system analysis' Yes/No question, with no branch enumeration) supply no equivalent resolution. Modeling a CASE_E Master's/certification branch would require inferring an arithmetic/domain resolution CASE_E's own source text does not state -- explicitly refused per this correction's STOP_AND_REPORT instruction, not modeled."
     }
   ]
 }

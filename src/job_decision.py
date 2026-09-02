@@ -90,14 +90,29 @@ def detect_hard_blockers(
     seniority: str | None,
     role: str | None,
     jd_text: str,
+    gated_requirement_ids: frozenset[str] = frozenset(),
+    qualification_gate_blockers: Sequence[str] = (),
 ) -> list[str]:
-    """Return human-readable hard blockers present in the analyzed role."""
+    """Return human-readable hard blockers present in the analyzed role.
+
+    ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (additive):
+    ``gated_requirement_ids`` -- requirement_ids referenced by some
+    qualification_gate (src/qualification_gate.py) -- are skipped by the
+    ordinary per-row loop below, so they are never independently
+    double-counted; they are evaluated only through their gate.
+    ``qualification_gate_blockers`` are already-computed
+    BLOCKED_BY_MATCHING_POLICY gate blocker strings, appended once each
+    (never one blocker per underlying gated row). Both default to empty,
+    so every existing caller and every ungrouped requirement retains
+    today's exact behavior, byte-unchanged.
+    """
     blockers: list[str] = []
     jd = jd_text.casefold() if isinstance(jd_text, str) else ""
 
     blockers.extend(
         detect_seniority_signals(role=role, jd_text=jd_text, seniority=seniority)
     )
+    blockers.extend(qualification_gate_blockers)
 
     # SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: this pattern is now
     # the single source of truth shared with requirement_source_role.py's
@@ -136,6 +151,12 @@ def detect_hard_blockers(
         if derive_qualification_gate(requirement.get("source_semantic_role")) != "YES":
             continue
         req_id = requirement.get("requirement_id")
+        if isinstance(req_id, str) and req_id in gated_requirement_ids:
+            # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: this row
+            # is evaluated only through its qualification_gate (already
+            # folded into qualification_gate_blockers above); never
+            # independently double-counted here.
+            continue
         match = match_by_req.get(req_id) if isinstance(req_id, str) else None
         result = match.get("result") if isinstance(match, Mapping) else None
         if result != "NONE":
@@ -306,6 +327,8 @@ def decide_lane_and_decision(
     role_family: str | None,
     role: str | None,
     jd_text: str,
+    gated_requirement_ids: frozenset[str] = frozenset(),
+    qualification_gate_blockers: Sequence[str] = (),
 ) -> dict[str, Any]:
     """Compute lane, decision, and rationale from structured analysis facts."""
     blockers = detect_hard_blockers(
@@ -314,6 +337,8 @@ def decide_lane_and_decision(
         seniority=seniority,
         role=role,
         jd_text=jd_text,
+        gated_requirement_ids=gated_requirement_ids,
+        qualification_gate_blockers=qualification_gate_blockers,
     )
     if blockers:
         return {
@@ -339,15 +364,27 @@ def decide_lane_and_decision(
         m["requirement_id"]: m for m in matches if isinstance(m.get("requirement_id"), str)
     }
 
+    # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: a gated row's raw
+    # EvidenceMatch result (e.g. NONE pending Claim approval) must not
+    # independently count toward none/high_none/strong_or_supported below --
+    # it is represented only through its gate's own SUPPORTED/UNRESOLVED/
+    # BLOCKED_BY_MATCHING_POLICY result (already folded into `blockers`
+    # above via qualification_gate_blockers). Defaults to empty, so every
+    # existing caller and every ungrouped requirement counts exactly as
+    # before.
     mandatory = [
         r
         for r in requirements
-        if r.get("importance") == "MANDATORY" and r.get("relevance") in {"HIGH", "MEDIUM"}
+        if r.get("importance") == "MANDATORY"
+        and r.get("relevance") in {"HIGH", "MEDIUM"}
+        and r.get("requirement_id") not in gated_requirement_ids
     ]
     preferred = [
         r
         for r in requirements
-        if r.get("importance") == "PREFERRED" and r.get("relevance") in {"HIGH", "MEDIUM"}
+        if r.get("importance") == "PREFERRED"
+        and r.get("relevance") in {"HIGH", "MEDIUM"}
+        and r.get("requirement_id") not in gated_requirement_ids
     ]
 
     strong_or_supported = 0

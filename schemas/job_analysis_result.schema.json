@@ -21,6 +21,7 @@
     "responsibility_evidence_unknowns",
     "application_or_legal_gate_observations",
     "unresolved_gate_observations",
+    "qualification_gate_results",
     "lane",
     "decision",
     "warnings",
@@ -158,6 +159,34 @@
         }
       },
       "description": "SOURCE_ROLE_IMPLEMENTATION_BOUNDED_CORRECTION_V1: a citizenship/clearance/work-authorization/legal-access requirement whose classification could not be proven covered by any named dedicated consumer -- resolved to AMBIGUOUS rather than an unproven APPLICATION_OR_LEGAL_GATE, and surfaced here so it can never simply disappear from every consequential view."
+    },
+    "qualification_gate_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["qualification_gate_id", "result", "leaf_support", "source_text", "source_location"],
+        "properties": {
+          "qualification_gate_id": { "type": "string", "minLength": 1 },
+          "result": {
+            "type": "string",
+            "enum": ["SUPPORTED", "BLOCKED_BY_MATCHING_POLICY", "UNRESOLVED"]
+          },
+          "leaf_support": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": ["SUPPORTED", "BLOCKED_BY_MATCHING_POLICY", "UNRESOLVED"]
+            }
+          },
+          "source_text": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "source_location": { "type": ["string", "null"] }
+        }
+      },
+      "description": "ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: one entry per employer-authored qualification_gate (structured_extraction.json's optional qualification_gates[]), evaluated against the current Match-truth state. Empty array for every job without alternative-branch employer logic (zero migration for existing fixtures). SUPPORTED/UNRESOLVED/BLOCKED_BY_MATCHING_POLICY are current bounded MATCH SUPPORT truth, never a claim about candidate factual reality -- see src/qualification_gate.py and the canonical ADR."
     },
     "lane": {
       "type": "string",

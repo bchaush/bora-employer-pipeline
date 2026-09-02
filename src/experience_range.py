@@ -272,4 +272,7 @@ def evaluate_generic_experience_range(
             "negative comparison was performed."
         ),
         "transfer_note": None,
+        # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: additive
+        # Match-truth provenance (see src/qualification_gate.py).
+        "evaluation_path": "EXPERIENCE_RANGE_EVALUATOR",
     }

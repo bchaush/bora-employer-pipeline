@@ -258,11 +258,19 @@ assert_true(
     "REQ_E_PROCESS_MAPPING" not in [b.rsplit(": ", 1)[-1] for b in contractor_result["hard_blockers"]],
     "REQ_E_PROCESS_MAPPING must no longer appear as a hard blocker",
 )
+# ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: REQ_E_DEGREE is now
+# referenced by GATE_E_DEGREE_EXPERIENCE and no longer independently
+# hard-blocks (gate resolves UNRESOLVED). With that fabricated blocker
+# removed, CASE_E's actual underlying state (this very requirement,
+# REQ_E_PROCESS_MAPPING, genuinely STRONG, alongside unrelated
+# MEDIUM-relevance NONE gaps) does not meet any REJECT threshold in the
+# existing, unmodified decision routing -- decision is now UNDECIDED, an
+# honest consequence, not manufactured.
 assert_true(
-    contractor_analysis["decision"] == "REJECT",
-    f"CASE_E final decision must remain REJECT (other independent blockers persist), got {contractor_analysis['decision']}",
+    contractor_analysis["decision"] == "UNDECIDED",
+    f"CASE_E final decision must be UNDECIDED (fabricated degree blocker removed), got {contractor_analysis['decision']}",
 )
-print("PASS G2: CASE_E (contractor) REQ_E_PROCESS_MAPPING (atomic requirement) resolves STRONG via CLAIM_WW_006 safely; final decision remains REJECT via other independent blockers, unweakened.")
+print("PASS G2: CASE_E (contractor) REQ_E_PROCESS_MAPPING (atomic requirement) resolves STRONG via CLAIM_WW_006 safely; final decision is UNDECIDED (degree gated, no longer a fabricated blocker).")
 
 
 # ======================================================================

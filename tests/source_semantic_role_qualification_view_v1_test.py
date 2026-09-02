@@ -490,16 +490,26 @@ result_e = analyze_job(_load_job_input(FIXTURE_E))
 assert_true(result_d["valid"] is True and result_e["valid"] is True, "MBTA D/E analyses must be valid")
 blockers_d = {b.rsplit(": ", 1)[-1] for b in result_d["hard_blockers"]}
 blockers_e = {b.rsplit(": ", 1)[-1] for b in result_e["hard_blockers"]}
-# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1 (post-dates this
-# milestone): REQ_D/E_SYS_ANALYSIS_EXP no longer independently hard-block
-# (resolve UNKNOWN, not NONE); only REQ_D/E_DEGREE remain.
-assert_true(blockers_d == {"REQ_D_DEGREE"}, f"MBTA direct blockers must not regress, got {blockers_d}")
-assert_true(blockers_e == {"REQ_E_DEGREE"}, f"MBTA contractor blockers must not regress, got {blockers_e}")
-assert_true(
-    result_d["analysis"]["decision"] == "REJECT" and result_e["analysis"]["decision"] == "REJECT",
-    "MBTA D/E decisions must not regress from REJECT",
-)
-print("PASS O: BSA remains WATCH with its STRONG match intact; MBTA direct/contractor blockers and decisions unchanged.")
+# DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1: REQ_D/E_SYS_ANALYSIS_EXP
+# no longer independently hard-block (resolve UNKNOWN, not NONE).
+# ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (post-dates and
+# SUPERSEDES the previous "only REQ_D/E_DEGREE remain" expectation):
+# REQ_D_DEGREE/REQ_E_DEGREE are now referenced by a qualification_gate
+# representing the employer's real alternative education/experience
+# branches and no longer independently hard-block either (both gates
+# currently resolve UNRESOLVED). hard_blockers is now empty for both.
+assert_true(blockers_d == set(), f"MBTA direct blockers must be exactly empty (degree gated), got {blockers_d}")
+assert_true(blockers_e == set(), f"MBTA contractor blockers must be exactly empty (degree gated), got {blockers_e}")
+# CASE_D remains REJECT via unrelated, unaffected ungrouped gaps
+# (ITSM/SaaS/MS Office). CASE_E's decision changes to UNDECIDED: with the
+# fabricated degree-only blocker removed, CASE_E's actual underlying state
+# (one genuinely STRONG requirement -- process mapping -- alongside
+# unrelated MEDIUM-relevance NONE gaps) does not meet any REJECT threshold
+# in the existing, unmodified decision routing -- an honest consequence,
+# not manufactured.
+assert_true(result_d["analysis"]["decision"] == "REJECT", f"MBTA direct decision must remain REJECT (unrelated ungrouped gaps), got {result_d['analysis']['decision']}")
+assert_true(result_e["analysis"]["decision"] == "UNDECIDED", f"MBTA contractor decision must be UNDECIDED (fabricated degree blocker removed), got {result_e['analysis']['decision']}")
+print("PASS O: BSA remains WATCH with its STRONG match intact; MBTA direct blockers/decision unchanged in kind; MBTA contractor degree no longer a fabricated blocker (decision now UNDECIDED, honest).")
 
 
 # ======================================================================
