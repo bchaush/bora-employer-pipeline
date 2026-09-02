@@ -1,142 +1,146 @@
-Status: CLOSED
-Closed task:
-DOMAIN_QUALIFIED_EXPERIENCE_DURATION_UNKNOWN_V1
-Canonical implementation SHA:
-a4e849fe2629f4f25293e685776f49a1b1eddaa7
-Authorization/pointer SHA (not current HEAD):
-544125f2a6fbf466e40d4292313b05b974ada3ce
-Selection baseline:
-dee032295cdfb95c79063c4179a2eb0b0a547c29
+Status: IMPLEMENTATION_AUTHORIZED
+Active task:
+ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1
+Architecture baseline (commit containing the canonical ADR):
+26f799075bd44c6fad729b4e14043c3eec2ab31c
+Canonical ADR:
+docs/decisions/ADR-ALTERNATIVE-QUALIFICATION-BRANCH-REPRESENTATION-V1.md
+Current HEAD at authorization:
+26f799075bd44c6fad729b4e14043c3eec2ab31c
 
 Selection provenance:
-ChatGPT Work/Bora selected this milestone only after
-POST_CLOSURE_REAL_JOB_SYSTEM_BOTTLENECK_AUDIT_V1 (read-only) reproduced the
-same epistemic hard-blocker defect on two independent real MBTA controls,
-and DOMAIN_QUALIFIED_EXPERIENCE_DURATION_SEMANTIC_SCOPE_V1 (read-only)
-designed a narrow, bounded correction architecture for it. No milestone
-was preselected before that audit chain.
+ChatGPT Work/Bora selected this milestone only after a chain of read-only
+audits (LIVE_EMPLOYER_TRUTH_AND_CANDIDATE_APPLICATION_GATE_AUDIT_V1,
+ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_CAUSALITY_V1) reproduced a
+real employer-truth representation defect on two live, currently-open real
+MBTA controls, and four subsequent architecture-decision passes
+(ALTERNATIVE_QUALIFICATION_BRANCH_ARCHITECTURE_DECISION_V1,
+NEGATIVE_SUFFICIENCY_AND_SUPPORT_SEMANTICS_FINAL_AUDIT,
+MATCH_TRUTH_PROVENANCE_FINAL_CORRECTION) converged on Option B, recorded
+and Cursor-reviewed (SAFE_TO_COMMIT_ADR) as the canonical ADR above. This
+milestone exists to implement that already-approved ADR faithfully. It
+must NOT redesign the architecture.
 
-Locked root cause (resolved by this milestone):
-REQ_D_SYS_ANALYSIS_EXP and REQ_E_SYS_ANALYSIS_EXP (MBTA direct and
-contractor real fixtures) are both ENTRY_QUALIFICATION, MANDATORY, HIGH
-relevance, domain="System Analysis", technology=[], experience_level="3
-years". Their text requires three years of experience in system
-analysis, with enterprise-application activities described under that
-umbrella. The generic experience-range evaluator correctly excludes them
-because they are domain-qualified; infer_requirement_capabilities()
-returns empty; the ordinary matcher therefore fell through to NONE;
-NONE became a hard blocker; neither domain support nor duration was
-actually evaluated.
+Locked root cause (the ADR-approved architecture addresses):
+Two live, currently-open real MBTA postings (CASE_D Job #26-20235, CASE_E
+Job #20260804A-ITS87) state that ANY of several education/experience
+branches satisfies one mandatory employer gate (e.g. HS/GED + 10 years
+system-analysis experience, OR Associate's + 6 years, OR Bachelor's + 3
+years, OR Master's in a related subject + 1 year). Current Requirement
+records are flat, atomic, single-condition rows; structured_extraction.json
+for both fixtures represents only the flat Bachelor's-branch condition.
+job_decision.py's hard-blocker loop treats each mandatory HIGH NONE row
+independently, so naively representing every branch as its own mandatory
+row would fabricate false blockers, and the schema has no alternative/OR-
+grouping concept at all.
 
-Accepted final implementation semantics:
-- A requirement enters the new domain-qualified-duration evaluator ONLY
-  when ALL are true:
-  1. structured domain is a non-empty string;
-  2. structured technology is empty;
-  3. the existing, UNMODIFIED infer_requirement_capabilities() returns no
-     capabilities for the requirement;
-  4. the raw requirement text matches a narrowly bounded numeric
-     domain-experience-duration grammar such as:
-     "N years of experience in <domain phrase>"
-     or equivalent explicitly enumerated variants.
-- Routed requirements resolve result = UNKNOWN only -- never NONE,
-  PARTIAL, SUPPORTED, or STRONG. UNKNOWN means "the system has not
-  established whether the candidate satisfies this domain-qualified
-  duration requirement." It does NOT mean "the candidate lacks the
-  domain capability."
-- No candidate years-of-experience computation was added.
-- No global NONE-vs-UNKNOWN rewrite was performed.
-- Named-platform/capability-backed requirements (SAP FI/CO, Salesforce,
-  Workday, UAT, other NONE_TRAPS cases) remain owned by the unmodified
-  ordinary matcher -- structurally protected by the empty-inferred-
-  capabilities gate, proven in the regression matrix.
-- Generic domain-free duration requirements ("0-2 years of work
-  experience") remain owned by the unmodified experience_range.py.
-- Technology-qualified duration requirements ("2 years of experience
-  with Python") remain outside this milestone.
+Locked implementation contract (all 20 items, from the canonical ADR --
+implementation must preserve every one; do not reopen without a separately
+approved architecture decision):
+1. Requirement rows remain atomic.
+2. Employer qualification composition is represented separately through
+   qualification_gates[] in structured_extraction.json.
+3. Qualification-gate records contain Employer truth only -- no candidate
+   Evidence/Claim/match-specific state.
+4. Gate logic_expression leaves reference Requirement IDs only.
+5. Raw employer-source (jd.txt) traceability is deterministic and
+   fail-closed (exact-substring-after-whitespace-normalization; no
+   semantic/embedding/model-judgment traceability).
+6. EvidenceMatch gains one new, additive, machine-readable evaluation_path
+   field (Match truth); explanation text never controls logic.
+7. V1 qualification support states: SUPPORTED / BLOCKED_BY_MATCHING_POLICY
+   / UNRESOLVED -- never a claim about candidate factual reality.
+8. Conservative V1 leaf policy:
+   STRONG/SUPPORTED -> SUPPORTED
+   PARTIAL/UNKNOWN -> UNRESOLVED
+   NONE + NONE_TRAP -> BLOCKED_BY_MATCHING_POLICY
+   NONE + NO_CAPABILITY_OVERLAP -> UNRESOLVED
+   NONE + NO_CAPABILITY_COVERAGE -> UNRESOLVED
+   missing/unrecognized evaluation_path -> UNRESOLVED
+9. application_logic.evaluate_expression() is reused only as an unmodified,
+   leaf-value-agnostic tree walker unless a concrete implementation
+   contradiction is proven and separately reported.
+10. Gate-referenced Requirement rows are not independently double-counted
+    by the existing ordinary hard-blocker loop.
+11. Gate SUPPORTED suppresses failed-alternative-branch gap/unknown noise
+    (no gap entries for branches the employer did not require once one
+    branch clears).
+12. Application Gate remains completely independent:
+    qualification_gate_result != application_question_answer, always.
+13. Ungrouped Requirement behavior remains byte-unchanged in this
+    milestone (the documented NO_CAPABILITY_OVERLAP ungrouped-vs-gated
+    asymmetry is deliberate, not silently fixed).
+14. CASE_E raw jd.txt restoration (missing Substitutions section and full
+    supplemental questionnaire) occurs before any structured
+    qualification-gate authoring for CASE_E.
+15. No certification-branch arithmetic invention (the employer source does
+    not state it; record via unmodeled_branches_note only).
+16. No Master's/Associate's base-credential capability-pattern expansion in
+    this milestone (explicitly deferred; those branch legs remain
+    UNRESOLVED under current capability coverage).
+17. No technology-qualified-duration fix in this milestone (separate,
+    already-identified, still-open matcher gap).
+18. No global NONE-vs-UNKNOWN remediation (remains separate, open, tracked
+    in CURRENT_STATE.md).
+19. No Application Gate capture milestone bundled (real ApplicationAttempt/
+    ApplicationQuestion authoring for either MBTA role stays deferred).
+20. No package-generation work bundled.
 
-Implementation surface (as built):
-- new src/domain_qualified_duration.py
-- src/job_analysis.py (added a third requirement-partition branch)
-- tests/domain_qualified_experience_duration_unknown_v1_test.py (new,
-  test-first, 18 lettered sections)
-- 4 pre-existing regression tests corrected for stale CASE_D/E
-  hard-blocker-set expectations (accredited_institution_qualifier_
-  semantics_v1_test.py, business_rules_technical_requirements_compound_
-  completion_v1_test.py, process_mapping_compound_completion_v1_test.py,
-  source_semantic_role_qualification_view_v1_test.py)
+Expected bounded implementation surface (minimum necessary subset only;
+any need outside this surface: STOP AND REPORT, do not expand scope
+automatically):
+- schemas/qualification_gate.schema.json (new)
+- schemas/evidence_match.schema.json (additive: evaluation_path)
+- schemas/job_analysis_result.schema.json (additive: optional gate-result
+  output fields)
+- src/requirement_match.py (additive: evaluation_path population for the
+  five paths it produces)
+- src/experience_range.py (additive: evaluation_path population)
+- src/domain_qualified_duration.py (additive: evaluation_path population)
+- src/job_analysis.py (additive: qualification_gates[] routing/wiring)
+- src/requirement_normalize.py (additive: qualification_gates[] pass-
+  through, as needed)
+- src/job_decision.py (additive: gate-membership exclusion in the existing
+  hard-blocker loop)
+- one new, bounded qualification-gate evaluator/module
+- CASE_D structured_extraction.json (new branch Requirement rows + one
+  gate record)
+- CASE_E jd.txt restoration first, then its structured_extraction.json
+- focused tests required by the ADR
 
-Unchanged (verified byte-identical / zero diff):
-- src/requirement_match.py
-- src/experience_range.py
-- src/job_decision.py
+Must remain unchanged unless a newly reproduced necessity is reported and
+approved before editing:
 - src/requirement_source_role.py
-- src/requirement_normalize.py
 - src/application_gate.py
-- schemas
+- schemas/requirement.schema.json
+- src/application_logic.py (reused unmodified per locked-contract item 9)
+- all 15 golden fixtures
+- Atominvest and MIT LL real fixtures
 - Claims
 - Evidence
 - Experiences
 - résumé
 - immigration/work-authorization logic
 - posting-state logic
-- golden expected results (no golden fixture contains a domain-qualified-
-  duration row)
+- BLUEPRINT.md, AGENTS.md, CLAUDE.md
 
-Accepted real-control results:
-- REQ_D_SYS_ANALYSIS_EXP: NONE -> UNKNOWN; hard blocker -> non-blocker.
-- REQ_E_SYS_ANALYSIS_EXP: NONE -> UNKNOWN; hard blocker -> non-blocker.
-- MBTA Direct: REJECT remains REJECT, blocker set reduced to
-  {REQ_D_DEGREE} only.
-- MBTA Contractor: REJECT remains REJECT, blocker set reduced to
-  {REQ_E_DEGREE} only.
-- qualification_gaps: fabricated unsupported-mandatory entries removed
-  for both system-analysis duration rows.
-- qualification_unknowns: truthful UNKNOWN entries added for both rows.
-- No APPLY-like decision was introduced.
-- Atominvest unchanged: blockers remain {REQ_A_DEGREE,
-  REQ_A_EXCEL_DATA}.
-- MIT LL unchanged: citizenship/clearance, degree/experience, and SAP
-  blockers remain intact.
-- JOB_FIXTURE_BSA_001 (synthetic) unchanged in milestone-relevant
-  semantics -- no domain-qualified-duration row exists in it.
+Required workflow:
+Test-first. Before production edits, add/reproduce focused failing tests
+for the real defect and the locked semantics above, covering at minimum:
+ALL_OF/ANY_OF three-valued behavior; NONE_TRAP -> BLOCKED_BY_MATCHING_POLICY;
+NO_CAPABILITY_OVERLAP -> UNRESOLVED inside gates; NO_CAPABILITY_COVERAGE ->
+UNRESOLVED; missing evaluation_path -> UNRESOLVED; partial semantic
+recognition cannot create gate FALSE; the static gate invariant across
+Claim-state changes; raw-source traceability fail-closed; missing
+Requirement-reference fail-closed; the CASE_D four-branch representation;
+gate SUPPORTED suppressing alternative gap/unknown noise; multiple
+independent gates not erasing one another; CASE_E qualification/
+application-state separation; and the full existing regression/golden
+suite. Cursor must independently adversarially review the complete
+uncommitted implementation diff before implementation commit/push.
 
-Validation performed:
-- Cursor final adversarial review: SAFE_TO_COMMIT_AND_PUSH (no BLOCKING/
-  HIGH/MEDIUM findings; two LOW documentation/test-wording observations
-  only, not remediated in this closure).
-- Full non-interactive suite: TOTAL=58 FAILED=0.
-- Job Analysis Golden suite: 15/15 PASS.
-- Application Gate Golden: 9/9 PASS.
-- posting-state wiring tests: PASS.
-- git diff --check: clean.
-- Implementation commit independently verified on GitHub by ChatGPT
-  Work: exactly one commit above the authorization baseline, exactly 7
-  files changed, no protected surface changed, no CURRENT_MILESTONE.md /
-  CURRENT_STATE.md change in the implementation commit.
-
-Carried-forward exclusions/conclusions (not reopened):
-- NONE-vs-UNKNOWN is NOT globally solved -- remains a separate,
-  secondary, not-yet-globally-fixed defect, now only narrowly addressed
-  for domain-qualified duration requirements.
-- Do not wire approved MM/TELUS Claims merely because they are approved
-  (APPROVED_CLAIM_CAPABILITY_MAPPING_CAUSALITY_AUDIT_V1 adjudication
-  stands).
-- No new Claim-to-capability mapping was authorized.
-- Immigration/work-authorization logic remains separate and
-  conservative -- unchanged.
-- SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 remains closed, not
-  reopened.
-- posting-state/Application Gate semantics remain unchanged.
-- No candidate years-of-experience computation exists anywhere in the
-  pipeline.
-- Technology-qualified duration requirements remain outside this
-  milestone.
-
-NO NEW ACTIVE IMPLEMENTATION MILESTONE IS CURRENTLY SELECTED.
-The next action is a fresh, truth-first, read-only real-job/system
-bottleneck audit and prioritization by ChatGPT Work/Bora -- not
-preselected here.
+NO IMPLEMENTATION HAS OCCURRED YET. This is a pointer/authorization state
+only.
 
 Locked conclusions (carried forward, not reopened):
 
@@ -195,6 +199,51 @@ Status: CLOSED
 Implementation SHA: a4e849fe2629f4f25293e685776f49a1b1eddaa7
 Authorization/pointer SHA: 544125f2a6fbf466e40d4292313b05b974ada3ce
 Selection baseline: dee032295cdfb95c79063c4179a2eb0b0a547c29
+
+Task: POST_V3_3_END_TO_END_REAL_WORLD_BOTTLENECK_AUDIT_V1
+Status: COMPLETE_ADJUDICATED (read-only)
+Baseline: 8ce2538735ff11571d088702fff42d8d5085ec7d
+Adjudication result: NO_IMPLEMENTATION_MILESTONE_JUSTIFIED at that time --
+highest-leverage findings (undergraduate degree evidence, Excel evidence)
+were candidate-truth/human-approval actions outside this system's
+authority, not code defects.
+
+Task: LIVE_EMPLOYER_TRUTH_AND_CANDIDATE_APPLICATION_GATE_AUDIT_V1
+Status: COMPLETE_ADJUDICATED (read-only)
+Baseline: 8ce2538735ff11571d088702fff42d8d5085ec7d
+Adjudication result: live re-fetch of both real, currently-open MBTA
+postings (CASE_D Job #26-20235, CASE_E Job #20260804A-ITS87) found employer
+alternative education/experience qualification branches (HS/Associate's/
+Bachelor's/Master's-plus-experience) genuinely present on both live
+postings and materially under-represented in the frozen fixtures; also
+corrected two documentation-drift findings (Q-2 Excel qualifier overmatch
+already fixed in code; CANDIDATE_SOURCE_INGESTION_V1 push-status label
+stale) and adjudicated the UNWE Academic Reference as establishing identity/
+program only, not degree conferral. Highest-leverage next action identified
+as G (alternative-branch representation), not a candidate-evidence action.
+
+Task: ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_CAUSALITY_V1
+Status: COMPLETE_ADJUDICATED (read-only)
+Baseline: 8ce2538735ff11571d088702fff42d8d5085ec7d
+Adjudication result: ARCHITECTURE_DECISION_REQUIRED -- flat, atomic
+Requirement rows cannot safely represent employer OR-branch qualification
+logic; naive representation would create false blockers.
+
+Task: ALTERNATIVE_QUALIFICATION_BRANCH_ARCHITECTURE_DECISION_V1
+Status: COMPLETE_ADJUDICATED (read-only, four converging passes)
+Baseline: 8ce2538735ff11571d088702fff42d8d5085ec7d
+Adjudication result: Option B (separate qualification_gate employer-truth
+record, additive in structured_extraction.json, Requirement rows remain
+atomic) selected over Option A (fields on Requirement rows); negative-
+sufficiency semantics converged, across NEGATIVE_SUFFICIENCY_AND_SUPPORT_
+SEMANTICS_FINAL_AUDIT and MATCH_TRUTH_PROVENANCE_FINAL_CORRECTION, on a
+conservative, Match-truth-only, evaluation_path-keyed policy (SUPPORTED /
+BLOCKED_BY_MATCHING_POLICY / UNRESOLVED) that never authors a candidate-
+specific judgment inside the employer-truth gate record --
+ARCHITECTURE_DECISION_READY_FOR_BORA_APPROVAL. Recorded as the canonical
+ADR: docs/decisions/ADR-ALTERNATIVE-QUALIFICATION-BRANCH-REPRESENTATION-V1.md
+(commit 26f799075bd44c6fad729b4e14043c3eec2ab31c; Cursor review:
+SAFE_TO_COMMIT_ADR, no BLOCKING/HIGH/MEDIUM findings).
 
 Historical anchors:
 Governance role-sync commit: 4b55448a8d189fe29344aded3d883a2fb35e9b5a
