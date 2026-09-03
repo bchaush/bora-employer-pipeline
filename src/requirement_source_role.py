@@ -132,6 +132,30 @@ _REQUIREMENTS_HEADING_CUES = re.compile(
     re.IGNORECASE,
 )
 
+# CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE_V1: a bounded, INTERNAL,
+# non-persisted heading category, weaker than REQUIREMENTS_HEADING, for a
+# heading family that describes the candidate profile without using any of
+# _REQUIREMENTS_HEADING_CUES' vocabulary. V1 recognizes ONLY the two
+# semantically equivalent variants reproduced against a real, live,
+# faithfully-captured source (JD Software Implementation Analyst,
+# https://www.jdsoft.com/career-ia.html, fetched 2026-09-03): "What We're
+# Looking For" and "What We Are Looking For". The apostrophe is matched
+# with `.` (not a literal `'`), mirroring this module's own existing
+# _RESPONSIBILITY_HEADING_CUES convention for "what you.ll be doing", since
+# the live source uses a curly apostrophe (U+2019), not a straight one.
+# Deliberately NOT extended to "What You Bring"/"What You'll Bring"/
+# "Who You Are"/"About You"/"Ideal Candidate" or other candidate-profile
+# synonyms -- those have not been reproduced against a real defect and, per
+# external evidence gathered during CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE_V1's
+# investigation, "Who You Are" in particular is also used by real employers
+# for broad culture/personality content rather than conventional
+# qualifications -- generalizing beyond the one reproduced heading family
+# is explicitly out of scope for V1.
+_CANDIDATE_PROFILE_HEADING_CUES = re.compile(
+    r"what\s+we.re\s+looking\s+for|what\s+we\s+are\s+looking\s+for",
+    re.IGNORECASE,
+)
+
 
 def _classify_heading(source_location: str | None) -> str:
     text = source_location if isinstance(source_location, str) else ""
@@ -141,6 +165,8 @@ def _classify_heading(source_location: str | None) -> str:
         return "RESPONSIBILITY_HEADING"
     if _REQUIREMENTS_HEADING_CUES.search(text):
         return "REQUIREMENTS_HEADING"
+    if _CANDIDATE_PROFILE_HEADING_CUES.search(text):
+        return "CANDIDATE_PROFILE_HEADING"
     return "UNRECOGNIZED_HEADING"
 
 
@@ -504,6 +530,39 @@ def _resolve_role(
             "but source_text is credential-shaped, not duty-shaped -- "
             "conflicting signals; resolved to AMBIGUOUS pending human "
             "review.",
+            False,
+        )
+
+    if heading == "CANDIDATE_PROFILE_HEADING":
+        # CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE_V1: a weaker positive
+        # signal than REQUIREMENTS_HEADING -- content shape still gates it.
+        # Unlike the REQUIREMENTS_HEADING branch above (which only treats a
+        # future-tense marker as a conflict, and lets an ordinary duty-verb
+        # lead through as routine Requirements-section phrasing), a
+        # candidate-profile heading is a less certain, more heterogeneous
+        # label across real employers -- so a duty-SHAPED row here
+        # (leading duty verb OR future-duty marker) is deliberately refused
+        # promotion and resolves AMBIGUOUS instead, pending human review.
+        if duty_shaped:
+            return (
+                "AMBIGUOUS",
+                "source_location indicates a weaker candidate-profile "
+                "heading (e.g. \"What We're Looking For\") and source_text "
+                "is duty-shaped (leading action verb or future-duty "
+                "marker) -- this heading family is a less certain signal "
+                "than a literal Requirements/Qualifications heading, so "
+                "duty-shaped content is not promoted; resolved to "
+                "AMBIGUOUS pending human review.",
+                False,
+            )
+        return (
+            "ENTRY_QUALIFICATION",
+            "source_location indicates a weaker candidate-profile heading "
+            "(e.g. \"What We're Looking For\") with no duty-shaped content "
+            "and no future-tense duty marker; the candidate-profile-"
+            "heading path is authoritative here (content shape: "
+            "credential-shaped) -- distinct from, and weaker than, a "
+            "literal Requirements/Qualifications-heading classification.",
             False,
         )
 

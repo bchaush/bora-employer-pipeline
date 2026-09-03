@@ -1017,4 +1017,143 @@ assert_true(
 )
 print("PASS V-M: ROLE_RESPONSIBILITY mandatory HIGH PARTIAL row does not inflate `partial` or suppress a deserved PRIORITY_APPLY.")
 
+
+# ======================================================================
+# W. CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE_V1: a bounded, internal,
+# non-persisted, WEAKER heading category recognizing ONLY "What We're
+# Looking For" / "What We Are Looking For" (V1 scope, deliberately not
+# generalized to "What You Bring"/"Who You Are"/"About You" -- see W-11
+# through W-13, deliberate scope locks). Real, live, faithfully-captured
+# JD Software Implementation Analyst source (fetched 2026-09-03).
+# ======================================================================
+
+# W-1. "What We're Looking For" + credential-shaped communication-skills
+# row (real JD Software IA wording) -> ENTRY_QUALIFICATION.
+w1 = _row("REQ_W1", "Excellent written and verbal communication skills.", "What We're Looking For")
+cw1 = classify_source_semantic_roles([w1])[0]
+assert_true(
+    cw1["source_semantic_role"] == "ENTRY_QUALIFICATION",
+    f"W-1: 'What We're Looking For' + credential-shaped row expected ENTRY_QUALIFICATION, got {cw1}",
+)
+assert_true(derive_qualification_gate(cw1["source_semantic_role"]) == "YES", "W-1: qualification_gate must be YES")
+print("PASS W-1: \"What We're Looking For\" + credential-shaped row -> ENTRY_QUALIFICATION.")
+
+# W-2. "What We Are Looking For" (non-contracted variant) + credential-shaped
+# row -> ENTRY_QUALIFICATION.
+w2 = _row("REQ_W2", "Excellent written and verbal communication skills.", "What We Are Looking For")
+cw2 = classify_source_semantic_roles([w2])[0]
+assert_true(
+    cw2["source_semantic_role"] == "ENTRY_QUALIFICATION",
+    f"W-2: 'What We Are Looking For' + credential-shaped row expected ENTRY_QUALIFICATION, got {cw2}",
+)
+print("PASS W-2: \"What We Are Looking For\" + credential-shaped row -> ENTRY_QUALIFICATION.")
+
+# W-3. Real JD Software IA degree-shaped row under "What We're Looking For"
+# -> ENTRY_QUALIFICATION (does not itself resolve the compound-OR gate
+# question -- only makes the row reachable, per this milestone's scope).
+w3 = _row(
+    "REQ_W3_IA_DEGREE",
+    "BS in a relevant discipline such as Mathematics or Computer Science OR an equivalent combination of education, training, and experience.",
+    "What We're Looking For",
+)
+cw3 = classify_source_semantic_roles([w3])[0]
+assert_true(
+    cw3["source_semantic_role"] == "ENTRY_QUALIFICATION",
+    f"W-3: JD Software IA degree row under 'What We're Looking For' expected ENTRY_QUALIFICATION, got {cw3}",
+)
+print("PASS W-3: real JD Software IA degree-shaped row under \"What We're Looking For\" -> ENTRY_QUALIFICATION.")
+
+# W-4. Real JD Software IA RDBMS "... a plus" row: role becomes
+# ENTRY_QUALIFICATION, importance (a separate, pre-authored field the
+# classifier never touches) remains exactly PREFERRED.
+w4 = _row(
+    "REQ_W4_IA_RDBMS",
+    "Experience with a Relational Database Management System (such as Postgres, Oracle, SQLServer, or MySQL) a plus.",
+    "What We're Looking For",
+    importance="PREFERRED",
+)
+cw4 = classify_source_semantic_roles([w4])[0]
+assert_true(
+    cw4["source_semantic_role"] == "ENTRY_QUALIFICATION",
+    f"W-4: RDBMS 'a plus' row expected role ENTRY_QUALIFICATION, got {cw4}",
+)
+merged_w4 = dict(w4, **{k: v for k, v in cw4.items() if not k.startswith("_")})
+assert_true(
+    merged_w4["importance"] == "PREFERRED",
+    f"W-4: classifier must never mutate importance; expected PREFERRED, got {merged_w4['importance']}",
+)
+print("PASS W-4: RDBMS 'a plus' row -> role ENTRY_QUALIFICATION, importance stays PREFERRED (classifier never mutates importance).")
+
+# W-5. Candidate-profile heading + duty-leading-verb row (constructed
+# adversarial, mirrors the real VGS/Fullscript external evidence pattern of
+# a distinct "What You'll Do" section existing elsewhere) -> AMBIGUOUS, not
+# silently ENTRY_QUALIFICATION -- this is the deliberate extra strictness
+# beyond plain REQUIREMENTS_HEADING behavior.
+w5 = _row("REQ_W5", "Collaborate with cross-functional teams to close new business.", "What We're Looking For")
+cw5 = classify_source_semantic_roles([w5])[0]
+assert_true(
+    cw5["source_semantic_role"] == "AMBIGUOUS",
+    f"W-5: duty-leading-verb row under candidate-profile heading expected AMBIGUOUS, got {cw5}",
+)
+assert_true(derive_qualification_gate(cw5["source_semantic_role"]) == "AMBIGUOUS", "W-5: qualification_gate must be AMBIGUOUS, never YES")
+print("PASS W-5: candidate-profile heading + duty-leading-verb row -> AMBIGUOUS (stricter than REQUIREMENTS_HEADING).")
+
+# W-6. Candidate-profile heading + explicit future-duty marker -> AMBIGUOUS.
+w6 = _row("REQ_W6", "You will drive incident management and mentor engineers.", "What We're Looking For")
+cw6 = classify_source_semantic_roles([w6])[0]
+assert_true(
+    cw6["source_semantic_role"] == "AMBIGUOUS",
+    f"W-6: future-duty-marker row under candidate-profile heading expected AMBIGUOUS, got {cw6}",
+)
+print("PASS W-6: candidate-profile heading + explicit future-duty marker -> AMBIGUOUS.")
+
+# W-7. Existing literal Requirements/Minimum Qualifications positive control
+# -- byte-for-byte semantic behavior unchanged, AND basis wording remains
+# the existing REQUIREMENTS_HEADING text (not the new, distinct
+# candidate-profile-heading wording) -- proves no cross-contamination
+# between the two heading strengths.
+w7 = _row("REQ_W7", "Strong Microsoft Office proficiency (Word, Excel, Outlook, PowerPoint, Teams).", "Required Skills")
+cw7 = classify_source_semantic_roles([w7])[0]
+assert_true(cw7["source_semantic_role"] == "ENTRY_QUALIFICATION", f"W-7: existing Requirements-heading control must remain ENTRY_QUALIFICATION, got {cw7}")
+assert_true(
+    "Requirements/Qualifications section" in cw7["source_semantic_role_basis"]
+    and "candidate-profile" not in cw7["source_semantic_role_basis"].lower(),
+    f"W-7: existing REQUIREMENTS_HEADING basis wording must be unchanged and distinct from the new candidate-profile wording, got {cw7['source_semantic_role_basis']!r}",
+)
+print("PASS W-7: existing literal Requirements-heading control unchanged, basis wording distinct from the new candidate-profile path.")
+
+# W-8. Existing Responsibilities/Duties control unchanged.
+w8 = _row("REQ_W8", "Configure customer platforms.", "Responsibilities")
+cw8 = classify_source_semantic_roles([w8])[0]
+assert_true(cw8["source_semantic_role"] == "ROLE_RESPONSIBILITY", f"W-8: existing Responsibilities control must remain ROLE_RESPONSIBILITY, got {cw8}")
+print("PASS W-8: existing Responsibilities/Duties control unchanged.")
+
+# W-9. Existing legal/application-gate control unchanged.
+w9 = _row("REQ_W9", "US citizenship required to obtain and maintain a security clearance.", "Citizenship / Security Clearance")
+cw9 = classify_source_semantic_roles([w9])[0]
+assert_true(cw9["source_semantic_role"] == "APPLICATION_OR_LEGAL_GATE", f"W-9: existing legal-gate control must remain APPLICATION_OR_LEGAL_GATE, got {cw9}")
+print("PASS W-9: existing legal/application-gate control unchanged.")
+
+# W-10. Genuinely unrecognized heading (pure marketing/company-description
+# text) remains AMBIGUOUS -- proves the new cue list does not over-fire.
+w10 = _row("REQ_W10", "We help government agencies streamline essential services.", "About JD Software")
+cw10 = classify_source_semantic_roles([w10])[0]
+assert_true(cw10["source_semantic_role"] == "AMBIGUOUS", f"W-10: genuinely unrecognized heading must remain AMBIGUOUS, got {cw10}")
+print("PASS W-10: genuinely unrecognized (marketing) heading remains AMBIGUOUS.")
+
+# W-11/W-12/W-13. Deliberate V1 scope locks -- these candidate-profile
+# synonyms are explicitly NOT recognized in this milestone (external
+# evidence showed "Who You Are" in particular can carry broad
+# culture/personality content rather than conventional qualifications;
+# generalizing beyond the one reproduced, faithfully-captured heading
+# family was explicitly not authorized).
+for heading in ("Who You Are", "About You", "What You Bring"):
+    w_locked = _row("REQ_W_SCOPE_LOCK", "Excellent written and verbal communication skills.", heading)
+    cw_locked = classify_source_semantic_roles([w_locked])[0]
+    assert_true(
+        cw_locked["source_semantic_role"] == "AMBIGUOUS",
+        f"W-11/12/13: heading {heading!r} must NOT be newly recognized in V1, expected AMBIGUOUS, got {cw_locked}",
+    )
+print("PASS W-11/W-12/W-13: 'Who You Are' / 'About You' / 'What You Bring' remain unrecognized (deliberate V1 scope locks).")
+
 print("ALL source_semantic_role_qualification_view_v1_test CHECKS PASSED")
