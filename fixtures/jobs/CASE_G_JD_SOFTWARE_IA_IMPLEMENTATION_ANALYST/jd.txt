@@ -1,0 +1,48 @@
+SOURCE: https://www.jdsoft.com/career-ia.html
+RETRIEVED: 2026-09-03 via direct tool-mediated fetch of the target URL (jdsoft.com, JD Software's own first-party careers page).
+
+Implementation Analyst
+at JD Software - (View all jobs)
+
+About JD Software
+JD Software is a growing GovTech company based in Salem, MA, specializing in innovative SaaS solutions for the public sector.
+We help government agencies streamline essential services like licensing and regulatory compliance with our flagship product arc.
+From supporting licensing for various health professions to enhancing regulatory processes, we focus on delivering real value through collaboration and technology.
+Our platform is trusted by more than 30 licensing boards, 750,000 professionals and 20,000 organizations.
+
+About the Role
+JD Software is seeking an Implementation Analyst to join our talented and growing team. This role is a great opportunity for analytical thinkers who enjoy solving complex problems, understanding business processes, and designing system logic. You will play a key role in the implementation and configuration of our software platform for government clients.
+Are you detail-oriented, curious, and eager to understand how systems work?
+As an Implementation Analyst, you will work closely with project managers, engineers, and clients to translate business needs into system rules, workflows, and configurations. This position offers the opportunity for significant career growth as JD Software continues to scale.
+
+Key Responsibilities
+Configure and customize our electronic licensing platform using a combination of built-in tools and database operations.
+Analyze client requirements and translate them into structured system configurations, including conditional logic, data mappings, and workflow states.
+Develop a strong working knowledge of the arc eLicensing platform and its configuration capabilities.
+Collaborate with project managers and engineers to ensure configurations align with client needs and overall system architecture.
+Support testing activities by creating and executing test plans to validate system behavior.
+Investigate and troubleshoot configuration-related issues by examining logic, data structures, and rule execution.
+Assist in documenting business requirements, configuration decisions, and system changes.
+
+What We’re Looking For
+Strong analytical skills and the ability to reason through business rules, logical conditions, and workflow scenarios.
+Detail-oriented, with the ability to identify edge cases and evaluate how rule changes impact the system.
+Ability to understand and work with structured information such as datasets, Boolean logic, and conditionals.
+Comfort presenting to external stakeholders, including government officials
+Excellent written and verbal communication skills.
+BS in a relevant discipline such as Mathematics or Computer Science OR an equivalent combination of education, training, and experience.
+Experience with a Relational Database Management System (such as Postgres, Oracle, SQLServer, or MySQL) a plus.
+
+This is an ideal time to join JD Software as we expand our footprint in the public sector. We offer a competitive compensation package, a collaborative culture, and real career growth opportunities.
+If you're ready to help modernize government services, we'd love to hear from you. Please reach out to us at careers@jdsoft.com.
+
+Your GovTech partner in driving meaningful change through innovative technology
+Contact
+sales@jdsoft.com
+careers@jdsoft.com
+Tel: (978) 912-7169
+Fax: (617) 419-1060
+Address
+27 Congress Street
+Suite 1310
+Salem, MA 01970
