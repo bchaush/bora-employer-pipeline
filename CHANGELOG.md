@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-03 — Real-world operation and calibration governance sync (`REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+Locked doctrine earned through recent real-market milestones, never previously recorded in canonical governance; also corrected an over-strong degree-conferral wording in `BLUEPRINT.md`.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.3 → v3.4. Corrected Section 2/131 degree wording to "requirements satisfied, conferral not independently established." Added commodity tool/adapter rule and `DiscoveryLead` boundary concept (Section 108 area). Extended Section 127 success metrics. Added new locked Section 133: operate-while-building, build-economy gate, real-world calibration tiers, outcomes-do-not-rewrite-truth list, human-consequential-control summary, and the fresh first-party employer source rule.
+* `AGENTS.md`: added a concise fresh-source operational rule (pointing to the new Blueprint doctrine), a Claim-is-not-a-capability-mapping rule, and a priority-selection rule.
+* `CLAUDE.md`: added two cross-references to the Blueprint/AGENTS rules above.
+
+**Not changed**
+
+Production code; tests; schemas; Claims; Evidence; Experiences; résumé data; fixtures; `.cursor/rules/*`; `CURRENT_STATE.md`; `CURRENT_MILESTONE.md`.
+
+**Validation**
+
+Documentation-only. `git diff --check` clean. `python scripts/verify_assurance_baseline.py` passes (unaffected).
+
+**Status**
+
+`REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1_CLOSED`.
+
+---
+
 ## 2026-09-01 — Candidate-facing real-world standard sync (`CANDIDATE_FACING_REAL_WORLD_STANDARD_SYNC_V1`, DOCUMENTATION ONLY)
 
 **Reason**
