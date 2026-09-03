@@ -55,6 +55,7 @@ def assert_true(condition: bool, message: str) -> None:
 
 FIXTURE_D = ROOT / "fixtures" / "jobs" / "CASE_D_MBTA_DIRECT_APPLICATION_ANALYST"
 FIXTURE_E = ROOT / "fixtures" / "jobs" / "CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST"
+FIXTURE_F = ROOT / "fixtures" / "jobs" / "CASE_F_JD_SOFTWARE_JPM_JUNIOR_PROJECT_MANAGER"
 
 
 def _load_job_input(fixture_dir: Path) -> dict:
@@ -503,6 +504,122 @@ print(
     "UNDECIDED is a real, honest consequence of removing the fabricated degree-only blocker; not manufactured "
     "or forced to any particular value)."
 )
+
+# ======================================================================
+# O. JD_SOFTWARE_ALTERNATIVE_QUALIFICATION_GATE_APPLICATION_V1 -- real,
+# live, first-party control (JD Software Junior Project Manager,
+# https://www.jdsoft.com/career-jpm.html, verified 2026-09-03). The
+# employer states a compound OR ("BS in a relevant discipline or, an
+# equivalent combination of education, training, and experience") under a
+# heading already correctly classified REQUIREMENTS_HEADING -> ENTRY_
+# QUALIFICATION. O1 is the test-first reproduction, run and confirmed
+# PASSING against the fixture's initial ungated state (proving the defect
+# exists) BEFORE the qualification_gate was added to the fixture's
+# structured_extraction.json. O2 exercises the fixture in its final,
+# gated, committed state.
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# O1. Test-first reproduction: with no qualification_gate authored, the
+# compound-OR degree row independently hard-blocks, fabricating rejection
+# of an alternative the employer explicitly permits.
+# ----------------------------------------------------------------------
+job_input_f = _load_job_input(FIXTURE_F)
+result_f_asis = analyze_job(job_input_f)
+assert_true(result_f_asis["valid"], f"CASE_F: analyze_job must be valid, errors={result_f_asis['errors']}")
+analysis_f_asis = result_f_asis["analysis"]
+assert_true(
+    "Unsupported core mandatory HIGH requirement: REQ_JDJPM_PM_EXPERIENCE" in result_f_asis["hard_blockers"],
+    f"CASE_F reproduction: REQ_JDJPM_PM_EXPERIENCE must independently hard-block (genuine, unrelated gap), got {result_f_asis['hard_blockers']}",
+)
+assert_true(
+    analysis_f_asis["decision"] == "REJECT",
+    f"CASE_F reproduction: expected REJECT, got {analysis_f_asis['decision']}",
+)
+if not analysis_f_asis.get("qualification_gate_results"):
+    assert_true(
+        "Unsupported core mandatory HIGH requirement: REQ_JDJPM_DEGREE" in result_f_asis["hard_blockers"],
+        f"CASE_F reproduction: with no gate authored, REQ_JDJPM_DEGREE must ALSO independently hard-block "
+        f"(the defect this milestone corrects), got {result_f_asis['hard_blockers']}",
+    )
+    print("PASS O1: CASE_F test-first reproduction confirmed -- with no qualification_gate, the compound-OR degree row independently (and fabricatedly) hard-blocks, exactly as expected on the unfixed fixture state.")
+else:
+    print("PASS O1: CASE_F fixture is in its final, gated state (qualification_gate present) -- reproduction was already independently confirmed and recorded during test-first development; see implementation report.")
+
+# ----------------------------------------------------------------------
+# O2. Final, gated fixture state -- the locked success criterion.
+# ----------------------------------------------------------------------
+assert_true(
+    len(analysis_f_asis.get("qualification_gate_results") or []) == 1,
+    f"CASE_F: expected exactly one qualification_gate, got {analysis_f_asis.get('qualification_gate_results')}",
+)
+gate_result_f = analysis_f_asis["qualification_gate_results"][0]
+assert_true(
+    gate_result_f["qualification_gate_id"] == "GATE_JDJPM_DEGREE_COMPONENT",
+    f"CASE_F: unexpected gate id {gate_result_f['qualification_gate_id']!r}",
+)
+assert_true(
+    gate_result_f["result"] == "UNRESOLVED",
+    f"CASE_F: gate must resolve UNRESOLVED (degree leaf unrecognized, never a proven negative), got {gate_result_f['result']!r}",
+)
+assert_true(
+    gate_result_f["leaf_support"] == {"REQ_JDJPM_DEGREE": "UNRESOLVED"},
+    f"CASE_F: expected single leaf REQ_JDJPM_DEGREE -> UNRESOLVED, got {gate_result_f['leaf_support']}",
+)
+assert_true(
+    "REQ_JDJPM_DEGREE" not in " ".join(result_f_asis["hard_blockers"]),
+    f"CASE_F: REQ_JDJPM_DEGREE must be ABSENT from ordinary hard_blockers once gated, got {result_f_asis['hard_blockers']}",
+)
+assert_true(
+    not any(g.startswith("REQ_JDJPM_DEGREE:") for g in analysis_f_asis["qualification_gaps"]),
+    f"CASE_F: REQ_JDJPM_DEGREE must be ABSENT from ordinary qualification_gaps once gated, got {analysis_f_asis['qualification_gaps']}",
+)
+assert_true(
+    any("GATE_JDJPM_DEGREE_COMPONENT" in u for u in analysis_f_asis["qualification_unknowns"]),
+    f"CASE_F: qualification_unknowns must truthfully surface the unresolved gate, got {analysis_f_asis['qualification_unknowns']}",
+)
+assert_true(
+    "REQ_JDJPM_DEGREE" in gate_leaf_ids({
+        "qualification_gate_id": "x", "job_id": "x", "source_text": ["x"], "source_location": "x",
+        "logic_expression": {"op": "ANY_OF", "terms": ["REQ_JDJPM_DEGREE"]},
+    }),
+    "CASE_F setup sanity: gate_leaf_ids() must recognize the single-leaf ANY_OF shape used",
+)
+# unmodeled_branches_note preserves the equivalent-combination branch --
+# verified directly against the persisted fixture (not part of analyze_job's
+# own output surface).
+structured_f = job_input_f["structured_extraction"]
+gates_f = structured_f.get("qualification_gates") or []
+assert_true(len(gates_f) == 1, f"CASE_F fixture: expected exactly one persisted qualification_gate, got {gates_f}")
+assert_true(
+    "equivalent combination" in (gates_f[0].get("unmodeled_branches_note") or "").casefold(),
+    f"CASE_F fixture: unmodeled_branches_note must preserve the employer's equivalent-combination branch, got {gates_f[0].get('unmodeled_branches_note')!r}",
+)
+assert_true(
+    gates_f[0]["logic_expression"] == {"op": "ANY_OF", "terms": ["REQ_JDJPM_DEGREE"]},
+    f"CASE_F fixture: no second Requirement leaf may be invented for the unquantified alternative, got {gates_f[0]['logic_expression']}",
+)
+# Raw-source traceability (fail-closed, per ADR §3) -- re-verified directly,
+# not merely assumed from analyze_job() having accepted it.
+traceability_errors_f = validate_gate_source_traceability(gates_f[0], job_input_f["jd_text"])
+assert_true(
+    traceability_errors_f == [],
+    f"CASE_F fixture: gate source_text must be traceable to jd.txt, got errors={traceability_errors_f}",
+)
+assert_true(
+    result_f_asis["hard_blockers"] == ["Unsupported core mandatory HIGH requirement: REQ_JDJPM_PM_EXPERIENCE"],
+    f"CASE_F: exactly one genuine, unrelated hard blocker must remain, got {result_f_asis['hard_blockers']}",
+)
+assert_true(
+    analysis_f_asis["decision"] == "REJECT",
+    f"CASE_F: overall decision must remain REJECT (via the genuine PM-experience gap only), got {analysis_f_asis['decision']}",
+)
+assert_true(
+    analysis_f_asis["decision"] not in ("APPLY", "PRIORITY_APPLY", "EFFICIENT_APPLY"),
+    "CASE_F: no APPLY-like decision may appear -- this milestone corrects representation, not outcome positivity",
+)
+print("PASS O2: CASE_F (JD Software Junior Project Manager) -- compound degree/equivalent-experience OR correctly gated via the existing, unmodified qualification_gate architecture; degree leaf UNRESOLVED, never fabricated; genuine REQ_JDJPM_PM_EXPERIENCE blocker preserved; overall decision honestly REJECT, no APPLY-like result.")
+
 
 if __name__ == "__main__":
     print("ALL alternative_qualification_branch_representation_v1_test CHECKS PASSED.")
