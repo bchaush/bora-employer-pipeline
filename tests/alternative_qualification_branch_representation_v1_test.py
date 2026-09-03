@@ -56,6 +56,7 @@ def assert_true(condition: bool, message: str) -> None:
 FIXTURE_D = ROOT / "fixtures" / "jobs" / "CASE_D_MBTA_DIRECT_APPLICATION_ANALYST"
 FIXTURE_E = ROOT / "fixtures" / "jobs" / "CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST"
 FIXTURE_F = ROOT / "fixtures" / "jobs" / "CASE_F_JD_SOFTWARE_JPM_JUNIOR_PROJECT_MANAGER"
+FIXTURE_G = ROOT / "fixtures" / "jobs" / "CASE_G_JD_SOFTWARE_IA_IMPLEMENTATION_ANALYST"
 
 
 def _load_job_input(fixture_dir: Path) -> dict:
@@ -619,6 +620,136 @@ assert_true(
     "CASE_F: no APPLY-like decision may appear -- this milestone corrects representation, not outcome positivity",
 )
 print("PASS O2: CASE_F (JD Software Junior Project Manager) -- compound degree/equivalent-experience OR correctly gated via the existing, unmodified qualification_gate architecture; degree leaf UNRESOLVED, never fabricated; genuine REQ_JDJPM_PM_EXPERIENCE blocker preserved; overall decision honestly REJECT, no APPLY-like result.")
+
+
+# ======================================================================
+# P. JD_SOFTWARE_IA_ALTERNATIVE_QUALIFICATION_GATE_APPLICATION_V1 -- real,
+# live, first-party control (JD Software Implementation Analyst,
+# https://www.jdsoft.com/career-ia.html, faithfully re-verified 2026-09-03,
+# byte-identical across two independent fetches). The employer states a
+# compound OR ("BS in a relevant discipline such as Mathematics or Computer
+# Science OR an equivalent combination of education, training, and
+# experience") under the real heading "What We're Looking For" -- correctly
+# classified ENTRY_QUALIFICATION via the now-canonical, separately-closed
+# CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE_V1 path (not REQUIREMENTS_HEADING).
+# P1 is the test-first reproduction, run and confirmed PASSING against the
+# fixture's initial ungated state (proving the defect exists, now reachable
+# only because the heading-classification milestone landed first) BEFORE the
+# qualification_gate was added to the fixture's structured_extraction.json.
+# P2 exercises the fixture in its final, gated, committed state.
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# P1. Test-first reproduction: with no qualification_gate authored, the
+# compound-OR degree row independently hard-blocks, fabricating rejection
+# of an alternative the employer explicitly permits.
+# ----------------------------------------------------------------------
+job_input_g = _load_job_input(FIXTURE_G)
+result_g_asis = analyze_job(job_input_g)
+assert_true(result_g_asis["valid"], f"CASE_G: analyze_job must be valid, errors={result_g_asis['errors']}")
+analysis_g_asis = result_g_asis["analysis"]
+assert_true(
+    "Unsupported core mandatory HIGH requirement: REQ_IA_ANALYTICAL" in result_g_asis["hard_blockers"],
+    f"CASE_G reproduction: REQ_IA_ANALYTICAL must independently hard-block (genuine, unrelated gap), got {result_g_asis['hard_blockers']}",
+)
+assert_true(
+    analysis_g_asis["decision"] == "REJECT",
+    f"CASE_G reproduction: expected REJECT, got {analysis_g_asis['decision']}",
+)
+if not analysis_g_asis.get("qualification_gate_results"):
+    assert_true(
+        "Unsupported core mandatory HIGH requirement: REQ_IA_DEGREE" in result_g_asis["hard_blockers"],
+        f"CASE_G reproduction: with no gate authored, REQ_IA_DEGREE must ALSO independently hard-block "
+        f"(the defect this milestone corrects), got {result_g_asis['hard_blockers']}",
+    )
+    print("PASS P1: CASE_G test-first reproduction confirmed -- with no qualification_gate, the compound-OR degree row independently (and fabricatedly) hard-blocks, exactly as expected on the unfixed fixture state.")
+else:
+    print("PASS P1: CASE_G fixture is in its final, gated state (qualification_gate present) -- reproduction was already independently confirmed and recorded during test-first development; see implementation report.")
+
+# ----------------------------------------------------------------------
+# P2. Final, gated fixture state -- the locked success criterion.
+# ----------------------------------------------------------------------
+assert_true(
+    len(analysis_g_asis.get("qualification_gate_results") or []) == 1,
+    f"CASE_G: expected exactly one qualification_gate, got {analysis_g_asis.get('qualification_gate_results')}",
+)
+gate_result_g = analysis_g_asis["qualification_gate_results"][0]
+assert_true(
+    gate_result_g["qualification_gate_id"] == "GATE_IA_DEGREE_COMPONENT",
+    f"CASE_G: unexpected gate id {gate_result_g['qualification_gate_id']!r}",
+)
+assert_true(
+    gate_result_g["result"] == "UNRESOLVED",
+    f"CASE_G: gate must resolve UNRESOLVED (degree leaf unrecognized, never a proven negative), got {gate_result_g['result']!r}",
+)
+assert_true(
+    gate_result_g["leaf_support"] == {"REQ_IA_DEGREE": "UNRESOLVED"},
+    f"CASE_G: expected single leaf REQ_IA_DEGREE -> UNRESOLVED, got {gate_result_g['leaf_support']}",
+)
+assert_true(
+    "REQ_IA_DEGREE" not in " ".join(result_g_asis["hard_blockers"]),
+    f"CASE_G: REQ_IA_DEGREE must be ABSENT from ordinary hard_blockers once gated, got {result_g_asis['hard_blockers']}",
+)
+assert_true(
+    not any(g.startswith("REQ_IA_DEGREE:") for g in analysis_g_asis["qualification_gaps"]),
+    f"CASE_G: REQ_IA_DEGREE must be ABSENT from ordinary qualification_gaps once gated, got {analysis_g_asis['qualification_gaps']}",
+)
+assert_true(
+    any("GATE_IA_DEGREE_COMPONENT" in u for u in analysis_g_asis["qualification_unknowns"]),
+    f"CASE_G: qualification_unknowns must truthfully surface the unresolved gate, got {analysis_g_asis['qualification_unknowns']}",
+)
+assert_true(
+    "REQ_IA_DEGREE" in gate_leaf_ids({
+        "qualification_gate_id": "x", "job_id": "x", "source_text": ["x"], "source_location": "x",
+        "logic_expression": {"op": "ANY_OF", "terms": ["REQ_IA_DEGREE"]},
+    }),
+    "CASE_G setup sanity: gate_leaf_ids() must recognize the single-leaf ANY_OF shape used",
+)
+# unmodeled_branches_note preserves the equivalent-combination branch --
+# verified directly against the persisted fixture (not part of analyze_job's
+# own output surface).
+structured_g = job_input_g["structured_extraction"]
+gates_g = structured_g.get("qualification_gates") or []
+assert_true(len(gates_g) == 1, f"CASE_G fixture: expected exactly one persisted qualification_gate, got {gates_g}")
+assert_true(
+    "equivalent combination" in (gates_g[0].get("unmodeled_branches_note") or "").casefold(),
+    f"CASE_G fixture: unmodeled_branches_note must preserve the employer's equivalent-combination branch, got {gates_g[0].get('unmodeled_branches_note')!r}",
+)
+assert_true(
+    gates_g[0]["logic_expression"] == {"op": "ANY_OF", "terms": ["REQ_IA_DEGREE"]},
+    f"CASE_G fixture: no second Requirement leaf may be invented for the unquantified alternative, got {gates_g[0]['logic_expression']}",
+)
+# Raw-source traceability (fail-closed, per ADR §3) -- re-verified directly,
+# not merely assumed from analyze_job() having accepted it.
+traceability_errors_g = validate_gate_source_traceability(gates_g[0], job_input_g["jd_text"])
+assert_true(
+    traceability_errors_g == [],
+    f"CASE_G fixture: gate source_text must be traceable to jd.txt, got errors={traceability_errors_g}",
+)
+assert_true(
+    result_g_asis["hard_blockers"] == ["Unsupported core mandatory HIGH requirement: REQ_IA_ANALYTICAL"],
+    f"CASE_G: exactly one genuine, unrelated hard blocker must remain, got {result_g_asis['hard_blockers']}",
+)
+assert_true(
+    analysis_g_asis["decision"] == "REJECT",
+    f"CASE_G: overall decision must remain REJECT (via the genuine analytical-skills gap only), got {analysis_g_asis['decision']}",
+)
+assert_true(
+    analysis_g_asis["decision"] not in ("APPLY", "PRIORITY_APPLY", "EFFICIENT_APPLY"),
+    "CASE_G: no APPLY-like decision may appear -- this milestone corrects representation, not outcome positivity",
+)
+# REQ_IA_RDBMS_PLUS must remain PREFERRED and non-blocking, unaffected by
+# either the heading-classification milestone or this gate milestone.
+req_ia_rdbms = next(r for r in structured_g["requirements"] if r["requirement_id"] == "REQ_IA_RDBMS_PLUS")
+assert_true(
+    req_ia_rdbms["importance"] == "PREFERRED",
+    f"CASE_G: REQ_IA_RDBMS_PLUS must remain PREFERRED, got {req_ia_rdbms['importance']}",
+)
+assert_true(
+    "REQ_IA_RDBMS_PLUS" not in " ".join(result_g_asis["hard_blockers"]),
+    f"CASE_G: REQ_IA_RDBMS_PLUS (preferred) must never appear in hard_blockers, got {result_g_asis['hard_blockers']}",
+)
+print("PASS P2: CASE_G (JD Software Implementation Analyst) -- compound degree/equivalent-experience OR correctly gated via the existing, unmodified qualification_gate architecture; degree leaf UNRESOLVED, never fabricated; genuine REQ_IA_ANALYTICAL blocker preserved; REQ_IA_RDBMS_PLUS remains preferred/non-blocking; overall decision honestly REJECT, no APPLY-like result.")
 
 
 if __name__ == "__main__":
