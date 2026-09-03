@@ -56,7 +56,7 @@ from claim_repository import validate_claim_repository  # noqa: E402
 from evidence_repository import validate_evidence_repository  # noqa: E402
 from experience_repository import validate_experience_repository  # noqa: E402
 from job_analysis import analyze_job  # noqa: E402
-from job_decision import detect_hard_blockers  # noqa: E402
+from job_decision import decide_lane_and_decision, detect_hard_blockers  # noqa: E402
 from requirement_normalize import normalize_structured_requirements  # noqa: E402
 from requirement_source_role import (  # noqa: E402
     CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN,
@@ -697,5 +697,324 @@ for fixture_id in GOLDEN_FIXTURE_IDS:
 assert_true(golden_pass_count == 15, f"all 15 golden cases must pass, only {golden_pass_count} did")
 print("PASS U: all 15 Job Analysis Golden cases pass directly against the migrated golden corpus.")
 
+
+# ======================================================================
+# V. SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY_V1: decide_lane_and_
+# decision()'s own mandatory/preferred threshold collections (job_decision.py
+# ~L375-388) must apply the exact same derive_qualification_gate(...)=="YES"
+# filter detect_hard_blockers() already applies at job_decision.py:151 --
+# otherwise a ROLE_RESPONSIBILITY/APPLICATION_OR_LEGAL_GATE/AMBIGUOUS/
+# missing-role row can silently contaminate none/high_none/partial/
+# strong_or_supported/high_strong/distinct_high_claims/
+# material_preferred_missing/nonmaterial_preferred_missing and therefore
+# REJECT/WATCH/EFFICIENT_APPLY/APPLY/PRIORITY_APPLY routing, even though it
+# is already correctly excluded from the human-facing hard_blockers list.
+# These tests exercise decide_lane_and_decision() directly (not merely
+# detect_hard_blockers()), which is the only function this defect lives in.
+# ======================================================================
+_SUPPORTED_FAMILY = "Business Systems"
+_NEUTRAL_JD_TEXT = "General business systems analyst role. No citizenship or clearance language present."
+
+
+def _threshold_row(
+    req_id: str,
+    *,
+    importance: str = "MANDATORY",
+    relevance: str = "HIGH",
+    source_semantic_role: object = "ENTRY_QUALIFICATION",
+    omit_role_key: bool = False,
+) -> dict:
+    row = {
+        "requirement_id": req_id,
+        "job_id": "JOB_SYNTH_THRESHOLD",
+        "text": f"Synthetic requirement {req_id}",
+        "category": "TEST",
+        "importance": importance,
+        "seniority_implication": None,
+        "technology": [],
+        "experience_level": None,
+        "domain": None,
+        "relevance": relevance,
+        "source_text": f"Synthetic requirement {req_id}",
+        "source_location": "Synthetic",
+    }
+    if not omit_role_key:
+        row["source_semantic_role"] = source_semantic_role
+    return row
+
+
+def _threshold_match(req_id: str, result: str, *, claim_ids: list[str] | None = None) -> dict:
+    return {"requirement_id": req_id, "result": result, "claim_ids": claim_ids or []}
+
+
+def _decide(requirements: list[dict], matches: list[dict], *, role_family: str = _SUPPORTED_FAMILY, jd_text: str = _NEUTRAL_JD_TEXT) -> dict:
+    return decide_lane_and_decision(
+        requirements=requirements,
+        matches=matches,
+        gaps=[],
+        unknowns=[],
+        seniority=None,
+        role_family=role_family,
+        role="Business Systems Analyst",
+        jd_text=jd_text,
+    )
+
+
+# V-A. ROLE_RESPONSIBILITY + MANDATORY + HIGH + NONE, isolated -- must not
+# independently cause threshold REJECT (this is the exact contamination
+# pattern reproduced live on JD Software Implementation Analyst).
+req_va = _threshold_row("REQ_VA", source_semantic_role="ROLE_RESPONSIBILITY")
+result_va = _decide([req_va], [_threshold_match("REQ_VA", "NONE")])
+assert_true(
+    result_va["decision"] != "REJECT",
+    f"V-A: a lone ROLE_RESPONSIBILITY mandatory HIGH NONE row must never independently REJECT, "
+    f"got decision={result_va['decision']!r} rationale={result_va['decision_rationale']!r}",
+)
+assert_true(
+    "high_none" not in result_va["decision_rationale"],
+    f"V-A: decision_rationale must not cite a contaminated high_none count, got {result_va['decision_rationale']!r}",
+)
+print("PASS V-A: lone ROLE_RESPONSIBILITY mandatory HIGH NONE row does not independently REJECT.")
+
+# V-B. ENTRY_QUALIFICATION + MANDATORY + HIGH + NONE -- retains existing
+# qualification-blocking behavior (unaffected sanity/regression check). A
+# lone genuine entry-qualification NONE is caught by detect_hard_blockers()
+# itself (via its own, unmodified, already-correct eligibility filter)
+# before decide_lane_and_decision() ever reaches the high_none threshold
+# branch -- REJECT via hard_blockers is the expected, unchanged path here;
+# this case's purpose is only to prove ENTRY_QUALIFICATION rows are NOT
+# swept up by the new exclusion.
+req_vb = _threshold_row("REQ_VB", source_semantic_role="ENTRY_QUALIFICATION")
+result_vb = _decide([req_vb], [_threshold_match("REQ_VB", "NONE")])
+assert_true(
+    result_vb["decision"] == "REJECT" and result_vb["hard_blockers"] == ["Unsupported core mandatory HIGH requirement: REQ_VB"],
+    f"V-B: a lone genuine ENTRY_QUALIFICATION mandatory HIGH NONE row must still independently REJECT "
+    f"(via detect_hard_blockers, unaffected by this change), got {result_vb}",
+)
+print("PASS V-B: genuine ENTRY_QUALIFICATION mandatory HIGH NONE row still independently REJECTs (unchanged).")
+
+# V-C. AMBIGUOUS + MANDATORY + HIGH + NONE -- excluded from threshold counting.
+req_vc = _threshold_row("REQ_VC", source_semantic_role="AMBIGUOUS")
+result_vc = _decide([req_vc], [_threshold_match("REQ_VC", "NONE")])
+assert_true(
+    result_vc["decision"] != "REJECT",
+    f"V-C: a lone AMBIGUOUS mandatory HIGH NONE row must never independently REJECT, got {result_vc}",
+)
+print("PASS V-C: AMBIGUOUS mandatory HIGH NONE row does not independently REJECT.")
+
+# V-D. APPLICATION_OR_LEGAL_GATE + MANDATORY + HIGH + NONE -- excluded from
+# ORDINARY threshold counting. Isolated from the separate JD-text-level
+# citizenship/clearance blocker by using neutral jd_text containing none of
+# CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN's vocabulary.
+req_vd = _threshold_row("REQ_VD", source_semantic_role="APPLICATION_OR_LEGAL_GATE")
+assert_true(
+    not CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN.search(_NEUTRAL_JD_TEXT.casefold()),
+    "V-D setup: neutral jd_text must not itself trip the separate citizenship/clearance blocker",
+)
+result_vd = _decide([req_vd], [_threshold_match("REQ_VD", "NONE")])
+assert_true(
+    result_vd["decision"] != "REJECT",
+    f"V-D: a lone APPLICATION_OR_LEGAL_GATE mandatory HIGH NONE row must never independently REJECT "
+    f"via ordinary threshold counting (isolated from the JD-text-level citizenship/clearance check), "
+    f"got {result_vd}",
+)
+print("PASS V-D: APPLICATION_OR_LEGAL_GATE mandatory HIGH NONE row does not independently REJECT via threshold counting.")
+
+# V-E. Missing source_semantic_role key entirely (direct low-level caller
+# bypassing normalization) -- must fail closed / excluded, consistent with
+# derive_qualification_gate(None) != "YES".
+req_ve = _threshold_row("REQ_VE", omit_role_key=True)
+assert_true("source_semantic_role" not in req_ve, "V-E setup: row must genuinely omit the key")
+result_ve = _decide([req_ve], [_threshold_match("REQ_VE", "NONE")])
+assert_true(
+    result_ve["decision"] != "REJECT",
+    f"V-E: a row with no persisted source_semantic_role at all must never independently REJECT "
+    f"(fail-closed exclusion, matching derive_qualification_gate(None)), got {result_ve}",
+)
+print("PASS V-E: missing source_semantic_role row does not independently REJECT (fail-closed).")
+
+# V-F. ROLE_RESPONSIBILITY + PREFERRED + HIGH + NONE -- must not create a
+# material preferred gap. Proven by observing which of the two structurally
+# adjacent APPLY branches fires: with the contaminant counted,
+# material_preferred_missing=1 selects the "material preferred gap(s)"
+# branch; correctly excluded, it falls through to the "Good evidence
+# alignment" branch instead. Three genuine STRONG ENTRY_QUALIFICATION rows
+# (distinct claims) establish strong_or_supported=3/none=0 either way.
+vf_mandatory = [
+    _threshold_row("REQ_VF_M1", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VF_M2", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VF_M3", source_semantic_role="ENTRY_QUALIFICATION"),
+]
+req_vf_contaminant = _threshold_row(
+    "REQ_VF_PREF", importance="PREFERRED", source_semantic_role="ROLE_RESPONSIBILITY"
+)
+vf_matches = [
+    _threshold_match("REQ_VF_M1", "STRONG", claim_ids=["CLAIM_VF_1"]),
+    _threshold_match("REQ_VF_M2", "STRONG", claim_ids=["CLAIM_VF_2"]),
+    _threshold_match("REQ_VF_M3", "STRONG", claim_ids=["CLAIM_VF_3"]),
+    _threshold_match("REQ_VF_PREF", "NONE"),
+]
+result_vf = _decide(vf_mandatory + [req_vf_contaminant], vf_matches)
+assert_true(
+    result_vf["decision"] == "APPLY",
+    f"V-F setup: expected APPLY from 3 genuine STRONG entry-qualification rows, got {result_vf}",
+)
+assert_true(
+    "material preferred gap" not in result_vf["decision_rationale"],
+    f"V-F: a ROLE_RESPONSIBILITY preferred NONE row must not be counted as a material preferred gap, "
+    f"got rationale={result_vf['decision_rationale']!r}",
+)
+print("PASS V-F: ROLE_RESPONSIBILITY preferred HIGH NONE row does not create a material_preferred_missing gap.")
+
+# V-G. ROLE_RESPONSIBILITY + MANDATORY + HIGH + STRONG -- must not inflate
+# positive coverage / distinct Claim provenance. Sharp decision-level
+# discriminator: 3 genuine ENTRY_QUALIFICATION STRONG rows (3 distinct
+# claims) alone reach only the ordinary APPLY branch (distinct_high_claim_
+# count=3 < 4). Adding a 4th, ROLE_RESPONSIBILITY-classified STRONG row with
+# its own distinct claim must NOT push distinct_high_claim_count/
+# strong_or_supported to the PRIORITY_APPLY threshold (>=4 both) -- if it
+# does, the contamination inflated positive counts, exactly mirroring the
+# real, live CASE_C_MIT_LL REQ_C_REQUIREMENTS_ANALYSIS (ROLE_RESPONSIBILITY,
+# STRONG) instance this milestone's audit found.
+vg_genuine = [
+    _threshold_row("REQ_VG_M1", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VG_M2", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VG_M3", source_semantic_role="ENTRY_QUALIFICATION"),
+]
+req_vg_contaminant = _threshold_row("REQ_VG_RESP", source_semantic_role="ROLE_RESPONSIBILITY")
+vg_matches = [
+    _threshold_match("REQ_VG_M1", "STRONG", claim_ids=["CLAIM_VG_1"]),
+    _threshold_match("REQ_VG_M2", "STRONG", claim_ids=["CLAIM_VG_2"]),
+    _threshold_match("REQ_VG_M3", "STRONG", claim_ids=["CLAIM_VG_3"]),
+    _threshold_match("REQ_VG_RESP", "STRONG", claim_ids=["CLAIM_VG_CONTAMINANT"]),
+]
+result_vg = _decide(vg_genuine + [req_vg_contaminant], vg_matches)
+assert_true(
+    result_vg["decision"] != "PRIORITY_APPLY",
+    f"V-G: a ROLE_RESPONSIBILITY mandatory HIGH STRONG row must not inflate strong_or_supported/"
+    f"distinct_high_claim_count to the PRIORITY_APPLY threshold, got {result_vg}",
+)
+assert_true(
+    result_vg["decision"] == "APPLY" and result_vg["lane"] == "LANE_1_EFFICIENT_APPLY",
+    f"V-G: with the contaminant correctly excluded, only 3 genuine distinct claims remain -- expected "
+    f"ordinary APPLY (not PRIORITY_APPLY), got {result_vg}",
+)
+print("PASS V-G: ROLE_RESPONSIBILITY mandatory HIGH STRONG row does not inflate positive/distinct-claim counts (mirrors the real MIT LL instance).")
+
+# V-H. ENTRY_QUALIFICATION + MANDATORY + HIGH + STRONG retains current
+# positive-count behavior -- proven by V-G's own 3 genuine rows still
+# driving a real APPLY result after the contaminant is excluded.
+assert_true(
+    result_vg["decision"] == "APPLY",
+    "V-H: genuine ENTRY_QUALIFICATION STRONG rows must still positively count toward APPLY",
+)
+print("PASS V-H: genuine ENTRY_QUALIFICATION mandatory HIGH STRONG rows retain their positive-count contribution.")
+
+# V-I. Alternative-gated ENTRY_QUALIFICATION row remains excluded from
+# ordinary threshold counting exactly once, independent of and in addition
+# to the source_semantic_role filter (the two exclusions are orthogonal).
+req_vi_gated = _threshold_row("REQ_VI_GATED", source_semantic_role="ENTRY_QUALIFICATION")
+req_vi_resp = _threshold_row("REQ_VI_RESP", source_semantic_role="ROLE_RESPONSIBILITY")
+result_vi = decide_lane_and_decision(
+    requirements=[req_vi_gated, req_vi_resp],
+    matches=[_threshold_match("REQ_VI_GATED", "NONE"), _threshold_match("REQ_VI_RESP", "NONE")],
+    gaps=[],
+    unknowns=[],
+    seniority=None,
+    role_family=_SUPPORTED_FAMILY,
+    role="Business Systems Analyst",
+    jd_text=_NEUTRAL_JD_TEXT,
+    gated_requirement_ids=frozenset({"REQ_VI_GATED"}),
+    qualification_gate_blockers=(),
+)
+assert_true(
+    result_vi["decision"] != "REJECT",
+    f"V-I: an alternative-gated ENTRY_QUALIFICATION row (excluded via gated_requirement_ids) plus an "
+    f"unrelated ROLE_RESPONSIBILITY row (excluded via source_semantic_role) must never independently "
+    f"REJECT -- both exclusions must co-exist correctly, got {result_vi}",
+)
+print("PASS V-I: alternative-gated ENTRY_QUALIFICATION row and source-role exclusion co-exist correctly.")
+
+# V-J. Mixed JD: true qualification rows plus responsibility rows -- routing
+# must depend only on the qualification-view rows (the exact JD-Software-
+# shaped pattern: one contaminating ROLE_RESPONSIBILITY NONE alongside
+# several genuine, positively-matched ENTRY_QUALIFICATION rows).
+vj_genuine = [
+    _threshold_row("REQ_VJ_M1", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VJ_M2", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VJ_M3", source_semantic_role="ENTRY_QUALIFICATION"),
+]
+req_vj_resp = _threshold_row("REQ_VJ_RESP", source_semantic_role="ROLE_RESPONSIBILITY")
+vj_matches = [
+    _threshold_match("REQ_VJ_M1", "STRONG", claim_ids=["CLAIM_VJ_1"]),
+    _threshold_match("REQ_VJ_M2", "STRONG", claim_ids=["CLAIM_VJ_2"]),
+    _threshold_match("REQ_VJ_M3", "STRONG", claim_ids=["CLAIM_VJ_3"]),
+    _threshold_match("REQ_VJ_RESP", "NONE"),
+]
+result_vj = _decide(vj_genuine + [req_vj_resp], vj_matches)
+assert_true(
+    result_vj["decision"] == "APPLY",
+    f"V-J: routing must be driven only by the 3 genuine STRONG entry-qualification rows, not the "
+    f"contaminating ROLE_RESPONSIBILITY NONE row, got {result_vj}",
+)
+print("PASS V-J: mixed-JD routing is driven only by qualification-view rows, not responsibility contamination.")
+
+# V-K. Two non-qualification MANDATORY + MEDIUM + NONE rows must not trigger
+# the separate `none >= 2 and strong_or_supported == 0` REJECT branch
+# (distinct from the high_none branch -- MEDIUM relevance never increments
+# high_none, only plain none).
+req_vk1 = _threshold_row("REQ_VK1", relevance="MEDIUM", source_semantic_role="ROLE_RESPONSIBILITY")
+req_vk2 = _threshold_row("REQ_VK2", relevance="MEDIUM", source_semantic_role="ROLE_RESPONSIBILITY")
+result_vk = _decide(
+    [req_vk1, req_vk2],
+    [_threshold_match("REQ_VK1", "NONE"), _threshold_match("REQ_VK2", "NONE")],
+)
+assert_true(
+    result_vk["decision"] != "REJECT",
+    f"V-K: two ROLE_RESPONSIBILITY mandatory MEDIUM NONE rows must not trigger the separate "
+    f"none>=2-and-strong_or_supported==0 REJECT branch, got {result_vk}",
+)
+print("PASS V-K: two non-qualification mandatory MEDIUM NONE rows do not trigger the none>=2 REJECT branch.")
+
+# V-L. Unsupported-family + responsibility NONE contamination must not
+# independently create an incompatible-family REJECT (tests the
+# `not family_fit` branch specifically, with an unsupported role_family).
+req_vl = _threshold_row("REQ_VL", source_semantic_role="ROLE_RESPONSIBILITY")
+result_vl = _decide([req_vl], [_threshold_match("REQ_VL", "NONE")], role_family="Marketing")
+assert_true(
+    result_vl["decision"] != "REJECT",
+    f"V-L: a lone contaminating ROLE_RESPONSIBILITY NONE row must not, by itself, trigger the "
+    f"unsupported-family REJECT branch (should route WATCH via family mismatch alone), got {result_vl}",
+)
+print("PASS V-L: unsupported-family routing is not independently forced to REJECT by responsibility-row contamination.")
+
+# V-M. ROLE_RESPONSIBILITY + PARTIAL must not inflate `partial` -- inverse of
+# V-G: here contamination would wrongly SUPPRESS an otherwise-earned
+# PRIORITY_APPLY (PRIORITY_APPLY requires partial==0). 4 genuine
+# ENTRY_QUALIFICATION STRONG rows (4 distinct claims) meet every PRIORITY_
+# APPLY criterion on their own; a 5th, ROLE_RESPONSIBILITY-classified
+# PARTIAL row must not count toward `partial` and block it.
+vm_genuine = [
+    _threshold_row("REQ_VM_M1", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VM_M2", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VM_M3", source_semantic_role="ENTRY_QUALIFICATION"),
+    _threshold_row("REQ_VM_M4", source_semantic_role="ENTRY_QUALIFICATION"),
+]
+req_vm_contaminant = _threshold_row("REQ_VM_RESP", source_semantic_role="ROLE_RESPONSIBILITY")
+vm_matches = [
+    _threshold_match("REQ_VM_M1", "STRONG", claim_ids=["CLAIM_VM_1"]),
+    _threshold_match("REQ_VM_M2", "STRONG", claim_ids=["CLAIM_VM_2"]),
+    _threshold_match("REQ_VM_M3", "STRONG", claim_ids=["CLAIM_VM_3"]),
+    _threshold_match("REQ_VM_M4", "STRONG", claim_ids=["CLAIM_VM_4"]),
+    _threshold_match("REQ_VM_RESP", "PARTIAL"),
+]
+result_vm = _decide(vm_genuine + [req_vm_contaminant], vm_matches)
+assert_true(
+    result_vm["decision"] == "PRIORITY_APPLY",
+    f"V-M: a ROLE_RESPONSIBILITY mandatory HIGH PARTIAL row must not count toward `partial` and must not "
+    f"suppress an otherwise fully-earned PRIORITY_APPLY (4 genuine distinct-claim STRONG rows), "
+    f"got {result_vm}",
+)
+print("PASS V-M: ROLE_RESPONSIBILITY mandatory HIGH PARTIAL row does not inflate `partial` or suppress a deserved PRIORITY_APPLY.")
 
 print("ALL source_semantic_role_qualification_view_v1_test CHECKS PASSED")
