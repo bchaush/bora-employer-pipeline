@@ -1,5 +1,135 @@
 Status: CLOSED
 Closed task:
+SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY_V1
+Reviewed implementation commit:
+c76916df625b1ebaf2e29e7bbcb7bfc41799e3c7
+Pull request:
+#2 (https://github.com/bchaush/bora-employer-pipeline/pull/2)
+Merge commit (canonical main):
+5ad657649b9df22eaa1e8a114380d05a36b08ed1
+Merge parents:
+d1aa1144e4ae07d63300b2dfffdc6c0bd2d1af97,
+c76916df625b1ebaf2e29e7bbcb7bfc41799e3c7
+
+Triggering provenance:
+POSITIVE_CONTROL_REAL_MARKET_FALSE_NEGATIVE_AUDIT_V1 (read-only) reproduced
+a live false negative on JD Software -- Implementation Analyst and
+adjudicated POSITIVE_CONTROL_FALSE_NEGATIVE_DEFECT_JUSTIFIES_MILESTONE.
+SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY_V1 (read-only architecture +
+test-design audit) independently re-verified the causal code path and
+adjudicated IMPLEMENTATION_ARCHITECTURE_JUSTIFIED, with the narrowest
+authorized surface: src/job_decision.py plus
+tests/source_semantic_role_qualification_view_v1_test.py only.
+
+Root defect:
+decide_lane_and_decision()'s ordinary mandatory/preferred threshold
+collections failed to apply the same source-semantic-role qualification
+eligibility boundary already respected by hard-blocker
+(detect_hard_blockers()) and qualification gap/unknown handling. A
+ROLE_RESPONSIBILITY/APPLICATION_OR_LEGAL_GATE/AMBIGUOUS/missing-role
+requirement could silently contaminate none/high_none/partial/
+strong_or_supported/high_strong/distinct_high_claims/
+material_preferred_missing/nonmaterial_preferred_missing and therefore
+REJECT/WATCH/EFFICIENT_APPLY/APPLY/PRIORITY_APPLY routing, with no trace
+of the real cause in hard_blockers or qualification_gaps.
+
+Canonical invariant (implemented):
+only explicit ENTRY_QUALIFICATION rows
+(derive_qualification_gate(source_semantic_role) == "YES") may participate
+in ordinary candidate-qualification threshold counting inside
+decide_lane_and_decision(). The pre-existing gated_requirement_ids
+exclusion (for alternative-qualification-branch rows) remains
+independently required -- the two filters are orthogonal, both applied.
+
+Implementation surface (as built, exactly as authorized, no third file):
+- src/job_decision.py: both the `mandatory` and `preferred` list
+  comprehensions in decide_lane_and_decision() gained
+  `derive_qualification_gate(r.get("source_semantic_role")) == "YES"`,
+  reusing the existing, unmodified function -- no second eligibility
+  definition created.
+- tests/source_semantic_role_qualification_view_v1_test.py: 13 new
+  regression cases (V-A through V-M), test-first (V-A reproduced the
+  pre-fix false REJECT on unfixed baseline before any production edit),
+  covering both negative contamination (NONE rows fabricating REJECT) and
+  positive contamination (STRONG/PARTIAL rows inflating positive counts or
+  wrongly suppressing an earned PRIORITY_APPLY) -- two cases (V-G, V-M)
+  directly mirror a real, live instance found during the audit
+  (CASE_C_MIT_LL's REQ_C_REQUIREMENTS_ANALYSIS, a ROLE_RESPONSIBILITY row
+  matched STRONG, previously inflating positive counts, masked only
+  because unrelated hard blockers already fired first).
+
+Accepted real-control result:
+JD Software -- Implementation Analyst: contaminated REJECT (high_none=6,
+half of which were genuine post-hire duties) -> truthful UNDECIDED /
+UNASSIGNED (hard_blockers=[], qualification_gaps=[]). Every row now
+resolves either genuinely ROLE_RESPONSIBILITY or AMBIGUOUS (the separate,
+still-deferred "What We're Looking For" heading-cue gap) -- zero rows
+misclassify as a fabricated qualification blocker. The milestone never
+required APPLY as its success criterion, and did not produce one.
+
+Symmetric correctness (proven, not merely asserted):
+non-qualification NONE rows cannot fabricate negative threshold counts
+(V-A/V-C/V-D/V-E/V-J/V-K/V-L); non-qualification STRONG/PARTIAL rows
+cannot inflate positive threshold counts or suppress an earned outcome
+(V-F/V-G/V-M). Genuine ENTRY_QUALIFICATION behavior (both negative and
+positive) is unchanged (V-B/V-H). Alternative-gate exclusion co-exists
+correctly with the new filter (V-I).
+
+Non-regression (independently verified, zero flips on any real or golden
+fixture): Atominvest, MIT Lincoln Laboratory, MBTA Direct, MBTA Contractor
+all produced identical decisions/hard_blockers to pre-fix. All 15 Job
+Analysis Golden fixtures unchanged. Application Gate Golden 9/9 unchanged.
+python scripts/verify_assurance_baseline.py: exit 0, Phase 1 PASS, Phase 2
+60/60, Phase 3 Golden 15/15 -- both pre-commit and, per the hosted evidence
+below, post-merge on canonical main.
+
+Hosted post-merge evidence (independently verified):
+- GitHub Actions workflow: Assurance Baseline
+- run id: 33709096641
+- event: push
+- head SHA: 5ad657649b9df22eaa1e8a114380d05a36b08ed1 (the merge commit)
+- conclusion: success
+
+Accepted Cursor review:
+SAFE_TO_COMMIT_SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY. Three LOW
+observations accepted non-blocking, not reopened for cleanup: V-L's
+family-fit isolation comment/setup framing is imperfect but the case still
+correctly discriminates the original threshold-contamination defect,
+independently covered elsewhere; V-F uses a decision_rationale-text-level
+discriminator rather than an enum flip, which still detects
+preferred-row contamination; V-H is redundant with V-G's own genuine rows
+but harmless.
+
+Explicitly carried forward / NOT solved by this milestone (deferred, not
+reopened): "What We're Looking For" heading recognition
+(requirement_source_role.py's _REQUIREMENTS_HEADING_CUES); BS / B.S. / BA
+degree-abbreviation parsing; global NONE-vs-UNKNOWN remediation; general
+candidate years-of-experience computation; technology-qualified duration;
+immigration/work-authorization inference; résumé/package generation;
+pursuit-approval implementation. is_information_deficit() was deliberately
+left unmodified -- responsibility rows remain valid evidence that a JD
+contains substantive information; they simply cannot participate in
+candidate-entry qualification threshold counting.
+
+No new implementation milestone is selected by this closure. The
+strongest next investigation candidate is a READ-ONLY semantic-scope audit
+of "What We're Looking For" heading behavior, because JD Software's own
+live posting contains genuine candidate-qualification content that
+currently remains AMBIGUOUS (not ENTRY_QUALIFICATION) purely because that
+exact heading synonym is unrecognized -- this is explicitly NOT a
+statement that adding the phrase to _REQUIREMENTS_HEADING_CUES is already
+authorized or correct; the heading is semantically overloaded across real
+job descriptions in ways that require investigation before any
+implementation is authorized.
+
+Prior closed implementation milestone (superseded as the top Status/
+Closed-task pointer by the block above; record preserved below exactly as
+written, including its own still-current Governance record and
+Architecture record, neither of which is superseded or historical -- only
+the top-level Status/Closed-task pointer changed):
+
+Status: CLOSED
+Closed task:
 REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1
 Canonical architecture SHA:
 d8826aa368e5dbfafb80531f03913bd43cd00713
