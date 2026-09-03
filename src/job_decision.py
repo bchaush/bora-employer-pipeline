@@ -372,12 +372,25 @@ def decide_lane_and_decision(
     # above via qualification_gate_blockers). Defaults to empty, so every
     # existing caller and every ungrouped requirement counts exactly as
     # before.
+    # SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY_V1: mirror
+    # detect_hard_blockers()'s own derive_qualification_gate(...) == "YES"
+    # eligibility filter (see the per-row loop above) here too. Without it,
+    # a ROLE_RESPONSIBILITY/APPLICATION_OR_LEGAL_GATE/AMBIGUOUS/missing-role
+    # row -- already correctly excluded from the human-facing hard_blockers
+    # list -- could still silently contaminate none/high_none/partial/
+    # strong_or_supported/high_strong/distinct_high_claims/
+    # material_preferred_missing/nonmaterial_preferred_missing below, and
+    # therefore REJECT/WATCH/EFFICIENT_APPLY/APPLY/PRIORITY_APPLY routing,
+    # with no trace of the real cause in hard_blockers or qualification_gaps.
+    # Orthogonal to, and applied in addition to, the pre-existing
+    # gated_requirement_ids exclusion.
     mandatory = [
         r
         for r in requirements
         if r.get("importance") == "MANDATORY"
         and r.get("relevance") in {"HIGH", "MEDIUM"}
         and r.get("requirement_id") not in gated_requirement_ids
+        and derive_qualification_gate(r.get("source_semantic_role")) == "YES"
     ]
     preferred = [
         r
@@ -385,6 +398,7 @@ def decide_lane_and_decision(
         if r.get("importance") == "PREFERRED"
         and r.get("relevance") in {"HIGH", "MEDIUM"}
         and r.get("requirement_id") not in gated_requirement_ids
+        and derive_qualification_gate(r.get("source_semantic_role")) == "YES"
     ]
 
     strong_or_supported = 0
