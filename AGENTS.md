@@ -31,6 +31,15 @@ Never invent or infer a factual claim merely to improve job fit. Unknown informa
 - Do NOT fabricate: work experience, technologies, metrics, employment dates, titles, immigration/OPT facts, employer details, sponsorship facts, or résumé claims.
 - Every material factual claim must trace directly to approved evidence in `evidence/` or `claims/`. No evidence lineage = no claim creation.
 
+## Fresh First-Party Employer Source Rule
+Operational execution of `BLUEPRINT.md`'s fresh first-party employer source rule: before acting on an employer-specific consequential premise, re-fetch the current source rather than reusing chat summaries, memory, sibling-role wording, or stale fixtures. If fresh source invalidates the premise, stop and report — do not adjust capture to fit the premise.
+
+## Approved Claim Is Not an Automatic Capability Mapping
+An approved Claim does not automatically become an EvidenceMatch capability mapping merely because the Claim exists. Capability mapping requires its own supported/authorized basis. Do not automatically wire MM/TELUS or any other approved Claim to capabilities.
+
+## Priority Selection
+Next-task selection favors real operational constraint, a reproduced reliability defect, or meaningful Bora time savings over historical TODO order or theoretical completeness — see `BLUEPRINT.md`'s build-economy gate.
+
 ## Claim Actor Attribution (v1)
 
 Substantive Evidence in `evidence_ids` establishes what happened. Bora's explicit `human_approval` on the exact Claim establishes conventional résumé active-voice actor attribution for that supported work. Human approval cannot create unsupported substantive facts. Authoritative policy: `docs/decisions/ADR-CLAIM-ACTOR-ATTRIBUTION-POLICY-V1.md`.

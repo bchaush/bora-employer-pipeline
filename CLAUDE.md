@@ -56,7 +56,9 @@ When implementing:
 2. make the smallest reliable diff within the approved milestone;
 3. run the repository's non-interactive tests required by the change;
 4. preserve truth, evidence lineage, immigration safety, and human-approval gates;
-5. stop and surface conflicts instead of silently weakening locked rules.
+5. stop and surface conflicts instead of silently weakening locked rules;
+6. obey `BLUEPRINT.md`'s build-economy gate — do not expand scope to solve unrelated theoretical completeness;
+7. for employer-specific consequential work, obey `AGENTS.md`'s fresh first-party employer source rule; if fresh first-party evidence contradicts the implementation premise, STOP before production editing.
 
 Evidence wins over model opinion.
 

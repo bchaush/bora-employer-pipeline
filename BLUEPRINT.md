@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.3**
+**Final Locked Blueprint v3.4**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -95,9 +95,13 @@ The system should **not** remove Bora from consequential decisions.
 
 Every agent must understand why Bora is searching.
 
-Bora has completed an:
+Bora's current evidence supports that all requirements for the:
 
-**MS in Business Analytics (STEM), Brandeis University.**
+**Brandeis MS in Business Analytics (STEM)**
+
+are satisfied. Degree conferral is **not** independently established in
+current evidence and must not be asserted or silently upgraded unless
+supported by updated evidence.
 
 His strongest current organizational evidence is:
 
@@ -2976,6 +2980,27 @@ It does not control:
 
 We are not spending time rebuilding commodity autofill.
 
+**Commodity tool / adapter rule.** The permanent, owned durable core of
+this system is: **Employer Truth, Candidate Truth, Match Truth, Pursuit
+Truth, Package Truth, Outcome Truth.** Commodity mechanics — job
+discovery/search, LLM drafting, browser/form autofill, email/calendar
+workflow, and similar — should normally use existing, replaceable
+external tools when those tools are good enough. Do not canonically lock
+a specific vendor as architecture. Do not build or integrate a provider
+merely because its API is easy. Build or integrate a provider only when
+live usage demonstrates enough Bora value to justify the implementation
+and ongoing maintenance cost. External providers remain replaceable
+adapters around the owned truth core; they never become the truth core
+themselves.
+
+**Discovery boundary (concept, not implemented by this milestone).**
+External discovery produces untrusted leads only. Conceptual boundary:
+external source → `DiscoveryLead` (untrusted lead representation) →
+dedupe/resolution → fresh first-party verification → Employer Truth. No
+external job-board representation, recommendation score, vendor match
+score, or discovery result becomes Employer Truth or Match Truth without
+independent first-party verification.
+
 **109. WHAT THE OS REPLACES**
 
 It replaces repeated manual work:
@@ -3377,11 +3402,22 @@ This system is worth keeping if, after real usage, it:
 
 - generates useful networking opportunities;
 
-- helps produce recruiter screens/interviews.
+- helps produce recruiter screens/interviews;
+
+- reduces false rejects and false positives;
+
+- keeps human review load useful rather than exhausting;
+
+- helps produce applications submitted, recruiter responses, screens,
+  interviews, and offers.
 
 If it merely produces a pretty dashboard:
 
 it failed.
+
+Milestone count and code volume are not primary success metrics. Tests
+protect reliability; green tests alone do not establish project success —
+real-world operational results (above) do.
 
 **128. RELATION TO BORA'S LONG-TERM BUSINESS**
 
@@ -3448,8 +3484,11 @@ Use this whenever a new build agent/session needs context:
 **You are working on Bora Employer Pipeline OS. Before doing any work,
 read BLUEPRINT.md and the applicable repository rules. BLUEPRINT.md is
 the project's authoritative source of truth. The system is being built
-specifically for Bora Chaush, an MS Business Analytics STEM graduate
-seeking legitimate U.S. employment quickly while building toward
+specifically for Bora Chaush, for whom current evidence supports that all
+requirements for the Brandeis MS in Business Analytics (STEM) are
+satisfied (degree conferral is not independently established and must
+not be asserted or silently upgraded unless supported by updated
+evidence), seeking legitimate U.S. employment quickly while building toward
 Reliable AI-Enabled Business Systems — BUILD → VERIFY → OPERATE. The
 Evidence Repository, not Bora's résumé and not model memory, is the
 factual source of truth. Never invent experience, tools, metrics,
@@ -3573,4 +3612,66 @@ manual work, fewer materially wrong decisions, faster identification of
 real worthwhile roles, credible application packages, better ability to
 act on opportunities, and real interviews, offers, income, experience,
 references, and useful professional relationships.
+
+**133. REAL-WORLD OPERATION AND CALIBRATION DOCTRINE (LOCKED)**
+
+Bora has explicitly approved the following as permanent, durable
+operating doctrine, earned through real production milestones and real
+job-market controls, not a hypothetical.
+
+**Operate while building.** Development and real job-search operation
+run in parallel. Do not wait for architectural completeness before using
+the system on real opportunities. The system should be operated now,
+with engineering responding to observed needs, not the reverse.
+
+**Build-economy gate.** A new feature or capability is justified only if
+at least one is true: (A) it fixes a demonstrated, reproduced material
+reliability/truth defect; or (B) it materially reduces Bora's live
+search/application workload. Otherwise, defer it. Do not build ontology
+breadth, provider breadth, generic platform features, integrations, UI,
+automation, or architectural completeness merely because they are
+possible or convenient.
+
+**Real-world calibration tiers.** Exactly three levels, never collapsed
+into one another: **HARD CORRECTION** — a reproduced source,
+representation, or deterministic defect; may justify implementation.
+**CALIBRATION SIGNAL** — repeated real outcomes suggesting ranking,
+evidence-resolution priorities, package emphasis, discovery-channel
+priority, or workflow allocation should be investigated; requires
+investigation before any consequential semantic change, and does not
+itself rewrite truth. **ANECDOTE** — one rejection, silence, recruiter
+response, screen, or interview; record it; do not redesign the system
+around it.
+
+**Outcomes do not rewrite truth.** Real-world outcomes may calibrate
+pursuit ranking, role-family emphasis, discovery-channel priority,
+application effort allocation, package emphasis among already-supported
+Claims, evidence-resolution priorities, and workflow efficiency. Outcomes
+do **not** independently convert: `UNKNOWN` → `SUPPORTED`; `UNKNOWN` →
+`NONE`; requirements satisfied → degree conferred; silence → sponsorship
+or work-authorization policy; adjacency → experience; rejection → proof
+Candidate lacks a capability; interview → proof an unsupported Claim was
+valid. Employer Truth, Candidate Truth, and Match Truth each require
+their own independent evidence, regardless of any outcome.
+
+**Human consequential control (summary — see
+`docs/decisions/ADR-PURSUIT-APPROVAL-BOUNDARY-V1.md` for full detail and
+rationale).** `Job.decision`/`Job.lane` are system recommendations, never
+Bora's explicit pursuit authorization. Pursuit authorization remains a
+separate, human-controlled state. A materially changed opportunity must
+never silently inherit stale pursuit authorization merely because its
+`Job_ID` is unchanged. Application Gate is separate from qualification
+and Match truth; application-question answers never rewrite qualification
+truth. `COMPLETE_HUMAN_CONFIRMED` requires explicit human confirmation.
+Package generation does not authorize submission. Final application
+submission remains human-controlled.
+
+**Fresh first-party employer source rule.** Before an employer-specific
+consequential implementation premise is authorized or acted upon,
+re-establish the current first-party employer source whenever reasonably
+retrievable. Fresh first-party employer evidence supersedes prior chat
+summaries, model memory, sibling-role wording, stale fixture assumptions,
+and in-memory reproductions. If fresh source invalidates the premise:
+STOP. Never alter source capture or representation to manufacture the
+authorized defect.
 
