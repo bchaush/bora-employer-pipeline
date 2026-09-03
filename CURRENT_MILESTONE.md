@@ -1,5 +1,266 @@
 Status: CLOSED
 Closed task:
+REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1
+Reviewed implementation commit:
+24a1c0829e27c662d6b31496a7ed80d611695dd6
+Pull request:
+#7 (https://github.com/bchaush/bora-employer-pipeline/pull/7)
+Merge commit (canonical main):
+784856ca2fdeed562cac5c1ef8d24c5483549ac6
+Merge parents:
+07321f12018980fcc2a392d5590a959fcf1941c1,
+24a1c0829e27c662d6b31496a7ed80d611695dd6
+
+This is a GOVERNANCE/DOCUMENTATION closure, not a product implementation
+milestone. Files changed: BLUEPRINT.md, AGENTS.md, CLAUDE.md, CHANGELOG.md
+only -- no src/, schemas, tests, fixtures, Claims, Evidence, Experiences,
+or resume/package data touched.
+
+Purpose:
+locked, into canonical `BLUEPRINT.md` (bumped v3.3 -> v3.4, new Section
+133), operating doctrine that had been applied consistently across the
+four most recently closed real-market milestones but was never previously
+recorded in governance: operate-while-building; the build-economy gate (a
+new feature/capability is justified only if it (A) fixes a demonstrated
+material reliability/truth defect, or (B) materially reduces Bora's live
+search/application workload -- otherwise defer); the three real-world
+calibration tiers (HARD CORRECTION / CALIBRATION SIGNAL / ANECDOTE); the
+explicit outcomes-do-not-rewrite-truth prohibited-conversion list
+(UNKNOWN->SUPPORTED, UNKNOWN->NONE, requirements-satisfied->degree-
+conferred, silence->sponsorship policy, adjacency->experience, rejection->
+proof-of-lacking-capability, interview->proof-of-valid-Claim); the fresh
+first-party employer source rule (re-establish current first-party source
+before an employer-specific consequential premise is authorized; fresh
+source supersedes prior chat summaries/model memory/sibling-role wording/
+stale fixtures/in-memory reproductions; STOP rather than manufacture the
+defect if fresh source invalidates the premise); the conceptual, NOT-
+implemented DiscoveryLead untrusted-lead boundary (external source ->
+DiscoveryLead -> dedupe/resolution -> fresh first-party verification ->
+Employer Truth); the six owned durable Truth layers (Employer/Candidate/
+Match/Pursuit/Package/Outcome) with replaceable commodity adapters around
+them; and a short human-consequential-control summary cross-referencing
+`docs/decisions/ADR-PURSUIT-APPROVAL-BOUNDARY-V1.md` rather than
+duplicating it.
+
+Also corrected an over-strong Brandeis degree-conferral wording in
+`BLUEPRINT.md` Sections 2 and 131 (previously "Bora has completed an MS
+in Business Analytics..." / "an MS Business Analytics STEM graduate") to
+evidence-neutral language: current evidence supports that all program
+requirements are satisfied; degree conferral is NOT independently
+established and must not be asserted or silently upgraded unless
+supported by updated evidence.
+
+`AGENTS.md` gained a concise fresh-source operational rule (pointing to
+the new Blueprint doctrine, not duplicating it), a standing rule that an
+approved Claim does not automatically become an EvidenceMatch capability
+mapping merely because the Claim exists, and a short priority-selection
+rule favoring real operational constraint over historical TODO order.
+`CLAUDE.md` gained two concise cross-references to the above (build-
+economy gate; fresh-source STOP condition) -- no restatement, consistent
+with CLAUDE.md's own "do not duplicate the Blueprint" rule. `CHANGELOG.md`
+recorded one concise dated entry per its own versioning-change rule.
+
+Independent Cursor adversarial review (two rounds -- first REQUIRES_
+CORRECTION on interpretive degree wording and a fresh-source rule missing
+from BLUEPRINT itself, both corrected; second round):
+SAFE_TO_COMMIT_REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC.
+
+Hosted post-merge evidence (independently verified):
+- GitHub Actions workflow: Assurance Baseline
+- run id: 33784508138
+- event: push
+- head SHA: 784856ca2fdeed562cac5c1ef8d24c5483549ac6 (the merge commit)
+- status: completed
+- conclusion: success
+
+CANONICAL DIRECTION (effective as of this closure): no new PRODUCT
+implementation milestone is currently selected. OPERATE FIRST, BUILD
+SECOND is now the canonical default -- the next phase is live real-job
+operation; new development is earned only by a demonstrated reliability/
+truth defect or a meaningful reduction in Bora's live search/application
+workload, per the build-economy gate now locked in `BLUEPRINT.md` Section
+133. Explicitly NOT selected or implied as authorized by this closure:
+MIT LL gate migration, additional candidate-profile heading synonyms,
+generic matcher cleanup, global NONE-vs-UNKNOWN remediation, DiscoveryLead
+implementation, manual intake, dashboard, crawler, ATS integrations,
+ApplicationBrief, outcome tooling, networking tooling, package automation,
+or pursuit-approval implementation -- each remains a candidate only,
+earned by real usage, not by this governance sync.
+
+Prior closed implementation milestone (superseded as the top Status/
+Closed-task pointer by the block above; record preserved below exactly as
+written):
+
+Status: CLOSED
+Closed task:
+JD_SOFTWARE_IA_ALTERNATIVE_QUALIFICATION_GATE_APPLICATION_V1
+Reviewed implementation commit:
+7ebed2fa9494d3039f41b8528ddffe01edbc9c82
+Pull request:
+#6 (https://github.com/bchaush/bora-employer-pipeline/pull/6)
+Merge commit (canonical main):
+07321f12018980fcc2a392d5590a959fcf1941c1
+Merge parents:
+c8eda27cd2b9611ca18c95b1a0eb395755ae2855,
+7ebed2fa9494d3039f41b8528ddffe01edbc9c82
+
+Triggering provenance:
+POST_CANDIDATE_PROFILE_CANONICAL_JD_SOFTWARE_IA_RECHECK_V1 (read-only)
+freshly re-fetched the live JD Software Implementation Analyst posting
+(https://www.jdsoft.com/career-ia.html) after CANDIDATE_PROFILE_HEADING_
+SEMANTIC_SCOPE_V1 landed, and reproduced the same compound-OR degree
+fabrication already solved for the sibling JPM posting: REQ_IA_DEGREE
+("BS in a relevant discipline such as Mathematics or Computer Science OR
+an equivalent combination of education, training, and experience"),
+newly reachable now that its rows correctly classify ENTRY_QUALIFICATION,
+independently resolved NONE/NO_CAPABILITY_COVERAGE and appeared as a
+fabricated hard blocker alongside the genuine REQ_IA_ANALYTICAL gap.
+
+Fix: reused the already-accepted CASE_F single-leaf ANY_OF qualification_
+gate pattern exactly, faithfully. New real fixture `fixtures/jobs/
+CASE_G_JD_SOFTWARE_IA_IMPLEMENTATION_ANALYST/` (jd.txt/job.json/
+structured_extraction.json, freshly captured, byte-identical across two
+independent fetches immediately before authoring) plus a new bounded
+regression section (P1/P2) in `tests/alternative_qualification_branch_
+representation_v1_test.py`. GATE_IA_DEGREE_COMPONENT wraps REQ_IA_DEGREE
+alone; `unmodeled_branches_note` preserves the "equivalent combination"
+branch; no fabricated second leaf; ZERO src/ or schema changes.
+
+Real-control result: REQ_IA_DEGREE moved from an independent hard blocker/
+qualification gap to an honestly UNRESOLVED qualification gate;
+REQ_IA_ANALYTICAL remains the sole, genuine, independent hard blocker;
+overall decision REJECT unchanged; REQ_IA_RDBMS_PLUS remains PREFERRED and
+non-blocking. Test-first reproduction (P1) confirmed the defect against
+the ungated fixture state before the gate was authored. Non-regression:
+CASE_F (JD Software JPM), CASE_D/CASE_E (MBTA), CASE_C (MIT LL),
+Atominvest, and all 15 Job Analysis Golden fixtures unchanged.
+
+Independent Cursor adversarial review:
+SAFE_TO_COMMIT_JD_SOFTWARE_IA_ALTERNATIVE_QUALIFICATION_GATE.
+
+Hosted post-merge evidence (independently verified):
+- run id: 33776919142, event: push, head SHA: 07321f12018980fcc2a392d5590a959fcf1941c1, conclusion: success
+
+Prior closed implementation milestone (superseded as the top Status/
+Closed-task pointer by the block above; record preserved below exactly as
+written):
+
+Status: CLOSED
+Closed task:
+CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE_V1
+Reviewed implementation commit:
+99d5e29f75cbccbc272d66e0ec141dd0e0241df3
+Pull request:
+#5 (https://github.com/bchaush/bora-employer-pipeline/pull/5)
+Merge commit (canonical main):
+c8eda27cd2b9611ca18c95b1a0eb395755ae2855
+Merge parents:
+2c7caaf8be8f5cae7f7d205f1afd0576279f85c7,
+99d5e29f75cbccbc272d66e0ec141dd0e0241df3
+
+Triggering provenance:
+The prior SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY_V1 closure (see
+further below) had left "What We're Looking For" heading recognition as
+an explicit, deliberately-deferred open investigation, not an authorized
+fix. WHAT_WERE_LOOKING_FOR_SEMANTIC_SCOPE_V1 (read-only) designed the
+narrowest truthful rule after external first-party corroboration (VGS,
+Fullscript real postings each cleanly separate a "What You Bring"-style
+qualifications heading from a distinctly-headed "What You'll Do"
+responsibilities section) and JD Software Implementation Analyst row-by-
+row analysis (all 7 real bullets are credential/trait-shaped, zero duty
+verbs).
+
+Fix: a new INTERNAL, non-persisted CANDIDATE_PROFILE_HEADING category in
+`src/requirement_source_role.py` -- weaker than REQUIREMENTS_HEADING,
+recognized only after LEGAL/RESPONSIBILITY/REQUIREMENTS headings fail to
+match. V1 scope deliberately narrow: recognizes ONLY "What We're Looking
+For" / "What We Are Looking For" (the real, faithfully re-verified JD
+Software IA heading, curly-apostrophe-tolerant). A duty-shaped row (
+leading duty verb or future-duty marker) under this heading still
+resolves AMBIGUOUS, stricter than plain REQUIREMENTS_HEADING behavior.
+"What You Bring"/"What You'll Bring"/"Who You Are"/"About You" and other
+synonyms are explicitly NOT recognized in V1 (external evidence showed
+"Who You Are" in particular can carry broad culture/personality content).
+No new persisted `source_semantic_role` enum value. Persisted outputs
+remain exactly ENTRY_QUALIFICATION / ROLE_RESPONSIBILITY / APPLICATION_OR_
+LEGAL_GATE / AMBIGUOUS.
+
+Implementation surface exactly `src/requirement_source_role.py` plus 13
+new test-first cases (W-1 through W-13) in `tests/source_semantic_role_
+qualification_view_v1_test.py`, including deliberate negative scope-lock
+assertions proving "Who You Are"/"About You"/"What You Bring" remain
+unrecognized. Real-control result (read-only downstream check, no
+fixture created in this milestone): JD Software IA's 7 rows correctly
+reclassify ENTRY_QUALIFICATION; decision becomes REJECT via genuine
+REQ_IA_ANALYTICAL/REQ_IA_DEGREE hard blockers (the latter's compound-OR
+fabrication left explicitly deferred to the next milestone, not solved
+here). Zero regression on all 15 golden fixtures and every real fixture.
+
+Independent Cursor adversarial review:
+SAFE_TO_COMMIT_CANDIDATE_PROFILE_HEADING_SEMANTIC_SCOPE.
+
+Hosted post-merge evidence (independently verified):
+- run id: 33774550732, event: push, head SHA: c8eda27cd2b9611ca18c95b1a0eb395755ae2855, conclusion: success
+
+Prior closed implementation milestone (superseded as the top Status/
+Closed-task pointer by the block above; record preserved below exactly as
+written):
+
+Status: CLOSED
+Closed task:
+JD_SOFTWARE_ALTERNATIVE_QUALIFICATION_GATE_APPLICATION_V1
+Reviewed implementation commit:
+fd578b5bcbeee02808a3bd7274f413cdc37d284e
+Pull request:
+#4 (https://github.com/bchaush/bora-employer-pipeline/pull/4)
+Merge commit (canonical main):
+2c7caaf8be8f5cae7f7d205f1afd0576279f85c7
+Merge parents:
+a6a86908c4ecf6056301db10a98f10708ed71fe1,
+fd578b5bcbeee02808a3bd7274f413cdc37d284e
+
+Triggering provenance:
+POST_JD_GATE_REAL_MARKET_END_TO_END_BOTTLENECK_AUDIT_V1-family real-
+control audits, culminating in an architecture investigation
+(ALTERNATIVE_QUALIFICATION_GATE_COVERAGE_COMPLETION_ARCHITECTURE_V1),
+reproduced a live fabricated hard blocker on JD Software's Junior Project
+Manager posting (https://www.jdsoft.com/career-jpm.html, verified live):
+REQ_JDJPM_DEGREE ("BS in a relevant discipline or, an equivalent
+combination of education, training, and experience") independently
+resolved NONE and hard-blocked despite the employer explicitly permitting
+an alternative route.
+
+Fix: reused the already-closed ALTERNATIVE_QUALIFICATION_BRANCH_
+REPRESENTATION_V1 (CASE_D/CASE_E) qualification_gate architecture
+unchanged. New real fixture `fixtures/jobs/CASE_F_JD_SOFTWARE_JPM_
+JUNIOR_PROJECT_MANAGER/` plus a new bounded regression section (O1/O2) in
+`tests/alternative_qualification_branch_representation_v1_test.py`.
+GATE_JDJPM_DEGREE_COMPONENT wraps REQ_JDJPM_DEGREE alone in a single-leaf
+ANY_OF gate; `unmodeled_branches_note` preserves the unquantified
+"equivalent combination" branch; no fabricated second leaf; ZERO src/ or
+schema changes. One Cursor-flagged M-01 correction applied before final
+commit: `job.json`'s `employment_type` corrected from an unsupported
+"FULL_TIME" to "UNKNOWN" (the source does not state an employment type).
+
+Real-control result: REQ_JDJPM_DEGREE moved from an independent hard
+blocker/qualification gap to an honestly UNRESOLVED qualification gate;
+REQ_JDJPM_PM_EXPERIENCE remains the sole, genuine, independent hard
+blocker; overall decision REJECT unchanged. Non-regression: CASE_D/CASE_E
+(MBTA), CASE_C (MIT LL), Atominvest, and all 15 Job Analysis Golden
+fixtures unchanged.
+
+Independent Cursor adversarial review (post-correction):
+SAFE_TO_COMMIT_JD_SOFTWARE_GATE_APPLICATION.
+
+Hosted post-merge evidence (independently verified):
+- run id: 33714772117, event: push, head SHA: 2c7caaf8be8f5cae7f7d205f1afd0576279f85c7, conclusion: success
+
+Prior closed implementation milestone (superseded as the top Status/
+Closed-task pointer by the block above; record preserved below exactly as
+written):
+
+Status: CLOSED
+Closed task:
 SOURCE_SEMANTIC_ROLE_THRESHOLD_COUNTING_PARITY_V1
 Reviewed implementation commit:
 c76916df625b1ebaf2e29e7bbcb7bfc41799e3c7
