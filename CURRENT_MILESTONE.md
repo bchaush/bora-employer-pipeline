@@ -10,6 +10,100 @@ b05c39022f791e3b6ef3f605f535a66620cd7c2a
 Canonical ADR:
 docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md
 
+Governance record (not a product implementation milestone; Status above
+remains CLOSED; supersedes the historical BRANCH_PROTECTION_UNVERIFIED
+text further below in this file for CURRENT branch-enforcement truth --
+see chronology):
+
+MAIN_BRANCH_PROTECTION_AND_MERGE_ENFORCEMENT_AUDIT_V1:
+MINIMAL_ENFORCEMENT_ARCHITECTURE_JUSTIFIED (read-only audit; independently
+verified at its own audit baseline that main was unprotected, required-
+status-check enforcement was off, and repository rulesets were empty).
+
+MAIN_BRANCH_PROTECTION_AND_MERGE_ENFORCEMENT_V1:
+SETTINGS_APPLIED_AND_VERIFIED.
+
+Chronology (so a fresh reader does not mistake historical assurance text
+for current branch-enforcement state):
+1. At REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1 closure (recorded
+   below in this file), branch enforcement was BRANCH_PROTECTION_UNVERIFIED
+   -- true at that time; that milestone verified reproducible assurance
+   only, not branch enforcement, and explicitly said so.
+2. MAIN_BRANCH_PROTECTION_AND_MERGE_ENFORCEMENT_AUDIT_V1 later superseded
+   that epistemic state by directly, independently re-verifying at its own
+   audit baseline that no enforcement existed (main unprotected; classic
+   required-status-check enforcement off; repository rulesets = []).
+3. MAIN_BRANCH_PROTECTION_AND_MERGE_ENFORCEMENT_V1 then created and
+   independently verified an active minimal repository ruleset. CURRENT
+   state: main is protected by that ruleset, not by classic branch
+   protection (classic branch-protection configuration remains a separate,
+   still-unused mechanism). GitHub's branch metadata now reports
+   protected=true precisely because it is protected by a ruleset.
+
+Live enforced architecture (independently verified against the GitHub API,
+not merely trusted from any prior instruction):
+- Ruleset name: main-minimal-enforcement, ID 22154366.
+- Target: refs/heads/main only.
+- Enforcement: active. Bypass actors: none. current_user_can_bypass: never.
+- Deletion of main blocked.
+- Force pushes / non-fast-forward updates to main blocked.
+- Pull request required to change main.
+- Required approving reviews: 0.
+- CODEOWNERS review not required. Last-push approval not required.
+  Review-thread resolution not required.
+- Required status check: verify, source/integration GitHub Actions
+  (integration_id 15368) -- independently confirmed against a live check
+  run on commit 777423af7b190d36763abf605a7c6c3ff6adf5d0.
+- strict_required_status_checks_policy: false (loose mode -- the PR head
+  must pass verify; it does not need to be updated with the latest main
+  first).
+- Intentionally NOT required: signed commits, CODEOWNERS, merge queue,
+  linear history, GitHub-approving review, strict/up-to-date branch
+  requirement -- each evaluated and omitted as unnecessary ceremony for a
+  single-collaborator repository, closing no real additional risk.
+- Platform-populated field require_extra_approval_for_unattributed_changes
+  = true: this governs unattributed Copilot pull requests (a Copilot-
+  authored PR not opened on behalf of a person), not commit signatures or
+  authorship verification -- it is not an added human review gate.
+  Adjudication: ACCEPTABLE_PLATFORM_DEFAULT_NO_SEMANTIC_EFFECT, because
+  GitHub's own documentation states this field has no effect when
+  required_approving_review_count = 0, which this ruleset sets. Do not
+  read this field as an unsigned-commit or authorship-signature
+  requirement -- it is not.
+- Bora retains final merge action and full settings/admin access
+  (independent of the ruleset's own bypass-actor list, which is empty) --
+  admin ruleset edit/disable remains available for genuine emergency
+  recovery, distinct from any routine merge-time bypass, of which none
+  exists.
+
+Fork contributor workflow approval policy:
+FORK_PR_CONTRIBUTOR_APPROVAL_POLICY = UNVERIFIED_REPO_SPECIFIC_VALUE.
+Not retrievable via REST or GraphQL API in this environment (UI-only
+GitHub setting); not modified; not inferred from GitHub's documented
+default. This UNKNOWN is orthogonal to the ruleset above: it governs
+whether an external contributor's fork PR workflow run may execute at
+all, while the ruleset governs whether main may be updated once a PR
+exists.
+
+New canonical development workflow (governance/process record, not a
+claim about GitHub's own enforcement capability):
+bounded branch -> independent Cursor adversarial review against the
+consequential uncommitted diff -> authorized commit to the bounded branch
+-> push the bounded branch -> pull request -> required GitHub Actions
+verify check -> Bora final merge -> main. GitHub mechanically enforces
+only: PR association for changes to main, the required verify check and
+its bound source (GitHub Actions / integration 15368), no force push, and
+no main deletion. GitHub does NOT mechanically verify that Cursor reviewed
+the diff, that any agent stayed in authorized scope, or that Bora's
+semantic adjudication was correct -- those remain process/governance
+invariants, not GitHub-enforced facts.
+
+This governance record does not select, open, or imply a new PRODUCT
+implementation milestone. The Status/Closed-task pointer at the top of
+this file remains authoritative. PURSUIT_APPROVAL_BOUNDARY_ARCHITECTURE_V1
+(recorded separately below) remains ARCHITECTURE ACCEPTED / IMPLEMENTATION
+DEFERRED, unaffected by this governance record.
+
 Implementation commit provenance:
 Parent authorization SHA 4a5ea68736f4c82274283ff154c7e53492320fba; commit
 message "REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1: implement
