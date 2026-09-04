@@ -19,6 +19,31 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-04 — Bora-specific hiring relevance (`BORA_SPECIFIC_HIRING_RELEVANCE_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+`BORA_SPECIFIC_HIRING_RELEVANCE_V1`'s representation-and-routing audit found the four-axis operating model (Qualification Truth / Competitive Position / Opportunity Value / Pursuit Economics) had no shared vocabulary for candidate-specific hiring relevance, so every role was manually re-reasoned from scratch, with no distinction between comparison-pool alignment and seniority, or between institutional hiring relevance and network/access leverage.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.7 → v3.8; new locked Section 136 records Bora-specific hiring relevance as a structured component of Competitive Position: Tier A (functional evidence overlap, comparison-pool alignment as distinct from seniority, realistic seniority, early-career/recent-graduate targeting, degree/program alignment, coherent narrative), Tier B (early-talent behavior, U.S. context, geography compatibility, established OPT compatibility), Tier C (three-strength institutional-affinity ladder: generic familiarity / demonstrated recruiting relationship / recent function-specific hiring), explicit separation of hiring relevance from network/access leverage, contextual-experience-transfer guidance (functional fit over employer-type similarity), an explicit weak-signals list, a non-compensation rule (relevance never overrides a hard qualification/actionability/legal/OPT/credential blocker), a fake-precision prohibition (no scores/weights/percentages), an explicit unchanged-architecture list, and a conceptual-only résumé connection note.
+* `AGENTS.md`: one concise operational pointer paragraph added, cross-referencing §136 — no restatement of the full doctrine.
+
+**Not changed**
+
+`CURRENT_MILESTONE.md` (no product implementation milestone selected); `CLAUDE.md`; `schemas/`; `src/`; `tests/`; `fixtures/`; `claims/`; `evidence/`; `experiences/`; `resume/`; networking code; `.cursor/rules/`; Qualification Truth runtime logic; lane/decision routing; hard-blocker logic; `initial_opt_relevance`/`future_stem_quality`; source-verification/role-status independence; the Pursuit Approval Boundary.
+
+**Validation**
+
+Documentation-only. `git diff --check` clean.
+
+**Status**
+
+`BORA_SPECIFIC_HIRING_RELEVANCE_V1_DOCUMENTATION_CLOSED`.
+
+---
+
 ## 2026-09-03 — Live role verified actionability gate (`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1`, DOCUMENTATION ONLY)
 
 **Reason**
