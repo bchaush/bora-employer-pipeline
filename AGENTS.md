@@ -38,6 +38,9 @@ This applies to live career operations, not only implementation work: before mea
 
 Cheap preliminary fit triage against discovery/index evidence is allowed before first-party verification (`BLUEPRINT.md` §135's `DiscoveryLead` → triage → gate → pursuit chain) — the gate applies before treating a role as actionable, not before any fit analysis. "Successfully established" requires the exact requisition to load as the matching current role/requisition identity and to satisfy the current-actionability test defined in `BLUEPRINT.md` §135 — not merely that a discovery/index source (including an employer-owned indexed/search snippet or stale ATS index) shows the requisition exists.
 
+## Bora-Specific Hiring Relevance
+Operational pointer: `BLUEPRINT.md` §136 locks Bora-specific hiring relevance as a structured component of Competitive Position (not a fifth truth axis, not a schema field, not a score). Comparison-pool alignment is distinct from seniority; institutional-affinity strength is tiered; network/access leverage is a separate concept from hiring relevance. Positive relevance signals never override a hard qualification blocker, a failed §135 actionability gate, or any legal/OPT/credential blocker. No numeric scores or weights — see §136 for the full doctrine.
+
 ## Approved Claim Is Not an Automatic Capability Mapping
 An approved Claim does not automatically become an EvidenceMatch capability mapping merely because the Claim exists. Capability mapping requires its own supported/authorized basis. Do not automatically wire MM/TELUS or any other approved Claim to capabilities.
 

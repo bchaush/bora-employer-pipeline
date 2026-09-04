@@ -1,10 +1,46 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-09-03 (LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1)
+Updated: 2026-09-04 (BORA_SPECIFIC_HIRING_RELEVANCE_V1)
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.7**.
+Governing Blueprint: **Final Locked Blueprint v3.8**.
+
+Bora-specific hiring relevance (`BORA_SPECIFIC_HIRING_RELEVANCE_V1`) —
+governance/documentation milestone, not a product implementation
+milestone. Triggering audit (`BORA_SPECIFIC_HIRING_RELEVANCE_V1`
+representation-and-routing audit) found the existing four-axis operating
+model (Qualification Truth / Competitive Position / Opportunity Value /
+Pursuit Economics) had no shared vocabulary for candidate-specific hiring
+relevance. `BLUEPRINT.md` bumped v3.7 → v3.8; new locked Section 136
+records Bora-specific hiring relevance as a structured component of
+Competitive Position -- not a fifth truth axis, not a qualification
+field, not a numeric score, and never a runtime hard blocker. Locks:
+comparison-pool alignment as distinct from seniority (who the employer is
+intentionally comparing Bora against -- recent-graduate/early-career/0-2
+targeting -- not a title check); a three-strength institutional-affinity
+ladder (generic familiarity / demonstrated recruiting relationship /
+recent function-specific hiring); explicit separation of institutional
+hiring relevance from network/access leverage (`network_action` not
+redesigned); contextual-experience-transfer guidance (functional fit
+over mechanical employer-type similarity); a weak-signals list (prestige,
+generic alumni presence, keyword/applicant counts, title similarity
+without functional overlap, Simplify/ATS scores); a non-compensation rule
+(relevance signals may compound but never override a hard qualification
+blocker, a failed §135 actionability gate, or any legal/OPT/credential
+blocker); a fake-precision prohibition (no numeric scores, weights,
+percentages, or point systems); an explicit unchanged-architecture list
+(Qualification Truth runtime logic, lane/decision routing, hard-blocker
+logic, the Job schema, `initial_opt_relevance`/`future_stem_quality`,
+source-verification/role-status independence, the Pursuit Approval
+Boundary); and a conceptual-only résumé-connection note (future
+selection/emphasis among already-approved truthful content only, never
+Candidate Truth, immutable fields, or the locked visual standard).
+`AGENTS.md` gained one concise operational pointer paragraph -- no
+restatement of the full doctrine. No schema, `src/`, test, fixture, or
+networking-code change was made or authorized; no scoring engine or
+ranking algorithm was built. `CURRENT_MILESTONE.md` unaffected; no new
+product implementation milestone is selected.
 
 Live role verified actionability gate
 (`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1`) — governance/operating-

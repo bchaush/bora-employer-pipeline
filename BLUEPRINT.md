@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.7**
+**Final Locked Blueprint v3.8**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -3892,4 +3892,124 @@ not erase historical Employer Truth already captured, historical
 qualification analysis already performed, or Submitted Application Truth
 for a prior, genuinely-verified application. Only current actionability
 changes.
+
+**136. BORA-SPECIFIC HIRING RELEVANCE — BORA_SPECIFIC_HIRING_RELEVANCE_V1 (LOCKED)**
+
+Serious roles are evaluated through four axes: **Qualification Truth**
+(can Bora credibly pursue this at all), **Competitive Position**
+(how naturally does Bora fit this specific employer/role/recruiting
+context, given career stage and comparison pool), **Opportunity Value**,
+and **Pursuit Economics**. The four axes organize pursuit judgment. They
+do not replace §5's locked optimization hierarchy or §132's five-layer
+truth model. Competitive Position may inform §5's realistic-hiring-
+probability judgment, but it is not a score, probability, or fifth truth
+axis. Bora-specific hiring relevance is a **structured component of
+Competitive Position** — not a fifth truth axis, not a qualification
+field, not a probability, not a numeric score, and never a runtime hard
+blocker. Qualification establishes whether Bora can credibly pursue;
+hiring relevance strengthens Competitive Position and helps determine
+pursuit priority among already-viable roles. Relevance alone never
+determines where Bora spends his time — Opportunity Value and Pursuit
+Economics remain independent, unreplaced considerations, and §5 remains
+the governing hierarchy when factors conflict.
+
+**The question this doctrine answers.** How naturally does this specific
+employer, role, recruiting context, career stage, and Bora's verified
+evidence combine into a coherent hiring case for Bora?
+
+**Tier A — core relevance.** Strong functional evidence overlap (readable
+directly from existing `EvidenceMatch`/`major_gaps` output — no new field
+needed); comparison-pool alignment (see below); realistic seniority;
+explicit recent-graduate/early-career/0-2-year targeting; degree/program
+alignment; a coherent evidence-to-JD narrative.
+
+**Comparison-pool alignment is a distinct concept from seniority.**
+Seniority detection (already locked, `job_decision.py`) asks whether a
+posting's *language* signals an advanced level, and functions only as a
+negative/disqualifying signal. Comparison-pool alignment asks a different
+question: who is this employer intentionally comparing Bora against?
+Positive comparison-pool evidence includes: recent graduate; a named
+graduating class (e.g. "Class of 2026"); new graduate; "master's
+graduates welcomed"; 0-1 or 0-2 years; an analyst/associate development
+program; campus recruiting; explicit early-career hiring language. This
+is not a title check — a role explicitly targeting recent graduates/0-2
+years may be materially more relevant to Bora than a superficially
+similar role requiring 2-4 or 3-5 years, because the comparison pool
+differs. Never converted into numeric weights.
+
+**Tier B — strong supporting relevance.** Demonstrated employer
+early-talent hiring behavior; relevant U.S. experience context;
+geography/employment-arrangement compatibility with Bora's immediate
+objective; explicit employer OPT compatibility when actually established
+(silence remains UNKNOWN, never positive — unchanged from existing
+immigration-evidence doctrine).
+
+**Tier C — institutional/contextual relevance.** Brandeis affinity is
+differentiated by evidence strength, not treated as one signal: (1)
+generic employer familiarity ("Brandeis graduates work there") — weak,
+supporting only; (2) a demonstrated recruiting relationship (the employer
+actively recruits through Brandeis, Handshake, events, or fairs) —
+stronger; (3) recent program/function-specific hiring (the employer
+recently hired Brandeis IBS/Business Analytics graduates into relevant
+functions) — the strongest institutional-affinity signal. Strength
+increases with recency, directness, and role-family specificity. Never
+interpreted as "Brandeis affinity means the employer prefers Bora" — the
+correct reading is lower institutional unfamiliarity, a demonstrated
+recruiting pathway, and potentially a stronger contextual/access signal.
+
+**Institutional hiring relevance and network/access leverage remain
+separate concepts, never collapsed.** Institutional hiring relevance
+(above) affects Competitive Position. Network/access leverage — a
+relevant alumnus, a recruiter contact, a referral path, hiring-manager
+insight, an informational-interview opportunity — is a separate concept
+entirely; a relevant alumnus may improve access while proving nothing
+about qualification or employer preference. `network_action`'s own
+representation is not redesigned by this milestone.
+
+**Contextual experience transfer is not mechanical employer-type
+similarity.** Winter Walk nonprofit experience does not mean nonprofits
+are automatically strong targets. The question is whether Bora's prior
+context makes his evidence easier for the target employer to understand
+as relevant: "nonprofit + implementation/workflows/UAT" may matter;
+"nonprofit + unrelated fundraising role" carries little or no relevance
+benefit. Functional overlap remains primary.
+
+**Weak signals only (never primary, never compensating):** prestige;
+generic alumni presence; keyword counts; applicant counts; title
+similarity without functional overlap; Simplify/ATS match scores.
+
+**Non-compensation rule.** Positive relevance signals may compound with
+each other, but never override: a hard qualification blocker; a failed
+current-actionability gate (§135); explicit work-authorization/OPT
+incompatibility; a legal/citizenship/clearance requirement; a required
+credential/certification blocker; required direct technology/domain
+experience with no acceptable alternative; or an application-specific
+blocker. Brandeis affinity cannot upgrade Qualification Truth. Recent-grad
+targeting cannot erase a hard technical blocker. Nonprofit/context overlap
+cannot upgrade Candidate Truth. Network access cannot upgrade
+qualification.
+
+**Fake-precision prohibition.** No numeric relevance scores, arbitrary
+weights, percentages, probabilities, point systems, or fake thresholds.
+Any future quantitative weighting must be earned from Bora-specific
+outcome evidence, never generic internet averages.
+
+**Relationship to existing architecture (unchanged by this milestone).**
+Qualification Truth's deterministic runtime logic; existing lane/decision
+routing; hard-blocker logic; the `Job` schema; `initial_opt_relevance`/
+`future_stem_quality`; source-verification/role-status independence
+(§§19-21); the Pursuit Approval Boundary (`docs/decisions/
+ADR-PURSUIT-APPROVAL-BOUNDARY-V1.md`). This doctrine governs semantic/
+manual Competitive Position assessment now; it may later inform a
+non-blocking runtime representation only if real live-role operation
+earns it under the build-economy gate (§133) — not by default.
+
+**Résumé connection (conceptual only, not implemented here).**
+Bora-specific relevance may later inform selection and emphasis among
+already-approved, truthful résumé content: evidence selection, project
+selection, bullet selection/order, space allocation, summary emphasis,
+skills ordering, and truthful lexical alignment (§48/§134). It must never
+alter Candidate Truth, invent tools or methodologies, bypass approved
+Claim lineage, change immutable dates/titles/employers/education, or
+weaken the locked one-page visual/format standard (§134).
 
