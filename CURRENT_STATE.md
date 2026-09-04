@@ -1,10 +1,44 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-09-03 (REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1 closure)
+Updated: 2026-09-03 (BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1)
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.4**.
+Governing Blueprint: **Final Locked Blueprint v3.5**.
+
+Brandeis MSBA awarded human attestation
+(`BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1`) — Candidate Truth update,
+not a product/governance implementation milestone. Bora explicitly
+attested, 2026-09-03, that his Brandeis MS in Business Analytics is
+officially completed and awarded, all academic requirements complete,
+physical diploma pending receipt (STEM/CIP designation remains not
+independently ingested, unaffected by this attestation). Represented via
+a new, dedicated
+OBSERVED-tier evidence record,
+`evidence/education/EDU_BRANDEIS_AWARDED_ATTESTATION_001.json`
+(experience_id `EXP_EDU_BRANDEIS_001`), mirroring the same human-
+attestation pattern already used for `TELUS_ENDDATE_001` — no new
+evidence-state enum value required. The three pre-existing Brandeis
+documentary evidence records (`EDU_BRANDEIS_IDENTITY_001`,
+`EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) remain byte-
+unchanged; they establish program identity, GPA, and requirements-
+satisfied status only and were never rewritten to assert conferral --
+degree-awarded status now rests on the new attestation record alone, a
+distinct evidentiary tier. `BLUEPRINT.md` bumped v3.4 -> v3.5; Sections
+2 and 131 updated to state the degree is completed/awarded per this
+attestation (superseding, for CURRENT truth only, the prior "degree
+conferral is not independently established" wording those same sections
+carried as of the `REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1`
+closure below -- that record remains accurate history of what was true at
+its own recorded point in time and is not rewritten). The 41-vs-43-unit
+discrepancy between `EDU_BRANDEIS_PROGRESS_001` and `EDU_BRANDEIS_GPA_001`
+remains separately unresolved, unaffected by this update. STEM/CIP
+designation remains not independently ingested, unaffected. `resume/master/
+RESUME_MASTER_WW_V1.json` was inspected and found to require no edit: its
+existing `education[]` entry (`degree_name` "Business Analytics (M.S.)",
+`date_range` "Fall 2025 – Summer 2026") never asserted an "in progress"
+or "expected" state, so it already renders compatibly with awarded status
+without any structural change.
 
 Real-world operation and calibration governance sync
 (`REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1`) = **CLOSED**
@@ -202,7 +236,7 @@ Candidate Source Ingestion v1 (`CANDIDATE_SOURCE_INGESTION_V1`) = **IMPLEMENTED 
 
 Canonical Experience records: **7** (`EXP_WW_001`, `EXP_MM_001`, `EXP_EDU_BRANDEIS_001`, `EXP_TELUS_001`, `EXP_EDU_UNWE_001`, `EXP_DCOMMERCE_001`, `EXP_BULMARMA_001`).
 
-Evidence records: **42** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 3 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`) plus 8 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`, `TELUS_ENDDATE_001`) plus 5 `CANDIDATE_SOURCE_INGESTION_V1` records (`EDU_UNWE_IDENTITY_001`, `DCOMMERCE_EXCEL_001`, `BULMARMA_EXCEL_001`, `DCOMMERCE_REFERENCE_001`, `DCOMMERCE_LINKEDIN_PERIOD_001`); Bora-approved Evidence only (the 5 new candidate-source records are ingested/traceable but not yet independently re-audited).
+Evidence records: **43** — 14 Winter Walk plus 12 MarketMind (`MM_SCOPE_001`–`MM_AUTHOR_001`) plus 4 Brandeis education records (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`, `EDU_BRANDEIS_AWARDED_ATTESTATION_001`) plus 8 TELUS records (`TELUS_OFFER_001`, `TELUS_RECRUITING_001`, `TELUS_LINKEDIN_PERIOD_001`, `TELUS_REVIEW_001`, `TELUS_PATTERN_001`, `TELUS_COLLAB_001`, `TELUS_VOLUME_001`, `TELUS_ENDDATE_001`) plus 5 `CANDIDATE_SOURCE_INGESTION_V1` records (`EDU_UNWE_IDENTITY_001`, `DCOMMERCE_EXCEL_001`, `BULMARMA_EXCEL_001`, `DCOMMERCE_REFERENCE_001`, `DCOMMERCE_LINKEDIN_PERIOD_001`); Bora-approved Evidence only (the 5 candidate-source records are ingested/traceable but not yet independently re-audited; `EDU_BRANDEIS_AWARDED_ATTESTATION_001` is the `BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1` OBSERVED-tier human-attestation record, added 2026-09-03 -- see the dated entry above).
 
 Claim records: **16** total — 13 `human_approval=true`/`reusable=true` *(corrected at TELUS approval time — Cursor F-01 finding: this line had gone stale after the Education/TELUS-evidence milestones; it previously still said 11)* — 6 Winter Walk approved reusable claims (`CLAIM_WW_001`–`CLAIM_WW_006`) plus 5 MarketMind claims (`CLAIM_MM_001`–`CLAIM_MM_005`) whose exact existing wording Bora explicitly approved on 2026-08-28 (`CLAIM_MM_001`–`004` `evidence_state=VERIFIED`; `CLAIM_MM_005` `evidence_state=OBSERVED`, reusable per the existing, unmodified `REUSABLE_CLAIM_STATES` rule — the same rule that already made `CLAIM_WW_005` reusable) plus 2 TELUS claims (`CLAIM_TELUS_001`–`CLAIM_TELUS_002`, both `evidence_state=OBSERVED`, reusable per the same rule) whose revised final wording Bora explicitly approved on 2026-08-28 — plus 3 new draft claims (`CLAIM_EDU_UNWE_001`, `CLAIM_DCOMMERCE_001`, `CLAIM_BULMARMA_001`), all `human_approval=false`/non-reusable, excluded from matching. Approval covers only the exact stored wording, subject to cited substantive Evidence and existing Claim boundaries; it does not establish sole/exclusive/unaided authorship, production use, business outcomes, or an employment relationship. Five human-approved MarketMind résumé modules (`MOD_MM_001_SCOPE`–`MOD_MM_005_TESTING`) now exist in the protected master (`resume/master/RESUME_MASTER_WW_V1.json`, version 6, 11 total modules) and are available for controlled, explicit selection; they are not in `default_module_order` and are therefore not automatically included in any derivative. No job-specific résumé has yet been generated.
 

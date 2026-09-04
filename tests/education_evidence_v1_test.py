@@ -49,7 +49,7 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 7, "Experience count must be 7 (Winter Walk, MarketMind, Brandeis education, TELUS, undergraduate education, D Commerce, Bulmarma)")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 42, "Evidence count must be 42 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records: undergraduate identity, D Commerce Excel, Bulmarma Excel + 2 human-source-resolution records: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001)")
+assert_true(len(ev_result["index"]) == 43, "Evidence count must be 43 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records: undergraduate identity, D Commerce Excel, Bulmarma Excel + 2 human-source-resolution records: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001 + 1 Brandeis MSBA awarded attestation record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
 assert_true(claim_result["records_checked"] == 16, "Claim count must be 16 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims: undergraduate, D Commerce, Bulmarma) -- Brandeis education itself adds no Claims")
@@ -128,7 +128,7 @@ print("PASS 5: Education present and correctly formatted in the test-only render
 #    sentence, e.g. "does not establish STEM/CIP designation" -- that is the
 #    correct, intentional way to record NOT_VERIFIED, not a violation.)
 edu_evidence_records = [record for eid, record in EVIDENCE_INDEX.items() if eid.startswith("EDU_")]
-assert_true(len(edu_evidence_records) == 4, f"expected exactly 4 education Evidence records (3 Brandeis + 1 undergraduate), got {len(edu_evidence_records)}")
+assert_true(len(edu_evidence_records) == 5, f"expected exactly 5 education Evidence records (4 Brandeis + 1 undergraduate), got {len(edu_evidence_records)}")
 asserted_fact_text = " ".join(record["fact"] for record in edu_evidence_records)
 asserted_fact_text += " " + json.dumps(MASTER["education"]) + " " + json.dumps(edu_experience.get("experience_name", "")) + " " + render_result["text"]
 assert_false("STEM" in asserted_fact_text, "no STEM designation may appear in any asserted fact, master data, or rendered output")

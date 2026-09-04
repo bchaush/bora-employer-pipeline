@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.4**
+**Final Locked Blueprint v3.5**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -95,13 +95,20 @@ The system should **not** remove Bora from consequential decisions.
 
 Every agent must understand why Bora is searching.
 
-Bora's current evidence supports that all requirements for the:
+Bora's:
 
-**Brandeis MS in Business Analytics (STEM)**
+**Brandeis MS in Business Analytics**
 
-are satisfied. Degree conferral is **not** independently established in
-current evidence and must not be asserted or silently upgraded unless
-supported by updated evidence.
+is officially completed and awarded, per Bora's direct human attestation
+dated 2026-09-03 (`evidence/education/EDU_BRANDEIS_AWARDED_ATTESTATION_001.json`,
+`evidence_state=OBSERVED`) — all academic requirements are complete; the
+physical diploma has not yet been received. This attestation-tier fact is
+distinct from, and does not retroactively upgrade, the separate
+documentary transcript/progress-screen evidence (`EDU_BRANDEIS_IDENTITY_001`,
+`EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`), which on its own
+establishes only program identity, GPA, and requirements-satisfied status,
+never conferral. A future official diploma or registrar record may
+strengthen or supersede this attestation tier.
 
 His strongest current organizational evidence is:
 
@@ -3484,11 +3491,12 @@ Use this whenever a new build agent/session needs context:
 **You are working on Bora Employer Pipeline OS. Before doing any work,
 read BLUEPRINT.md and the applicable repository rules. BLUEPRINT.md is
 the project's authoritative source of truth. The system is being built
-specifically for Bora Chaush, for whom current evidence supports that all
-requirements for the Brandeis MS in Business Analytics (STEM) are
-satisfied (degree conferral is not independently established and must
-not be asserted or silently upgraded unless supported by updated
-evidence), seeking legitimate U.S. employment quickly while building toward
+specifically for Bora Chaush, who holds a completed, awarded Brandeis MS
+in Business Analytics per his own direct human attestation dated
+2026-09-03 (physical diploma pending receipt; STEM/CIP designation
+remains not independently ingested; see
+`evidence/education/EDU_BRANDEIS_AWARDED_ATTESTATION_001.json`),
+seeking legitimate U.S. employment quickly while building toward
 Reliable AI-Enabled Business Systems — BUILD → VERIFY → OPERATE. The
 Evidence Repository, not Bora's résumé and not model memory, is the
 factual source of truth. Never invent experience, tools, metrics,
