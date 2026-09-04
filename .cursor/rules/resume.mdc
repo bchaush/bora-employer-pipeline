@@ -201,7 +201,25 @@ Before export, validate relevant structural rules including:
 * excessive line growth;
 * export success.
 
-Do not solve overflow by making the document unreadably small.
+Do not solve overflow by making the document unreadably small — this
+includes crushing margins, not only shrinking font size.
+
+## Resume Reference Visual Standard
+
+Operational reference: `BLUEPRINT.md` §134 (`RESUME_REFERENCE_STANDARD_V1`)
+records the full fixed visual/QA contract extracted from Bora's approved
+reference PDF, `Bora_Chaush_MGB_Application_Analyst_I_Resume_REFERENCE_v1.pdf`
+(one-page default at Bora's current career stage, one column, restrained
+black-and-white design, thin section-rule headings, no graphics/sidebars/
+icons/skill-bars, PDF as the canonical submission artifact, functional
+short-label hyperlinks) — not restated here in full. Before treating any
+résumé PDF as submission-ready, apply that section's QA checklist:
+one-page-default overflow, clipping/overlap,
+plain-text extraction/read-order, hyperlink-destination verification, and
+a final human look at the actual rendered PDF. This is a manual QA
+checklist today, not automated tooling — no generator or validator
+implementation is authorized merely because this standard exists (see
+`BLUEPRINT.md` §134 Non-Goals and §133's build-economy gate).
 
 ## Application-Specific Outputs
 

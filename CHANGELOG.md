@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-03 — Résumé reference visual standard (`RESUME_REFERENCE_STANDARD_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+Bora approved `Bora_Chaush_MGB_Application_Analyst_I_Resume_REFERENCE_v1.pdf` as the authoritative visual/reference exemplar for the Career OS résumé standard; the repeatable quality contract it represents needed to be locked into canonical governance before any future generator work is considered.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.5 → v3.6; new locked Section 134 records the fixed visual/QA contract (page format, margins, typography hierarchy, hyperlink rule, PDF-as-canonical-artifact, manual QA checklist) and ten content-quality principles (Evidence Budget, Role-Specific Narrative Density, Human Resonance, Employer Confidence Signals, Interview Expandability, Recruiter Inference Audit, Justified Curiosity, Truthful Lexical Alignment, "completed-execution results are legitimate," "skills summarize proof") — explicitly extending, not restating, the existing Sections 44-51 content-architecture doctrine.
+* `.cursor/rules/resume.mdc`: added a short pointer section to the new Blueprint doctrine, and extended the existing overflow rule to explicitly cover margins, not only font size.
+* `CURRENT_STATE.md`: new paragraph recording this closure.
+
+**Not changed**
+
+`CURRENT_MILESTONE.md` (no product implementation milestone selected); `AGENTS.md`; `CLAUDE.md`; production/matching/qualification code; schemas; Candidate Truth; Employer Truth; the protected résumé master; any résumé generator, DOCX tooling, or ATS-scoring implementation. The binary reference PDF is not stored in the repository, consistent with existing practice for Bora-supplied source documents.
+
+**Validation**
+
+Documentation-only. `git diff --check` clean.
+
+**Status**
+
+`RESUME_REFERENCE_STANDARD_V1_DOCUMENTATION_CLOSED`.
+
+---
+
 ## 2026-09-03 — Brandeis MSBA awarded human attestation (`BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1`, CANDIDATE TRUTH)
 
 **Reason**
