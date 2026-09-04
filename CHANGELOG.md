@@ -19,6 +19,31 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-03 — Live role verified actionability gate (`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+Two reproduced live-market stale-role failures (Mass General Brigham RQ4055007; Fresenius Medical Care R0266808, where employer-owned indexed Workday evidence appeared sufficient but the exact requisition returned "The page you are looking for doesn't exist" when actually opened) showed `LIVE_APPLICATION_FIRST_PARTY_EXECUTION_RULE_V1` remained operationally ambiguous between "first-party discovery/index evidence exists" and "exact current requisition is actually actionable."
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.6 → v3.7; new locked Section 135 sharpens the existing Direct-Source Rule (§19), Role Freshness (§20), Ghost/Stale Role Detection (§21), and Discovery-boundary (§133) doctrine: cheap preliminary triage remains allowed before verification; `VERIFIED_LIVE` requires the exact current requisition to load as the matching current role identity AND provide a current actionable application route/status, not merely be indexed; discovery/index evidence (including employer-owned indexed/search snippets and stale ATS indexes) never alone establishes actionability; failure examples recorded; historical Employer/qualification/Application Truth explicitly preserved when the gate fails; no new posting-state axis or enum created.
+* `AGENTS.md`: extended the existing Fresh First-Party Employer Source Rule section with one concise clarifying paragraph — no restatement of Blueprint doctrine.
+
+**Not changed**
+
+`CURRENT_MILESTONE.md` (no product implementation milestone selected); `CLAUDE.md`; `src/`; `schemas/`; `tests/`; `fixtures/`; `claims/`; `evidence/`; `experiences/`; `resume/`; posting-state enums; automation/crawling/scraping code.
+
+**Validation**
+
+Documentation-only. `git diff --check` clean.
+
+**Status**
+
+`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1_DOCUMENTATION_CLOSED`.
+
+---
+
 ## 2026-09-03 — Résumé reference visual standard (`RESUME_REFERENCE_STANDARD_V1`, DOCUMENTATION ONLY)
 
 **Reason**
