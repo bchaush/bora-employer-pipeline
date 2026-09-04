@@ -14,6 +14,8 @@ from requirement_source_role import (
     CITIZENSHIP_CLEARANCE_JD_CONSUMER_PATTERN,
     derive_qualification_gate,
 )
+from experience_range import parse_generic_experience_range
+from domain_qualified_duration import parse_domain_qualified_duration
 
 
 SUPPORTED_ROLE_FAMILY_TOKENS = (
@@ -356,6 +358,196 @@ def apply_posting_state_routing(
         "BOTH role_status=VERIFIED_LIVE AND source_verification_status="
         "VERIFIED_DIRECT; qualification result unchanged)."
     ).strip()
+    return result
+
+
+_RECRUITER_THRESHOLD_LOWER_BOUND_MIN = 2
+
+
+def apply_recruiter_threshold_guard(
+    *,
+    base_result: Mapping[str, Any],
+    requirements: Sequence[Mapping[str, Any]],
+    matches: Sequence[Mapping[str, Any]],
+    gated_requirement_ids: frozenset[str] = frozenset(),
+) -> dict[str, Any]:
+    """BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1: pursuit/surfacing-economics
+    downgrade-only guard, strictly AFTER decide_lane_and_decision() and
+    apply_posting_state_routing() have already produced their result.
+
+    Root cause this function exists to fix: experience_range.py and
+    domain_qualified_duration.py correctly and deliberately return UNKNOWN
+    (never a fabricated NONE) for an explicit numeric experience-threshold
+    requirement, because no canonical candidate-duration fact exists in
+    this repository. But decide_lane_and_decision()'s threshold counters
+    (`none`, `strong_or_supported`, `partial`) are blind to UNKNOWN --  an
+    UNKNOWN mandatory-HIGH row contributes to none of them, so it exerts
+    zero friction on PRIORITY_APPLY/APPLY routing. When Bora's evidence is
+    otherwise strong, this silently promotes a role whose real recruiter
+    threshold (e.g. "2-4 years of work experience", reproduced live at
+    Bose Professional -- IT Business Analyst) was never actually resolved
+    one way or the other.
+
+    This function does NOT touch Qualification Truth, does NOT compute or
+    infer a candidate experience duration, and does NOT convert UNKNOWN
+    into NONE. It only caps how favorably an already-computed APPLY-like
+    decision may be SURFACED for pursuit purposes, mirroring
+    apply_posting_state_routing()'s own downgrade-only pattern exactly:
+
+      - only an incoming decision of PRIORITY_APPLY, APPLY, or
+        EFFICIENT_APPLY may be touched; WATCH, REJECT, and UNDECIDED are
+        returned unchanged -- this guard can never introduce REJECT and
+        never upgrades anything (permanent invariant: a threshold guard
+        may only make pursuit more conservative, never more favorable).
+        BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1 CURSOR CORRECTION: EARLIER
+        drafts of this guard excluded EFFICIENT_APPLY from its early
+        return, treating it as a universal floor this guard only ever
+        caps DOWN TO and never itself touches. That was wrong for the
+        >=3 tier specifically: an already-EFFICIENT_APPLY role with an
+        unresolved mandatory lower_bound>=3 threshold must still be
+        downgraded to WATCH (the >=3 tier consumes ALL APPLY-like
+        decisions, EFFICIENT_APPLY included) -- otherwise a role could
+        reach EFFICIENT_APPLY by some other path (e.g. a material
+        preferred gap) and then silently dodge the >=3 tier's own
+        conservative ceiling purely by already sitting at the exactly-2
+        tier's floor. EFFICIENT_APPLY is now included in the incoming-
+        decision check; see the exactly-2/>=3 tier logic below for the
+        precise per-tier behavior on each incoming decision;
+      - a requirement is examined only when importance=="MANDATORY" (a
+        formally PREFERRED numeric threshold does not trigger this guard
+        -- PREFERRED != CENTRAL is a judgment left to semantic review, not
+        this deterministic gate) and its requirement_id is NOT in
+        gated_requirement_ids (an alternative-qualification-branch row is
+        already authoritatively represented by the existing
+        qualification_gate architecture; this guard never re-litigates
+        that);
+      - a requirement triggers the guard only when its EvidenceMatch
+        result=="UNKNOWN" AND evaluation_path is exactly
+        "EXPERIENCE_RANGE_EVALUATOR" or "DOMAIN_QUALIFIED_DURATION_EVALUATOR"
+        -- i.e. only the two existing, unmodified, deliberately-narrow
+        evaluators' own honest-UNKNOWN output, never any other UNKNOWN
+        source, and never a positively-established STRONG/SUPPORTED
+        result (explicit supported satisfaction is never downgraded
+        merely because a number appears in the JD);
+      - the requirement's own `text` is re-parsed with the existing,
+        unmodified parse_generic_experience_range()/
+        parse_domain_qualified_duration() functions (the exact same
+        parsers each evaluator already used to reach its own UNKNOWN) to
+        read the employer's own stated lower_bound -- this is Employer
+        Truth already captured, never a computed/inferred candidate fact;
+      - lower_bound <= 1 (covers "0-2" -- no guard from years alone -- and
+        "1-3", left explicitly case-by-case/discretionary, not an
+        automatic trigger) never triggers the guard;
+      - lower_bound == 2 exactly (covers "2-4" -- a RANGE parse's
+        lower_bound, the Bose-style THRESHOLD STRETCH case) caps
+        PRIORITY_APPLY/APPLY down to EFFICIENT_APPLY; an incoming
+        EFFICIENT_APPLY is left unchanged (already at or below this
+        tier's own ceiling -- there is nothing further to downgrade to
+        for this tier alone, absent a >=3 row);
+      - lower_bound >= 3 (covers "3+", "5+", "6+", "7+", "8+", "10+",
+        etc. alike -- outside Bora's normal serious-pursuit pool per the
+        locked operating calibration) caps PRIORITY_APPLY, APPLY, AND
+        EFFICIENT_APPLY alike down to WATCH, the existing canonical
+        conservative non-APPLY state -- this tier consumes every
+        APPLY-like decision, never REJECT (this guard still never
+        introduces REJECT).
+        BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1 CORRECTION (second
+        post-review pass): V1 of this guard capped every lower_bound>=2
+        identically at EFFICIENT_APPLY. That fixed the monotonicity
+        defect (no threshold routed more favorably than a smaller one)
+        but under-corrected severity: an otherwise-strong, unkeyworded
+        "10+ years of work experience" role could still remain
+        APPLY-like (at EFFICIENT_APPLY), which does not match the
+        approved operating calibration -- 3+ unsupported is outside
+        Bora's normal serious-pursuit pool, and 5+/7+/10+ must not
+        survive merely because no Senior keyword is present. Splitting
+        the single cap into two conservative tiers (2 exactly ->
+        EFFICIENT_APPLY; >=3 -> WATCH) preserves strict, non-inverting
+        monotonicity (0-2/1-3 > 2 > 3+, each tier strictly more
+        conservative than the last as the unresolved bound grows) while
+        still never touching Qualification Truth, never fabricating a
+        candidate-duration comparison, and never introducing REJECT or a
+        new schema/enum -- WATCH is the same existing canonical
+        conservative state decide_lane_and_decision() already produces
+        elsewhere (e.g. information-deficit, unsupported-family routing).
+        This still does not touch, duplicate, or weaken
+        detect_seniority_signals -- a keyworded "Senior"/"Staff"/
+        "Principal"/"Lead" case still REJECTs via that separate,
+        untouched mechanism, unaffected by and independent of this guard;
+      - when a requirement in each tier is present, the MORE conservative
+        tier wins (a role with both an unresolved "2-4" row and an
+        unresolved "5+" row routes to WATCH, not EFFICIENT_APPLY) --
+        this guard only ever moves a result MORE conservative, never
+        picks the more favorable of two triggered tiers;
+      - requirement-level matches, gaps, unknowns, and hard_blockers are
+        never modified; only lane/decision/decision_rationale may change.
+    """
+    result = dict(base_result)
+
+    incoming_decision = result.get("decision")
+    if incoming_decision not in ("PRIORITY_APPLY", "APPLY", "EFFICIENT_APPLY"):
+        return result
+
+    match_by_req = {m.get("requirement_id"): m for m in matches if isinstance(m, Mapping)}
+    tier_exactly_2_reasons: list[str] = []
+    tier_3_plus_reasons: list[str] = []
+    for requirement in requirements:
+        if requirement.get("importance") != "MANDATORY":
+            continue
+        req_id = requirement.get("requirement_id")
+        if not isinstance(req_id, str) or req_id in gated_requirement_ids:
+            continue
+        match = match_by_req.get(req_id)
+        if not isinstance(match, Mapping) or match.get("result") != "UNKNOWN":
+            continue
+        evaluation_path = match.get("evaluation_path")
+        if evaluation_path not in ("EXPERIENCE_RANGE_EVALUATOR", "DOMAIN_QUALIFIED_DURATION_EVALUATOR"):
+            continue
+        text = requirement.get("text")
+        if not isinstance(text, str):
+            continue
+        parsed = parse_generic_experience_range(text) or parse_domain_qualified_duration(text)
+        if parsed is None:
+            continue
+        lower_bound = parsed.get("lower_bound")
+        if not isinstance(lower_bound, int):
+            continue
+        if lower_bound < _RECRUITER_THRESHOLD_LOWER_BOUND_MIN:
+            continue
+        reason = f"{req_id} (lower_bound={lower_bound} years, unresolved)"
+        if lower_bound == _RECRUITER_THRESHOLD_LOWER_BOUND_MIN:
+            tier_exactly_2_reasons.append(reason)
+        else:
+            tier_3_plus_reasons.append(reason)
+
+    if tier_3_plus_reasons:
+        result["lane"] = "WATCH"
+        result["decision"] = "WATCH"
+        result["decision_rationale"] = (
+            f"{result.get('decision_rationale', '')} "
+            "Capped to WATCH: unresolved explicit mandatory recruiter "
+            "experience threshold(s) at 3+ years, outside Bora's normal "
+            f"serious-pursuit pool ({'; '.join(tier_3_plus_reasons)}) -- "
+            "BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1, pursuit/surfacing "
+            "economics only; qualification result unchanged."
+        ).strip()
+        return result
+
+    if tier_exactly_2_reasons and incoming_decision in ("PRIORITY_APPLY", "APPLY"):
+        result["lane"] = "LANE_1_EFFICIENT_APPLY"
+        result["decision"] = "EFFICIENT_APPLY"
+        result["decision_rationale"] = (
+            f"{result.get('decision_rationale', '')} "
+            "Capped to EFFICIENT_APPLY: unresolved explicit mandatory recruiter "
+            f"experience threshold(s) at Bora's early-career target pool boundary ("
+            f"{'; '.join(tier_exactly_2_reasons)}) -- BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1, "
+            "pursuit/surfacing economics only; qualification result unchanged."
+        ).strip()
+        return result
+
+    # incoming_decision == "EFFICIENT_APPLY" with only tier_exactly_2_reasons
+    # (no tier_3_plus_reasons, handled above): already at or below the
+    # exactly-2 ceiling -- nothing further to downgrade.
     return result
 
 

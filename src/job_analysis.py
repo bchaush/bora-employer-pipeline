@@ -26,7 +26,11 @@ from experience_range import (
     evaluate_generic_experience_range,
     is_generic_experience_range_requirement,
 )
-from job_decision import apply_posting_state_routing, decide_lane_and_decision
+from job_decision import (
+    apply_posting_state_routing,
+    apply_recruiter_threshold_guard,
+    decide_lane_and_decision,
+)
 from job_id import generate_job_id
 from qualification_gate import (
     all_gates_leaf_ids,
@@ -625,6 +629,28 @@ def analyze_job(
         base_result=decision,
         role_status=role_status,
         source_verification_status=source_verification_status,
+    )
+
+    # BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1: a further, independent,
+    # downgrade-only pursuit/surfacing-economics layer. Runs after posting-
+    # state routing so both layers compose (either may downgrade; neither
+    # can undo the other's downgrade). Applies when an unresolved
+    # MANDATORY, ungated, EXPERIENCE_RANGE_EVALUATOR/
+    # DOMAIN_QUALIFIED_DURATION_EVALUATOR requirement states an explicit
+    # lower-bound experience threshold of 2+ years, in two conservative
+    # tiers: lower_bound==2 exactly caps PRIORITY_APPLY/APPLY at
+    # EFFICIENT_APPLY (an incoming EFFICIENT_APPLY is left unchanged);
+    # lower_bound>=3 caps PRIORITY_APPLY/APPLY/EFFICIENT_APPLY alike down
+    # to WATCH (this tier consumes every APPLY-like decision). Never
+    # touches Qualification Truth, never computes a candidate duration,
+    # never converts UNKNOWN to NONE, never introduces REJECT. See
+    # src/job_decision.py::apply_recruiter_threshold_guard for the full
+    # invariant list.
+    decision = apply_recruiter_threshold_guard(
+        base_result=decision,
+        requirements=requirements,
+        matches=matches,
+        gated_requirement_ids=gated_requirement_ids,
     )
 
     analysis = {
