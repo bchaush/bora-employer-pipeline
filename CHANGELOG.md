@@ -19,6 +19,33 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-03 — Brandeis MSBA awarded human attestation (`BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1`, CANDIDATE TRUTH)
+
+**Reason**
+
+Bora provided a new direct human attestation on 2026-09-03 that his Brandeis M.S. in Business Analytics is officially completed/awarded, all academic requirements complete, and the physical diploma is pending receipt.
+
+**Changed**
+
+* New evidence record `evidence/education/EDU_BRANDEIS_AWARDED_ATTESTATION_001.json` (`evidence_state=OBSERVED`, mirroring the existing `TELUS_ENDDATE_001` human-attestation pattern — no new evidence-state enum required).
+* `BLUEPRINT.md` bumped v3.4 → v3.5; Sections 2 and 131 updated to state the degree is completed/awarded per this attestation, with the physical diploma explicitly noted as pending. The prior "degree conferral is not independently established" wording was correct under the evidence available at that historical point — it is superseded here for current truth, not described as an error.
+* `CURRENT_STATE.md`: new top-of-Current-Phase paragraph recording this update and its provenance; the current live-inventory bullet (Evidence records / Brandeis education record list) also corrected: total Evidence 42 → 43, Brandeis education record count 3 → 4, `EDU_BRANDEIS_AWARDED_ATTESTATION_001` added to the enumerated list. Historical dated closure records elsewhere in the file, accurate as of their own recorded point in time, were not rewritten.
+* Test and golden-test regression anchors updated mechanically, purely as a consequence of adding the one new evidence record — no test logic, semantic expectation, or unrelated assertion changed: total repository Evidence count 42 → 43 across 19 test files (20 assertion locations) plus `golden-tests/run_job_analysis_golden_set.py`'s repository-regression check and its accompanying PASS-message count; the Brandeis/education-scoped Evidence count in `education_evidence_v1_test.py` 4 → 5; `EDU_BRANDEIS_AWARDED_ATTESTATION_001` added to the two explicit `EXPECTED_EDU_IDS` literal lists (`evidence_repository_test.py`, `evidence_experience_reference_test.py`); and stale explanatory count-breakdown arithmetic in 12 already-42→43-updated assertion messages (e.g. "37 prior + 3 ... + 2 ...") corrected to include "+ 1 Brandeis MSBA awarded attestation record" so the human-readable breakdown sums to the new total. This is regression-anchor bookkeeping only, not a product logic or semantic behavior change.
+
+**Not changed**
+
+Prior Brandeis documentary evidence (`EDU_BRANDEIS_IDENTITY_001`, `EDU_BRANDEIS_GPA_001`, `EDU_BRANDEIS_PROGRESS_001`); schemas; production/qualification logic; Employer Truth; résumé renderer/generator implementation; unrelated Candidate Truth.
+
+**Validation**
+
+New evidence record validated against `evidence.schema.json` (Draft 2020-12). `python scripts/verify_assurance_baseline.py`: all phases pass. `git diff --check` clean.
+
+**Status**
+
+`BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1_CANDIDATE_TRUTH_UPDATED`.
+
+---
+
 ## 2026-09-03 — Real-world operation and calibration governance sync (`REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1`, DOCUMENTATION ONLY)
 
 **Reason**

@@ -1,0 +1,19 @@
+{
+  "evidence_id": "EDU_BRANDEIS_AWARDED_ATTESTATION_001",
+  "experience_id": "EXP_EDU_BRANDEIS_001",
+  "fact": "Bora directly attested, dated 2026-09-03, that his Brandeis University Master of Science in Business Analytics is officially completed and awarded, with all academic requirements complete, and that he is currently waiting only for receipt of the physical diploma.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora's direct human attestation (conversational instruction to the build agent), dated 2026-09-03; not a registrar record, diploma, or other third-party document",
+  "source_location": "Bora's explicit statement, 2026-09-03, session instruction BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1",
+  "safe_for_external_use": true,
+  "notes": "Candidate self-attestation of degree-award status, mirroring the same OBSERVED-tier human-attestation pattern already used for TELUS_ENDDATE_001 (an exact end-date fact sourced only to Bora's direct attestation, not an employer document). This record does NOT retroactively upgrade or reinterpret EDU_BRANDEIS_IDENTITY_001, EDU_BRANDEIS_GPA_001, or EDU_BRANDEIS_PROGRESS_001 -- those remain exactly what they always were: documentary transcript/progress-screen evidence that establishes program identity, GPA, and requirements-satisfied status, but never independently established degree conferral on their own. This record is the reason degree-awarded status may now be treated as current Candidate Truth: an explicit, dated, direct human attestation from Bora himself, distinct in kind and tier from an independent registrar/diploma document.",
+  "limitations": [
+    "This is candidate self-attestation, not an independently verified registrar, diploma, or degree-conferral document",
+    "The physical diploma has not yet been received; this record does not establish an exact conferral date beyond 'currently complete, diploma pending'",
+    "Does not establish STEM/CIP designation (unaffected by this record; remains separately not ingested)",
+    "Does not reconcile or resolve the pre-existing 41-vs-43-unit discrepancy between EDU_BRANDEIS_PROGRESS_001 and EDU_BRANDEIS_GPA_001",
+    "A future official diploma, registrar confirmation, or other independent Level-0 source may strengthen or supersede this attestation-tier evidence"
+  ]
+}

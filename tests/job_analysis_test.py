@@ -83,7 +83,7 @@ exp = validate_experience_repository()
 ev = validate_evidence_repository()
 cl = validate_claim_repository()
 assert_true(exp["valid"] is True and exp["records_checked"] == 7, "Experience regression")
-assert_true(ev["valid"] is True and ev["records_checked"] == 42, "Evidence regression")
+assert_true(ev["valid"] is True and ev["records_checked"] == 43, "Evidence regression")
 assert_true(
     ev["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
     "Evidence Experience integrity",

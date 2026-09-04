@@ -67,6 +67,7 @@ EXPECTED_MM_IDS = [
 ]
 
 EXPECTED_EDU_IDS = [
+    "EDU_BRANDEIS_AWARDED_ATTESTATION_001",
     "EDU_BRANDEIS_GPA_001",
     "EDU_BRANDEIS_IDENTITY_001",
     "EDU_BRANDEIS_PROGRESS_001",
@@ -154,7 +155,7 @@ def write_temp_experience_root(base: Path, experience_id: str = "EXP_TEST_001") 
 # ---------------------------------------------------------------------------
 real = validate_evidence_repository(EVIDENCE_ROOT)
 assert_true(real["valid"] is True, "current evidence repository failed")
-assert_true(real["records_checked"] == 42, f"expected 42 records, got {real['records_checked']}")
+assert_true(real["records_checked"] == 43, f"expected 43 records, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_ALL_IDS,
