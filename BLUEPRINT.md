@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.5**
+**Final Locked Blueprint v3.6**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -3682,4 +3682,153 @@ summaries, model memory, sibling-role wording, stale fixture assumptions,
 and in-memory reproductions. If fresh source invalidates the premise:
 STOP. Never alter source capture or representation to manufacture the
 authorized defect.
+
+**134. RESUME REFERENCE VISUAL STANDARD — RESUME_REFERENCE_STANDARD_V1 (LOCKED)**
+
+Bora explicitly approved **`Bora_Chaush_MGB_Application_Analyst_I_Resume_REFERENCE_v1.pdf`**
+(2026-09) as the authoritative visual/reference exemplar for the Career OS
+résumé standard. This is a reference-standard/QA-doctrine lock only —
+Sections 44-51 already govern content architecture (master protection,
+immutable/adjustable fields, structured patching, claim lineage, format
+validation) and `.cursor/rules/resume.mdc` already operationally enforces
+them; this section extends that existing doctrine with the visual
+contract and content-quality principles the reference PDF embodies, and
+does not restate what is already locked. The binary PDF is not stored in
+the repository, consistent with this repository's existing practice for
+Bora-supplied source documents (transcripts, offer letters, and similar
+are recorded by description/date, never stored) — this section is the
+canonical record of the approved exemplar and its extracted contract.
+
+**Reference principle.** The PDF is the authority for visual execution.
+Where written descriptions and the PDF differ on a visual detail, the
+PDF's actual visual grammar governs, unless doing so would violate
+Candidate Truth, ATS safety, accessibility/readability, an explicit
+employer submission requirement, or a stronger canonical governance rule.
+MGB-specific content itself (exact wording, section order, bullet
+selection, evidence allocation, role-family language, JD terminology,
+which links are exposed, Education-first ordering) is a job-specific
+strategic variable, never frozen as universal — only the visual/QA
+contract below is fixed.
+
+**Fixed visual/QA contract (stable across every résumé derivative).**
+U.S. Letter page; one page by default at Bora's current career stage;
+one-column structure; the candidate name/contact information is a
+centered block at the top of the document body, and must not be placed
+in an actual Word/PDF page header or footer region; restrained
+black-and-white design with no color accents needed for readability;
+readable professional typography with a clear font-size hierarchy
+(candidate name largest, section headings next, body/bullet text
+smallest but fully readable); consistent, professional margins; section headings
+set apart by a thin horizontal rule, not by color, shading, or boxes;
+a clear role/employer/date hierarchy per entry (role and employer visually
+distinct from the date range, dates right-aligned or otherwise clearly
+separated); consistent bullet indentation and spacing; dense but readable
+page utilization; no large dead lower-page region when relevant supported
+evidence exists to fill it. Explicitly excluded: decorative graphics,
+sidebars, skill bars/meters, icons, and text-box-based visual gimmicks.
+Hyperlinks (e.g. LinkedIn, GitHub, Live Demo) use short, human-readable
+visible labels, not raw URLs, and must be genuinely clickable (a real URI
+annotation) in the exported PDF, not merely styled to look like a link.
+
+**PDF-first output rule.** The PDF is Bora's canonical/default submitted
+résumé artifact, unless the employer or application system explicitly
+requires or recommends another supported format — employer submission
+instructions win. Final visual/format QA authority is always the
+rendered PDF, never an intermediate document format, even when a
+different format is what is actually submitted. A DOCX version, if ever produced,
+is an optional companion only, not required unless a specific employer or
+workflow needs one; if generated, its content must match the approved
+résumé and visual drift from the PDF should be minimized, but it never
+carries final QA authority.
+
+**Full-page utilization, honestly.** Substantially using the page with
+relevant, evidence-supported material is the goal — not eliminating every
+trace of whitespace, and never adding filler content merely to reach the
+bottom margin. Overflow is never solved by shrinking type or crushing
+margins to an unreadable size (already locked, Section 50 / `resume.mdc`
+Format Validation) — this section extends that same discipline to
+margins specifically, not only font size.
+
+**Typographic character discipline.** Extends the existing no-em-dash
+punctuation preference (Section 132): use normal, plain typographic
+characters throughout Bora-facing and candidate-facing résumé text —
+ordinary hyphens, not em/en dashes or other decorative Unicode dash
+variants; straight quotation marks are acceptable but no other
+decorative/smart-typography substitutions are needed to satisfy this
+standard.
+
+**Content-quality principles (extend, do not replace, the existing
+Keyword Rule and Candidate-Facing Style doctrine already locked in
+Section 48 / `resume.mdc`):**
+
+- **Evidence Budget.** The space given to each experience/project on the
+  page should be proportional to its relevance to the target role, not
+  equal or automatic — a stronger, more relevant experience earns more
+  bullets and more page space than a weaker or less relevant one.
+- **Role-Specific Narrative Density.** How much detail a given bullet
+  carries (how many concrete specifics vs. a compact summary) should flex
+  with how central that experience is to the specific role being pursued,
+  within Section 45's existing adjustable-field boundaries.
+- **Human Resonance.** A bullet should read as something a real person
+  actually did, in plain natural language (already governed by the
+  Candidate-Facing Style rule), not as a generic, interchangeable
+  capability statement that could describe anyone.
+- **Employer Confidence Signals.** Where truthfully supported, prefer
+  wording that shows reliability, ownership, and sound judgment in how
+  work was carried out, not merely a list of tasks performed.
+- **Interview Expandability.** A bullet should be phrased so a reasonable
+  follow-up question about it is one Bora can truthfully and comfortably
+  expand on in an interview — never a bullet whose only supporting detail
+  runs out immediately.
+- **Recruiter Inference Audit.** Before finalizing a bullet, check what a
+  reasonable recruiter would infer from it as written, and confirm that
+  inference is truthful and intended — not merely that the literal words
+  are individually defensible.
+- **Justified Curiosity.** An intentionally distinctive, truthful detail
+  (e.g., a real project) may be included specifically because it invites
+  a legitimate "tell me more" — never included as an empty gimmick.
+- **Truthful Lexical Alignment.** The same rule as the existing Keyword
+  Rule (Section 48): JD terminology may be mirrored only when it
+  truthfully describes evidence Bora already has.
+- **Completed-execution results are legitimate results.** A well-executed
+  process, system, or control that has no fabricated quantified business
+  metric attached is still a legitimate, presentable result on its own —
+  the absence of an invented number is not a weakness to be papered over
+  (extends, never weakens, the existing "never fabricate quantified
+  business impact" rule already locked).
+- **Skills summarize proof; they do not substitute for proof.** A Skills
+  section is a derived summary of evidence-backed bullets elsewhere on
+  the résumé, never an independent channel for asserting a capability
+  that is not otherwise demonstrated.
+
+**QA checklist (verification, not implementation — see Non-Goals below).**
+Before any résumé PDF is treated as submission-ready: one-page-default overflow
+check; clipping/overlap check (no visual element cut off or colliding);
+plain-text extraction/read-order check (the PDF's underlying text extracts
+in the correct logical order, relevant to ATS parsing); hyperlink
+destination verification (each visible link label resolves to its correct
+URI); final rendered-PDF visual QA (a human look at the actual rendered
+page, not just the source data). These are QA requirements this standard
+locks — not an instruction to build automated tooling for them now (see
+Non-Goals).
+
+**General GitHub contact-block inclusion.** Not made universally mandatory by
+this section. It was appropriate and approved for the MGB reference PDF;
+universal inclusion in every future derivative remains conditional on
+public-surface Package Truth and relevance to the specific application,
+a job-specific strategic variable like the others named above.
+
+**Non-Goals (explicit, per the build-economy gate, Section 133).** This
+section locks a reference standard and QA requirements, not an
+implementation. It does not authorize: a PDF generator; DOCX parity
+tooling; automated ATS scoring or generic keyword scoring; an automated
+hyperlink validator, overflow checker, or visual-diff tool; any change to
+matching/qualification logic, Candidate Truth, Employer Truth, schemas, or
+runtime product code; application automation; or automated package
+generation. Generator/tooling work to satisfy this standard must still be
+separately earned under the build-economy gate (Section 133: a
+demonstrated material reliability/truth defect, or recurring, measured
+workflow cost from manual reproduction that materially wastes live
+application time) — the existence of this reference standard alone does
+not authorize building anything to enforce it.
 

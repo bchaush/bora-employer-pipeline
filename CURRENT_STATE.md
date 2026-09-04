@@ -1,10 +1,44 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-09-03 (BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1)
+Updated: 2026-09-03 (RESUME_REFERENCE_STANDARD_V1)
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.5**.
+Governing Blueprint: **Final Locked Blueprint v3.6**.
+
+Résumé reference visual standard (`RESUME_REFERENCE_STANDARD_V1`) —
+governance/reference-doctrine synchronization, not a product
+implementation milestone. Bora's approved
+`Bora_Chaush_MGB_Application_Analyst_I_Resume_REFERENCE_v1.pdf` was
+extracted into a locked fixed visual/QA contract (`BLUEPRINT.md` §134):
+U.S. Letter, one-page default, one column, centered name/contact block
+in the document body (never an actual page header/footer region), restrained
+black-and-white design, thin section-rule headings, consistent
+typography/margins, functional short-label hyperlinks, PDF as the
+canonical submission artifact, and a manual QA checklist (overflow,
+clipping, extraction/read-order, hyperlink-destination, final rendered
+visual check). Content-quality principles were added alongside it
+(Evidence Budget, Role-Specific Narrative Density, Human Resonance,
+Employer Confidence Signals, Interview Expandability, Recruiter Inference
+Audit, Justified Curiosity, Truthful Lexical Alignment, "completed-
+execution results are legitimate," "skills summarize proof") -- ten
+total, extending, not duplicating, the existing
+Section 44-51 / `resume.mdc` content-architecture doctrine (master
+protection, immutable/adjustable fields, structured patching, claim
+lineage, Keyword Rule, Candidate-Facing Style) which already covered most
+of the content-governance ground. `.cursor/rules/resume.mdc` gained a
+short pointer section plus a one-clause extension of the existing
+overflow rule to explicitly cover margins. The binary reference PDF is
+not stored in the repository, consistent with existing practice for
+Bora-supplied source documents. Content variables (exact wording, section
+order, bullet/project selection, evidence allocation, role-family
+language, JD terminology, exposed links, Education-first ordering)
+remain explicitly job-specific and unfrozen. No PDF generator, DOCX
+tooling, ATS scoring, or QA-automation implementation was authorized or
+built -- this remains doctrine/reference only; generator work must still
+be separately earned under the build-economy gate (`BLUEPRINT.md` §133).
+No product implementation milestone is currently selected;
+`CURRENT_MILESTONE.md` unchanged.
 
 Brandeis MSBA awarded human attestation
 (`BRANDEIS_MSBA_AWARDED_HUMAN_ATTESTATION_V1`) — Candidate Truth update,
