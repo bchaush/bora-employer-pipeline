@@ -1,10 +1,41 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-09-03 (RESUME_REFERENCE_STANDARD_V1)
+Updated: 2026-09-03 (LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1)
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.6**.
+Governing Blueprint: **Final Locked Blueprint v3.7**.
+
+Live role verified actionability gate
+(`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1`) — governance/operating-
+semantics clarification, not a product implementation milestone. Earned
+by two reproduced live-market stale-role failures: Mass General Brigham
+RQ4055007 (fresh first-party requisition could not be re-established;
+led to `LIVE_APPLICATION_FIRST_PARTY_EXECUTION_RULE_V1`) and Fresenius
+Medical Care R0266808 (employer-owned indexed Workday evidence appeared
+sufficient, but the exact requisition returned "The page you are looking
+for doesn't exist" when actually opened), showing the prior rule
+remained ambiguous between discovery/index evidence existing and the
+exact current requisition actually being actionable. `BLUEPRINT.md`
+bumped v3.6 → v3.7; new locked Section 135 sharpens the existing
+Direct-Source/Role-Freshness/Discovery-boundary doctrine (§§19-21, §133):
+cheap preliminary triage remains allowed before verification (the chain
+is `DiscoveryLead` → triage → exact first-party actionability gate →
+pursuit recommendation → tailoring/package/application work);
+`VERIFIED_LIVE` requires the exact current requisition to load as the
+matching current role identity and satisfy the current-actionability
+test defined in `BLUEPRINT.md` §135 -- not merely "contains an Apply
+button," and not merely being indexed anywhere, even when the index
+source is employer-owned; explicit failure examples recorded
+(page-not-found, generic-search redirect, unresolvable identity, stale
+application route); historical Employer Truth, historical qualification
+analysis, and Submitted Application Truth explicitly preserved when the
+gate fails -- only current actionability changes; no new posting-state
+axis or enum created; `source_verification_status`/`role_status`
+remain independent, as before. `AGENTS.md` gained one concise clarifying
+paragraph extending the existing Fresh First-Party Employer Source Rule
+section -- no restatement of Blueprint doctrine. `CURRENT_MILESTONE.md`
+unaffected; no new product implementation milestone is selected.
 
 Résumé reference visual standard (`RESUME_REFERENCE_STANDARD_V1`) —
 governance/reference-doctrine synchronization, not a product

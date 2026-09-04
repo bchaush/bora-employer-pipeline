@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.6**
+**Final Locked Blueprint v3.7**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -3831,4 +3831,65 @@ demonstrated material reliability/truth defect, or recurring, measured
 workflow cost from manual reproduction that materially wastes live
 application time) — the existence of this reference standard alone does
 not authorize building anything to enforce it.
+
+**135. LIVE ROLE VERIFIED ACTIONABILITY GATE — LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1 (LOCKED)**
+
+Earned by two reproduced live-market stale-role failures (Mass General
+Brigham RQ4055007; Fresenius Medical Care R0266808, where employer-owned
+indexed Workday evidence was treated as sufficient, but the exact
+requisition returned "The page you are looking for doesn't exist" when
+actually opened). This section sharpens, and does not contradict, the
+already-locked Direct-Source Rule (Section 19), Role Freshness (Section
+20), Ghost/Stale Role Detection (Section 21), the Discovery-boundary
+concept (Section 133), and `LIVE_APPLICATION_FIRST_PARTY_EXECUTION_RULE_V1`
+(`AGENTS.md`) — it does not create a competing truth system, a new
+posting-state axis, or a new enum.
+
+**The chain.** `DiscoveryLead` (untrusted lead) → cheap preliminary
+triage allowed → exact first-party actionability gate → actionable
+pursuit recommendation → meaningful tailoring/package/application work.
+Cheap preliminary fit triage against discovery/index evidence remains
+allowed and encouraged before verification — this section does not
+require first-party verification before any fit analysis, only before
+the role is treated as actionable. This preserves the Blueprint goal of
+evaluating large numbers of roles cheaply.
+
+**What discovery evidence may never do on its own.** Search-engine
+results, LinkedIn/Indeed/Simplify/other aggregators, cached employer
+search results, employer-owned indexed/search snippets, stale
+Workday/ATS indexes, prior captures, chat summaries, and memory may all
+support cheap preliminary triage, but none of them, alone, may establish
+`VERIFIED_LIVE`, enter the actionable pursuit queue, receive a serious
+pursuit recommendation, or trigger meaningful résumé tailoring, package
+generation, or application execution — even when the source is
+employer-owned, indexed, or otherwise appears first-party in origin. An
+indexed listing is evidence that a requisition existed at index time,
+never evidence that it is currently actionable.
+
+**What "successfully established" means.** Not narrowly "contains an
+Apply button." The exact current requisition must (a) load as the
+matching current role/requisition identity, and (b) provide a current
+actionable application route, or explicit current application
+instructions/status sufficient to establish actionability. Both are
+required.
+
+**Examples that fail to establish current actionability:** the exact
+requisition returns page-not-found; the exact requisition redirects only
+to a generic job search with no matching current role; matching
+requisition identity cannot be established; the application route or
+instructions found are no longer current or cannot be established.
+
+**When first-party actionability cannot be re-established.** Do not
+fabricate `VERIFIED_LIVE`. Preserve uncertainty using the existing,
+independent `source_verification_status` / `role_status` axes (Section
+19-21) — do not collapse them, do not infer one from the other, and do
+not add a new axis or enum to represent this state. Cheap preliminary
+triage already recorded may remain recorded if useful. No meaningful
+tailoring, package generation, or application execution may proceed.
+
+**Historical truth is unaffected.** A role failing this gate today does
+not erase historical Employer Truth already captured, historical
+qualification analysis already performed, or Submitted Application Truth
+for a prior, genuinely-verified application. Only current actionability
+changes.
 
