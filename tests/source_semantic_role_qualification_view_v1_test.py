@@ -670,7 +670,12 @@ def _load_golden_job_input(fixture_id: str) -> dict:
         "jd_text": jd_text,
         "structured_extraction": extraction,
         "fixture_key": fixture_id,
+        # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
+        # with VERIFIED_DIRECT so this golden-fixture mirror's intended
+        # fully-verified-live state still preserves APPLY-like routing
+        # under the new dual-axis gate (Blueprint §135).
         "role_status": "VERIFIED_LIVE",
+        "source_verification_status": "VERIFIED_DIRECT",
     }
 
 

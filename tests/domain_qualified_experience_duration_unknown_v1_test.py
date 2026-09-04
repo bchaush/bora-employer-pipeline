@@ -61,7 +61,17 @@ def _load_job_input(fixture_dir: Path, *, company: str = "TestCo", role: str = "
     if job_json_path.exists():
         job_input = dict(json.loads(job_json_path.read_text(encoding="utf-8")))
     else:
-        job_input = {"company": company, "role": role, "role_status": "VERIFIED_LIVE"}
+        # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
+        # with source_verification_status=VERIFIED_DIRECT so this
+        # synthetic (no job.json) fallback's intended fully-verified-live
+        # fixture state still preserves APPLY-like routing under the new
+        # dual-axis gate (Blueprint §135).
+        job_input = {
+            "company": company,
+            "role": role,
+            "role_status": "VERIFIED_LIVE",
+            "source_verification_status": "VERIFIED_DIRECT",
+        }
     job_input["jd_text"] = jd_text
     job_input["structured_extraction"] = structured
     job_input["fixture_key"] = fixture_dir.name
