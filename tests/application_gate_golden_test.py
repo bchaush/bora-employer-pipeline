@@ -80,7 +80,13 @@ def load_job_input(fixture_id: str) -> dict:
         # verification. VERIFIED_LIVE is the correct explicit fixture state
         # for that intent, per the same rationale applied in
         # golden-tests/run_job_analysis_golden_set.py.
+        # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
+        # with source_verification_status=VERIFIED_DIRECT so this suite's
+        # genuinely-intended fully-verified-live fixture state (see
+        # rationale above) still preserves APPLY-like Gate-1 routing under
+        # the new dual-axis gate (Blueprint §135).
         "role_status": "VERIFIED_LIVE",
+        "source_verification_status": "VERIFIED_DIRECT",
     }
 
 

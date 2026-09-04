@@ -135,7 +135,14 @@ def evaluate_fixture(
         # condition"). Real-employer fixtures (fixtures/jobs/CASE_A_*,
         # CASE_C_*) are NOT touched by this change and carry no fabricated
         # live-status claim.
+        # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: an
+        # APPLY-like decision now also requires source_verification_status
+        # =="VERIFIED_DIRECT" (Blueprint §135). These synthetic golden
+        # fixtures intentionally model a fully verified live posting, so
+        # this pairs with the existing role_status=VERIFIED_LIVE fixture
+        # state above -- not a mechanical stamp, the same deliberate intent.
         "role_status": "VERIFIED_LIVE",
+        "source_verification_status": "VERIFIED_DIRECT",
     }
     # Prefer explicit role title from extraction metadata.
     meta_role = extraction.get("_role_title")

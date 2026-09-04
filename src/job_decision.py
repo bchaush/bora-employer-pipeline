@@ -251,13 +251,20 @@ _POSTING_WATCH_STATES = frozenset({"UNCLEAR", "POSSIBLY_STALE", "CONFIRMED_CLOSE
 _LIVE_ROLE_STATES = frozenset({"VERIFIED_LIVE", "LIKELY_LIVE"})
 
 
+_VERIFIED_DIRECT_SOURCE = "VERIFIED_DIRECT"
+
+
 def apply_posting_state_routing(
     *,
     base_result: Mapping[str, Any],
     role_status: Any,
+    source_verification_status: Any = None,
 ) -> dict[str, Any]:
     """Apply Blueprint Section 30 posting-state downgrade to an already-computed
-    qualification decision (POSTING_STATE_DECISION_WIRING_V1).
+    qualification decision (POSTING_STATE_DECISION_WIRING_V1), extended by
+    PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1 (Blueprint §135)
+    to require exact first-party actionability, not merely posting
+    freshness, before preserving an APPLY-like result.
 
     Posting reality and qualification truth are separate axes. This function
     runs strictly AFTER decide_lane_and_decision() has already produced its
@@ -269,22 +276,33 @@ def apply_posting_state_routing(
         from information deficit) is never touched either -- posting-state
         routing only ever downgrades an APPLY-like result, and never
         rewrites an existing rationale;
-      - role_status="VERIFIED_LIVE" or "LIKELY_LIVE" (and only those two
-        exact strings) preserve an APPLY-like result unchanged;
-      - every other role_status value downgrades an APPLY-like result
-        (PRIORITY_APPLY/APPLY/EFFICIENT_APPLY) to WATCH -- never to REJECT.
-        This deliberately includes: None/absent; the other canonical
-        values UNCLEAR/POSSIBLY_STALE/CONFIRMED_CLOSED; an unrecognized
-        string (e.g. "BOGUS"); and any non-string type (int/list/dict/
-        bool). Missing or malformed posting-state evidence is treated the
-        same as an explicit UNCLEAR -- the absence or invalidity of
-        verification must not silently become a favorable actionable
-        state (permanent project rule).
-      - role_status is a str check gate BEFORE any set-membership test, so
-        an unhashable raw value (e.g. a list) can never reach a hash-based
-        lookup -- this function never raises for any input type. It never
-        coerces or rewrites role_status itself; the surfaced role_status
-        value is owned entirely by job_analysis.py.
+      - an APPLY-like result (PRIORITY_APPLY/APPLY/EFFICIENT_APPLY) is
+        preserved unchanged ONLY when BOTH role_status=="VERIFIED_LIVE"
+        AND source_verification_status=="VERIFIED_DIRECT" are true
+        (Blueprint §135: role freshness alone is discovery/index-shaped
+        evidence, not proof of exact current first-party actionability).
+        role_status="LIKELY_LIVE" -- even paired with a fully
+        VERIFIED_DIRECT source -- no longer crosses this gate; this is a
+        deliberate, disclosed narrowing of POSTING_STATE_DECISION_WIRING_V1's
+        original behavior (see tests/posting_state_decision_wiring_v1_test.py
+        Section B for the documented migration).
+      - every other combination downgrades an APPLY-like result to WATCH
+        -- never to REJECT. This deliberately includes: either axis
+        None/absent; role_status in UNCLEAR/POSSIBLY_STALE/CONFIRMED_CLOSED;
+        source_verification_status in SOURCE_VERIFICATION_REQUIRED/
+        DIRECT_SOURCE_UNAVAILABLE/UNKNOWN; an unrecognized string on either
+        axis; and any non-string type on either axis. Missing or malformed
+        posting/source evidence is treated the same as an explicit
+        unverified value -- the absence or invalidity of verification must
+        never silently become a favorable actionable state (permanent
+        project rule).
+      - both axes are compared with a str type-check gate BEFORE any
+        equality/membership test, so an unhashable raw value (e.g. a list)
+        on either axis can never reach a hash-based lookup or raise -- this
+        function never raises for any input type on either axis. It never
+        coerces or rewrites either input value, and never infers one axis
+        from the other; the surfaced role_status/source_verification_status
+        values are owned entirely by job_analysis.py.
       - Requirement-level matches, gaps, unknowns, and hard_blockers are
         never modified; only lane/decision/decision_rationale may change.
     """
@@ -292,27 +310,51 @@ def apply_posting_state_routing(
 
     if result.get("decision") not in _APPLY_LIKE_DECISIONS:
         return result
-    if isinstance(role_status, str) and role_status in _LIVE_ROLE_STATES:
+
+    role_status_ok = isinstance(role_status, str) and role_status == "VERIFIED_LIVE"
+    source_ok = (
+        isinstance(source_verification_status, str)
+        and source_verification_status == _VERIFIED_DIRECT_SOURCE
+    )
+    if role_status_ok and source_ok:
         return result
 
-    if isinstance(role_status, str) and role_status in _POSTING_WATCH_STATES:
-        reason = f"role_status={role_status}"
-    elif isinstance(role_status, str):
-        reason = f"role_status={role_status!r} is not a recognized posting-state value"
-    elif role_status is None:
-        reason = "role_status missing (no posting-state verification supplied)"
-    else:
-        reason = (
-            f"role_status is not a valid posting-state string (got {type(role_status).__name__})"
-        )
+    failed_axes: list[str] = []
+    if not role_status_ok:
+        if isinstance(role_status, str) and role_status in _POSTING_WATCH_STATES:
+            failed_axes.append(f"role_status={role_status}")
+        elif isinstance(role_status, str):
+            failed_axes.append(f"role_status={role_status!r} is not VERIFIED_LIVE")
+        elif role_status is None:
+            failed_axes.append("role_status missing (no posting-state verification supplied)")
+        else:
+            failed_axes.append(
+                f"role_status is not a valid posting-state string (got {type(role_status).__name__})"
+            )
+    if not source_ok:
+        if isinstance(source_verification_status, str):
+            failed_axes.append(
+                f"source_verification_status={source_verification_status!r} is not VERIFIED_DIRECT"
+            )
+        elif source_verification_status is None:
+            failed_axes.append(
+                "source_verification_status missing (no first-party source verification supplied)"
+            )
+        else:
+            failed_axes.append(
+                "source_verification_status is not a valid verification string "
+                f"(got {type(source_verification_status).__name__})"
+            )
+    reason = "; ".join(failed_axes)
 
     result["lane"] = "WATCH"
     result["decision"] = "WATCH"
     result["decision_rationale"] = (
         f"{result.get('decision_rationale', '')} "
         f"Downgraded to WATCH: {reason} "
-        "(Blueprint Section 30 -- posting status uncertain, unverified, or "
-        "role not currently active; qualification result unchanged)."
+        "(Blueprint §135 -- exact first-party current actionability requires "
+        "BOTH role_status=VERIFIED_LIVE AND source_verification_status="
+        "VERIFIED_DIRECT; qualification result unchanged)."
     ).strip()
     return result
 

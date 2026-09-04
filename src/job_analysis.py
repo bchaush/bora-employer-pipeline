@@ -595,25 +595,37 @@ def analyze_job(
 
     # POSTING_STATE_DECISION_WIRING_V1: consume the canonical, already-classified
     # posting-state fields (schemas/job.schema.json, Schema Milestone 1) if the
-    # caller supplied them on job_input. role_status is passed through to
-    # apply_posting_state_routing() exactly as supplied -- including None,
-    # an unrecognized string, or a non-canonical type -- and that function
-    # treats anything other than an explicit "VERIFIED_LIVE"/"LIKELY_LIVE"
-    # string as unverified, downgrading an APPLY-like decision to WATCH.
-    # This means a caller that supplies no role_status at all is NOT
-    # byte-identical to pre-milestone routing: an otherwise APPLY-like
-    # qualification now routes to WATCH by default (permanent project
-    # rule -- missing/invalid posting-state evidence must never silently
-    # become a favorable actionable state). The surfaced role_status
-    # output field is a separate concern: it is only ever the raw string
-    # the caller supplied, or None -- never fabricated, never coerced to
-    # a canonical value here. Posting state never alters qualification
-    # evidence, requirement-level matches, gaps, unknowns, or
-    # hard_blockers, and it never upgrades a decision or converts REJECT.
+    # caller supplied them on job_input. role_status and
+    # source_verification_status are each passed through to
+    # apply_posting_state_routing() independently and exactly as supplied
+    # -- including None, an unrecognized string, or a non-canonical type on
+    # either axis. Strengthened by LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1
+    # / Blueprint §135 (PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1):
+    # an already-computed APPLY-like decision now survives only when BOTH
+    # role_status == "VERIFIED_LIVE" AND source_verification_status ==
+    # "VERIFIED_DIRECT" are true. Missing, malformed, or any other value on
+    # EITHER axis alone -- including role_status="LIKELY_LIVE" even when
+    # source_verification_status="VERIFIED_DIRECT" -- fails closed,
+    # downgrading an APPLY-like decision to WATCH by default (permanent
+    # project rule -- missing/invalid posting/source evidence must never
+    # silently become a favorable actionable state). Neither axis is ever
+    # inferred from, or coerced into, the other. The surfaced role_status/
+    # source_verification_status output fields are a separate concern:
+    # each is only ever the raw string the caller supplied, or None --
+    # never fabricated, never coerced to a canonical value here.
+    # Posting/source verification affects actionable routing only -- it
+    # never alters qualification evidence, requirement-level matches,
+    # gaps, unknowns, or hard_blockers, and it never upgrades a decision
+    # or converts REJECT (a qualification REJECT remains REJECT under
+    # every posting/source combination).
     role_status = job_input.get("role_status")
     source_verification_status = job_input.get("source_verification_status")
     date_last_verified = job_input.get("date_last_verified")
-    decision = apply_posting_state_routing(base_result=decision, role_status=role_status)
+    decision = apply_posting_state_routing(
+        base_result=decision,
+        role_status=role_status,
+        source_verification_status=source_verification_status,
+    )
 
     analysis = {
         "job_id": job_id,
