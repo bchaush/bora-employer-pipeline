@@ -793,6 +793,61 @@ def _find_binary(name: str, extra_candidates: Sequence[str] = ()) -> str:
     raise InfrastructureError(f"required executable {name!r} not found on PATH")
 
 
+def _find_claude_binary() -> str:
+    """Resolve the Claude Code executable, preferring the native
+    `claude.exe` over the npm-generated `claude.cmd`/`claude.CMD`
+    wrapper on Windows.
+
+    ARGV-W1 correction (Cursor review, HIGH): empirically reproduced --
+    on Windows, `shutil.which("claude")` resolves to `claude.CMD`
+    (PATHEXT resolution order). That wrapper re-parses argv through
+    `cmd.exe`'s `%*` expansion, which does NOT preserve embedded
+    newlines: a real multiline builder prompt ("line one\\nline
+    two\\nline three") arrived at Claude as only "line one" -- silently
+    truncated, with no error at all. The native `claude.exe` (verified
+    directly) preserves the exact same multiline prompt byte-for-byte.
+    Since every real controller builder prompt is multiline
+    (`prompts/milestone_builder_v1.md` is a multi-section template), the
+    `.cmd` wrapper is never an acceptable substitute when a native
+    executable is available.
+
+    npm installs a bundled native binary for this package at a
+    deterministic path RELATIVE TO THE WRAPPER'S OWN DIRECTORY --
+    `<wrapper_dir>/node_modules/@anthropic-ai/claude-code/bin/claude.exe`
+    (confirmed by reading the actual installed `claude.cmd` contents,
+    which itself invokes exactly this relative path). This is not a
+    machine-specific absolute path: it is derived from wherever
+    `shutil.which` actually found the wrapper, so it works on any
+    machine with the same npm global-install layout.
+
+    If `which` resolves directly to a non-`.cmd` executable (already the
+    case on non-Windows, and would remain so if a future Windows install
+    ever ships a bare `claude.exe` on PATH), it is used unchanged --
+    non-Windows behavior is untouched.
+
+    Fail-closed: if only the `.cmd`/`.CMD` wrapper can be found and the
+    expected native sibling executable does not exist at that
+    deterministic relative path, this raises InfrastructureError rather
+    than silently falling back to a wrapper known to corrupt multiline
+    prompt content -- "no usable Claude executable" now specifically
+    means "none that can carry the real prompt intact", not merely
+    "PATH resolved to nothing"."""
+    found = shutil.which("claude")
+    if not found:
+        raise InfrastructureError("required executable 'claude' not found on PATH")
+    found_path = Path(found)
+    if found_path.suffix.lower() != ".cmd":
+        return found
+    native = found_path.parent / "node_modules" / "@anthropic-ai" / "claude-code" / "bin" / "claude.exe"
+    if native.exists():
+        return str(native)
+    raise InfrastructureError(
+        f"only the argv-corrupting claude.cmd wrapper was found ({found}); "
+        f"the expected native executable {native} does not exist -- refusing to invoke "
+        "a wrapper known to truncate multiline prompt content"
+    )
+
+
 def real_claude_builder_invoker(
     *, prompt: str, cwd: Path, policy: Mapping[str, Any], session_id: str | None
 ) -> dict[str, Any]:
@@ -809,8 +864,41 @@ def real_claude_builder_invoker(
     returned the raw outer envelope directly, which would never satisfy
     validate_builder_result() (no "status" field) against any real
     invocation. The builder's own JSON reply must be extracted from the
-    envelope's `result` STRING field."""
-    claude_bin = _find_binary("claude")
+    envelope's `result` STRING field.
+
+    CAREER_OS_CLAUDE_BUILDER_ARGV_ORDERING_FIX_V1 (reproduced on the
+    first real controller run, corrected twice):
+
+    Pass 1 -- `--allowedTools <tools...>` is a Commander.js VARIADIC
+    option -- it greedily consumes every subsequent positional argument
+    as an additional tool-name value. Placing the prompt after
+    `--allowedTools` left the CLI with zero positional prompt arguments,
+    always failing with "Input must be provided either through stdin or
+    as a prompt argument when using --print". First-fix attempt: move
+    the prompt to be the very first argument, before every flag.
+
+    Pass 2 (Cursor rereview, ARGV-W1/leading-dash finding) -- moving the
+    prompt first is insufficient on its own: a prompt whose own text
+    happens to begin with `-` or `--` (a real possibility for a builder
+    prompt, since it is assembled from a template and not otherwise
+    constrained) is misparsed as an option token by the CLI's argument
+    parser regardless of position, verified directly (`-reply...` was
+    read as an attempted short option; `--reply...` produced "unknown
+    option"). The corrected shape instead places every flag first, then
+    the literal `--` positional-terminator token, then the prompt last.
+    `--` is Commander.js's (and the general POSIX convention's) standard
+    signal that everything following is positional data, never an
+    option -- this was verified directly to correctly and simultaneously
+    handle: a normal prompt, a multiline prompt, a prompt beginning with
+    `-`, a prompt beginning with `--`, a prompt containing the literal
+    substring "--allowedTools" embedded in its own text, and a Unicode
+    prompt -- all six arrived at Claude character-for-character intact.
+    `--` also correctly terminates `--allowedTools`'s own variadic
+    collection, so the original Pass-1 defect remains fixed too. No
+    `shell=True`, no command-string quoting, and no stdin-based
+    invocation was needed -- argv-based invocation with a trailing `--`
+    satisfies the full contract."""
+    claude_bin = _find_claude_binary()
     args = [
         claude_bin,
         "-p",
@@ -819,11 +907,11 @@ def real_claude_builder_invoker(
         "--permission-mode",
         "acceptEdits",
         "--allowedTools",
-        "Read Write Edit Glob Grep",
+        "Read,Write,Edit,Glob,Grep",
     ]
     if session_id:
         args += ["--resume", session_id]
-    args += [prompt]
+    args += ["--", prompt]
     ok, output = _run_subprocess(args, cwd=cwd, timeout=int(policy["builder_timeout_seconds"]))
     if not ok:
         raise InfrastructureError(f"builder invocation failed: {output[-2000:]}")

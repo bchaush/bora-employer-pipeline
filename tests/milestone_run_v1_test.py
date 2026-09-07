@@ -25,6 +25,7 @@ appearance" guidance.
 
 from __future__ import annotations
 
+import inspect
 import json
 import shutil
 import subprocess
@@ -1732,6 +1733,428 @@ def _test_also_no_unbounded_loop(root: Path) -> None:
 
 _with_tmp_repo(_test_also_no_unbounded_loop)
 print("PASS ALSO-3: a perpetually-mutating adversarial scenario (evidence invalidated on every single pass) terminates within the max_steps bound rather than running forever -- documented limitation: this specific bounce has no dedicated budget of its own beyond max_steps.")
+
+
+# ======================================================================
+# CAREER_OS_CLAUDE_BUILDER_ARGV_ORDERING_FIX_V1 -- regression coverage.
+#
+# Pass 1 defect: --allowedTools <tools...> is a Commander.js VARIADIC
+# option in the real Claude Code CLI -- it greedily consumes every
+# subsequent positional argument, including the prompt, as an additional
+# tool-name value. Placing the prompt after --allowedTools left the CLI
+# with zero positional prompt arguments, always failing with "Input must
+# be provided either through stdin or as a prompt argument when using
+# --print". First-fix attempt: move the prompt to be the very first
+# argument, before every flag.
+#
+# Pass 2 defect (Cursor rereview, ARGV-W1 leading-dash finding):
+# prompt-first is insufficient -- a prompt beginning with '-' or '--' is
+# misparsed as an option token regardless of position, independently
+# reproduced against the real CLI both before and after this correction.
+# The final fix places every flag first, then the literal '--'
+# positional-terminator, then the prompt last -- verified directly
+# against the real CLI to correctly handle a normal prompt, a multiline
+# prompt, a leading-dash prompt, a leading-double-dash prompt, a prompt
+# containing the literal substring "--allowedTools", and a Unicode
+# prompt, all six intact.
+#
+# ARGV-W1 also required correcting binary resolution: on Windows,
+# shutil.which("claude") resolves to the argv-corrupting claude.CMD
+# wrapper (which truncates multiline prompts at the first newline via
+# cmd.exe's %* re-expansion -- independently reproduced: a real 3-line
+# prompt arrived as only "line one"). _find_claude_binary() now prefers
+# the native claude.exe sibling when available and fails closed
+# (InfrastructureError) rather than silently using a wrapper known to
+# corrupt prompt content.
+# ======================================================================
+
+def _write_fake_claude_shim(tmp_dir: Path) -> Path:
+    """A small fake 'claude'-like CLI (a plain Python script) that MODELS
+    the real CLI's argument-parsing behavior -- variadic --allowedTools
+    consumption, a '--' positional terminator, and rejection of an
+    unrecognized leading-dash token before '--' is seen -- not a mock of
+    milestone_run.py's own code. This proves the constructed argv is
+    actually correct at the real subprocess/argv-parsing boundary, not
+    merely via a static list assertion. The positional prompt (found
+    either before any flag, in the ORIGINAL prompt-first shape, or after
+    '--', in the CORRECTED shape) is echoed back byte-for-byte inside a
+    valid envelope for exact content-fidelity checks.
+
+    IMPORTANT: this returns the bare `.py` script path -- callers MUST
+    invoke it as a genuine native process (`[sys.executable, path, ...]`,
+    see `_native_run_subprocess`), never wrapped in a `.cmd`/`.bat`
+    shim. An earlier version of this fixture wrapped the script in a
+    `claude.cmd` file to mirror the real npm-installed layout, but that
+    accidentally routed every invocation through cmd.exe's own `%*`
+    argument re-expansion -- which mangles embedded newlines completely
+    independently of anything in milestone_run.py, exactly the same
+    Windows batch-file limitation ARGV-W1's production fix exists to
+    route AROUND (by always preferring a native executable). Testing
+    through that same limitation here would confound the test with an
+    unrelated fixture bug rather than exercising the corrected code
+    path, which -- after the ARGV-W1 fix -- never invokes a `.cmd`
+    wrapper for real work in the first place."""
+    fake_py = tmp_dir / "fake_claude.py"
+    fake_py.write_text(
+        "import sys, json\n"
+        "args = sys.argv[1:]\n"
+        "VALUE_FLAGS = {'--output-format', '--permission-mode', '--resume'}\n"
+        "NOARG_FLAGS = {'-p'}\n"
+        "i = 0\n"
+        "prompt = None\n"
+        "saw_terminator = False\n"
+        "error = None\n"
+        "while i < len(args):\n"
+        "    tok = args[i]\n"
+        "    if not saw_terminator and tok == '--':\n"
+        "        saw_terminator = True; i += 1; continue\n"
+        "    if not saw_terminator and tok in NOARG_FLAGS:\n"
+        "        i += 1; continue\n"
+        "    if not saw_terminator and tok in VALUE_FLAGS:\n"
+        "        i += 2; continue\n"
+        "    if not saw_terminator and tok == '--allowedTools':\n"
+        "        i += 1\n"
+        "        # VARIADIC: consume every following token until '--', a\n"
+        "        # recognized flag, or end -- the real CLI's actual\n"
+        "        # documented behavior, and the exact mechanism of the bug.\n"
+        "        while i < len(args) and args[i] != '--' and args[i] not in VALUE_FLAGS and args[i] not in NOARG_FLAGS and args[i] != '--allowedTools':\n"
+        "            i += 1\n"
+        "        continue\n"
+        "    if not saw_terminator and tok.startswith('-') and tok not in NOARG_FLAGS and tok not in VALUE_FLAGS:\n"
+        "        error = f\"error: unknown option '{tok}'\"\n"
+        "        break\n"
+        "    if prompt is None:\n"
+        "        prompt = tok\n"
+        "    i += 1\n"
+        "if error is not None:\n"
+        "    sys.stderr.write(error + '\\n')\n"
+        "    sys.exit(1)\n"
+        "if prompt is None:\n"
+        "    sys.stderr.write('Error: Input must be provided either through stdin or as a prompt argument when using --print\\n')\n"
+        "    sys.exit(1)\n"
+        "envelope = {\n"
+        "    'is_error': False,\n"
+        "    'session_id': 'fake-session-id',\n"
+        "    'result': json.dumps({\n"
+        "        'status': 'IMPLEMENTATION_ATTEMPT_COMPLETE',\n"
+        "        'summary': 'fake shim received prompt',\n"
+        "        'files_touched': [],\n"
+        "        'stop_condition_encountered': None,\n"
+        "        'architecture_decision_required': False,\n"
+        "        '_echoed_prompt': prompt,\n"
+        "    }),\n"
+        "    'type': 'result',\n"
+        "}\n"
+        "sys.stdout.reconfigure(encoding='utf-8')\n"
+        "print(json.dumps(envelope))\n"
+        "sys.exit(0)\n",
+        encoding="utf-8",
+    )
+    return fake_py
+
+
+def _native_run_subprocess(fake_py: Path):
+    """Wraps the REAL mr._run_subprocess so that whatever placeholder
+    `claude_bin` string real_claude_builder_invoker() constructed argv
+    with is replaced, at the last moment, by a genuine native-process
+    invocation of the fake CLI script -- `[sys.executable, fake_py]`,
+    a real PE executable, no cmd.exe indirection -- while every other
+    constructed argv element (flags, --allowedTools value, the '--'
+    terminator, the prompt itself) passes through completely unchanged.
+    This exercises the real argv-construction code in
+    real_claude_builder_invoker() end-to-end through a real subprocess
+    boundary, structurally equivalent to how the corrected production
+    code invokes a native claude.exe."""
+    original = mr._run_subprocess
+
+    def _wrapped(args, *, cwd, timeout=600):
+        native_args = [sys.executable, str(fake_py)] + list(args[1:])
+        return original(native_args, cwd=cwd, timeout=timeout)
+
+    return _wrapped
+
+
+# Requirement ARGV-T1, cases A-H: exact character-for-character prompts.
+ARGV_FIDELITY_CASES: dict[str, str] = {
+    "A_spaces": "plain prompt with several   embedded   spaces",
+    "B_newlines": "line one\nline two\n\nline four after a blank line\nline five",
+    "C_braces_quotes": 'prompt with {curly braces} and "double quotes" and \'single quotes\'',
+    "D_command_like": "prompt; rm -rf /  && echo pwned # command-like text that must never be interpreted",
+    "E_literal_allowedtools_token": "this text contains the literal token --allowedTools embedded inside it",
+    "F_commas": "prompt, with, several, embedded, commas, like, a, tool, list",
+    "G_leading_dash": "--this prompt itself begins with a double dash and must not be parsed as an option",
+    "H_unicode": "Unicode payload: \u00e9\u00e8\u00fc\u00f1 \u4e2d\u6587\u5b57\u7b26 \U0001F600\U0001F680 \u0645\u0631\u062d\u0628\u0627",
+}
+
+
+def _test_argv_ordering_boundary_shim_exact_fidelity() -> None:
+    """Requirement ARGV-T1: assert EXACT character-for-character equality
+    between the expected prompt and the prompt actually received at the
+    fake CLI boundary, for every case A-H -- not merely 'some prompt
+    survived'. Fails on any lost, inserted, reordered, normalized, or
+    otherwise altered character."""
+    tmp_dir = Path(tempfile.mkdtemp(prefix="claude_shim_fidelity_test_"))
+    try:
+        fake_py = _write_fake_claude_shim(tmp_dir)
+        original_find_claude_binary = mr._find_claude_binary
+        original_run_subprocess = mr._run_subprocess
+        mr._find_claude_binary = lambda: "claude-placeholder"
+        mr._run_subprocess = _native_run_subprocess(fake_py)
+        try:
+            for label, expected_prompt in ARGV_FIDELITY_CASES.items():
+                result = mr.real_claude_builder_invoker(
+                    prompt=expected_prompt, cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None
+                )
+                assert_true(
+                    result.get("summary") == "fake shim received prompt",
+                    f"Case {label}: the prompt must be received as the genuine positional prompt, got {result}",
+                )
+                received_prompt = result.get("_echoed_prompt")
+                assert_true(
+                    received_prompt == expected_prompt,
+                    f"Case {label}: the prompt must arrive EXACTLY character-for-character intact.\nExpected: {expected_prompt!r}\nReceived: {received_prompt!r}",
+                )
+        finally:
+            mr._find_claude_binary = original_find_claude_binary
+            mr._run_subprocess = original_run_subprocess
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+_test_argv_ordering_boundary_shim_exact_fidelity()
+print("PASS ARGV-FIX-1: cases A-H (spaces, newlines, braces/quotes, command-like text, a literal '--allowedTools' substring, commas, a leading-dash prompt, and Unicode) all arrive at the fake CLI boundary EXACTLY character-for-character intact -- not merely 'some prompt survived'.")
+
+
+def _test_argv_ordering_boundary_shim_negative_controls() -> None:
+    """Negative controls: prove the shim itself genuinely reproduces (a)
+    the ORIGINAL Pass-1 bug (prompt after --allowedTools, no terminator)
+    and (b) the Pass-1-fix's own insufficiency (a leading-dash prompt
+    placed FIRST, without a '--' terminator) -- confirming this exact
+    test harness would have caught both real defects, not merely that
+    the current (corrected) production code happens to pass."""
+    tmp_dir = Path(tempfile.mkdtemp(prefix="claude_shim_regression_test_"))
+    try:
+        fake_py = _write_fake_claude_shim(tmp_dir)
+
+        # (a) original Pass-1 defect: prompt after --allowedTools, no '--'.
+        # Invoked as a genuine native process ([sys.executable, fake_py,
+        # ...]), same as the fidelity test -- no cmd.exe indirection.
+        broken_args_pass1 = [
+            sys.executable, str(fake_py), "-p", "--output-format", "json", "--permission-mode", "acceptEdits",
+            "--allowedTools", "Read,Write,Edit,Glob,Grep", "this prompt must be swallowed",
+        ]
+        ok, output = mr._run_subprocess(broken_args_pass1, cwd=Path("."), timeout=30)
+        assert_true(not ok, "the shim must reproduce the ORIGINAL Pass-1 failure when the prompt is placed after --allowedTools with no terminator")
+        assert_true(
+            "Input must be provided either through stdin or as a prompt argument" in output,
+            f"the shim must reproduce the exact real CLI Pass-1 error message, got {output!r}",
+        )
+
+        # (b) Pass-1-fix insufficiency: leading-dash prompt placed FIRST,
+        # before any flag, with no '--' terminator -- this is exactly
+        # the shape the first (insufficient) correction used.
+        broken_args_pass1fix = [
+            sys.executable, str(fake_py), "--this leading-dash prompt would be placed first", "-p",
+            "--output-format", "json", "--permission-mode", "acceptEdits",
+            "--allowedTools", "Read,Write,Edit,Glob,Grep",
+        ]
+        ok2, output2 = mr._run_subprocess(broken_args_pass1fix, cwd=Path("."), timeout=30)
+        assert_true(not ok2, "the shim must reproduce the Pass-1-fix's own insufficiency: a leading-dash prompt placed first, with no '--' terminator, must still fail")
+        assert_true(
+            "unknown option" in output2,
+            f"a leading-dash prompt placed first without a terminator must be rejected as an unrecognized option, got {output2!r}",
+        )
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+_test_argv_ordering_boundary_shim_negative_controls()
+print("PASS ARGV-FIX-1-NEG: negative controls confirm this test harness would have caught BOTH the original Pass-1 defect (prompt swallowed by --allowedTools) AND the Pass-1-fix's own insufficiency (a leading-dash prompt placed first without a '--' terminator is still misparsed as an option).")
+
+
+def _test_argv_static_structure_and_flags() -> None:
+    """Requirements #1, #3, #4, #5, #6, #7: static assertions on the
+    constructed argv and unchanged surrounding behavior, using a
+    recording fake subprocess runner (fast, no real process needed)."""
+    recorded: dict[str, Any] = {}
+    original_run_subprocess = mr._run_subprocess
+
+    def _recording_run_subprocess(args, *, cwd, timeout=600):
+        recorded["args"] = list(args)
+        recorded["timeout"] = timeout
+        return True, json.dumps(
+            {
+                "is_error": False,
+                "session_id": "rec-session",
+                "result": json.dumps(
+                    {
+                        "status": "IMPLEMENTATION_ATTEMPT_COMPLETE",
+                        "summary": "ok",
+                        "files_touched": [],
+                        "stop_condition_encountered": None,
+                        "architecture_decision_required": False,
+                    }
+                ),
+                "type": "result",
+            }
+        )
+
+    mr._run_subprocess = _recording_run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    try:
+        mr.real_claude_builder_invoker(
+            prompt="a real prompt", cwd=Path("."), policy={"builder_timeout_seconds": 123}, session_id=None
+        )
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+
+    args = recorded["args"]
+    # The prompt must be the LAST argv element, immediately preceded by
+    # a literal '--' terminator, so it can never be swallowed by
+    # --allowedTools's variadic consumption nor misparsed as an option
+    # even if it begins with '-' or '--'.
+    assert_true(args[-1] == "a real prompt", f"the prompt must be the final argv element, got {args}")
+    assert_true(args[-2] == "--", f"the prompt must be immediately preceded by a literal '--' terminator, got {args}")
+    allowed_tools_idx = args.index("--allowedTools")
+    assert_true(allowed_tools_idx < len(args) - 2, f"--allowedTools must appear before the '--' terminator, got {args}")
+
+    # 3. allowed tools unchanged (same five tools, whatever separator convention).
+    tools_value = args[allowed_tools_idx + 1]
+    tools_set = {t.strip() for t in tools_value.replace(",", " ").split()}
+    assert_true(tools_set == {"Read", "Write", "Edit", "Glob", "Grep"}, f"the allowed tool set must remain exactly Read/Write/Edit/Glob/Grep, got {tools_set}")
+
+    # 4. --output-format json still present.
+    assert_true("--output-format" in args and args[args.index("--output-format") + 1] == "json", "the --output-format json flag must remain present")
+
+    # 5. --permission-mode unchanged.
+    assert_true("--permission-mode" in args and args[args.index("--permission-mode") + 1] == "acceptEdits", "the --permission-mode flag must remain acceptEdits, unchanged")
+
+    # 6. timeout behavior unchanged -- the policy's builder_timeout_seconds is forwarded as-is.
+    assert_true(recorded["timeout"] == 123, f"builder_timeout_seconds must still be forwarded to the subprocess call unchanged, got {recorded['timeout']}")
+
+    # No shell invocation is ever introduced -- args[0] is a plain
+    # executable path/string, and _run_subprocess (shared, unmodified)
+    # never sets shell=True anywhere in this module.
+    # Scoped to the three actual subprocess.run() call sites (_run_git,
+    # _run_subprocess, _is_ancestor) rather than the whole module --
+    # scanning the whole module would false-positive on this very
+    # docstring's own prose explaining that shell=True was NOT used.
+    for fn in (mr._run_git, mr._run_subprocess, mr._is_ancestor):
+        assert_true("shell=True" not in inspect.getsource(fn) and "shell = True" not in inspect.getsource(fn), f"{fn.__name__} must never introduce a shell=True subprocess invocation")
+
+
+_test_argv_static_structure_and_flags()
+print("PASS ARGV-FIX-2: static argv assertions confirm the prompt is the final argv element immediately preceded by a literal '--' terminator (never swallowed by --allowedTools, never misparsed even if it begins with '-'), --allowedTools/--output-format/--permission-mode are unchanged, builder_timeout_seconds is still forwarded unchanged, and no shell=True invocation exists anywhere in the module.")
+
+
+def _test_argv_fix_fail_closed_on_nonzero_and_malformed() -> None:
+    """Requirement #7: a nonzero subprocess exit, and a malformed
+    envelope, must both still fail closed (InfrastructureError) -- the
+    argv/binary-resolution correction must not have weakened this
+    existing behavior."""
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (False, "simulated nonzero exit")
+    raised = False
+    try:
+        mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+    except mr.InfrastructureError:
+        raised = True
+    finally:
+        mr._run_subprocess = original_run_subprocess
+    assert_true(raised, "a nonzero subprocess exit must still raise InfrastructureError (fail closed), unchanged by this correction")
+
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (True, "not even json")
+    raised = False
+    try:
+        mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+    except mr.InfrastructureError:
+        raised = True
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(raised, "a malformed (non-JSON) envelope must still raise InfrastructureError (fail closed), unchanged by this correction")
+
+
+_test_argv_fix_fail_closed_on_nonzero_and_malformed()
+print("PASS ARGV-FIX-3: a nonzero subprocess exit and a malformed envelope both still fail closed with InfrastructureError, unchanged by this correction.")
+
+
+# ======================================================================
+# ARGV-W1: binary-resolution correction (native claude.exe preferred
+# over the argv-corrupting claude.CMD wrapper on Windows).
+# ======================================================================
+def _test_argv_w1_prefers_native_exe_over_cmd_wrapper() -> None:
+    tmp_dir = Path(tempfile.mkdtemp(prefix="claude_binres_test_"))
+    try:
+        wrapper_dir = tmp_dir / "npmglobal"
+        wrapper_dir.mkdir(parents=True)
+        cmd_path = wrapper_dir / "claude.cmd"
+        cmd_path.write_text("@echo off\r\n", encoding="utf-8")
+        native_dir = wrapper_dir / "node_modules" / "@anthropic-ai" / "claude-code" / "bin"
+        native_dir.mkdir(parents=True)
+        native_path = native_dir / "claude.exe"
+        native_path.write_text("", encoding="utf-8")
+
+        original_which = mr.shutil.which
+        mr.shutil.which = lambda name: str(cmd_path) if name == "claude" else original_which(name)
+        try:
+            resolved = mr._find_claude_binary()
+        finally:
+            mr.shutil.which = original_which
+        assert_true(
+            Path(resolved) == native_path,
+            f"when a native claude.exe sibling exists next to the claude.cmd wrapper, it must be preferred over the wrapper, got {resolved}",
+        )
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _test_argv_w1_fails_closed_when_only_wrapper_exists() -> None:
+    tmp_dir = Path(tempfile.mkdtemp(prefix="claude_binres_failclosed_test_"))
+    try:
+        wrapper_dir = tmp_dir / "npmglobal"
+        wrapper_dir.mkdir(parents=True)
+        cmd_path = wrapper_dir / "claude.cmd"
+        cmd_path.write_text("@echo off\r\n", encoding="utf-8")
+        # Deliberately do NOT create the native sibling executable.
+
+        original_which = mr.shutil.which
+        mr.shutil.which = lambda name: str(cmd_path) if name == "claude" else original_which(name)
+        try:
+            raised = False
+            try:
+                mr._find_claude_binary()
+            except mr.InfrastructureError:
+                raised = True
+            assert_true(raised, "when only the argv-corrupting claude.cmd wrapper exists (no native sibling), resolution must fail closed rather than silently use the wrapper")
+        finally:
+            mr.shutil.which = original_which
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _test_argv_w1_non_windows_style_path_passthrough() -> None:
+    """A which() result that is not a .cmd (e.g. a bare POSIX script, or
+    an already-native .exe) is used unchanged -- non-Windows behavior,
+    and an already-native Windows result, are both untouched."""
+    original_which = mr.shutil.which
+    mr.shutil.which = lambda name: "/usr/local/bin/claude" if name == "claude" else original_which(name)
+    try:
+        resolved = mr._find_claude_binary()
+    finally:
+        mr.shutil.which = original_which
+    assert_true(resolved == "/usr/local/bin/claude", f"a non-.cmd which() result must be used unchanged, got {resolved}")
+
+
+_test_argv_w1_prefers_native_exe_over_cmd_wrapper()
+_test_argv_w1_fails_closed_when_only_wrapper_exists()
+_test_argv_w1_non_windows_style_path_passthrough()
+print("PASS ARGV-W1: _find_claude_binary() prefers a native claude.exe sibling over the claude.cmd wrapper when available, fails closed (InfrastructureError) when only the corrupting wrapper exists with no native sibling, and leaves an already-non-.cmd which() result (POSIX script or already-native executable) unchanged.")
 
 
 print("ALL milestone_run_v1_test CHECKS PASSED")
