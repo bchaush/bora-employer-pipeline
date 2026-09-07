@@ -35,6 +35,12 @@ downloads/
 # Logs generated at runtime
 logs/*.log
 
+# CAREER_OS_BOUNDED_AGENT_BUILD_LOOP_V1: local, per-machine milestone-run
+# state (manifests, locks, builder/reviewer/assurance artifacts). Never
+# committed -- restart-safety comes from this being reconstructible from
+# Git plus these local files, never from repository history.
+.career-os/
+
 # Sensitive local files
 *.csv
 *.xlsx

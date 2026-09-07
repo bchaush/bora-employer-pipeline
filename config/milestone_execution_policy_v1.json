@@ -1,0 +1,10 @@
+{
+  "policy_version": "1",
+  "_comment": "CAREER_OS_BOUNDED_AGENT_BUILD_LOOP_V1. Conservative V1 engineering defaults for HOW the controller may attempt an already-authorized milestone -- never WHAT is authorized (that is the milestone contract's job, never this file's). These are operational defaults chosen for a single-collaborator repository with a slow, careful human approval gate, NOT empirically proven universal values. Snapshotted (with its own content hash) into every run at initialization; changing this file later never mutates an already-running run's own snapshot.",
+  "implementation_repair_limit": 3,
+  "review_correction_limit": 2,
+  "infrastructure_retry_limit": 2,
+  "builder_timeout_seconds": 900,
+  "reviewer_timeout_seconds": 300,
+  "builder_max_turns": 40
+}
