@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/milestone_contract.schema.json",
+  "title": "Career OS Milestone Contract",
+  "description": "CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1. Branch-scoped authorization record for one bounded milestone's in-progress work. baseline_sha records historical authorization provenance (the canonical main SHA this milestone was authorized against) -- never a claim about the CURRENT canonical SHA, which is always derived live from Git/GitHub.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "milestone_id",
+    "kind",
+    "goal",
+    "baseline_sha",
+    "allowed_paths",
+    "forbidden_paths",
+    "required_tests",
+    "acceptance_conditions",
+    "stop_conditions",
+    "review_requirements",
+    "human_approval_requirements"
+  ],
+  "properties": {
+    "milestone_id": { "type": "string", "minLength": 1 },
+    "kind": {
+      "type": "string",
+      "enum": ["IMPLEMENTATION", "DOCTRINE_LOCK", "READ_ONLY_AUDIT", "GOVERNANCE_SYNC"]
+    },
+    "goal": { "type": "string", "minLength": 1 },
+    "baseline_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The exact canonical main SHA this milestone was authorized against -- historical authorization provenance, not a current-state claim."
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "required_tests": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "acceptance_conditions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "review_requirements": { "type": "string", "minLength": 1 },
+    "human_approval_requirements": { "type": "string", "minLength": 1 }
+  }
+}

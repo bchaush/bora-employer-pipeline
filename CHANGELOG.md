@@ -19,6 +19,32 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-07 — Career OS milestone contract and state validation (`CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1`)
+
+**Reason**
+
+The `CANONICAL_STATE_RECOVERY_AND_MILESTONE_CONTRACT_V1` read-only audit reproduced a real, mechanically-undetectable state-continuity defect: `CURRENT_STATE.md` still declared Blueprint v3.8 while canonical `BLUEPRINT.md` was already v3.10, and `CURRENT_MILESTONE.md`'s top pointer was ten pull requests behind canonical main -- a drift that had already recurred once before despite a prior one-time manual sync (`POST_GOVERNANCE_CANONICAL_STATE_CONTINUITY_SYNC_V1`, PR #8), because no mechanical check anywhere in the repository could ever detect it.
+
+**Changed**
+
+* New `project_state.json` (root): small, canonical-MERGED-only semantic state (Blueprint version, latest locked section, latest closed milestone id/PR, current phase, next authorized action, last-updated date) -- deliberately carries no current Git SHA and no transient active-milestone field.
+* New `schemas/project_state.schema.json`, `schemas/milestone_contract.schema.json`; new `src/career_os_state.py` (pure, deterministic, offline-first validator: cross-checks `project_state.json` against actual `BLUEPRINT.md` content; branch-scoped milestone-contract discovery, schema validation, baseline_sha-vs-actual-merge-base check, and allowed/forbidden/protected-path enforcement over the current branch's changed files -- narrowly scoped to the CURRENT branch only, never a repository-wide branch scan); new `scripts/verify_milestone_state.py` (`career-os milestone check` CLI, local mode by default, `--online` mode separately verifying the latest closed milestone's PR is actually MERGED on GitHub).
+* `scripts/verify_assurance_baseline.py` gained a new Phase 0 (`project_state.json` vs `BLUEPRINT.md` only -- offline, no git-history dependency, since this workflow's shallow single-ref checkout cannot reliably resolve `main` for a merge-base-dependent check).
+* New `milestone_contracts/feature/career-os-milestone-contract-and-state-validation-v1.json`: this milestone's own dogfooded contract, exercised end-to-end by `scripts/verify_milestone_state.py` against the real repository.
+* New `tests/career_os_state_v1_test.py` (13 sections, built on disposable real temporary git repositories, including two regression sections added after dogfooding this checker against the actual repository surfaced two real bugs: a `.strip()` call silently corrupting the leading status-code column of `git status --porcelain`'s first line, and a wholly-new untracked directory collapsing into one summary line instead of listing its individual files).
+* `CURRENT_STATE.md`/`CURRENT_MILESTONE.md`: smallest catch-up (corrected version/pointer, four previously-unrecorded closures retroactively logged) plus a new authority-demotion note making explicit that their prose is informational and never outranks `BLUEPRINT.md`/`project_state.json`/live Git-GitHub state.
+* New `docs/decisions/ADR-CAREER-OS-MILESTONE-CONTRACT-AND-STATE-VALIDATION-V1.md`.
+
+**Not changed**
+
+`BLUEPRINT.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`; every Truth-layer schema and qualification/decision runtime file (`job_analysis.py`, `job_decision.py`, `requirement_source_role.py`, etc.); the résumé architecture; `requirements.in`/`requirements-lock.txt` (no new dependency -- reuses the existing `jsonschema`-backed `schema_validation.build_draft202012_validator`); no autonomous builder/reviewer loop, no programmatic Claude/Codex/Cursor invocation, no daily job-discovery/application automation.
+
+**Validation**
+
+`tests/career_os_state_v1_test.py`: 13/13 sections pass. `python scripts/verify_milestone_state.py`: PASSED against this milestone's own real contract. `python scripts/verify_assurance_baseline.py`: ALL PHASES PASSED (Phase 0 new, Phase 2 63/63, Phase 3 Golden 15/15). Existing recruiter-threshold and résumé suites unchanged and green. `git diff --check` clean.
+
+---
+
 ## 2026-09-07 — Bora role selection and pursuit priority standard (`BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1`, DOCUMENTATION ONLY)
 
 **Reason**

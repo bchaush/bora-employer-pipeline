@@ -1,10 +1,73 @@
 # Bora Employer Pipeline OS — Current State
 
-Updated: 2026-09-04 (BORA_SPECIFIC_HIRING_RELEVANCE_V1)
+Updated: 2026-09-07 (CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1 catch-up)
+
+**Authority note (CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1).**
+This file's prose is historical narrative -- informational, never
+authoritative. It can drift behind canonical state (it did: see the
+2026-09-07 catch-up entry below, reproduced live by the
+`CANONICAL_STATE_RECOVERY_AND_MILESTONE_CONTRACT_V1` read-only audit,
+which found this file still declared Blueprint v3.8 while canonical
+`BLUEPRINT.md` was already v3.10). The mechanically checkable facts --
+`BLUEPRINT.md`'s own version header and locked-section numbering,
+`project_state.json` (checked against them by
+`scripts/verify_assurance_baseline.py` Phase 0 /
+`scripts/verify_milestone_state.py`), and live Git/GitHub state -- always
+outrank this prose. Before trusting anything below, verify it against
+those sources rather than this file alone.
+
+## Catch-Up Entry (2026-09-07)
+
+Four milestones closed and merged to canonical `main` between this
+file's prior update (2026-09-04) and this catch-up, none previously
+recorded here -- the exact drift the audit above reproduced. Recorded
+retroactively, briefly, without rewriting any history below this entry:
+
+1. **`PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1`** (PR #14) --
+   extended `apply_posting_state_routing()` in `src/job_decision.py` to
+   require BOTH `role_status=="VERIFIED_LIVE"` AND
+   `source_verification_status=="VERIFIED_DIRECT"` before preserving
+   APPLY-like routing, closing a live-reproduced gap (MGB RQ4075857)
+   where a `LIKELY_LIVE` + `VERIFIED_DIRECT` role could still surface as
+   an APPLY-like recommendation.
+2. **`BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1`** (PR #15) -- new
+   `apply_recruiter_threshold_guard()` in `src/job_decision.py`, a
+   downstream, downgrade-only pursuit/surfacing guard closing a gap
+   reproduced live at Bose Professional (a truthful but under-qualified
+   recruiter-threshold role reaching `PRIORITY_APPLY`): an unresolved
+   mandatory experience threshold with `lower_bound==2` caps at
+   `EFFICIENT_APPLY`; `lower_bound>=3` caps every APPLY-like decision
+   (including an incoming `EFFICIENT_APPLY`) at `WATCH`. Never touches
+   Qualification Truth; never converts `UNKNOWN` to `NONE`.
+3. **`RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1`**
+   (PR #16, `BLUEPRINT.md` v3.9, new locked Section 137) -- new
+   `src/resume_page_utilization.py`, a pure geometry validator enforcing
+   Bora's explicit 92%-of-page-height meaningful-content floor (never
+   generates/parses a PDF; no new dependency); wired as an optional,
+   fail-closed `page_geometry` parameter on `resume_validation.py`'s
+   existing export-approval gate. Closed a gap reproduced live at
+   Atominvest -- Implementation Analyst (a truthful but substantially
+   under-filled one-page résumé Bora had to manually correct).
+4. **`BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1`** (PR #17,
+   `BLUEPRINT.md` v3.10, new locked Section 138) -- governance/doctrine
+   lock (no schema/runtime/test change) operationalizing Section 136 into
+   a concrete role-discovery and pursuit-priority standard: comparison-
+   pool bands A+/A/B/C, primary search lanes, Bora-specific freshness
+   bands, remote-authenticity vocabulary, and a serious-role presentation
+   standard with zero numeric scoring -- see Section 138 for the full,
+   authoritative doctrine text.
+
+`CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1` itself (this
+milestone) is recorded once merged, not here in advance, consistent with
+this file's own established convention of recording a closure after it
+actually happens.
 
 ## Current Phase
 
-Governing Blueprint: **Final Locked Blueprint v3.8**.
+Governing Blueprint: **Final Locked Blueprint v3.10** (see the 2026-09-07
+catch-up entry above -- this line itself is prose and can drift; verify
+against `BLUEPRINT.md`'s own header and `project_state.json` rather than
+trusting this line alone).
 
 Bora-specific hiring relevance (`BORA_SPECIFIC_HIRING_RELEVANCE_V1`) —
 governance/documentation milestone, not a product implementation

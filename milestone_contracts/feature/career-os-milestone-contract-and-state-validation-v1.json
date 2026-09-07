@@ -1,0 +1,50 @@
+{
+  "milestone_id": "CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Build the smallest deterministic state/milestone validator preventing a fresh agent from trusting stale CURRENT_STATE.md/CURRENT_MILESTONE.md claims, per the CANONICAL_STATE_RECOVERY_AND_MILESTONE_CONTRACT_V1 read-only audit.",
+  "baseline_sha": "178fb50b0f928bfb254634b07109016e5d377b04",
+  "allowed_paths": [
+    "project_state.json",
+    "schemas/project_state.schema.json",
+    "schemas/milestone_contract.schema.json",
+    "src/career_os_state.py",
+    "scripts/verify_milestone_state.py",
+    "scripts/verify_assurance_baseline.py",
+    "milestone_contracts/feature/career-os-milestone-contract-and-state-validation-v1.json",
+    "tests/career_os_state_v1_test.py",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md",
+    "docs/decisions/ADR-CAREER-OS-MILESTONE-CONTRACT-AND-STATE-VALIDATION-V1.md"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "src/job_analysis.py",
+    "src/job_decision.py",
+    "src/requirement_source_role.py",
+    "src/resume_validation.py",
+    "schemas/job.schema.json",
+    "schemas/job_analysis_result.schema.json",
+    "schemas/resume_derivative.schema.json",
+    ".github/workflows/assurance-baseline.yml"
+  ],
+  "required_tests": [
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "python scripts/verify_milestone_state.py exits 0 on this branch against its own contract",
+    "python scripts/verify_assurance_baseline.py reports ALL PHASES PASSED, including the new local state-validation phase",
+    "existing recruiter-threshold, resume, and full test suites remain unchanged and green",
+    "git diff --check is clean"
+  ],
+  "stop_conditions": [
+    "implementation would require modifying BLUEPRINT.md beyond what canonical doctrine already truthfully establishes",
+    "implementation would require modifying a Truth-layer schema or qualification/decision runtime logic",
+    "implementation would require building an autonomous builder/reviewer loop or programmatically invoking Claude/Codex/Cursor"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_MERGE_REQUIRED_NO_AUTO_MERGE"
+}

@@ -6,8 +6,31 @@ docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md §5.
 Usage:
     python scripts/verify_assurance_baseline.py
 
-Runs exactly three execution phases, in order:
+Runs exactly four execution phases, in order:
 
+  Phase 0 -- CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1 local,
+             deterministic, OFFLINE semantic-state validation
+             (src/career_os_state.py::validate_project_state). Confirms
+             project_state.json's claims (Blueprint version, latest
+             locked section number) against actual BLUEPRINT.md content.
+             This phase makes NO network calls and no git-history
+             assumptions (no branch/merge-base query), deliberately:
+             this workflow's checkout step uses the default shallow,
+             single-ref fetch (no `fetch-depth: 0`), under which `main`
+             is not necessarily locally resolvable from an arbitrary PR
+             checkout -- so the FULL branch-scoped milestone-contract
+             check (src/career_os_state.py::run_local_state_checks,
+             which does need merge-base/branch information) is
+             deliberately NOT run here, to avoid a misleading, flaky
+             enforcement claim this exact CI environment cannot actually
+             back up. That fuller check runs via the separate
+             scripts/verify_milestone_state.py, intended for local/
+             developer/agent use in a full working checkout, where
+             `main` and full history are always available. GitHub-online
+             verification is a further, explicitly opt-in mode on that
+             same script, never invoked here, so this CI job never
+             recursively depends on calling back out to GitHub from
+             inside its own run.
   Phase 1 -- compile/syntax check (equivalent to
              `python -m compileall -q src tests`).
   Phase 2 -- discover and run all tests/*_test.py in deterministic sorted
@@ -58,6 +81,9 @@ SRC_DIR = ROOT / "src"
 TESTS_DIR = ROOT / "tests"
 GOLDEN_RUNNER = ROOT / "golden-tests" / "run_job_analysis_golden_set.py"
 
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 # Mandatory Phase-2 coverage anchors (ADR §5). If any of these is absent
 # from the discovered tests/*_test.py set, Phase 2 fails closed before
 # running anything -- this is an environment/setup-style failure, not an
@@ -90,6 +116,21 @@ def _run(cmd: list[str], *, label: str) -> tuple[bool, str]:
     output = (completed.stdout or "") + (completed.stderr or "")
     ok = completed.returncode == 0
     return ok, output
+
+
+def phase_0_state_validation() -> bool:
+    print("=== Phase 0: semantic-state validation (project_state.json vs BLUEPRINT.md) ===")
+    from career_os_state import validate_project_state
+
+    result = validate_project_state(root=ROOT)
+    if result["errors"]:
+        for error in result["errors"]:
+            print(f"FAIL {error}")
+    if not result["valid"]:
+        print("Phase 0 FAILED: project_state.json does not match actual BLUEPRINT.md content.")
+        return False
+    print("Phase 0 PASSED.")
+    return True
 
 
 def phase_1_compile() -> bool:
@@ -172,6 +213,8 @@ def phase_3_job_analysis_golden() -> bool:
 
 
 def main() -> int:
+    if not phase_0_state_validation():
+        return 1
     if not phase_1_compile():
         return 1
     if not phase_2_tests():
