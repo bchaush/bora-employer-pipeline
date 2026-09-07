@@ -19,6 +19,27 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-07 — Bora role selection and pursuit priority standard (`BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1`, DOCUMENTATION ONLY)
+
+**Reason**
+
+Career OS had no locked operating standard for which roles it should actively search for, prioritize, and spend Bora's application effort on. §136 established the four-axis Competitive Position framework but did not operationalize concrete discovery bands, primary search lanes, freshness urgency, remote-authenticity vocabulary, or a serious-role output standard.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.9 → v3.10; new locked Section 138 operationalizes §136 (cross-referenced, not restated) into: comparison-pool discovery bands A+/A/B/C with an explicit "do not actively target" list (2-4/3-5/5+/Senior/Lead/Principal/Manager) that is a discovery/pursuit-economics rule, never an automatic Qualification Truth REJECT; central-functional-overlap priority list; required-skill non-compensation examples; three primary search lanes (Boston/Greater Boston, verified U.S. remote part-time/contract/temporary, verified U.S. remote full-time); Bora-specific freshness bands (VERY_FRESH/FRESH/AGING/STALE_LEANING/UNKNOWN) keyed to the existing `board_posted_date` field, explicitly not a universal employer-hiring-probability claim and never a modification of Employer Truth; a restated (not redefined) §135 first-party-actionability cross-reference; a remote-authenticity qualitative vocabulary (VERIFIED/LIKELY_LEGITIMATE/UNCLEAR/HIGH_RISK/CONFIRMED_FRAUD/N/A) for human/model assessment, explicitly not a new schema enum or runtime field; a serious-role output standard (Bora Fit/Comparison Pool/Freshness/Location/First-Party Actionability/Remote Authenticity/Authorization/Opportunity Value/Pursuit Economics/Final Verdict) with zero numeric scoring; a conceptual-only core selection principle; preserved current role-family search targets (cross-referencing §6, not a closed ontology); an employment-type principle rejecting a fake full-time > contract > temporary > part-time hierarchy; an explicit build-economy/implementation boundary naming a required future read-only architecture audit before any runtime work; and an Atominvest calibration-reference note that does not persist or alter its separately recorded Application Truth.
+* New `.cursor/rules/role-selection.mdc`: a concise operational pointer to §138 (no restatement), since no existing `.cursor/rules/*.mdc` file covered discovery/comparison-pool/freshness/remote-authenticity doctrine.
+
+**Not changed**
+
+`schemas/`; `src/`; `tests/`; `fixtures/`; `claims/`; `evidence/`; `experiences/`; `resume/`; `CURRENT_STATE.md`; `CURRENT_MILESTONE.md` (consistent with recent doctrine-lock precedent — no product implementation milestone recorded); Qualification Truth, Employer Truth, Candidate Truth, and Match Truth runtime logic (`job_analysis.py`, `job_decision.py`, the existing mechanical recruiter-threshold guard, all byte-unchanged); lane/decision routing; hard-blocker logic; the existing §135 actionability gate; §136 itself (extended, not contradicted or duplicated); Atominvest's own `Job.application_status` (remains a separate, later, bounded change).
+
+**Validation**
+
+Documentation-only. No schema, runtime behavior, or test expectation changed. `git diff --check` clean; existing recruiter-threshold and résumé test suites and the full assurance baseline confirmed unaffected.
+
+---
+
 ## 2026-09-06 — Résumé page-utilization enforcement (`RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1`)
 
 **Reason**
