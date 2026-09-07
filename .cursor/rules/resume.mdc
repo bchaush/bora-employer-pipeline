@@ -221,6 +221,26 @@ checklist today, not automated tooling — no generator or validator
 implementation is authorized merely because this standard exists (see
 `BLUEPRINT.md` §134 Non-Goals and §133's build-economy gate).
 
+## Résumé Page-Utilization Enforcement
+
+Operational reference: `BLUEPRINT.md` §137
+(`RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1`) locks
+a hard floor: meaningful content must extend through at least 92% of
+U.S. Letter page height, measured from the physical top of the page to
+the bottom-most meaningful content. Truth, readability, ATS safety, and
+immutable history always outrank this floor -- underutilization is a QA
+failure to correct through truthful means (reorder, reword, restore
+stronger approved material, reallocate space), never an instruction to
+fabricate or pad content. `src/resume_page_utilization.py`'s
+`evaluate_resume_page_utilization()` mechanically enforces this floor
+(plus one-page/US-Letter/no-overflow) against a normalized
+rendered-page-geometry payload, and `resume_validation.py`'s export gate
+(`approve_derivative_for_export`) blocks export approval when a supplied
+payload fails. No PDF generator or geometry producer exists in this
+repository yet, so this check only runs when a geometry payload is
+explicitly supplied -- satisfying the floor for an actual submitted PDF
+remains a human QA step (§134's QA checklist) until one exists.
+
 ## Application-Specific Outputs
 
 Every generated resume derivative should have a distinct version identifier and traceability to:
