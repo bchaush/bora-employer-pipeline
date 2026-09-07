@@ -2157,4 +2157,666 @@ _test_argv_w1_non_windows_style_path_passthrough()
 print("PASS ARGV-W1: _find_claude_binary() prefers a native claude.exe sibling over the claude.cmd wrapper when available, fails closed (InfrastructureError) when only the corrupting wrapper exists with no native sibling, and leaves an already-non-.cmd which() result (POSIX script or already-native executable) unchanged.")
 
 
+# ======================================================================
+# CAREER_OS_BUILDER_SESSION_RECOVERY_AND_STRUCTURED_COMPLETION_V1
+#
+# Reproduced on the second real controller run (run_id
+# 20260907T193310Z-f6a756d2): the builder genuinely did substantial real
+# work across 3 independent attempts, but each attempt's final reply was
+# conversational prose rather than the required structured JSON result,
+# so extract_schema_valid_result() raised on all three -- and, before
+# this fix, each retry silently discarded a perfectly good, resumable
+# session_id and started a brand new session from zero, with no memory
+# of the already-completed work.
+#
+# Covers the milestone's 12 numbered required scenarios; mapping (not
+# every scenario needs a fully separate test where the same underlying
+# mechanism already proves it, per this file's own docstring):
+#   SR-1  -> (1)
+#   SR-2  -> (2), (5)
+#   SR-3  -> (3)
+#   SR-4  -> (4)
+#   SR-5  -> (6)
+#   SR-6  -> (7)
+#   SR-7  -> (8)
+#   SR-8  -> (9)
+#   SR-9  -> (10)
+#   SR-10 -> (11)
+#   SR-11 -> (12)
+#
+# BOUNDED CORRECTION PASS (Cursor CHANGES_REQUIRED, findings SR-CRASH-1
+# and SR-WS-1) -- mapping to that correction pass's own 12 numbered
+# required regression tests:
+#   SR-CRASH-1  -> (1) crash/desync recovery, (2) resumed invocation
+#                  receives exact recovered session id, (3) narrow
+#                  resumed-completion prompt used after reconstruction
+#   SR-CRASH-1b -> (4) stale recovered event + BUILDER_INVOKED -> no
+#                  false pending recovery
+#   SR-CRASH-1c -> (5) multiple recovery events -> latest still-pending
+#                  one governs
+#   SR-WS-1a    -> (6) whitespace-only session id -> plain
+#                  InfrastructureError
+#   SR-WS-1b    -> (7) leading/trailing whitespace -> stripped canonical
+#                  id persisted/resumed
+#   SR-WS-1c    -> (8) missing/non-string/empty session id -> fail-closed
+#                  (already covered for the None/missing case by SR-6;
+#                  extended here to the empty-string and non-string forms
+#                  named explicitly in SR-WS-1's own examples)
+#   (9) malformed outer envelope cannot seed recovery -- already covered
+#       by SR-5, unaffected by this correction, not duplicated here
+#   (10) conflicting inner structured results still fail closed --
+#        already covered by SR-8, unaffected by this correction
+#   (11) normal successful builder path unchanged -- already covered by
+#        SR-9, re-exercised implicitly by SR-CRASH-1's own happy-path tail
+#   (12) REPAIRING / CORRECTING_REVIEW session lifecycle unchanged --
+#        already covered by SR-10; the crash-reconstruction path only
+#        engages via _pending_recovered_session_id(), which SR-10's own
+#        scenario never populates, so that coverage still applies
+#        unmodified
+# ======================================================================
+
+def _recording_fake_builder(sequence: list) -> callable:
+    """Like fake_builder(), but also records every call's (prompt,
+    session_id) so a test can assert exactly what was sent on a
+    resumed retry, not merely what was returned."""
+    calls: list[dict] = []
+
+    def _invoke(*, prompt, cwd, policy, session_id):
+        calls.append({"prompt": prompt, "session_id": session_id})
+        idx = min(len(calls) - 1, len(sequence) - 1)
+        item = sequence[idx]
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+    _invoke.calls = calls
+    return _invoke
+
+
+def _test_sr1_recoverable_on_valid_envelope_invalid_inner() -> None:
+    """(1) A valid outer provider envelope carrying a trustworthy
+    session_id, but an inner result that fails schema-valid extraction
+    (Claude finished real work but replied in prose, not JSON), must
+    fail closed as RecoverableSessionInfrastructureError -- never a
+    plain InfrastructureError that would silently discard the session."""
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
+        True,
+        json.dumps(
+            {
+                "is_error": False,
+                "session_id": "sess-recoverable-1",
+                "result": "Audit complete. The report is done and everything checks out.",
+                "type": "result",
+            }
+        ),
+    )
+    try:
+        raised = None
+        try:
+            mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+        except mr.RecoverableSessionInfrastructureError as exc:
+            raised = exc
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(raised is not None, "an inner-validation failure accompanying a valid session_id must raise RecoverableSessionInfrastructureError")
+    assert_true(raised.session_id == "sess-recoverable-1", f"the recoverable exception must carry the real session_id forward, got {getattr(raised, 'session_id', None)}")
+
+
+_test_sr1_recoverable_on_valid_envelope_invalid_inner()
+print("PASS SR-1: a valid outer envelope with a trustworthy session_id but a failed inner-result extraction raises RecoverableSessionInfrastructureError carrying that exact session_id, never a plain InfrastructureError that would discard it.")
+
+
+def _test_sr2_retry_receives_and_resumes_recovered_session(root: Path) -> None:
+    """(2) The very next retry after a recoverable failure receives the
+    exact recovered session_id. (5) A successful resumed retry
+    transitions normally onward to TESTING."""
+    baseline = _base_repo(root)
+    branch = "feature/sr2-retry-session"
+    _make_feature_branch(root, branch)
+    _write(root, "src/thing.py", "x = 1\n")
+    _commit(root, "in-scope work")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+
+    builder = _recording_fake_builder(
+        [mr.RecoverableSessionInfrastructureError("prose instead of json", session_id="sess-abc"), BUILDER_OK]
+    )
+    adapters = mr.Adapters(
+        builder_invoker=builder,
+        reviewer_invoker=fake_reviewer([REVIEWER_SAFE]),
+        test_runner=fake_test_runner([True]),
+        assurance_runner=fake_assurance_runner(True),
+    )
+    init_result = mr.init_run(root, contract_path, policy_path)
+    run_id = init_result["run_id"]
+    mr.advance(root, run_id, adapters)  # INITIALIZING -> BUILDING
+    manifest = mr.advance(root, run_id, adapters)  # BUILDING raises recoverable -> self-loop
+    assert_true(manifest["phase"] == "BUILDING", f"a recoverable session failure must self-loop back to BUILDING, got {manifest['phase']}")
+    assert_true(manifest["builder_session_id"] == "sess-abc", f"the recovered session_id must be persisted onto the manifest, got {manifest.get('builder_session_id')}")
+
+    expected_contract = _contract(branch, baseline)
+    expected_resumed_prompt = mr.build_resumed_completion_prompt(expected_contract)
+
+    manifest = mr.advance(root, run_id, adapters)  # BUILDING retries, resumed
+    assert_true(len(builder.calls) == 2, f"expected exactly 2 builder calls by now, got {len(builder.calls)}")
+    assert_true(builder.calls[1]["session_id"] == "sess-abc", f"the resumed retry must receive the exact recovered session_id, got {builder.calls[1]['session_id']}")
+    assert_true(builder.calls[1]["prompt"] == expected_resumed_prompt, "the resumed retry must use the narrow completion-focused prompt, not the full original task prompt")
+    assert_true(manifest["phase"] == "TESTING", f"a successful resumed retry must transition normally onward to TESTING, got {manifest['phase']}")
+
+
+_with_tmp_repo(_test_sr2_retry_receives_and_resumes_recovered_session)
+print("PASS SR-2: after a recoverable session failure, the recovered session_id is persisted onto the manifest, the very next retry both receives that exact session_id and uses the narrow resumed-completion prompt, and a successful resumed retry transitions normally onward to TESTING.")
+
+
+def _test_sr3_resumed_invocation_includes_resume_flag() -> None:
+    """(3) The resumed invocation's constructed argv actually includes
+    `--resume <session_id>` at the real adapter/CLI-argv level, not just
+    the manifest bookkeeping level."""
+    recorded_calls: list[list] = []
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+
+    def _recording_run_subprocess(args, *, cwd, timeout=600):
+        recorded_calls.append(list(args))
+        return True, json.dumps(
+            {
+                "is_error": False,
+                "session_id": "sess-resume-3",
+                "result": json.dumps(
+                    {
+                        "status": "IMPLEMENTATION_ATTEMPT_COMPLETE",
+                        "summary": "done",
+                        "files_touched": [],
+                        "stop_condition_encountered": None,
+                        "architecture_decision_required": False,
+                    }
+                ),
+                "type": "result",
+            }
+        )
+
+    mr._run_subprocess = _recording_run_subprocess
+    try:
+        mr.real_claude_builder_invoker(
+            prompt="resumed completion prompt", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id="sess-resume-3"
+        )
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+
+    args = recorded_calls[0]
+    assert_true("--resume" in args, f"a resumed invocation must include --resume, got {args}")
+    resume_idx = args.index("--resume")
+    assert_true(args[resume_idx + 1] == "sess-resume-3", f"--resume must be immediately followed by the exact recovered session_id, got {args}")
+    assert_true(resume_idx < len(args) - 2, f"--resume <id> must appear before the '--' terminator and the prompt, got {args}")
+
+
+_test_sr3_resumed_invocation_includes_resume_flag()
+print("PASS SR-3: a resumed builder invocation's constructed argv actually includes --resume immediately followed by the exact recovered session_id, positioned before the '--' terminator and the prompt.")
+
+
+def _test_sr4_resumed_prompt_is_narrow_and_completion_focused() -> None:
+    """(4) The resumed retry's own instruction text is completion-focused
+    and does not authorize broader/new work -- distinct in both content
+    and identity from the full original task prompt."""
+    contract = _contract("feature/sr4-narrow-prompt", "0" * 40)
+    resumed_prompt = mr.build_resumed_completion_prompt(contract)
+    full_prompt = mr.build_builder_prompt(contract)
+
+    assert_true(resumed_prompt != full_prompt, "the resumed completion prompt must not be identical to the full original task prompt")
+    assert_true("IMPLEMENTATION_ATTEMPT_COMPLETE" in resumed_prompt, "the resumed prompt must name the exact required success status literal")
+    assert_true("STOPPED" in resumed_prompt, "the resumed prompt must name the exact required stop status literal")
+    assert_true("Do NOT restart" in resumed_prompt or "do not restart" in resumed_prompt.lower(), "the resumed prompt must explicitly forbid restarting/broadening the task")
+    assert_true(contract["milestone_id"] in resumed_prompt, "the resumed prompt must still identify the correct milestone")
+    # It must not re-carry a fresh copy of the full allowed/forbidden path
+    # boilerplate -- that context already lives inside the resumed
+    # session itself; re-issuing it would look like (and could be
+    # misread as) a fresh, broader task specification.
+    assert_true(contract["goal"] not in resumed_prompt, "the resumed prompt must not restate the full original goal text as if reissuing the whole task")
+
+
+_test_sr4_resumed_prompt_is_narrow_and_completion_focused()
+print("PASS SR-4: the resumed-retry prompt is narrow and completion-focused -- it names the exact required JSON status literals, explicitly forbids restarting/broadening the task, and is textually distinct from the full original task prompt.")
+
+
+def _test_sr5_malformed_envelope_no_recovery() -> None:
+    """(6) An outer envelope that is not even valid JSON must remain an
+    ordinary, non-recoverable InfrastructureError -- untrusted output
+    must never be upgraded into a session-recovery path."""
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (True, "not even json")
+    try:
+        raised_type = None
+        try:
+            mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+        except mr.InfrastructureError as exc:
+            raised_type = type(exc)
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(raised_type is mr.InfrastructureError, f"a malformed (non-JSON) outer envelope must raise plain InfrastructureError, never the recoverable subtype, got {raised_type}")
+
+
+_test_sr5_malformed_envelope_no_recovery()
+print("PASS SR-5: a malformed (non-JSON) outer provider envelope remains a plain, non-recoverable InfrastructureError -- ordinary bounded infrastructure retry, no session recovery.")
+
+
+def _test_sr6_no_session_id_no_invented_recovery() -> None:
+    """(7) A valid, well-formed envelope with no session_id at all must
+    never invent or trust a session -- fail closed as a plain, ordinary
+    InfrastructureError."""
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "result": "just prose, no json, and no session_id field at all", "type": "result"})
+    )
+    try:
+        raised_type = None
+        try:
+            mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+        except mr.InfrastructureError as exc:
+            raised_type = type(exc)
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(raised_type is mr.InfrastructureError, f"a valid envelope with no session_id must never invent/trust a session -- plain InfrastructureError only, got {raised_type}")
+
+
+_test_sr6_no_session_id_no_invented_recovery()
+print("PASS SR-6: a valid, well-formed envelope carrying no session_id at all never invents or trusts a session -- plain InfrastructureError, fail closed, unchanged.")
+
+
+def _test_sr7_recoverable_failure_never_treated_as_success(root: Path) -> None:
+    """(8) An invalid inner result -- even a recoverable one, even with
+    real in-scope file changes already present in the working tree --
+    must NEVER be treated as success. The run must stay bounded in
+    BUILDING (self-looping, retry-counted) and never reach TESTING or
+    any terminal success state merely because files changed."""
+    baseline = _base_repo(root)
+    branch = "feature/sr7-no-fake-success"
+    _make_feature_branch(root, branch)
+    # A real, substantial, in-scope file change already sitting in the
+    # working tree -- exactly the misleading signal a naive "did files
+    # change?" heuristic could be fooled by.
+    _write(root, "src/thing.py", "x = 1\nsubstantial_change = True\n")
+    _commit(root, "in-scope work that looks complete")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+
+    adapters = mr.Adapters(
+        builder_invoker=fake_builder([mr.RecoverableSessionInfrastructureError("prose, not json", session_id="sess-sr7")]),
+        reviewer_invoker=fake_reviewer([REVIEWER_SAFE]),
+        test_runner=fake_test_runner([True]),
+        assurance_runner=fake_assurance_runner(True),
+    )
+    init_result = mr.init_run(root, contract_path, policy_path)
+    run_id = init_result["run_id"]
+    mr.advance(root, run_id, adapters)  # INITIALIZING -> BUILDING
+    manifest = mr.advance(root, run_id, adapters)  # BUILDING: recoverable failure
+    assert_true(manifest["phase"] == "BUILDING", f"a recoverable inner-validation failure must never be treated as success merely because in-scope files already changed, got {manifest['phase']}")
+    assert_true(manifest["last_valid_test_artifact"] is None, "no test evidence must exist -- TESTING was never legitimately reached")
+    assert_true(manifest["infrastructure_retry_count"] == 1, f"the failure must still count against the bounded infrastructure retry budget, got {manifest['infrastructure_retry_count']}")
+
+
+_with_tmp_repo(_test_sr7_recoverable_failure_never_treated_as_success)
+print("PASS SR-7: a recoverable inner-validation failure is never treated as success merely because substantial in-scope file changes already exist in the working tree -- the run stays bounded in BUILDING, counted against the infrastructure retry budget, never fast-forwarded to TESTING or success.")
+
+
+def _test_sr8_ambiguous_inner_result_still_recoverable_fail_closed() -> None:
+    """(9) Two conflicting schema-valid inner objects must still fail
+    closed (never guess which is authoritative) -- and, since a
+    trustworthy session_id accompanies them, the failure must still be
+    recoverable rather than discarding a real session over ambiguity."""
+    first = {
+        "status": "IMPLEMENTATION_ATTEMPT_COMPLETE",
+        "summary": "first",
+        "files_touched": [],
+        "stop_condition_encountered": None,
+        "architecture_decision_required": False,
+    }
+    second = {
+        "status": "IMPLEMENTATION_ATTEMPT_COMPLETE",
+        "summary": "second, on reflection",
+        "files_touched": [],
+        "stop_condition_encountered": None,
+        "architecture_decision_required": False,
+    }
+    ambiguous_result_text = json.dumps(first) + " ... on reflection, actually ... " + json.dumps(second)
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "session_id": "sess-ambiguous", "result": ambiguous_result_text, "type": "result"})
+    )
+    try:
+        raised = None
+        try:
+            mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+        except mr.InfrastructureError as exc:
+            raised = exc
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(isinstance(raised, mr.RecoverableSessionInfrastructureError), f"two conflicting schema-valid inner objects must still fail closed, and (given a trustworthy session_id) remain recoverable, got {type(raised)}")
+    assert_true(raised.session_id == "sess-ambiguous", f"the ambiguous-result failure must still preserve the real session_id, got {getattr(raised, 'session_id', None)}")
+
+
+_test_sr8_ambiguous_inner_result_still_recoverable_fail_closed()
+print("PASS SR-8: two conflicting schema-valid inner result objects still fail closed (never guessing which is authoritative), and -- since a trustworthy session_id accompanies them -- the failure remains recoverable rather than discarding a real session merely because of ambiguity.")
+
+
+def _test_sr9_normal_first_attempt_unchanged(root: Path) -> None:
+    """(10) A normal first-attempt builder invocation is completely
+    unaffected by the session-recovery machinery: session_id=None, the
+    full original task prompt is used, and the happy path still reaches
+    READY_FOR_HUMAN_APPROVAL exactly as before."""
+    baseline = _base_repo(root)
+    branch = "feature/sr9-first-attempt-unchanged"
+    _make_feature_branch(root, branch)
+    _write(root, "src/thing.py", "x = 1\n")
+    _commit(root, "in-scope work")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+
+    builder = _recording_fake_builder([BUILDER_OK])
+    result = mr.run(
+        root,
+        contract_path,
+        policy_path,
+        adapters=mr.Adapters(
+            builder_invoker=builder,
+            reviewer_invoker=fake_reviewer([REVIEWER_SAFE]),
+            test_runner=fake_test_runner([True]),
+            assurance_runner=fake_assurance_runner(True),
+        ),
+    )
+    assert_true(result["phase"] == "READY_FOR_HUMAN_APPROVAL", f"the happy path must still reach READY_FOR_HUMAN_APPROVAL unchanged, got {result['phase']}")
+    assert_true(builder.calls[0]["session_id"] is None, "the first-ever builder invocation must not require a pre-existing session_id")
+    expected_contract = _contract(branch, baseline)
+    expected_prompt = mr.build_builder_prompt(expected_contract)
+    assert_true(builder.calls[0]["prompt"] == expected_prompt, "a normal first attempt must use the full original task prompt, not the narrow resumed-completion prompt")
+
+
+_with_tmp_repo(_test_sr9_normal_first_attempt_unchanged)
+print("PASS SR-9: a normal first-attempt builder invocation is completely unaffected by the session-recovery machinery -- session_id=None, the full original task prompt is used, and the happy path still reaches READY_FOR_HUMAN_APPROVAL exactly as before.")
+
+
+def _test_sr10_repairing_and_correcting_review_unaffected(root: Path) -> None:
+    """(11) REPAIRING and CORRECTING_REVIEW's own existing session
+    threading and full-context prompting must not regress: a session_id
+    established by a genuinely successful builder turn is correctly
+    carried forward into a REPAIRING retry and a CORRECTING_REVIEW pass,
+    and both use the full (non-narrow) builder prompt, since no
+    recoverable-session-failure ever occurred on this run."""
+    baseline = _base_repo(root)
+    branch = "feature/sr10-repair-correction-unaffected"
+    _make_feature_branch(root, branch)
+    _write(root, "src/thing.py", "x = 1\n")
+    _commit(root, "in-scope work")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+
+    builder_ok_with_session = dict(BUILDER_OK, session_id="sess-normal")
+    builder = _recording_fake_builder([builder_ok_with_session, BUILDER_OK, BUILDER_OK])
+    changes_required_with_finding = {
+        "outcome": "CHANGES_REQUIRED",
+        "findings": [
+            {"id": "R1", "severity": "HIGH", "required": True, "path": "src/thing.py", "line": 1, "invariant": "x", "evidence": "x", "required_action": "fix x"}
+        ],
+    }
+    adapters = mr.Adapters(
+        builder_invoker=builder,
+        reviewer_invoker=fake_reviewer([changes_required_with_finding, REVIEWER_SAFE]),
+        test_runner=fake_test_runner([False, True, True]),
+        assurance_runner=fake_assurance_runner(True),
+    )
+    result = mr.run(root, contract_path, policy_path, adapters=adapters)
+    assert_true(result["phase"] == "READY_FOR_HUMAN_APPROVAL", f"expected the run to complete through REPAIRING and CORRECTING_REVIEW to READY_FOR_HUMAN_APPROVAL, got {result['phase']} / {result.get('stop_reason')}")
+    assert_true(len(builder.calls) == 3, f"expected exactly 3 builder calls (BUILDING, REPAIRING, CORRECTING_REVIEW), got {len(builder.calls)}")
+
+    resumed_marker = "resuming this exact same session"
+    assert_true(builder.calls[0]["session_id"] is None, "the first BUILDING call must not require a pre-existing session_id")
+    assert_true(builder.calls[1]["session_id"] == "sess-normal", f"the REPAIRING call must resume the session established by the successful BUILDING turn, got {builder.calls[1]['session_id']}")
+    assert_true(resumed_marker not in builder.calls[1]["prompt"], "REPAIRING must use the normal full builder prompt (with deterministic failures), not the narrow session-recovery completion prompt")
+    assert_true(builder.calls[2]["session_id"] == "sess-normal", f"the CORRECTING_REVIEW call must also resume the same established session, got {builder.calls[2]['session_id']}")
+    assert_true(resumed_marker not in builder.calls[2]["prompt"], "CORRECTING_REVIEW must use the normal full builder prompt (with reviewer findings), not the narrow session-recovery completion prompt")
+
+
+_with_tmp_repo(_test_sr10_repairing_and_correcting_review_unaffected)
+print("PASS SR-10: REPAIRING and CORRECTING_REVIEW correctly resume the session established by a genuinely successful builder turn and use the normal full builder prompt -- unaffected by, and never confused with, the new narrow session-recovery completion path.")
+
+
+def _test_sr11_no_session_persisted_on_ordinary_infra_error(root: Path) -> None:
+    """(12) An ordinary (non-recoverable) infrastructure error -- the
+    state-machine-level consequence of an untrusted/malformed outer
+    envelope -- must never result in an invented session_id being
+    persisted onto the manifest."""
+    baseline = _base_repo(root)
+    branch = "feature/sr11-no-invented-session"
+    _make_feature_branch(root, branch)
+    _write(root, "src/thing.py", "x = 1\n")
+    _commit(root, "in-scope work")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+    adapters = mr.Adapters(
+        builder_invoker=fake_builder([mr.InfrastructureError("malformed envelope, no session"), BUILDER_OK]),
+        reviewer_invoker=fake_reviewer([REVIEWER_SAFE]),
+        test_runner=fake_test_runner([True]),
+        assurance_runner=fake_assurance_runner(True),
+    )
+    init_result = mr.init_run(root, contract_path, policy_path)
+    run_id = init_result["run_id"]
+    mr.advance(root, run_id, adapters)  # INITIALIZING -> BUILDING
+    manifest = mr.advance(root, run_id, adapters)  # BUILDING raises ordinary InfrastructureError -> self-loop
+    assert_true(manifest["phase"] == "BUILDING", f"an ordinary infra error must self-loop back to BUILDING, got {manifest['phase']}")
+    assert_true(manifest["builder_session_id"] is None, f"a plain (non-recoverable) infrastructure error must never persist an invented session_id, got {manifest.get('builder_session_id')}")
+
+
+_with_tmp_repo(_test_sr11_no_session_persisted_on_ordinary_infra_error)
+print("PASS SR-11: an ordinary (non-recoverable) infrastructure error never results in an invented session_id being persisted onto the manifest.")
+
+
+# ======================================================================
+# SR-CRASH-1 / SR-WS-1 (bounded correction pass, Cursor CHANGES_REQUIRED)
+# ======================================================================
+
+def _test_sr_crash1_reconstructs_lost_session_after_crash(root: Path) -> None:
+    """SR-CRASH-1: a process crash between the durable event write and
+    the durable manifest save can leave events.jsonl carrying a real
+    recovered session_id while manifest.json still has
+    builder_session_id=null. The very next advance() (a fresh process,
+    per the resume() contract) must reconstruct and use that exact
+    session_id -- both for the invocation (--resume-equivalent at the
+    adapter boundary) and for selecting the narrow resumed-completion
+    prompt -- never silently falling back to a fresh/full invocation."""
+    baseline = _base_repo(root)
+    branch = "feature/sr-crash1-reconstruct"
+    _make_feature_branch(root, branch)
+    _write(root, "src/thing.py", "x = 1\n")
+    _commit(root, "in-scope work")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+
+    builder = _recording_fake_builder([BUILDER_OK])
+    adapters = mr.Adapters(
+        builder_invoker=builder,
+        reviewer_invoker=fake_reviewer([REVIEWER_SAFE]),
+        test_runner=fake_test_runner([True]),
+        assurance_runner=fake_assurance_runner(True),
+    )
+    init_result = mr.init_run(root, contract_path, policy_path)
+    run_id = init_result["run_id"]
+    mr.advance(root, run_id, adapters)  # INITIALIZING -> BUILDING
+
+    # Simulate the exact crash window SR-CRASH-1 describes: the durable
+    # event was written, but the manifest save that should have followed
+    # it never completed.
+    rdir = mr.run_dir(root, run_id)
+    mr.append_event(rdir, {"event": "BUILDER_SESSION_RECOVERED", "session_id": "session-crash-recovery"})
+    manifest = mr.load_manifest(rdir)
+    assert_true(manifest["builder_session_id"] is None, "setup: the manifest must still show no session_id, simulating a crash before its own save completed")
+
+    expected_contract = _contract(branch, baseline)
+    expected_resumed_prompt = mr.build_resumed_completion_prompt(expected_contract)
+
+    manifest = mr.advance(root, run_id, adapters)  # a fresh advance(), as if from a restarted process
+    assert_true(len(builder.calls) == 1, f"expected exactly one builder call, got {len(builder.calls)}")
+    assert_true(builder.calls[0]["session_id"] == "session-crash-recovery", f"the reconstructed session_id must be used for this invocation, got {builder.calls[0]['session_id']}")
+    assert_true(builder.calls[0]["prompt"] == expected_resumed_prompt, "a reconstructed pending recovery must use the narrow resumed-completion prompt, never the full fresh-task prompt")
+    assert_true(manifest["builder_session_id"] == "session-crash-recovery", f"the manifest must be self-healed with the reconstructed session_id, got {manifest.get('builder_session_id')}")
+    assert_true(manifest["phase"] == "TESTING", f"a successful reconstructed-session invocation must transition normally onward, got {manifest['phase']}")
+
+
+_with_tmp_repo(_test_sr_crash1_reconstructs_lost_session_after_crash)
+print("PASS SR-CRASH-1: a process crash leaving events.jsonl with a durably-recorded BUILDER_SESSION_RECOVERED but manifest.builder_session_id still null is reconstructed on the next advance() -- the exact session_id is both used for the invocation and the narrow resumed-completion prompt, and the manifest is self-healed.")
+
+
+def _test_sr_crash1_stale_event_not_resurrected_after_invocation(root: Path) -> None:
+    """A BUILDER_SESSION_RECOVERED event followed by a genuine
+    BUILDER_INVOKED event must not resurrect as pending on a later
+    advance() -- pending recovery is cleared the moment an invocation
+    actually completes, crash-reconstruction included."""
+    baseline = _base_repo(root)
+    branch = "feature/sr-crash1-stale-not-resurrected"
+    _make_feature_branch(root, branch)
+    _write(root, "src/thing.py", "x = 1\n")
+    _commit(root, "in-scope work")
+    contract_path, policy_path = _write_contract_and_policy(root, branch, baseline)
+
+    builder = _recording_fake_builder([BUILDER_OK])
+    adapters = mr.Adapters(
+        builder_invoker=builder,
+        reviewer_invoker=fake_reviewer([REVIEWER_SAFE]),
+        test_runner=fake_test_runner([True]),
+        assurance_runner=fake_assurance_runner(True),
+    )
+    init_result = mr.init_run(root, contract_path, policy_path)
+    run_id = init_result["run_id"]
+    rdir = mr.run_dir(root, run_id)
+    mr.advance(root, run_id, adapters)  # INITIALIZING -> BUILDING
+
+    # A stale recovery event from an earlier (already-resolved) attempt,
+    # followed by proof that attempt actually completed.
+    mr.append_event(rdir, {"event": "BUILDER_SESSION_RECOVERED", "session_id": "stale-session-should-not-resurrect"})
+    mr.append_event(rdir, {"event": "BUILDER_INVOKED", "valid": True, "artifact": "irrelevant"})
+    assert_true(mr._pending_recovered_session_id(rdir) is None, "a BUILDER_SESSION_RECOVERED event followed by a genuine BUILDER_INVOKED must not read back as still pending")
+
+    manifest = mr.advance(root, run_id, adapters)
+    assert_true(builder.calls[0]["session_id"] is None, f"the invocation must not resurrect the stale session, got {builder.calls[0]['session_id']}")
+    expected_contract = _contract(branch, baseline)
+    expected_full_prompt = mr.build_builder_prompt(expected_contract)
+    assert_true(builder.calls[0]["prompt"] == expected_full_prompt, "the invocation must use the normal full prompt, not the narrow resumed-completion prompt, since no recovery is genuinely pending")
+    assert_true(manifest["builder_session_id"] is None, f"the manifest must not be healed with a stale, already-resolved session_id, got {manifest.get('builder_session_id')}")
+
+
+_with_tmp_repo(_test_sr_crash1_stale_event_not_resurrected_after_invocation)
+print("PASS SR-CRASH-1b: a stale BUILDER_SESSION_RECOVERED event followed by a genuine BUILDER_INVOKED never resurrects as pending recovery on a later advance() -- no stale session reconstruction, normal full prompt used.")
+
+
+def _test_sr_crash1_latest_pending_recovery_governs() -> None:
+    """When multiple BUILDER_SESSION_RECOVERED events exist without any
+    intervening BUILDER_INVOKED, only the LATEST one's session_id
+    governs -- never an earlier, superseded one."""
+    tmp_dir = Path(tempfile.mkdtemp(prefix="sr_crash1_multi_"))
+    try:
+        rdir = tmp_dir / "run"
+        rdir.mkdir(parents=True)
+        mr.append_event(rdir, {"event": "BUILDER_SESSION_RECOVERED", "session_id": "first-superseded-session"})
+        mr.append_event(rdir, {"event": "BUILDER_SESSION_RECOVERED", "session_id": "second-latest-session"})
+        pending = mr._pending_recovered_session_id(rdir)
+        assert_true(pending == "second-latest-session", f"only the LATEST still-pending recovery event's session_id must govern, got {pending!r}")
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+_test_sr_crash1_latest_pending_recovery_governs()
+print("PASS SR-CRASH-1c: when multiple BUILDER_SESSION_RECOVERED events exist without an intervening BUILDER_INVOKED, only the latest one's session_id governs.")
+
+
+def _test_sr_ws1_whitespace_only_session_id_not_recoverable() -> None:
+    """SR-WS-1: a whitespace-only session_id ("   ") must never be
+    treated as recoverable -- plain InfrastructureError only, never
+    RecoverableSessionInfrastructureError, never persisted, never
+    reaching --resume."""
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "session_id": "   ", "result": "prose, not json", "type": "result"})
+    )
+    try:
+        raised_type = None
+        try:
+            mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+        except mr.InfrastructureError as exc:
+            raised_type = type(exc)
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(raised_type is mr.InfrastructureError, f"a whitespace-only session_id must never be recoverable -- expected plain InfrastructureError, got {raised_type}")
+
+
+_test_sr_ws1_whitespace_only_session_id_not_recoverable()
+print("PASS SR-WS-1a: a whitespace-only session_id (\"   \") is never treated as recoverable -- plain InfrastructureError, fail closed, exactly like a missing session_id.")
+
+
+def _test_sr_ws1_leading_trailing_whitespace_stripped() -> None:
+    """A valid session_id surrounded by incidental whitespace
+    (" session-with-padding ") must still be recoverable, and the
+    STRIPPED canonical value is what gets carried forward and would
+    reach --resume."""
+    original_run_subprocess = mr._run_subprocess
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "session_id": "  session-with-padding  ", "result": "prose, not json", "type": "result"})
+    )
+    try:
+        raised = None
+        try:
+            mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+        except mr.RecoverableSessionInfrastructureError as exc:
+            raised = exc
+    finally:
+        mr._run_subprocess = original_run_subprocess
+        mr._find_claude_binary = original_find_claude_binary
+    assert_true(raised is not None, "a session_id with incidental surrounding whitespace must still be recoverable")
+    assert_true(raised.session_id == "session-with-padding", f"the STRIPPED canonical session_id must be what is carried forward, got {raised.session_id!r}")
+
+
+_test_sr_ws1_leading_trailing_whitespace_stripped()
+print("PASS SR-WS-1b: a session_id with incidental leading/trailing whitespace is still recoverable, and the stripped canonical value (not the raw padded string) is what gets carried forward.")
+
+
+def _test_sr_ws1_invalid_session_id_forms_all_fail_closed() -> None:
+    """Every non-recoverable session_id form from SR-WS-1's own worked
+    examples (empty string, absent/None, a non-string type) must remain
+    plain InfrastructureError -- never recoverable."""
+    invalid_session_ids = ["", None, 123]
+    for bad_id in invalid_session_ids:
+        original_run_subprocess = mr._run_subprocess
+        original_find_claude_binary = mr._find_claude_binary
+        mr._find_claude_binary = lambda: "claude-binary-path"
+        envelope = {"is_error": False, "result": "prose, not json", "type": "result"}
+        if bad_id is not None:
+            envelope["session_id"] = bad_id
+        mr._run_subprocess = lambda args, *, cwd, timeout=600, _envelope=envelope: (True, json.dumps(_envelope))
+        try:
+            raised_type = None
+            try:
+                mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
+            except mr.InfrastructureError as exc:
+                raised_type = type(exc)
+        finally:
+            mr._run_subprocess = original_run_subprocess
+            mr._find_claude_binary = original_find_claude_binary
+        assert_true(raised_type is mr.InfrastructureError, f"session_id form {bad_id!r} must never be recoverable, got {raised_type}")
+
+
+_test_sr_ws1_invalid_session_id_forms_all_fail_closed()
+print("PASS SR-WS-1c: empty-string, absent/None, and non-string session_id forms all remain plain InfrastructureError -- never recoverable, matching SR-WS-1's own worked examples.")
+
+
 print("ALL milestone_run_v1_test CHECKS PASSED")
