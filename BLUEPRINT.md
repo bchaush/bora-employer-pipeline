@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.9**
+**Final Locked Blueprint v3.10**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -4067,4 +4067,251 @@ destination verification, final rendered-PDF visual QA), remain manual
 human review. This section does not claim end-to-end automated PDF
 enforcement — only that a geometry payload, once supplied, is checked
 mechanically and fail-closed at the export-approval boundary.
+
+**138. BORA ROLE SELECTION AND PURSUIT PRIORITY STANDARD — BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1 (LOCKED)**
+
+This is a governance/operating-doctrine lock, not a runtime implementation.
+It operationalizes §136's Competitive Position / Opportunity Value /
+Pursuit Economics doctrine into a concrete discovery and role-selection
+standard, consistent with §5 (Locked Optimization Order), §6 (Job
+Universe), and §7 (Generally Low-Priority/Reject) and operationalized
+from §136's quantitative comparison-pool framing — not a claim that this
+level of quantitative detail was already present in §5 itself. It does
+not restate §136's comparison-
+pool distinction, non-compensation rule, institutional-relevance ladder,
+network/access separation, or fake-precision prohibition — those remain
+authoritative and unchanged, cross-referenced here rather than duplicated.
+
+**Governing boundary (restated once, applies to every subsection below).**
+Nothing in this section may convert: `UNKNOWN` → `SUPPORTED`; `UNKNOWN` →
+`NONE`; adjacent experience → direct experience; functional overlap →
+qualification; good location → qualification; a fresh posting →
+qualification; remote authenticity → qualification; institutional
+affinity → qualification; or network access → qualification.
+Qualification Truth, Employer Truth, Candidate Truth, and Match Truth are
+governed entirely by existing, unchanged architecture (`job_analysis.py`,
+`job_decision.py`, the requirement/evidence-match/qualification-gate
+pipeline, and the existing mechanical recruiter-threshold guard). This
+section governs only Pursuit Truth and Package Truth: discovery priority,
+pursuit urgency, and how a serious role is presented for Bora's decision —
+never whether Bora is qualified.
+
+**138.1 Discovery/comparison-pool priority.** Career OS should actively
+search and prioritize, in descending order: **A+** — recent/new graduate,
+a named graduate/development/rotational program, or explicit no-prior-
+professional-experience-required language; **A** — 0-1 or 0-2 years; **B**
+— 1-2 years selectively, especially where internships, projects, academic
+work, or equivalent/transferable experience are explicitly accepted; **C**
+— exceptional 1-3 years only, and only when central functional overlap is
+unusually strong with no material hard requirement blocking Bora. Do not
+actively target 2-4 years, 3-5 years, 5+ years, Senior, Lead, Principal, or
+Manager-type roles, unless an explicit employer-authored alternative
+qualification branch materially changes the case (the existing
+qualification-gate architecture, unchanged) — consistent with, and not a
+narrowing of, §7's existing low-priority list. "Do not actively target" is
+a discovery/pursuit-economics rule, never an automatic Qualification Truth
+`REJECT` — the existing mechanical recruiter-threshold guard in
+`job_decision.py` remains authoritative and unchanged, and this doctrine
+does not duplicate or weaken it.
+
+**138.2 Central functional overlap.** Within the correct comparison pool,
+prioritize roles whose day-to-day work maps directly to Bora's verified
+evidence: requirements clarification, workflow/process mapping,
+implementation, UAT/QA, application/systems analysis, process improvement,
+structured reporting, data operations, data quality, API/data workflows,
+stakeholder coordination, operational controls, technical documentation,
+and exception handling. Functional overlap is necessary for strong pursuit
+priority but never repairs a hard qualification blocker; a 0-2 role is not
+automatically a strong target merely because its recruiter threshold is
+low.
+
+**138.3 Required-skill non-compensation.** A favorable comparison pool
+must never erase a genuinely required, unsupported mandatory requirement
+(examples: SQL, Tableau, Salesforce, SAP, Epic, Workday, ERP/platform
+ownership, specialized domain tenure, direct enterprise-platform
+administration, Agile/Waterfall experience, a required
+certification/license, or a citizenship/clearance requirement). Preferred/
+plus/exposure language remains distinct from required language (§48's
+existing Keyword Rule). Résumé/package generation may never invent a
+required skill to solve a gap (§§45/49/134, `.cursor/rules/resume.mdc`,
+unchanged).
+
+**138.4 Bora's primary search lanes.** Three primary practical lanes,
+none ranked above the others as a universal rule — each is evaluated
+through Opportunity Value and Pursuit Economics (§132) for the specific
+opportunity: **Lane A — Boston/Greater Boston** (Boston, Cambridge,
+Greater Boston, and realistically commute-accessible hybrid/onsite roles;
+especially useful for early-career implementation/systems/business-
+systems/applications/data-operations roles, including contract,
+temporary, part-time, and hybrid arrangements). **Lane B — verified U.S.
+remote part-time/contract/temporary**, especially attractive where it
+provides U.S. experience, income, references, implementation/UAT/data
+experience, or stronger future career capital. **Lane C — verified U.S.
+remote full-time**, strong when functional fit is strong, the comparison
+pool is appropriate, Massachusetts/U.S. work-location restrictions permit
+Bora's location, and first-party actionability (§135) is established.
+Other U.S. geographies are secondary unless an opportunity is unusually
+strong and realistically accessible. Location/work arrangement affects
+Pursuit Truth, Competitive Position, and Pursuit Economics — it never
+alters Qualification Truth; a candidate may be fully qualified for a role
+that is still low pursuit priority because location is impractical.
+
+**138.5 Freshness — Bora-specific pursuit priority (not a universal
+employer-hiring-probability claim).** Extends §20's existing freshness
+fields without redefining them. Bands, keyed to the existing
+`board_posted_date` field (`schemas/job.schema.json`) when it is reliably
+available: **0-2 days = VERY_FRESH** (highest urgency); **3-7 days =
+FRESH** (strong urgency); **8-14 days = AGING** (lower priority relative
+to an otherwise-equivalent fresher role); **15+ days = STALE_LEANING**
+(requires stronger fit/value justification to spend Bora's time);
+**UNKNOWN** when posting date cannot be reliably established. `STALE_
+LEANING` does not mean closed, does not mean unqualified, and does not
+modify Employer Truth; first-party verified live/actionable evidence
+(§135) outranks age assumptions — an excellent 16-day-old verified-live
+role may still deserve pursuit. Freshness is a tiebreaker/urgency/pursuit-
+economics factor only, never a qualification fact, and there is no
+universal magical employer cutoff at 14/15 days — these bands are Bora-
+specific application-urgency doctrine, not a claim about any employer's
+actual hiring behavior. Where `board_posted_date` is unavailable or
+unreliable, preserve `UNKNOWN`; never silently substitute `discovered_
+date` or `date_first_seen` as if it were the employer's own posting date.
+
+**138.6 First-party actionability.** §135 remains fully authoritative and
+is not re-defined, narrowed, or duplicated here: before meaningful
+tailoring/application work, the exact current requisition must load, its
+role/requisition identity must match, a substantive current posting must
+exist, and current application route/instructions must be actionable.
+Discovery/search/index evidence alone supports only cheap preliminary
+triage. Failed or unresolved first-party actionability routes to `WATCH`/
+no serious application effort, unless an independent blocker already
+produces `REJECT`. This section creates no new, competing actionability
+axis.
+
+**138.7 Remote authenticity.** Remote is not suspicious by itself; missing
+evidence is not proof of fraud. Remote authenticity is a separate Pursuit/
+Trust assessment — never Bora Fit and never Qualification Truth. This
+locks a qualitative vocabulary for human/model assessment now (explicitly
+**not** a new schema enum or runtime field in this milestone):
+`VERIFIED` — employer identity established, exact current requisition
+verified, remote arrangement stated by the employer/a current first-party
+source, an official careers/ATS route established, and location
+restrictions checked where available; `LIKELY_LEGITIMATE` — strong
+legitimate evidence exists but one non-critical authenticity element
+remains unresolved; `UNCLEAR` — insufficient evidence to confidently
+establish authenticity (must never be described as scam/fraud);
+`HIGH_RISK` — material scam indicators exist (examples: requests to pay
+for a job; fake-check/equipment-purchase/reimbursement schemes; gift-
+card/crypto/payment requests; suspicious impersonation; sensitive
+financial/identity information requested outside a normal verified
+hiring/onboarding context; recruiter identity/domain inconsistencies;
+unsolicited suspicious channels combined with other red flags);
+`CONFIRMED_FRAUD` — only when strong direct evidence establishes
+fraudulent activity, never inferred from one weak signal; `N/A` when the
+role is not remote. The employer's official site/official ATS remains the
+first verification layer; when recruiter contact occurs later, verify
+recruiter/domain identity independently when consequential. External
+fraud-safety rationale may reference current FTC/FBI/IC3 guidance
+(illustrative operating basis: verify openings on official employer
+sites; never pay for a job; a fake check or equipment-purchase/
+reimbursement request is a scam indicator; be cautious with premature
+personal/financial information requests; a fake employer/recruiter may
+use a remote-job pretext to solicit crypto, money, or sensitive
+information) without encoding external URLs into runtime logic or
+treating one deviation from those examples as proof of fraud.
+
+**138.8 Serious-role output standard.** Every serious role analysis should
+present these distinct qualitative judgments, none of which is a numeric
+score, a fake probability, or an arbitrary point system: **Bora Fit**
+(`HIGH` / `GOOD` / `STRETCH` / `LOW` — a synthesized qualitative
+functional/competitive fit judgment for pursuit, never Qualification
+Truth and never a hiring-probability claim); **Comparison Pool**
+(`STRONG` / `ACCEPTABLE` / `WEAK`); **Freshness** (`VERY_FRESH` / `FRESH`
+/ `AGING` / `STALE_LEANING` / `UNKNOWN`, per §138.5); **Location/Work
+Arrangement** (`STRONG` / `ACCEPTABLE` / `WEAK`); **First-Party
+Actionability** (`VERIFIED` / `FAILED` / `UNKNOWN`, per §135/§138.6);
+**Remote Authenticity** (`VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
+`HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A`, per §138.7); **Authorization**
+(`PASS` / `BLOCKER` / `UNKNOWN`); **Opportunity Value** (qualitative
+narrative); **Pursuit Economics** (qualitative narrative); and a **Final
+Verdict**: `PURSUE - DEEP` (exceptional verified target; substantial
+tailoring/networking effort justified), `PURSUE - CONTROLLED HIGH-
+QUALITY` (strong target; a good tailored application is justified, but
+avoid disproportionate effort), `PURSUE - EFFICIENT` (worth applying;
+keep time tightly bounded), `WATCH` (interesting/unresolved/low urgency;
+do not spend serious application effort yet), or `REJECT` (a known
+blocker, or clearly irrational pursuit). `REJECT` remains stronger than
+bad freshness or geography alone — freshness, location, comparison pool,
+or weak remote evidence alone should normally downgrade pursuit economics
+rather than fabricate a Qualification Truth `REJECT`.
+
+**Presentation-vocabulary disambiguation (required — Cursor MEDIUM
+finding, presentation-vocabulary collision risk).** Every label in this
+subsection is human/model presentation vocabulary for Pursuit Truth
+only. None of them is a value of, or a synonym for, `Job.decision`,
+`Job.lane`, `role_status`, or `source_verification_status` — these
+remain separate, existing, unchanged runtime/schema fields
+(`schemas/job.schema.json`, `job_decision.py`) and this doctrine's labels
+must never be written into those persisted/runtime fields. Concretely:
+Freshness `STALE_LEANING` (§138.5, a Bora-specific pursuit-urgency label)
+is not the same value as, and must never be confused with, `role_status`
+`POSSIBLY_STALE` (§21, an Employer Truth ghost/stale-role signal) — the
+two describe different truth layers and may disagree on the same role.
+First-Party Actionability (`VERIFIED` / `FAILED` / `UNKNOWN`) is a
+presentation summary derived from existing §135/§§19-21 evidence
+(`role_status`, `source_verification_status`), not a new persisted axis
+and not a restatement of either field's own enum. Final Verdict `WATCH`
+and `REJECT` are presentation-level pursuit judgments for this doctrine's
+own output standard and do not redefine, alias, or replace the existing
+`Job.decision` enum (`WATCH`, `REJECT`, `EFFICIENT_APPLY`, `APPLY`,
+`PRIORITY_APPLY`), even where the label text coincides. Remote
+Authenticity (§138.7) is presentation/doctrine vocabulary only, never a
+persisted schema field or a value of any existing enum.
+
+**138.9 Core selection principle (conceptual only).** Career OS should
+optimize discovery toward the lowest realistic recruiter threshold,
+combined with the strongest central-work overlap, combined with the
+strongest practical accessibility — subject always to Qualification
+Truth, first-party actionability, authorization/legal reality,
+Opportunity Value, and Pursuit Economics. This is a conceptual
+prioritization statement only; it does not authorize multiplication,
+weights, numeric scoring, or a point system.
+
+**138.10 Current role-family search targets.** Preserves §6's existing
+Job Universe (Primary and High-Value Adjacent role families) without
+redefinition; the illustrative list carried by this doctrine — Application/
+Applications Analyst, Implementation Analyst, Systems Analyst, Business
+Systems Analyst, genuinely junior Business Analyst/Technical BA, Associate/
+Implementation Consultant, Customer Implementation Analyst, Operations
+Systems Analyst, Process Systems Analyst, Technical Operations Analyst,
+Data Operations Analyst, Data Quality Analyst, and Digital Solutions
+Analyst — is not a permanent closed ontology; an adjacent role remains
+eligible whenever its actual duties fit, per §6's own function-over-title
+principle.
+
+**138.11 Employment-type principle.** Do not impose a fake universal
+ranking such as full-time > contract > temporary > part-time. For Bora
+now, contract, temporary, or part-time work can be strategically
+excellent when it improves U.S. experience, income, references,
+implementation/systems credibility, or future access (consistent with
+§§3-4's existing bridge-role doctrine). Evaluate employment type through
+Opportunity Value and Pursuit Economics, never a fixed hierarchy.
+
+**138.12 Build-economy/implementation boundary.** This doctrine lock does
+not itself authorize runtime implementation. A separate, future READ-ONLY
+architecture audit (working name: `BORA_ROLE_PRIORITY_FRESHNESS_AND_
+REMOTE_AUTHENTICITY_V1`) is required to determine which pieces, if any,
+merit deterministic code under §133's build-economy gate. This lock does
+not pre-authorize any new schema, enum, runtime scoring, lane value,
+decision value, database field, remote-fraud classifier, automated fraud
+declaration, job-search automation change, or scraping/provider change.
+
+**138.13 Atominvest (calibration reference only).** Atominvest —
+Implementation Analyst remains a positive calibration case for: a 0-2
+comparison pool; strong central functional overlap; finance/data
+adjacency; a first-party verified role/application route; and
+application-specific authorization discovery. This section does not
+persist or alter Atominvest's Application Truth, which remains recorded
+separately (Atominvest — Implementation Analyst, SUBMITTED, 2026-09-06,
+exact approved application résumé retained); any Atominvest application-
+record persistence change is a separate, later, bounded change.
 

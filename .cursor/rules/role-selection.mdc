@@ -1,0 +1,75 @@
+---
+
+description: Role discovery, comparison-pool priority, freshness, remote-authenticity, and pursuit-priority operating doctrine for the Bora Employer Pipeline OS
+alwaysApply: true
+-----------------
+
+# Role Selection and Pursuit Priority
+
+Operational reference: `BLUEPRINT.md` §138
+(`BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1`) locks the full
+doctrine for which roles Career OS should actively search for,
+prioritize, and spend application effort on. This file is a pointer, not
+a restatement — read §138 (and the sections it cross-references: §5, §6,
+§7, §19-21, §132, §135, §136) before acting on discovery, comparison-pool,
+freshness, remote-authenticity, or pursuit-priority questions.
+
+## Governance boundary (the one invariant worth restating here)
+
+This doctrine governs Pursuit Truth and Package Truth only — discovery
+priority, pursuit urgency, and how a serious role is presented for Bora's
+decision. It never governs Qualification Truth, Employer Truth, Candidate
+Truth, or Match Truth, all of which remain owned entirely by
+`job_analysis.py`, `job_decision.py`, and the existing deterministic
+requirement/evidence-match/qualification-gate/recruiter-threshold
+pipeline, unchanged.
+
+Do not convert, under any circumstance:
+
+* `UNKNOWN` -> `SUPPORTED`;
+* `UNKNOWN` -> `NONE`;
+* adjacent experience -> direct experience;
+* functional overlap -> qualification;
+* good location -> qualification;
+* a fresh posting -> qualification;
+* remote authenticity -> qualification;
+* institutional affinity -> qualification;
+* network access -> qualification.
+
+## Quick-reference vocabulary (full definitions in §138, not here)
+
+* Comparison-pool discovery bands: A+ / A / B / C (§138.1) -- "do not
+  actively target" 2-4/3-5/5+/Senior/Lead/Principal/Manager is a
+  discovery/pursuit-economics rule, never an automatic qualification
+  REJECT; the existing mechanical recruiter-threshold guard in
+  `job_decision.py` remains authoritative and unchanged.
+* Freshness bands: `VERY_FRESH` / `FRESH` / `AGING` / `STALE_LEANING` /
+  `UNKNOWN` (§138.5) -- Bora-specific pursuit urgency, never a universal
+  employer-hiring-probability claim, and never a modification of Employer
+  Truth. `STALE_LEANING` never means closed or unqualified.
+* Remote authenticity: `VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
+  `HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A` (§138.7) -- doctrine vocabulary
+  for human/model assessment only; not a schema enum or runtime field.
+* Serious-role output standard (§138.8): Bora Fit, Comparison Pool,
+  Freshness, Location/Work Arrangement, First-Party Actionability, Remote
+  Authenticity, Authorization, Opportunity Value, Pursuit Economics, and
+  a Final Verdict (`PURSUE - DEEP` / `PURSUE - CONTROLLED HIGH-QUALITY` /
+  `PURSUE - EFFICIENT` / `WATCH` / `REJECT`). No numeric score, no fake
+  probability, no point system, ever.
+
+**Disambiguation (§138.8):** every §138.8 label is presentation
+vocabulary for Pursuit Truth only -- never a value of, or synonym for,
+`Job.decision`, `Job.lane`, `role_status`, or `source_verification_status`,
+and never to be written into those persisted/runtime fields (e.g.
+Freshness `STALE_LEANING` != `role_status=POSSIBLY_STALE`; Final Verdict
+`WATCH`/`REJECT` do not redefine the existing `Job.decision` enum even
+where the label text coincides).
+
+## Stop rule
+
+This doctrine lock does not itself authorize runtime implementation --
+no new schema, enum, runtime scoring, lane value, decision value,
+database field, remote-fraud classifier, automated fraud declaration, or
+job-search automation change is pre-authorized by §138. A separate,
+explicitly earned architecture audit under §133's build-economy gate is
+required before any of that is built.
