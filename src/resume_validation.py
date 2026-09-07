@@ -9,6 +9,7 @@ from typing import Any, Mapping
 from resume_diff import compute_resume_diff
 from resume_digest import compute_derivative_validation_digest
 from resume_lineage import validate_resume_module_lineage
+from resume_page_utilization import evaluate_resume_page_utilization
 from resume_patch_apply import (
     apply_resume_patch,
     reject_forbidden_patch_extension,
@@ -247,8 +248,27 @@ def validate_derivative_eligibility(
     evidence_index: Mapping[str, Any],
     require_validation_digest: bool = True,
     for_export: bool = False,
+    page_geometry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Re-validate a derivative against master and trusted indexes."""
+    """Re-validate a derivative against master and trusted indexes.
+
+    RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1:
+    ``page_geometry`` is an OPTIONAL, additive parameter (default None,
+    preserving every existing caller byte-for-byte). When provided AND
+    ``for_export`` is True, the normalized rendered-page-geometry payload
+    is checked via ``evaluate_resume_page_utilization()``
+    (src/resume_page_utilization.py); a failing result (e.g.
+    RESUME_PAGE_UNDERUTILIZED, RESUME_PAGE_COUNT_INVALID,
+    RESUME_PAGE_SIZE_UNSUPPORTED, RESUME_PAGE_CONTENT_OVERFLOW) blocks
+    export eligibility exactly like any other error here. When
+    ``page_geometry`` is omitted, no mechanical page-utilization check
+    occurs -- this reflects current reality honestly: no PDF-generation
+    or rendered-page-geometry producer exists anywhere in this
+    repository today, so this parameter cannot yet be populated
+    automatically for a real export. See
+    src/resume_page_utilization.py's own module docstring for the full
+    architecture-boundary rationale.
+    """
     errors = _schema_validate(DERIVATIVE_SCHEMA, derivative)
 
     if derivative.get("master_id") != master.get("master_id"):
@@ -324,6 +344,11 @@ def validate_derivative_eligibility(
         protected_metadata = validate_protected_metadata_resolved(derivative)
         if not protected_metadata["valid"]:
             errors.extend(protected_metadata["errors"])
+
+        if page_geometry is not None:
+            page_utilization = evaluate_resume_page_utilization(page_geometry)
+            if not page_utilization["valid"]:
+                errors.extend(page_utilization["errors"])
 
     return {
         "valid": len(errors) == 0,
@@ -474,8 +499,15 @@ def approve_derivative_for_export(
     claim_index: Mapping[str, Any],
     evidence_index: Mapping[str, Any],
     human_approval: bool = False,
+    page_geometry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Explicit human export approval after full eligibility re-validation."""
+    """Explicit human export approval after full eligibility re-validation.
+
+    RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1:
+    ``page_geometry`` is OPTIONAL (default None, every existing caller
+    unaffected). See ``validate_derivative_eligibility``'s docstring for
+    the full fail-closed page-utilization behavior this forwards to.
+    """
     if human_approval is not True:
         return {
             "valid": False,
@@ -515,6 +547,7 @@ def approve_derivative_for_export(
         claim_index=claim_index,
         evidence_index=evidence_index,
         for_export=True,
+        page_geometry=page_geometry,
     )
     if not eligibility["valid"]:
         return {"valid": False, "errors": eligibility["errors"]}

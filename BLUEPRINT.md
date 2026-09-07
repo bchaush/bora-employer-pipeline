@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.8**
+**Final Locked Blueprint v3.9**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -4012,4 +4012,59 @@ skills ordering, and truthful lexical alignment (§48/§134). It must never
 alter Candidate Truth, invent tools or methodologies, bypass approved
 Claim lineage, change immutable dates/titles/employers/education, or
 weaken the locked one-page visual/format standard (§134).
+
+**137. RÉSUMÉ PAGE-UTILIZATION ENFORCEMENT — RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1 (LOCKED)**
+
+Earned under §133's build-economy gate by a demonstrated, reproduced
+material quality/workflow defect: the live Atominvest — Implementation
+Analyst application produced a truthful, technically-one-page résumé that
+was nevertheless substantially under-filled (a large dead lower-page
+region; useful approved evidence unnecessarily deleted), which Bora
+manually corrected before submission. This section locks the resulting
+hard product rule and records exactly what is mechanically enforced today
+versus what remains manual QA — it does not restate §134's fixed visual
+contract, which remains the controlling reference standard.
+
+**Hard floor.** For a normal Bora application résumé: one U.S. Letter
+page, truthful and readable, with meaningful content extending through at
+least 92% of page height (measured from the physical top of the page to
+the bottom-most meaningful content, never `text_bbox_height / page_height`,
+so a normal top margin is not penalized). 92% is a floor, not a target to
+decorate past.
+
+**Precedence (unchanged, restated for this rule specifically).** (1)
+Candidate Truth / Evidence / approved Claims; (2) readability, ATS safety,
+no clipping, no overflow; (3) immutable history; (4) 92% page utilization.
+The 92% floor never authorizes filler, unsupported claims, invented
+technologies or metrics, duplicated bullets, generic padding, distorted
+spacing, crushed margins, or unreadably small type. Underutilization is a
+QA failure to correct through truthful means already locked in §§45/134
+(reordering, rewording, restoring stronger approved material, reallocating
+space) — never an instruction to fabricate content. If 92% genuinely
+cannot be reached with truthful, readable, useful supported material, the
+résumé fails this QA gate; it is not padded to pass.
+
+**What is mechanically enforced today.** A pure, deterministic validator
+(`evaluate_resume_page_utilization()`, `src/resume_page_utilization.py`)
+checks a normalized rendered-page-geometry payload (page size/count and a
+list of content objects tagged with an explicit content-type) against the
+92% floor, one-page U.S. Letter size, and page/content overflow — never
+generating, rendering, or parsing a PDF itself, and never touching
+Candidate Truth or résumé content. `resume_validation.py`'s existing
+export-approval gate (`approve_derivative_for_export`,
+`validate_derivative_eligibility`) accepts this payload through an
+optional `page_geometry` parameter; when supplied, a failing result blocks
+export approval exactly like any other eligibility failure.
+
+**What remains human/manual (not mechanically enforced).** No PDF
+generator, renderer, or rendered-page-geometry producer exists anywhere in
+this repository; Bora's actual submitted PDF is produced by a
+human-controlled process outside this repository (§134) and never passes
+through this validator today. The correspondence between a supplied
+geometry payload and the real exported PDF, and every item in §134's QA
+checklist (clipping/overlap, plain-text extraction/read-order, hyperlink
+destination verification, final rendered-PDF visual QA), remain manual
+human review. This section does not claim end-to-end automated PDF
+enforcement — only that a geometry payload, once supplied, is checked
+mechanically and fail-closed at the export-approval boundary.
 

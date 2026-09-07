@@ -19,6 +19,33 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-06 — Résumé page-utilization enforcement (`RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1`)
+
+**Reason**
+
+The live Atominvest — Implementation Analyst application workflow produced a truthful, technically-one-page résumé that was nevertheless substantially under-filled (a large dead lower-page region; useful approved evidence unnecessarily deleted), which Bora manually corrected before submission. Earned under §133's build-economy gate (demonstrated, reproduced material quality/workflow defect).
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.8 → v3.9; new locked Section 137 records the hard 92%-of-page-height meaningful-content floor (measured from the bottom-most meaningful content to the physical top of the page, never `text_bbox_height / page_height`), the unchanged precedence order (Candidate Truth > readability/ATS safety/no clipping/overflow > immutable history > 92% utilization), the explicit non-authorization of filler/fabrication to reach the floor, and an honest record of exactly what is mechanically enforced today versus what remains manual/human review.
+* New `src/resume_page_utilization.py`: a pure, deterministic validator (`evaluate_resume_page_utilization()`) over a normalized rendered-page-geometry payload (page size/count, content objects tagged with an explicit content-type). Never generates, renders, or parses a PDF; zero third-party dependency; zero coupling to résumé content/patch/derivative structures. Enforces one U.S. Letter page, no page/content overflow, and the 92% floor computed only over an explicit allow-list of meaningful content-type tags (decorative/hidden/whitespace/metadata objects never count, by construction).
+* `src/resume_validation.py`: `validate_derivative_eligibility()` and `approve_derivative_for_export()` each gained one optional, additive `page_geometry` parameter (default `None`, every existing caller unaffected). When supplied at export time, a failing page-utilization result blocks export approval exactly like any other eligibility failure (fail-closed export boundary).
+* New `tests/resume_page_utilization_v1_test.py`: 10 regression sections (full-page pass, sparse-derivative/Atominvest-shaped failure, two-page/overflow, non-Letter page size, exact-threshold pass, just-below-threshold failure, decorative-object non-gaming, truth/no-mutation precedence, existing-derivative-safety/signature-compatibility, and a real end-to-end `build_resume_derivative()`/`approve_derivative_for_export()` integration proving the fail-closed boundary).
+
+**Not changed**
+
+`schemas/resume_derivative.schema.json` and every other resume schema (no new persisted field — the QA result is an ephemeral export-time check, not stored derivative state); `resume_text_renderer.py`, `resume_presentation.py`, `resume_patch_apply.py`, `resume_diff.py`, and every other existing resume module; every existing resume test's behavior; `requirements.in`/`requirements-lock.txt` (no new dependency); Candidate Truth, Claim/Evidence lineage, immutable-field protection, review-status/digest behavior; Atominvest's own `Job.application_status` (handled as a separate, later, bounded change).
+
+**Architectural limitation (explicit, not overstated)**
+
+No PDF generator or rendered-page-geometry producer exists anywhere in this repository. `page_geometry` cannot yet be populated automatically for a real export; until a real geometry producer exists, satisfying the 92% floor for an actual submitted résumé remains a human QA step per §134's QA checklist. This milestone does not claim end-to-end automated PDF enforcement.
+
+**Validation**
+
+`tests/resume_page_utilization_v1_test.py`: 10/10 sections pass. Full existing resume test suite (`resume_architecture_test.py`, schema smoke, export/protected-metadata, module display-title binding, employment/project/presentation section views, text renderer): unchanged, all pass. `python scripts/verify_assurance_baseline.py`: ALL PHASES PASSED (Phase 2 62/62, Phase 3 Golden 15/15). `git diff --check` clean.
+
+---
+
 ## 2026-09-04 — Bora-specific hiring relevance (`BORA_SPECIFIC_HIRING_RELEVANCE_V1`, DOCUMENTATION ONLY)
 
 **Reason**
