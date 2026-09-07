@@ -164,6 +164,28 @@ class InfrastructureError(Exception):
     by execution-policy retry limits, never retried unboundedly."""
 
 
+class RecoverableSessionInfrastructureError(InfrastructureError):
+    """CAREER_OS_BUILDER_SESSION_RECOVERY_AND_STRUCTURED_COMPLETION_V1.
+
+    Raised only when a builder invocation's OUTER provider envelope
+    parsed as strict JSON, was a mapping, carried a trustworthy string
+    `session_id`, but the INNER structured builder result then failed
+    extract_schema_valid_result() (missing, malformed, or ambiguous --
+    e.g. Claude finished real work but replied in prose instead of the
+    required JSON object). The session_id is real and resumable --
+    silently discarding it would force the next attempt into a brand
+    new session with no memory of already-completed work.
+
+    Never raised for a malformed/unparseable outer envelope, a
+    non-mapping envelope, or a missing/non-string session_id -- those
+    remain plain InfrastructureError with no session recovery, since an
+    untrusted envelope's session_id must never be invented or trusted."""
+
+    def __init__(self, message: str, *, session_id: str):
+        super().__init__(message)
+        self.session_id = session_id
+
+
 def _error(code: str, **fields: Any) -> dict[str, Any]:
     payload: dict[str, Any] = {"code": code}
     payload.update(fields)
@@ -897,7 +919,30 @@ def real_claude_builder_invoker(
     collection, so the original Pass-1 defect remains fixed too. No
     `shell=True`, no command-string quoting, and no stdin-based
     invocation was needed -- argv-based invocation with a trailing `--`
-    satisfies the full contract."""
+    satisfies the full contract.
+
+    CAREER_OS_BUILDER_SESSION_RECOVERY_AND_STRUCTURED_COMPLETION_V1
+    (reproduced on the second real controller run, run_id
+    20260907T193310Z-f6a756d2: the builder genuinely performed substantial
+    real work across 3 independent attempts, but each attempt's final
+    reply was conversational prose rather than the required structured
+    JSON result, so extract_schema_valid_result() raised on all three --
+    and, before this fix, each retry silently discarded a perfectly good,
+    resumable session_id and started over from zero): once the OUTER
+    envelope has parsed as strict JSON and is confirmed to be a mapping
+    carrying a trustworthy string session_id, a failure extracting the
+    INNER structured result is raised as RecoverableSessionInfrastructureError
+    (carrying that session_id) instead of a plain InfrastructureError, so
+    the caller can resume the same session with a narrow completion-only
+    instruction instead of starting a fresh one. A malformed/unparseable
+    outer envelope, or one with no trustworthy session_id, is never
+    upgraded this way -- it remains a plain, non-recoverable
+    InfrastructureError, exactly as before.
+
+    SR-WS-1 (Cursor correction pass): a whitespace-only session_id
+    (e.g. "   ") is stripped before the recoverability check, and the
+    stripped value is what gets carried forward -- never treated as
+    recoverable, never trusted, never reaches --resume."""
     claude_bin = _find_claude_binary()
     args = [
         claude_bin,
@@ -918,7 +963,23 @@ def real_claude_builder_invoker(
     envelope = _parse_strict_json(output)
     if not isinstance(envelope, Mapping) or not isinstance(envelope.get("result"), str):
         raise InfrastructureError(f"builder envelope missing string 'result' field: {envelope!r}")
-    result = extract_schema_valid_result(envelope["result"], validate=validate_builder_result)
+    envelope_session_id = envelope.get("session_id")
+    # SR-WS-1 (Cursor correction pass): a whitespace-only session_id
+    # (e.g. "   ") is not a real session identity and must never be
+    # treated as recoverable or ever reach --resume. Use the stripped,
+    # canonical value both for the recoverability check and for the
+    # value actually carried forward.
+    recoverable_session_id: str | None = None
+    if isinstance(envelope_session_id, str):
+        stripped_session_id = envelope_session_id.strip()
+        if stripped_session_id:
+            recoverable_session_id = stripped_session_id
+    try:
+        result = extract_schema_valid_result(envelope["result"], validate=validate_builder_result)
+    except InfrastructureError as exc:
+        if recoverable_session_id is not None:
+            raise RecoverableSessionInfrastructureError(str(exc), session_id=recoverable_session_id) from exc
+        raise
     if envelope.get("session_id"):
         result = dict(result)
         result["session_id"] = envelope["session_id"]
@@ -999,6 +1060,38 @@ def build_builder_prompt(
         forbidden_paths=_format_list(contract["forbidden_paths"]),
         deterministic_failures=deterministic_failures,
         reviewer_findings=reviewer_findings_text,
+    )
+
+
+def build_resumed_completion_prompt(contract: Mapping[str, Any]) -> str:
+    """CAREER_OS_BUILDER_SESSION_RECOVERY_AND_STRUCTURED_COMPLETION_V1.
+
+    Used ONLY for a bounded resumed retry after a RecoverableSessionInfrastructureError
+    (a real, valid session whose prior turn finished in prose instead of
+    the required structured result). Deliberately narrow and
+    completion-focused -- it must never re-issue the full original task
+    prompt (that would blindly rerun already-completed work as if
+    nothing happened) and must never authorize broader scope than the
+    original invocation already carried. Does not require a change to
+    prompts/milestone_builder_v1.md: the full task context already lives
+    inside the resumed Claude session itself via --resume."""
+    return (
+        f"You are still the BOUNDED IMPLEMENTATION BUILDER for milestone "
+        f"{contract['milestone_id']!r}, resuming this exact same session.\n\n"
+        "Your previous turn in this session did real work but did not end "
+        "with the required structured completion result -- it ended in "
+        "prose instead of the required JSON object.\n\n"
+        "Do NOT restart, redo, or broaden the task. Do NOT make any further "
+        "code changes beyond what is strictly necessary to finish what you "
+        "had already started. Briefly inspect the current state of your own "
+        "prior work if needed, then reply with ONLY the required builder "
+        "result JSON object as your final output -- no prose before or "
+        "after it. The object must have a top-level \"status\" field equal "
+        "to exactly \"IMPLEMENTATION_ATTEMPT_COMPLETE\" (if your changes are "
+        "in place) or \"STOPPED\" (if you must stop without completing, in "
+        "which case also include \"stop_condition_encountered\" describing "
+        "why, and \"architecture_decision_required\": true only if that stop "
+        "is because a material architecture decision is required)."
     )
 
 
@@ -1222,6 +1315,55 @@ def advance(repo_root: Path, run_id: str, adapters: Adapters) -> dict[str, Any]:
     return manifest
 
 
+def _pending_recovered_session_id(rdir: Path) -> str | None:
+    """CAREER_OS_BUILDER_SESSION_RECOVERY_AND_STRUCTURED_COMPLETION_V1.
+
+    Deliberately NOT a manifest field (schemas/milestone_run.schema.json
+    is `additionalProperties: false` and out of scope for this bounded
+    milestone). Derived instead from this run's own local, gitignored,
+    append-only events.jsonl -- read fully, in order, every call:
+    a BUILDER_SESSION_RECOVERED event sets the pending session_id (its
+    own session_id field, defensively re-validated as a non-empty
+    stripped string -- SR-WS-1); any subsequent BUILDER_INVOKED event
+    (the adapter genuinely returned, successfully or not) clears it,
+    since that attempt already consumed the recovery. The LATEST state
+    after a full scan governs, so a stale recovery event followed by a
+    real invocation never resurrects as pending, and of several recovery
+    events only the latest still-pending one is authoritative.
+
+    SR-CRASH-1 (Cursor correction pass): this is also the sole source of
+    truth used to RECONSTRUCT a lost session_id after a process crash
+    between the durable event write and the durable manifest save --
+    events.jsonl is written (fsync'd via a normal file append) before
+    _do_builder_phase ever raises back out to advance()'s manifest save,
+    so a crash in that narrow window leaves the event durably recorded
+    even if the manifest itself never got the chance to persist it. On
+    the next advance() (a fresh process, per the resume() contract), this
+    function is consulted again and the caller self-heals the manifest
+    field from it -- the recovery invariant depends only on this durable
+    log, never on any single in-memory write having completed."""
+    events_path = rdir / "events.jsonl"
+    if not events_path.exists():
+        return None
+    pending: str | None = None
+    with events_path.open("r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                evt = json.loads(line)
+            except ValueError:
+                continue
+            name = evt.get("event")
+            if name == "BUILDER_SESSION_RECOVERED":
+                sid = evt.get("session_id")
+                pending = sid.strip() if isinstance(sid, str) and sid.strip() else None
+            elif name == "BUILDER_INVOKED":
+                pending = None
+    return pending
+
+
 def _do_builder_phase(
     repo_root: Path,
     rdir: Path,
@@ -1235,12 +1377,38 @@ def _do_builder_phase(
     reviewer_findings_text: str,
     on_success_phase: str,
 ) -> dict[str, Any]:
-    prompt = build_builder_prompt(
-        contract, deterministic_failures=deterministic_failures, reviewer_findings_text=reviewer_findings_text
-    )
-    raw = adapters.builder_invoker(
-        prompt=prompt, cwd=repo_root, policy=policy, session_id=manifest.get("builder_session_id")
-    )
+    recovered_session_id = _pending_recovered_session_id(rdir)
+    if recovered_session_id and manifest.get("builder_session_id") != recovered_session_id:
+        # SR-CRASH-1 self-heal: the durable event log carries a pending
+        # recovered session that the manifest itself never recorded
+        # (e.g. a crash between the event write and the manifest save on
+        # a prior process). Restore it now so the invariant holds
+        # regardless of exactly where a prior process was interrupted --
+        # this mutation is picked up by advance()'s own save_manifest()
+        # call at the end of this same advance() invocation.
+        manifest["builder_session_id"] = recovered_session_id
+        append_event(rdir, {"event": "BUILDER_SESSION_RECONSTRUCTED", "session_id": recovered_session_id})
+
+    effective_session_id = manifest.get("builder_session_id")
+    if recovered_session_id:
+        # A bounded resumed retry aimed only at finishing already-started
+        # work and emitting the required structured result -- never the
+        # full original task prompt, which would blindly rerun work that
+        # (per the recovered session's own last turn) already happened.
+        prompt = build_resumed_completion_prompt(contract)
+    else:
+        prompt = build_builder_prompt(
+            contract, deterministic_failures=deterministic_failures, reviewer_findings_text=reviewer_findings_text
+        )
+    try:
+        raw = adapters.builder_invoker(
+            prompt=prompt, cwd=repo_root, policy=policy, session_id=effective_session_id
+        )
+    except RecoverableSessionInfrastructureError as exc:
+        manifest["builder_session_id"] = exc.session_id
+        append_event(rdir, {"event": "BUILDER_SESSION_RECOVERED", "session_id": exc.session_id, "detail": str(exc)})
+        raise
+
     validity = validate_builder_result(raw)
     artifact_path = rdir / "builder" / f"{uuid.uuid4().hex[:8]}.json"
     atomic_write_json(artifact_path, raw if isinstance(raw, Mapping) else {"raw": raw})
