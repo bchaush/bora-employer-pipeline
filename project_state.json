@@ -1,0 +1,9 @@
+{
+  "blueprint_version": "3.10",
+  "latest_locked_section": 138,
+  "latest_closed_milestone_id": "BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1",
+  "latest_closed_milestone_pr": 17,
+  "current_phase": "OPERATE_WHILE_BUILDING (BLUEPRINT.md Section 133)",
+  "next_authorized_action": "No product implementation milestone is preselected on canonical main. Any next bounded implementation requires a new, explicitly authorized, branch-scoped milestone contract (BLUEPRINT.md Section 133 operate-first/build-when-earned doctrine).",
+  "semantic_state_updated_at": "2026-09-07"
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/project_state.schema.json",
+  "title": "Career OS Canonical Project Semantic State",
+  "description": "CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1. Small, machine-readable, canonical-MERGED semantic state, checked against BLUEPRINT.md/GitHub reality rather than trusted at face value. Deliberately excludes any current Git SHA (Git/GitHub are always the live source of the current commit) and any transient active-milestone/branch/builder field (active work belongs to a branch-scoped milestone contract, not this canonical-main file).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "blueprint_version",
+    "latest_locked_section",
+    "latest_closed_milestone_id",
+    "latest_closed_milestone_pr",
+    "current_phase",
+    "next_authorized_action",
+    "semantic_state_updated_at"
+  ],
+  "properties": {
+    "blueprint_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Must equal BLUEPRINT.md's own 'Final Locked Blueprint vX.Y' header string, checked mechanically, never merely asserted."
+    },
+    "latest_locked_section": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Must equal the highest-numbered '**N. TITLE**' top-level locked section heading actually present in BLUEPRINT.md."
+    },
+    "latest_closed_milestone_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "latest_closed_milestone_pr": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "GitHub PR number for the latest closed milestone, or null for a governance record with no PR (e.g. a read-only audit)."
+    },
+    "current_phase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_authorized_action": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Durable canonical-main authorization state ONLY -- e.g. that no product implementation milestone is currently preselected, or a specific one has been explicitly pre-approved for a future branch. Must remain true after THIS state file's own merge, and must never describe transient in-progress branch work (e.g. never 'MILESTONE_X in progress') or silently pre-authorize a next milestone that has not been separately, explicitly approved. Transient/active-work state belongs exclusively to a branch-scoped milestone contract under milestone_contracts/, never here."
+    },
+    "semantic_state_updated_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    }
+  }
+}

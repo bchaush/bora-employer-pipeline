@@ -1,3 +1,67 @@
+Authority note (CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1):
+this file's pointer and historical log are prose -- informational, never
+authoritative. This exact pointer previously drifted ten pull requests
+behind canonical main (from PR #7 to PR #17) despite an earlier one-time
+manual sync (POST_GOVERNANCE_CANONICAL_STATE_CONTINUITY_SYNC_V1, PR #8,
+2026-09-03) having already corrected the same kind of drift once before
+-- proof this is a recurring architectural gap, not a one-off lapse.
+Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
+scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
+before trusting the pointer below.
+
+Status: CLOSED
+Closed task:
+BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1
+Pull request:
+#17 (https://github.com/bchaush/bora-employer-pipeline/pull/17)
+Merge commit (canonical main):
+178fb50b0f928bfb254634b07109016e5d377b04
+Merge parents:
+6c8cc7ad87056f1c7ea7e9b53707a15ea89bef79,
+31df2c8fea0faa86427e7622517f7f499fccda3c
+
+Governance/doctrine lock (BLUEPRINT.md v3.9 -> v3.10, new locked Section
+138) operationalizing Section 136 into a concrete role-discovery and
+pursuit-priority standard -- see Section 138 for the full doctrine. No
+schema/runtime/test change. Two Cursor adversarial review rounds (a
+MEDIUM presentation-vocabulary-collision finding between Section 138.8's
+labels and Job.decision/Job.lane/role_status/source_verification_status,
+corrected with an explicit disambiguation paragraph); final verdict SAFE.
+
+Retroactively recorded catch-up (this closure record was authored during
+CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1, not contemporaneously
+with PR #17's own merge -- exactly the drift-window this new milestone's
+mechanical check now catches going forward). Three prior closures, also
+not previously recorded here, in merge order:
+
+- PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1 -- PR #14,
+  merge commit c2b948a7569e643878fb37b4fbfcc0b60ed15f83. Extended
+  apply_posting_state_routing() (src/job_decision.py) to require BOTH
+  role_status=="VERIFIED_LIVE" AND
+  source_verification_status=="VERIFIED_DIRECT" before preserving
+  APPLY-like routing (BLUEPRINT.md Section 135 dual-axis gate).
+- BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1 -- PR #15, merge commit
+  d6735dbffc948e69e6f78b164ef08240ee726b14. New
+  apply_recruiter_threshold_guard() (src/job_decision.py): unresolved
+  mandatory experience-threshold lower_bound==2 caps at EFFICIENT_APPLY;
+  lower_bound>=3 caps every APPLY-like decision (including an incoming
+  EFFICIENT_APPLY) at WATCH. Reproduced live at Bose Professional.
+- RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1 -- PR
+  #16, merge commit 6c8cc7ad87056f1c7ea7e9b53707a15ea89bef79
+  (BLUEPRINT.md v3.8 -> v3.9, new locked Section 137). New
+  src/resume_page_utilization.py (pure geometry validator, no PDF
+  generator/parser/dependency) enforcing the 92%-of-page-height
+  meaningful-content floor, wired as an optional page_geometry parameter
+  on resume_validation.py's export-approval gate. Reproduced live at
+  Atominvest -- Implementation Analyst.
+
+No new PRODUCT implementation milestone is auto-selected by this catch-up
+entry; CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1 itself will
+be recorded as its own top pointer once it actually merges.
+
+Prior top pointer (superseded by the block above; preserved unchanged
+below as historical record, per this file's own established convention):
+
 Status: CLOSED
 Closed task:
 REAL_WORLD_OPERATION_AND_CALIBRATION_GOVERNANCE_SYNC_V1
