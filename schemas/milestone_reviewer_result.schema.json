@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/milestone_reviewer_result.schema.json",
+  "title": "Career OS Milestone Independent Reviewer Result",
+  "description": "CAREER_OS_BOUNDED_AGENT_BUILD_LOOP_V1. Strict machine-readable output contract for the independent read-only reviewer boundary. A malformed reviewer result must never be treated as SAFE by default -- it fails closed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["outcome", "findings"],
+  "properties": {
+    "outcome": {
+      "type": "string",
+      "enum": ["SAFE", "CHANGES_REQUIRED", "ESCALATE"]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "required", "invariant", "evidence", "required_action"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "severity": {
+            "type": "string",
+            "enum": ["BLOCKING", "HIGH", "MEDIUM", "LOW"]
+          },
+          "required": { "type": "boolean" },
+          "path": { "type": ["string", "null"] },
+          "line": { "type": ["integer", "null"] },
+          "invariant": { "type": "string", "minLength": 1 },
+          "evidence": { "type": "string", "minLength": 1 },
+          "required_action": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
