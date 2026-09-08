@@ -1,0 +1,56 @@
+{
+  "milestone_id": "CAREER_OS_CURSOR_REVIEWER_STDIN_TRANSPORT_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Fix the reproduced Windows Cursor reviewer transport defect where a large review prompt is passed through agent.cmd as a positional command-line argument and fails with 'The command line is too long.' Preserve the same read-only reviewer authority and structured envelope semantics while moving only the reviewer prompt transport to stdin.",
+  "baseline_sha": "baa0f16b4e6da3767caf23258e2b53364aa3482c",
+  "allowed_paths": [
+    "src/milestone_run.py",
+    "tests/milestone_run_v1_test.py",
+    "milestone_contracts/feature/career-os-cursor-reviewer-stdin-transport-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "schemas/",
+    "src/job_analysis.py",
+    "src/job_decision.py",
+    "src/application_logic.py",
+    "src/resume_validation.py",
+    ".cursor/rules/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "resume/"
+  ],
+  "required_tests": [
+    "tests/milestone_run_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "A deterministic regression reproduces the pre-fix Windows-wrapper risk with a reviewer prompt longer than 8191 characters and proves the fixed reviewer argv no longer contains the prompt text",
+    "real_cursor_reviewer_invoker transports the prompt through stdin rather than a positional command-line argument",
+    "Cursor reviewer authority remains read-only: --mode ask and --trust/workspace behavior preserved; --force and --yolo remain absent",
+    "reviewer output-format json and strict stdout-only provider-envelope parsing remain unchanged",
+    "stderr remains diagnostic-only and nonzero reviewer exits still fail closed",
+    "builder prompt transport and Claude session-recovery behavior remain unchanged",
+    "the subprocess helper change, if needed, is backward-compatible for all existing callers and does not introduce shell=True",
+    "short reviewer prompts and long reviewer prompts both preserve exact prompt bytes/characters through stdin in deterministic tests",
+    "python tests/milestone_run_v1_test.py passes",
+    "python tests/career_os_state_v1_test.py passes",
+    "python scripts/verify_milestone_state.py passes",
+    "python scripts/verify_assurance_baseline.py reports ALL PHASES PASSED",
+    "git diff --check is clean",
+    "independent Cursor adversarial review returns SAFE"
+  ],
+  "stop_conditions": [
+    "a reliable fix would require broad controller redesign, new external dependencies, shell=True, reviewer write authority, or weakening strict structured-result validation",
+    "the repair would require changing Claude builder transport or session recovery rather than only the shared subprocess helper/reviewer boundary needed for stdin",
+    "the repair would require modifying governance, job logic, Candidate Truth, immigration doctrine, or resume/package logic",
+    "stdin transport cannot be proven to preserve exact reviewer prompt content and strict output parsing"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

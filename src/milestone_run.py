@@ -256,7 +256,9 @@ def _run_subprocess(args: list[str], *, cwd: Path, timeout: int = 600) -> tuple[
     return ok, _diagnostic_text(stdout, stderr)
 
 
-def _run_subprocess_streams(args: list[str], *, cwd: Path, timeout: int = 600) -> tuple[bool, str, str]:
+def _run_subprocess_streams(
+    args: list[str], *, cwd: Path, timeout: int = 600, input_text: str | None = None
+) -> tuple[bool, str, str]:
     """Subprocess boundary for a provider structured (`--output-format
     json`) invocation: stdout and stderr are returned SEPARATELY, never
     concatenated, so a caller can strictly parse the provider's own outer
@@ -264,10 +266,32 @@ def _run_subprocess_streams(args: list[str], *, cwd: Path, timeout: int = 600) -
     unparsed, purely as diagnostic evidence. Success/failure is exit-code
     only (`returncode == 0`), independent of stdout's content -- a
     nonzero exit is always a failure even when stdout looks like valid
-    JSON."""
+    JSON.
+
+    CAREER_OS_CURSOR_REVIEWER_STDIN_TRANSPORT_V1: `input_text`, when
+    given, is written to the child process's stdin instead of being
+    passed as a positional argv element -- needed for the Cursor reviewer
+    adapter, whose prompt can exceed the Windows command-line length
+    limit when passed as an argument through `agent.cmd` (a cmd.exe
+    wrapper), reproducibly failing with 'The command line is too long.'
+    `None` (the default) preserves the exact prior behavior (no stdin
+    piped in) for every other caller.
+
+    `encoding='utf-8'` is pinned explicitly (rather than relying on the
+    platform default text-mode encoding) because reviewer prompts are
+    built from UTF-8 templates/diffs and, on Windows, the default
+    locale encoding (often cp1252) can silently corrupt or raise on
+    non-ASCII stdin content -- unlike the prior argv transport, which
+    went through CreateProcessW without any such re-encoding step."""
     try:
         completed = subprocess.run(
-            args, cwd=str(cwd), capture_output=True, text=True, timeout=timeout
+            args,
+            cwd=str(cwd),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=timeout,
+            input=input_text,
         )
     except subprocess.TimeoutExpired:
         return False, "", f"TIMEOUT after {timeout}s running {args!r}"
@@ -1051,7 +1075,22 @@ def real_cursor_reviewer_invoker(*, prompt: str, cwd: Path, policy: Mapping[str,
     non-interactive (-p), read-only (--mode ask, empirically verified
     structurally enforced -- see the ADR), workspace-trusted (this
     repository, not an arbitrary directory), structured JSON output.
-    Never --force/--yolo."""
+    Never --force/--yolo.
+
+    CAREER_OS_CURSOR_REVIEWER_STDIN_TRANSPORT_V1 (reproduced on a real
+    controller run): `agent` resolves on Windows to `agent.cmd`, a
+    cmd.exe wrapper -- cmd.exe imposes an ~8191-character total
+    command-line length limit. A real review prompt (a full diff plus
+    template text) routinely exceeds that, failing every time with 'The
+    command line is too long.', regardless of quoting. There is no
+    native `agent.exe` sibling to fall back to (unlike the Claude CLI's
+    `.cmd`/`.exe` pair), so the prompt itself must not be part of argv at
+    all. The prompt is instead written to the child process's stdin;
+    `agent -p` (empirically) reads the prompt from stdin when no
+    positional prompt argument is given. This moves ONLY the prompt's
+    transport -- every other flag (`--mode ask`, `--trust`, `--workspace`,
+    `--output-format json`) is unchanged, and reviewer authority/read-only
+    semantics are unaffected."""
     agent_bin = _find_binary(
         "agent",
         extra_candidates=[str(Path.home() / "AppData" / "Local" / "cursor-agent" / "agent.cmd")],
@@ -1066,9 +1105,10 @@ def real_cursor_reviewer_invoker(*, prompt: str, cwd: Path, policy: Mapping[str,
         "--trust",
         "--workspace",
         str(cwd),
-        prompt,
     ]
-    ok, stdout, stderr = _run_subprocess_streams(args, cwd=cwd, timeout=int(policy["reviewer_timeout_seconds"]))
+    ok, stdout, stderr = _run_subprocess_streams(
+        args, cwd=cwd, timeout=int(policy["reviewer_timeout_seconds"]), input_text=prompt
+    )
     if not ok:
         raise InfrastructureError(f"reviewer invocation failed: {_diagnostic_text(stdout, stderr)[-2000:]}")
     envelope = _parse_provider_outer_envelope(stdout, stderr)
