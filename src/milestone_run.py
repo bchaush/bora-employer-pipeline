@@ -245,16 +245,47 @@ def _run_git(args: list[str], *, cwd: Path, timeout: int = 30) -> tuple[bool, st
 
 
 def _run_subprocess(args: list[str], *, cwd: Path, timeout: int = 600) -> tuple[bool, str]:
+    """Combined-output subprocess runner for callers (deterministic test
+    runner, Assurance) whose subprocess output is NOT a provider JSON
+    envelope -- for those, a single human-readable diagnostic blob
+    containing both stdout and stderr is exactly what's wanted. NEVER
+    used for a provider adapter (Claude/Cursor) -- see
+    `_run_subprocess_streams` for that boundary, where stdout and stderr
+    must never be merged before strict JSON parsing."""
+    ok, stdout, stderr = _run_subprocess_streams(args, cwd=cwd, timeout=timeout)
+    return ok, _diagnostic_text(stdout, stderr)
+
+
+def _run_subprocess_streams(args: list[str], *, cwd: Path, timeout: int = 600) -> tuple[bool, str, str]:
+    """Subprocess boundary for a provider structured (`--output-format
+    json`) invocation: stdout and stderr are returned SEPARATELY, never
+    concatenated, so a caller can strictly parse the provider's own outer
+    JSON envelope from stdout alone while stderr remains available,
+    unparsed, purely as diagnostic evidence. Success/failure is exit-code
+    only (`returncode == 0`), independent of stdout's content -- a
+    nonzero exit is always a failure even when stdout looks like valid
+    JSON."""
     try:
         completed = subprocess.run(
             args, cwd=str(cwd), capture_output=True, text=True, timeout=timeout
         )
     except subprocess.TimeoutExpired:
-        return False, f"TIMEOUT after {timeout}s running {args!r}"
+        return False, "", f"TIMEOUT after {timeout}s running {args!r}"
     except Exception as exc:  # noqa: BLE001
-        return False, f"failed to execute {args!r}: {exc!r}"
-    output = (completed.stdout or "") + (completed.stderr or "")
-    return completed.returncode == 0, output
+        return False, "", f"failed to execute {args!r}: {exc!r}"
+    return completed.returncode == 0, completed.stdout or "", completed.stderr or ""
+
+
+def _diagnostic_text(stdout: str, stderr: str) -> str:
+    """Human-readable diagnostic concatenation of stdout and stderr --
+    NEVER used for parsing, only for error messages/logged artifacts.
+    Preserves the pre-fix `_run_subprocess` combined-output shape for
+    diagnostic purposes so existing non-provider consumers (test runner,
+    Assurance) and provider-failure error messages keep equivalent
+    diagnostic content even though stdout/stderr are no longer merged
+    before strict envelope parsing."""
+    parts = [p for p in (stdout or "", stderr or "") if p]
+    return "\n".join(parts)
 
 
 def get_current_branch(*, cwd: Path) -> str | None:
@@ -725,6 +756,35 @@ def _parse_strict_json(text: str) -> Any:
         raise InfrastructureError(f"provider envelope is not strict JSON ({exc}): {text[:500]!r}")
 
 
+def _parse_provider_outer_envelope(stdout: str, stderr: str) -> Any:
+    """CAREER_OS_PROVIDER_ENVELOPE_STDOUT_STDERR_SEPARATION_V1. Strict
+    outer-envelope parse of STDOUT ONLY, via `_parse_strict_json`
+    unchanged (still a full-document strict parse -- never fuzzy
+    extraction for the outer envelope). stderr is never provider data and
+    is never parsed or included in what gets parsed, but if the strict
+    stdout parse fails (malformed, empty, trailing-contaminated, or
+    multiple-document stdout), whatever stderr the provider wrote is
+    folded into the raised error message as diagnostic evidence only --
+    the same "stderr is never silently discarded" guarantee a nonzero
+    exit already gets, extended to a malformed/empty-stdout failure too.
+
+    Reproduced defect this replaces: `_run_subprocess` used to
+    concatenate stdout+stderr into one string BEFORE this parse, so a
+    provider that wrote its one valid JSON envelope to stdout and
+    incidental diagnostic text to stderr on an otherwise-successful
+    (exit 0) invocation would fail here with `json.JSONDecodeError: Extra
+    data` -- a genuine, valid provider result discarded purely because of
+    transport-boundary contamination, never a real defect in the
+    provider's own reply."""
+    try:
+        return _parse_strict_json(stdout)
+    except InfrastructureError as exc:
+        stderr_snippet = (stderr or "").strip()
+        if stderr_snippet:
+            raise InfrastructureError(f"{exc} | stderr: {stderr_snippet[-2000:]!r}") from exc
+        raise
+
+
 def _find_all_balanced_json_objects(text: str) -> list[Any]:
     """Every top-level JSON object in text, found via
     `json.JSONDecoder().raw_decode` from each candidate `{` offset --
@@ -957,10 +1017,10 @@ def real_claude_builder_invoker(
     if session_id:
         args += ["--resume", session_id]
     args += ["--", prompt]
-    ok, output = _run_subprocess(args, cwd=cwd, timeout=int(policy["builder_timeout_seconds"]))
+    ok, stdout, stderr = _run_subprocess_streams(args, cwd=cwd, timeout=int(policy["builder_timeout_seconds"]))
     if not ok:
-        raise InfrastructureError(f"builder invocation failed: {output[-2000:]}")
-    envelope = _parse_strict_json(output)
+        raise InfrastructureError(f"builder invocation failed: {_diagnostic_text(stdout, stderr)[-2000:]}")
+    envelope = _parse_provider_outer_envelope(stdout, stderr)
     if not isinstance(envelope, Mapping) or not isinstance(envelope.get("result"), str):
         raise InfrastructureError(f"builder envelope missing string 'result' field: {envelope!r}")
     envelope_session_id = envelope.get("session_id")
@@ -1008,10 +1068,10 @@ def real_cursor_reviewer_invoker(*, prompt: str, cwd: Path, policy: Mapping[str,
         str(cwd),
         prompt,
     ]
-    ok, output = _run_subprocess(args, cwd=cwd, timeout=int(policy["reviewer_timeout_seconds"]))
+    ok, stdout, stderr = _run_subprocess_streams(args, cwd=cwd, timeout=int(policy["reviewer_timeout_seconds"]))
     if not ok:
-        raise InfrastructureError(f"reviewer invocation failed: {output[-2000:]}")
-    envelope = _parse_strict_json(output)
+        raise InfrastructureError(f"reviewer invocation failed: {_diagnostic_text(stdout, stderr)[-2000:]}")
+    envelope = _parse_provider_outer_envelope(stdout, stderr)
     result_text = envelope.get("result") if isinstance(envelope, Mapping) else None
     if not isinstance(result_text, str):
         raise InfrastructureError(f"reviewer envelope missing string 'result' field: {envelope!r}")
