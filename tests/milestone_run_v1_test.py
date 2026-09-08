@@ -3325,4 +3325,40 @@ _test_cursor_reviewer_non_ascii_prompt_transport_preserves_exact_characters_via_
 print("PASS CURSOR-REVIEWER-STDIN-TRANSPORT-3: a non-ASCII review prompt is transported to the Cursor reviewer via stdin with exact characters preserved and encoding='utf-8' explicitly pinned, never as a positional argv element.")
 
 
+def _test_reviewer_prompt_carries_stage_boundary_and_later_gate_non_substitution_language() -> None:
+    """CAREER_OS_REVIEWER_POST_REVIEW_GATE_SEPARATION_V1: the reviewer
+    prompt must tell Cursor that later controller/human gates (full
+    Assurance, final release diff-check, human approval, release
+    verification) intentionally have not happened yet and their absence
+    from the review packet is not grounds for CHANGES_REQUIRED -- while
+    also explicitly preserving those gates as mandatory, SAFE as not a
+    substitute for them, and Cursor's authority to flag any diff that
+    weakens/removes/bypasses/misorders them."""
+    text = (ROOT / "prompts" / "milestone_reviewer_v1.md").read_text(encoding="utf-8")
+
+    assert_true("CHANGES_REQUIRED" in text, "setup: prompt must still define the CHANGES_REQUIRED outcome")
+    assert_true(
+        "solely because" in text and "CHANGES_REQUIRED" in text,
+        "the prompt must instruct the reviewer not to return CHANGES_REQUIRED solely because later-gate evidence is absent",
+    )
+    for later_gate_term in ("Assurance", "human approval", "release"):
+        assert_true(later_gate_term in text, f"the prompt must name the later gate {later_gate_term!r} explicitly")
+    assert_true(
+        "mandatory" in text,
+        "the prompt must state that later gates remain mandatory regardless of this review's outcome",
+    )
+    assert_true(
+        "substitute" in text,
+        "the prompt must state that a SAFE outcome here is never a substitute for the later gates",
+    )
+    assert_true(
+        any(term in text for term in ("weakens", "weaken")) and any(term in text for term in ("bypass", "bypasses")) and any(term in text for term in ("misorder", "misorders")),
+        "the prompt must preserve the reviewer's authority to flag a diff that weakens, bypasses, or misorders the later gates",
+    )
+
+
+_test_reviewer_prompt_carries_stage_boundary_and_later_gate_non_substitution_language()
+print("PASS REVIEWER-GATE-SEPARATION-1: the reviewer prompt carries the stage-boundary instruction (no CHANGES_REQUIRED solely for absent later-gate evidence) while preserving later gates as mandatory, non-substitutable, and still flaggable if weakened/bypassed/misordered.")
+
+
 print("ALL milestone_run_v1_test CHECKS PASSED")

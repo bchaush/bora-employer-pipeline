@@ -28,12 +28,32 @@ forbidden_paths: {forbidden_paths}
 
 {governance_excerpt}
 
+## Stage boundary -- what this review is, and is not
+
+You are reviewing the CURRENT diff at the CURRENT stage only. Later
+controller/human gates -- full Assurance, the final release diff-check,
+human approval, and commit/PR/merge verification -- intentionally have
+not happened yet and their evidence is intentionally absent from this
+review packet. Do not return "CHANGES_REQUIRED" solely because
+evidence belonging to one of those later gates is not yet present here.
+Those later gates remain mandatory regardless of your outcome here, and
+a "SAFE" outcome from you is never a substitute for any of them. You
+retain full authority to flag, as a required finding, any diff that
+weakens, removes, bypasses, or misorders those later gates themselves
+(for example: a change that skips Assurance, disables human approval,
+or lets code commit/push/merge without review) -- that is a finding
+about the current diff, not a demand for later-gate evidence.
+
 ## Your task
 
-Review the diff above for: correctness bugs, scope violations (any
-change outside allowed_paths, or touching a forbidden/protected path),
-weakened tests, silently altered Golden Test expectations, fabricated or
-unsupported claims, and any violation of the governance excerpts given.
+Independently evaluate the actual diff, the allowed/forbidden scope,
+applicable governance, and the deterministic test evidence given below.
+Review for: correctness bugs, scope violations (any change outside
+allowed_paths, or touching a forbidden/protected path), weakened tests,
+silently altered Golden Test expectations, fabricated or unsupported
+claims, and any violation of the governance excerpts given -- including,
+per the stage-boundary section above, any weakening, removal, bypass, or
+misordering of the later mandatory gates.
 
 Reply with STRICT JSON ONLY, matching exactly this shape (no prose before
 or after):
