@@ -3167,4 +3167,162 @@ _test_case_k_provider_envelope_stdout_stderr_transport_boundary_cursor_reviewer(
 print("PASS PROVIDER-ENVELOPE-TRANSPORT-2 (case K): the Cursor reviewer adapter shares the identical stdout/stderr transport boundary as the Claude builder adapter (valid stdout survives stderr diagnostic text), and remains read-only/strict (--mode ask, never --force/--yolo).")
 
 
+def _test_cursor_reviewer_prompt_transport_is_stdin_not_argv() -> None:
+    """CAREER_OS_CURSOR_REVIEWER_STDIN_TRANSPORT_V1: on Windows, `agent`
+    resolves to `agent.cmd`, a cmd.exe wrapper subject to cmd.exe's
+    ~8191-character total command-line length limit -- a real review
+    prompt (a full diff plus template text) routinely exceeds that and
+    fails every time with 'The command line is too long.' regardless of
+    quoting. The fix must move the prompt off argv entirely, onto the
+    child process's stdin, while every other flag (--mode ask, --trust,
+    --workspace, --output-format json) stays exactly as before."""
+    original_run = mr.subprocess.run
+    original_find_binary = mr._find_binary
+    recorded: dict[str, Any] = {}
+    mr._find_binary = lambda name, extra_candidates=(): "agent-binary-path"
+
+    huge_prompt = "X" * 20000  # far larger than cmd.exe's ~8191-char argv limit
+
+    def _recording_fake_run(args, *, cwd=None, capture_output=None, text=None, encoding=None, timeout=None, input=None, **kwargs):
+        recorded["args"] = list(args)
+        recorded["input"] = input
+        recorded["encoding"] = encoding
+        return _FakeCompletedProcess(0, _VALID_REVIEWER_STDOUT, "")
+
+    mr.subprocess.run = _recording_fake_run
+    try:
+        result = mr.real_cursor_reviewer_invoker(prompt=huge_prompt, cwd=Path("."), policy={"reviewer_timeout_seconds": 30})
+        assert_true(result.get("outcome") == "SAFE", f"a valid reviewer envelope must still be returned when the prompt is transported via stdin, got {result!r}")
+
+        args = recorded["args"]
+        assert_true(
+            huge_prompt not in args,
+            "REGRESSION: the reviewer prompt must never appear as a positional argv element -- "
+            "that is exactly the defect that overflows cmd.exe's command-line length limit on Windows",
+        )
+        assert_true(
+            recorded.get("input") == huge_prompt,
+            f"the reviewer prompt must be transported via the child process's stdin (subprocess.run(..., input=prompt)), got input={recorded.get('input')!r}",
+        )
+        assert_true(
+            recorded.get("encoding") == "utf-8",
+            f"stdin transport must pin encoding='utf-8' explicitly (not rely on the platform default text-mode encoding) so non-ASCII prompt content is not corrupted on Windows, got encoding={recorded.get('encoding')!r}",
+        )
+        # every other flag must remain exactly as before.
+        assert_true("--mode" in args and args[args.index("--mode") + 1] == "ask", f"--mode ask must remain present, got {args}")
+        assert_true("--trust" in args, f"--trust must remain present, got {args}")
+        assert_true("--workspace" in args, f"--workspace must remain present, got {args}")
+        assert_true("--output-format" in args and args[args.index("--output-format") + 1] == "json", f"--output-format json must remain present, got {args}")
+    finally:
+        mr.subprocess.run = original_run
+        mr._find_binary = original_find_binary
+
+
+_test_cursor_reviewer_prompt_transport_is_stdin_not_argv()
+print("PASS CURSOR-REVIEWER-STDIN-TRANSPORT-1: a large review prompt (20000 chars, far exceeding cmd.exe's ~8191-char argv limit) is transported to the Cursor reviewer via stdin, never as a positional argv element, while --mode ask/--trust/--workspace/--output-format json remain unchanged.")
+
+
+def _test_cursor_reviewer_short_prompt_transport_is_stdin_not_argv() -> None:
+    """CAREER_OS_CURSOR_REVIEWER_STDIN_TRANSPORT_V1 (REV-001): the stdin
+    transport fix must not be conditional on prompt size -- a short
+    prompt (well under cmd.exe's ~8191-char limit, and previously legal
+    as a positional argv element) must ALSO be transported via stdin,
+    never argv, with the exact same bytes/characters preserved. This
+    guards against a fix that only routes large prompts through stdin
+    while silently leaving small prompts on argv."""
+    original_run = mr.subprocess.run
+    original_find_binary = mr._find_binary
+    recorded: dict[str, Any] = {}
+    mr._find_binary = lambda name, extra_candidates=(): "agent-binary-path"
+
+    short_prompt = "review this small diff please"
+
+    def _recording_fake_run(args, *, cwd=None, capture_output=None, text=None, encoding=None, timeout=None, input=None, **kwargs):
+        recorded["args"] = list(args)
+        recorded["input"] = input
+        recorded["encoding"] = encoding
+        return _FakeCompletedProcess(0, _VALID_REVIEWER_STDOUT, "")
+
+    mr.subprocess.run = _recording_fake_run
+    try:
+        result = mr.real_cursor_reviewer_invoker(prompt=short_prompt, cwd=Path("."), policy={"reviewer_timeout_seconds": 30})
+        assert_true(result.get("outcome") == "SAFE", f"a valid reviewer envelope must still be returned for a short stdin-transported prompt, got {result!r}")
+
+        args = recorded["args"]
+        assert_true(
+            short_prompt not in args,
+            "REGRESSION: a short reviewer prompt must never appear as a positional argv element either -- "
+            "the stdin fix must not be conditional on prompt length",
+        )
+        assert_true(
+            recorded.get("input") == short_prompt,
+            f"the short reviewer prompt must be transported via the child process's stdin with exact characters preserved, got input={recorded.get('input')!r}",
+        )
+        assert_true(
+            recorded.get("encoding") == "utf-8",
+            f"stdin transport must pin encoding='utf-8' explicitly, got encoding={recorded.get('encoding')!r}",
+        )
+        assert_true("--force" not in args and "--yolo" not in args, f"--force/--yolo must remain absent, got {args}")
+        assert_true("--mode" in args and args[args.index("--mode") + 1] == "ask", f"--mode ask must remain present, got {args}")
+        assert_true("--trust" in args, f"--trust must remain present, got {args}")
+        assert_true("--workspace" in args, f"--workspace must remain present, got {args}")
+        assert_true("--output-format" in args and args[args.index("--output-format") + 1] == "json", f"--output-format json must remain present, got {args}")
+    finally:
+        mr.subprocess.run = original_run
+        mr._find_binary = original_find_binary
+
+
+_test_cursor_reviewer_short_prompt_transport_is_stdin_not_argv()
+print("PASS CURSOR-REVIEWER-STDIN-TRANSPORT-2: a short review prompt (well under the cmd.exe argv limit) is also transported to the Cursor reviewer via stdin with exact characters preserved, never as a positional argv element, while --mode ask/--trust/--workspace/--output-format json remain unchanged and --force/--yolo remain absent.")
+
+
+def _test_cursor_reviewer_non_ascii_prompt_transport_preserves_exact_characters_via_utf8() -> None:
+    """CAREER_OS_CURSOR_REVIEWER_STDIN_TRANSPORT_V1 (REV-001): reviewer
+    prompts are built from UTF-8 templates/diffs and can contain
+    non-ASCII characters. Prior argv transport went through
+    CreateProcessW (Unicode) without re-encoding via a legacy code
+    page; the stdin transport must not regress this -- it must pin
+    encoding='utf-8' on the subprocess.run call so non-ASCII prompt
+    content is not corrupted or rejected under Windows' default
+    locale encoding (often cp1252)."""
+    original_run = mr.subprocess.run
+    original_find_binary = mr._find_binary
+    recorded: dict[str, Any] = {}
+    mr._find_binary = lambda name, extra_candidates=(): "agent-binary-path"
+
+    non_ascii_prompt = "reviewer prompt with non-ASCII: café, über, 日本語, — em dash"
+
+    def _recording_fake_run(args, *, cwd=None, capture_output=None, text=None, encoding=None, timeout=None, input=None, **kwargs):
+        recorded["args"] = list(args)
+        recorded["input"] = input
+        recorded["encoding"] = encoding
+        return _FakeCompletedProcess(0, _VALID_REVIEWER_STDOUT, "")
+
+    mr.subprocess.run = _recording_fake_run
+    try:
+        result = mr.real_cursor_reviewer_invoker(prompt=non_ascii_prompt, cwd=Path("."), policy={"reviewer_timeout_seconds": 30})
+        assert_true(result.get("outcome") == "SAFE", f"a valid reviewer envelope must still be returned for a non-ASCII stdin-transported prompt, got {result!r}")
+
+        args = recorded["args"]
+        assert_true(
+            non_ascii_prompt not in args,
+            "REGRESSION: a non-ASCII reviewer prompt must never appear as a positional argv element either",
+        )
+        assert_true(
+            recorded.get("input") == non_ascii_prompt,
+            f"the non-ASCII reviewer prompt must reach subprocess.run's input= boundary with exact characters preserved, got input={recorded.get('input')!r}",
+        )
+        assert_true(
+            recorded.get("encoding") == "utf-8",
+            f"stdin transport must pin encoding='utf-8' explicitly so non-ASCII prompt content is not corrupted on Windows, got encoding={recorded.get('encoding')!r}",
+        )
+    finally:
+        mr.subprocess.run = original_run
+        mr._find_binary = original_find_binary
+
+
+_test_cursor_reviewer_non_ascii_prompt_transport_preserves_exact_characters_via_utf8()
+print("PASS CURSOR-REVIEWER-STDIN-TRANSPORT-3: a non-ASCII review prompt is transported to the Cursor reviewer via stdin with exact characters preserved and encoding='utf-8' explicitly pinned, never as a positional argv element.")
+
+
 print("ALL milestone_run_v1_test CHECKS PASSED")
