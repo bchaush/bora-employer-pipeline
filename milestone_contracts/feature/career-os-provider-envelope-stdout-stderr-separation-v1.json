@@ -1,0 +1,70 @@
+{
+  "milestone_id": "CAREER_OS_PROVIDER_ENVELOPE_STDOUT_STDERR_SEPARATION_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Fix the provider-envelope transport defect reproduced by fresh canary run 20260907T220348Z-3dacfcfd: subprocess capture currently combines stdout and stderr before strict outer-envelope parsing, so valid structured JSON on stdout plus diagnostic text on stderr can fail with Extra data. Deterministically reproduce the boundary, then make the smallest change that parses provider structured JSON from stdout only while retaining stderr as diagnostic evidence. Investigate whether long-run stdout contamination is separately reproducible; if stderr separation does not reproduce and close the real failure signature, stop rather than guess. Preserve the failed runs 20260907T180932Z-656eae27, 20260907T193310Z-f6a756d2, and 20260907T220348Z-3dacfcfd as historical evidence. No commit, push, PR, or merge is authorized.",
+  "baseline_sha": "e6f2dd17519e626870a6efdb821000203b469675",
+  "allowed_paths": [
+    "src/milestone_run.py",
+    "tests/milestone_run_v1_test.py",
+    "milestone_contracts/feature/career-os-provider-envelope-stdout-stderr-separation-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md",
+    "schemas/**",
+    ".cursor/rules/**",
+    ".github/**",
+    "src/job_analysis.py",
+    "src/job_decision.py",
+    "src/requirement_source_role.py",
+    "src/application_logic.py",
+    "src/qualification_gate.py",
+    "src/application_gate.py",
+    "src/resume_validation.py",
+    "evidence/**",
+    "claims/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "docs/**"
+  ],
+  "required_tests": [
+    "tests/milestone_run_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "A deterministic pre-fix reproduction proves valid JSON stdout plus stderr diagnostic text causes the current strict-envelope failure because stdout and stderr are combined.",
+    "The subprocess boundary distinguishes exit code, stdout, and stderr without shell=True or tool-authority expansion.",
+    "Claude and Cursor provider outer-envelope parsing uses stdout only and remains strict: malformed, empty, trailing-contaminated, or multiple-document stdout fails closed.",
+    "Stderr is never interpreted as provider data and remains available in useful diagnostics for malformed stdout, empty stdout, and nonzero exit failures.",
+    "Nonzero exit remains failure even when stdout looks like valid JSON.",
+    "Valid JSON stdout with empty, warning, or multiline stderr preserves provider result semantics.",
+    "Claude builder session-recovery and durable reconstruction behavior from PR #21 remains intact.",
+    "Cursor reviewer remains strict and read-only.",
+    "Tests cover cases A-M in Bora's authorization, including no tool-authority broadening.",
+    "No path outside allowed_paths changes.",
+    "python tests/milestone_run_v1_test.py passes.",
+    "python tests/career_os_state_v1_test.py passes.",
+    "python scripts/verify_milestone_state.py passes.",
+    "python scripts/verify_assurance_baseline.py passes.",
+    "git diff --check passes.",
+    "Independent Cursor adversarial review returns SAFE before human approval."
+  ],
+  "stop_conditions": [
+    "origin/main or live repository reality differs from the authorized baseline before work begins",
+    "stderr separation does not deterministically reproduce and close the real Extra data failure signature",
+    "additional long-run stdout contamination is reproduced and cannot be resolved inside the same strict stdout-only boundary without fuzzy outer parsing",
+    "implementation requires any path outside allowed_paths",
+    "a schema, governance, Truth-layer, job, resume, or role-selection change is required",
+    "strict outer-envelope parsing, strict inner validation, exactly-one-schema-valid-inner-object semantics, session recovery, bounded retries, scope enforcement, locking, diff fingerprinting, reviewer independence, Assurance, or human approval would be weakened",
+    "Cursor produces a materially ambiguous or disputed finding that cannot be resolved deterministically"
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_CURSOR_ADVERSARIAL_REVIEW; Cursor must inspect the actual uncommitted diff and deterministic evidence in read-only Ask mode; required findings must be corrected within this contract or escalated.",
+  "human_approval_requirements": "BORA_EXPLICIT_APPROVAL_REQUIRED_AFTER_CURSOR_SAFE_AND_FULL_ASSURANCE; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED"
+}

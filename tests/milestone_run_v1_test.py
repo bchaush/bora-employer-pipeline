@@ -1854,18 +1854,18 @@ def _write_fake_claude_shim(tmp_dir: Path) -> Path:
 
 
 def _native_run_subprocess(fake_py: Path):
-    """Wraps the REAL mr._run_subprocess so that whatever placeholder
-    `claude_bin` string real_claude_builder_invoker() constructed argv
-    with is replaced, at the last moment, by a genuine native-process
-    invocation of the fake CLI script -- `[sys.executable, fake_py]`,
-    a real PE executable, no cmd.exe indirection -- while every other
-    constructed argv element (flags, --allowedTools value, the '--'
+    """Wraps the REAL mr._run_subprocess_streams so that whatever
+    placeholder `claude_bin` string real_claude_builder_invoker()
+    constructed argv with is replaced, at the last moment, by a genuine
+    native-process invocation of the fake CLI script -- `[sys.executable,
+    fake_py]`, a real PE executable, no cmd.exe indirection -- while every
+    other constructed argv element (flags, --allowedTools value, the '--'
     terminator, the prompt itself) passes through completely unchanged.
     This exercises the real argv-construction code in
     real_claude_builder_invoker() end-to-end through a real subprocess
     boundary, structurally equivalent to how the corrected production
     code invokes a native claude.exe."""
-    original = mr._run_subprocess
+    original = mr._run_subprocess_streams
 
     def _wrapped(args, *, cwd, timeout=600):
         native_args = [sys.executable, str(fake_py)] + list(args[1:])
@@ -1897,9 +1897,9 @@ def _test_argv_ordering_boundary_shim_exact_fidelity() -> None:
     try:
         fake_py = _write_fake_claude_shim(tmp_dir)
         original_find_claude_binary = mr._find_claude_binary
-        original_run_subprocess = mr._run_subprocess
+        original_run_subprocess_streams = mr._run_subprocess_streams
         mr._find_claude_binary = lambda: "claude-placeholder"
-        mr._run_subprocess = _native_run_subprocess(fake_py)
+        mr._run_subprocess_streams = _native_run_subprocess(fake_py)
         try:
             for label, expected_prompt in ARGV_FIDELITY_CASES.items():
                 result = mr.real_claude_builder_invoker(
@@ -1916,7 +1916,7 @@ def _test_argv_ordering_boundary_shim_exact_fidelity() -> None:
                 )
         finally:
             mr._find_claude_binary = original_find_claude_binary
-            mr._run_subprocess = original_run_subprocess
+            mr._run_subprocess_streams = original_run_subprocess_streams
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
@@ -1977,7 +1977,7 @@ def _test_argv_static_structure_and_flags() -> None:
     constructed argv and unchanged surrounding behavior, using a
     recording fake subprocess runner (fast, no real process needed)."""
     recorded: dict[str, Any] = {}
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
 
     def _recording_run_subprocess(args, *, cwd, timeout=600):
         recorded["args"] = list(args)
@@ -1997,9 +1997,9 @@ def _test_argv_static_structure_and_flags() -> None:
                 ),
                 "type": "result",
             }
-        )
+        ), ""
 
-    mr._run_subprocess = _recording_run_subprocess
+    mr._run_subprocess_streams = _recording_run_subprocess
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
     try:
@@ -2007,7 +2007,7 @@ def _test_argv_static_structure_and_flags() -> None:
             prompt="a real prompt", cwd=Path("."), policy={"builder_timeout_seconds": 123}, session_id=None
         )
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
 
     args = recorded["args"]
@@ -2035,13 +2035,15 @@ def _test_argv_static_structure_and_flags() -> None:
     assert_true(recorded["timeout"] == 123, f"builder_timeout_seconds must still be forwarded to the subprocess call unchanged, got {recorded['timeout']}")
 
     # No shell invocation is ever introduced -- args[0] is a plain
-    # executable path/string, and _run_subprocess (shared, unmodified)
-    # never sets shell=True anywhere in this module.
-    # Scoped to the three actual subprocess.run() call sites (_run_git,
-    # _run_subprocess, _is_ancestor) rather than the whole module --
-    # scanning the whole module would false-positive on this very
-    # docstring's own prose explaining that shell=True was NOT used.
-    for fn in (mr._run_git, mr._run_subprocess, mr._is_ancestor):
+    # executable path/string, and _run_subprocess_streams never sets
+    # shell=True anywhere in this module.
+    # Scoped to the actual subprocess.run() call sites (_run_git,
+    # _run_subprocess_streams, _is_ancestor -- _run_subprocess itself now
+    # just delegates to _run_subprocess_streams and no longer calls
+    # subprocess.run directly) rather than the whole module -- scanning
+    # the whole module would false-positive on this very docstring's own
+    # prose explaining that shell=True was NOT used.
+    for fn in (mr._run_git, mr._run_subprocess, mr._run_subprocess_streams, mr._is_ancestor):
         assert_true("shell=True" not in inspect.getsource(fn) and "shell = True" not in inspect.getsource(fn), f"{fn.__name__} must never introduce a shell=True subprocess invocation")
 
 
@@ -2054,28 +2056,28 @@ def _test_argv_fix_fail_closed_on_nonzero_and_malformed() -> None:
     envelope, must both still fail closed (InfrastructureError) -- the
     argv/binary-resolution correction must not have weakened this
     existing behavior."""
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
 
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (False, "simulated nonzero exit")
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (False, "", "simulated nonzero exit")
     raised = False
     try:
         mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
     except mr.InfrastructureError:
         raised = True
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
     assert_true(raised, "a nonzero subprocess exit must still raise InfrastructureError (fail closed), unchanged by this correction")
 
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (True, "not even json")
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (True, "not even json", "")
     raised = False
     try:
         mr.real_claude_builder_invoker(prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None)
     except mr.InfrastructureError:
         raised = True
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(raised, "a malformed (non-JSON) envelope must still raise InfrastructureError (fail closed), unchanged by this correction")
 
@@ -2239,10 +2241,10 @@ def _test_sr1_recoverable_on_valid_envelope_invalid_inner() -> None:
     (Claude finished real work but replied in prose, not JSON), must
     fail closed as RecoverableSessionInfrastructureError -- never a
     plain InfrastructureError that would silently discard the session."""
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (
         True,
         json.dumps(
             {
@@ -2252,6 +2254,7 @@ def _test_sr1_recoverable_on_valid_envelope_invalid_inner() -> None:
                 "type": "result",
             }
         ),
+        "",
     )
     try:
         raised = None
@@ -2260,7 +2263,7 @@ def _test_sr1_recoverable_on_valid_envelope_invalid_inner() -> None:
         except mr.RecoverableSessionInfrastructureError as exc:
             raised = exc
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(raised is not None, "an inner-validation failure accompanying a valid session_id must raise RecoverableSessionInfrastructureError")
     assert_true(raised.session_id == "sess-recoverable-1", f"the recoverable exception must carry the real session_id forward, got {getattr(raised, 'session_id', None)}")
@@ -2316,7 +2319,7 @@ def _test_sr3_resumed_invocation_includes_resume_flag() -> None:
     `--resume <session_id>` at the real adapter/CLI-argv level, not just
     the manifest bookkeeping level."""
     recorded_calls: list[list] = []
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
 
@@ -2337,15 +2340,15 @@ def _test_sr3_resumed_invocation_includes_resume_flag() -> None:
                 ),
                 "type": "result",
             }
-        )
+        ), ""
 
-    mr._run_subprocess = _recording_run_subprocess
+    mr._run_subprocess_streams = _recording_run_subprocess
     try:
         mr.real_claude_builder_invoker(
             prompt="resumed completion prompt", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id="sess-resume-3"
         )
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
 
     args = recorded_calls[0]
@@ -2387,10 +2390,10 @@ def _test_sr5_malformed_envelope_no_recovery() -> None:
     """(6) An outer envelope that is not even valid JSON must remain an
     ordinary, non-recoverable InfrastructureError -- untrusted output
     must never be upgraded into a session-recovery path."""
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (True, "not even json")
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (True, "not even json", "")
     try:
         raised_type = None
         try:
@@ -2398,7 +2401,7 @@ def _test_sr5_malformed_envelope_no_recovery() -> None:
         except mr.InfrastructureError as exc:
             raised_type = type(exc)
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(raised_type is mr.InfrastructureError, f"a malformed (non-JSON) outer envelope must raise plain InfrastructureError, never the recoverable subtype, got {raised_type}")
 
@@ -2411,11 +2414,11 @@ def _test_sr6_no_session_id_no_invented_recovery() -> None:
     """(7) A valid, well-formed envelope with no session_id at all must
     never invent or trust a session -- fail closed as a plain, ordinary
     InfrastructureError."""
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
-        True, json.dumps({"is_error": False, "result": "just prose, no json, and no session_id field at all", "type": "result"})
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "result": "just prose, no json, and no session_id field at all", "type": "result"}), ""
     )
     try:
         raised_type = None
@@ -2424,7 +2427,7 @@ def _test_sr6_no_session_id_no_invented_recovery() -> None:
         except mr.InfrastructureError as exc:
             raised_type = type(exc)
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(raised_type is mr.InfrastructureError, f"a valid envelope with no session_id must never invent/trust a session -- plain InfrastructureError only, got {raised_type}")
 
@@ -2488,11 +2491,11 @@ def _test_sr8_ambiguous_inner_result_still_recoverable_fail_closed() -> None:
         "architecture_decision_required": False,
     }
     ambiguous_result_text = json.dumps(first) + " ... on reflection, actually ... " + json.dumps(second)
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
-        True, json.dumps({"is_error": False, "session_id": "sess-ambiguous", "result": ambiguous_result_text, "type": "result"})
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "session_id": "sess-ambiguous", "result": ambiguous_result_text, "type": "result"}), ""
     )
     try:
         raised = None
@@ -2501,7 +2504,7 @@ def _test_sr8_ambiguous_inner_result_still_recoverable_fail_closed() -> None:
         except mr.InfrastructureError as exc:
             raised = exc
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(isinstance(raised, mr.RecoverableSessionInfrastructureError), f"two conflicting schema-valid inner objects must still fail closed, and (given a trustworthy session_id) remain recoverable, got {type(raised)}")
     assert_true(raised.session_id == "sess-ambiguous", f"the ambiguous-result failure must still preserve the real session_id, got {getattr(raised, 'session_id', None)}")
@@ -2740,11 +2743,11 @@ def _test_sr_ws1_whitespace_only_session_id_not_recoverable() -> None:
     treated as recoverable -- plain InfrastructureError only, never
     RecoverableSessionInfrastructureError, never persisted, never
     reaching --resume."""
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
-        True, json.dumps({"is_error": False, "session_id": "   ", "result": "prose, not json", "type": "result"})
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "session_id": "   ", "result": "prose, not json", "type": "result"}), ""
     )
     try:
         raised_type = None
@@ -2753,7 +2756,7 @@ def _test_sr_ws1_whitespace_only_session_id_not_recoverable() -> None:
         except mr.InfrastructureError as exc:
             raised_type = type(exc)
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(raised_type is mr.InfrastructureError, f"a whitespace-only session_id must never be recoverable -- expected plain InfrastructureError, got {raised_type}")
 
@@ -2767,11 +2770,11 @@ def _test_sr_ws1_leading_trailing_whitespace_stripped() -> None:
     (" session-with-padding ") must still be recoverable, and the
     STRIPPED canonical value is what gets carried forward and would
     reach --resume."""
-    original_run_subprocess = mr._run_subprocess
+    original_run_subprocess_streams = mr._run_subprocess_streams
     original_find_claude_binary = mr._find_claude_binary
     mr._find_claude_binary = lambda: "claude-binary-path"
-    mr._run_subprocess = lambda args, *, cwd, timeout=600: (
-        True, json.dumps({"is_error": False, "session_id": "  session-with-padding  ", "result": "prose, not json", "type": "result"})
+    mr._run_subprocess_streams = lambda args, *, cwd, timeout=600: (
+        True, json.dumps({"is_error": False, "session_id": "  session-with-padding  ", "result": "prose, not json", "type": "result"}), ""
     )
     try:
         raised = None
@@ -2780,7 +2783,7 @@ def _test_sr_ws1_leading_trailing_whitespace_stripped() -> None:
         except mr.RecoverableSessionInfrastructureError as exc:
             raised = exc
     finally:
-        mr._run_subprocess = original_run_subprocess
+        mr._run_subprocess_streams = original_run_subprocess_streams
         mr._find_claude_binary = original_find_claude_binary
     assert_true(raised is not None, "a session_id with incidental surrounding whitespace must still be recoverable")
     assert_true(raised.session_id == "session-with-padding", f"the STRIPPED canonical session_id must be what is carried forward, got {raised.session_id!r}")
@@ -2796,13 +2799,13 @@ def _test_sr_ws1_invalid_session_id_forms_all_fail_closed() -> None:
     plain InfrastructureError -- never recoverable."""
     invalid_session_ids = ["", None, 123]
     for bad_id in invalid_session_ids:
-        original_run_subprocess = mr._run_subprocess
+        original_run_subprocess_streams = mr._run_subprocess_streams
         original_find_claude_binary = mr._find_claude_binary
         mr._find_claude_binary = lambda: "claude-binary-path"
         envelope = {"is_error": False, "result": "prose, not json", "type": "result"}
         if bad_id is not None:
             envelope["session_id"] = bad_id
-        mr._run_subprocess = lambda args, *, cwd, timeout=600, _envelope=envelope: (True, json.dumps(_envelope))
+        mr._run_subprocess_streams = lambda args, *, cwd, timeout=600, _envelope=envelope: (True, json.dumps(_envelope), "")
         try:
             raised_type = None
             try:
@@ -2810,13 +2813,358 @@ def _test_sr_ws1_invalid_session_id_forms_all_fail_closed() -> None:
             except mr.InfrastructureError as exc:
                 raised_type = type(exc)
         finally:
-            mr._run_subprocess = original_run_subprocess
+            mr._run_subprocess_streams = original_run_subprocess_streams
             mr._find_claude_binary = original_find_claude_binary
         assert_true(raised_type is mr.InfrastructureError, f"session_id form {bad_id!r} must never be recoverable, got {raised_type}")
 
 
 _test_sr_ws1_invalid_session_id_forms_all_fail_closed()
 print("PASS SR-WS-1c: empty-string, absent/None, and non-string session_id forms all remain plain InfrastructureError -- never recoverable, matching SR-WS-1's own worked examples.")
+
+
+# ======================================================================
+# CAREER_OS_PROVIDER_ENVELOPE_STDOUT_STDERR_SEPARATION_V1 (reproduced on
+# the fresh canary run 20260907T220348Z-3dacfcfd, FIXED below): the old
+# `_run_subprocess` used to do `output = (completed.stdout or "") +
+# (completed.stderr or "")` -- it concatenated stdout and stderr into a
+# single string BEFORE either provider adapter's strict outer-envelope
+# parse. A provider that writes its single well-formed JSON envelope to
+# stdout (the documented `--output-format json` contract) and ALSO writes
+# incidental warning/diagnostic text to stderr on an otherwise-successful
+# (exit 0) invocation used to have that diagnostic text appended directly
+# onto the tail of an otherwise-valid JSON document, so
+# `_parse_strict_json`'s `json.loads` failed with `json.JSONDecodeError:
+# Extra data ...` -- a genuine, valid provider result discarded as an
+# infrastructure failure purely because of transport-boundary
+# contamination, not any real defect in the provider's own structured
+# reply.
+#
+# Fix: `real_claude_builder_invoker`/`real_cursor_reviewer_invoker` now
+# call `_run_subprocess_streams` (stdout/stderr kept separate) and
+# `_parse_provider_outer_envelope` (strict stdout-only parse; stderr
+# folded into the error message only on failure, never parsed).
+#
+# These tests patch `mr.subprocess.run` itself (a fake subprocess, exactly
+# at the real OS boundary `_run_subprocess_streams` calls) rather than
+# `mr._run_subprocess_streams`, so the real merge-free logic in
+# `_run_subprocess_streams`/`_parse_provider_outer_envelope` is genuinely
+# exercised end-to-end -- every OTHER test in this file mocks
+# `mr._run_subprocess_streams` directly at a higher level and therefore
+# never exercises the actual `subprocess.run` boundary these two
+# functions sit on top of, which is exactly why this defect reached a
+# real canary run undetected in the first place.
+# ======================================================================
+
+class _FakeCompletedProcess:
+    def __init__(self, returncode: int, stdout: str, stderr: str) -> None:
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+def _fake_subprocess_run(returncode: int, stdout: str, stderr: str):
+    def _run(args, *, cwd=None, capture_output=None, text=None, timeout=None, **kwargs):
+        return _FakeCompletedProcess(returncode, stdout, stderr)
+    return _run
+
+
+_VALID_BUILDER_ENVELOPE = {
+    "is_error": False,
+    "session_id": "canary-session-id",
+    "type": "result",
+    "result": json.dumps({
+        "status": "IMPLEMENTATION_ATTEMPT_COMPLETE",
+        "summary": "fake builder finished",
+        "files_touched": [],
+        "stop_condition_encountered": None,
+        "architecture_decision_required": False,
+    }),
+}
+_VALID_BUILDER_STDOUT = json.dumps(_VALID_BUILDER_ENVELOPE)
+
+# Case letters below intentionally track the acceptance conditions named
+# directly in milestone_contracts/feature/career-os-provider-envelope-stdout-stderr-separation-v1.json
+# (the boundary must distinguish exit code/stdout/stderr; stdout-only
+# strict parsing; stderr never interpreted as provider data but remains
+# useful diagnostics; nonzero exit always fails even over valid-looking
+# stdout; empty/warning/multiline stderr must not affect a valid result).
+# Cases proven identically true both before and after the fix (D, F, G, H)
+# are included to prove the fix must not weaken them while closing B/C --
+# they deliberately reuse the same harness rather than duplicating a
+# separate suite.
+#
+# Full case index A-M (every lettered case below is executed by an
+# assertion; none is a label without a corresponding check):
+#   A - valid stdout, empty stderr (baseline happy path)
+#   B - valid stdout, single-line warning stderr (THE reproduced defect shape)
+#   C - valid stdout, multiline stderr (defect shape, multiple stderr lines)
+#   D - nonzero exit over valid-looking stdout (must still fail)
+#   E - empty stdout, nonzero exit, stderr diagnostic (must fail; stderr surfaces)
+#   F - malformed stdout, empty stderr (must fail closed)
+#   G - trailing-contaminated stdout itself, not stderr (must still fail closed --
+#       negative control proving the fix is a strict boundary correction, never a
+#       fuzzy tolerance of trailing garbage; this is the stdout-contamination
+#       negative control the milestone contract requires)
+#   H - multiple JSON documents on stdout itself (must still fail closed -- the
+#       second stdout-contamination negative control the milestone contract
+#       requires)
+#   I - malformed stdout with stderr diagnostic present (must fail on stdout;
+#       stderr diagnostic must still surface in the raised error)
+#   J - empty stdout with stderr diagnostic present, exit 0 (must fail on stdout;
+#       stderr diagnostic must still surface in the raised error)
+#   K - Cursor reviewer adapter shares the identical boundary (see
+#       `_test_provider_envelope_stdout_stderr_transport_boundary_cursor_reviewer`
+#       below), and remains read-only/strict (--mode ask, never --force/--yolo)
+#   L - adversarial stderr lock (empty stdout, and separately malformed stdout)
+#       with a FULLY VALID provider JSON envelope on stderr: stderr must never be
+#       interpreted as provider data even when it is itself well-formed and
+#       parseable -- both must still fail closed on stdout alone
+#   M - adversarial stderr lock: valid stdout AND a conflicting, independently
+#       valid JSON envelope on stderr (different session_id/result) -- the
+#       returned result must reflect stdout's envelope only, never stderr's
+_BUILDER_TRANSPORT_CASES: dict[str, dict[str, Any]] = {
+    "A_valid_stdout_empty_stderr": dict(
+        returncode=0, stdout=_VALID_BUILDER_STDOUT, stderr="", expect_ok=True,
+    ),
+    "B_valid_stdout_warning_stderr": dict(
+        # THE reproduced defect: one valid JSON envelope on stdout, one
+        # line of incidental diagnostic text on stderr, exit 0.
+        returncode=0, stdout=_VALID_BUILDER_STDOUT,
+        stderr="Warning: deprecated flag used\n", expect_ok=True,
+    ),
+    "C_valid_stdout_multiline_stderr": dict(
+        returncode=0, stdout=_VALID_BUILDER_STDOUT,
+        stderr="notice: telemetry disabled\nnotice: cache miss\n", expect_ok=True,
+    ),
+    "D_nonzero_exit_valid_looking_stdout": dict(
+        returncode=1, stdout=_VALID_BUILDER_STDOUT, stderr="fatal: crashed after writing partial output\n",
+        expect_ok=False, expect_error_substring="fatal: crashed",
+    ),
+    "E_empty_stdout_nonzero_exit_stderr_diagnostic": dict(
+        returncode=2, stdout="", stderr="Fatal: authentication expired\n",
+        expect_ok=False, expect_error_substring="authentication expired",
+    ),
+    "F_malformed_stdout_empty_stderr": dict(
+        returncode=0, stdout="not even json", stderr="", expect_ok=False, expect_error_substring="not strict JSON",
+    ),
+    "G_trailing_contaminated_stdout_itself": dict(
+        # The contamination is inside stdout itself (not stderr) -- this
+        # must remain a failure even after stdout/stderr separation ships,
+        # proving the fix is a strict boundary correction, never a fuzzy
+        # tolerance of trailing garbage.
+        returncode=0, stdout=_VALID_BUILDER_STDOUT + " <<unexpected trailing text>>", stderr="",
+        expect_ok=False, expect_error_substring="not strict JSON",
+    ),
+    "H_multiple_json_documents_on_stdout": dict(
+        returncode=0, stdout=_VALID_BUILDER_STDOUT + "\n" + _VALID_BUILDER_STDOUT, stderr="",
+        expect_ok=False, expect_error_substring="not strict JSON",
+    ),
+    "I_malformed_stdout_with_stderr_diagnostic": dict(
+        # Malformed stdout AND non-empty stderr, exit 0: must still fail
+        # closed on the malformed stdout, and the stderr diagnostic must
+        # still be visible in the raised error (never silently dropped),
+        # even though it plays no part in the (failed) parse itself.
+        returncode=0, stdout="not even json", stderr="notice: something happened during the run\n",
+        expect_ok=False, expect_error_substring=("not strict JSON", "notice: something happened during the run"),
+    ),
+    "J_empty_stdout_with_stderr_diagnostic_exit_zero": dict(
+        # Empty stdout on an exit-0 invocation, with stderr diagnostic
+        # text present: still fails closed (empty stdout is not valid
+        # JSON), and the stderr diagnostic must still surface in the
+        # raised error.
+        returncode=0, stdout="", stderr="notice: nothing to report\n",
+        expect_ok=False, expect_error_substring=("not strict JSON", "notice: nothing to report"),
+    ),
+    "L_empty_stdout_valid_envelope_on_stderr": dict(
+        # Adversarial stderr lock (R3a): stdout is empty but stderr itself
+        # carries a FULLY VALID, well-formed provider JSON envelope. Even
+        # though stderr is perfectly parseable JSON, it must never be
+        # treated as provider data -- this must still fail closed on the
+        # empty stdout alone.
+        returncode=0, stdout="", stderr=json.dumps(_VALID_BUILDER_ENVELOPE),
+        expect_ok=False, expect_error_substring="not strict JSON",
+    ),
+    "L_malformed_stdout_valid_envelope_on_stderr": dict(
+        # Adversarial stderr lock (R3a), malformed-stdout variant: stdout
+        # is malformed but stderr carries a fully valid provider JSON
+        # envelope. Must still fail closed on the malformed stdout alone
+        # -- a valid envelope landing on the wrong stream is never a
+        # rescue path.
+        returncode=0, stdout="not even json", stderr=json.dumps(_VALID_BUILDER_ENVELOPE),
+        expect_ok=False, expect_error_substring="not strict JSON",
+    ),
+    "M_valid_stdout_conflicting_valid_envelope_on_stderr": dict(
+        # Adversarial stderr lock (R3b): stdout carries the real, valid
+        # envelope AND stderr independently carries a different, also
+        # well-formed valid envelope (different session_id and result).
+        # The returned result must reflect stdout's envelope only -- the
+        # success-path assertions below already check
+        # session_id == "canary-session-id", which only stdout's envelope
+        # carries, so this proves stderr's conflicting envelope never wins.
+        returncode=0, stdout=_VALID_BUILDER_STDOUT,
+        stderr=json.dumps({
+            **_VALID_BUILDER_ENVELOPE,
+            "session_id": "IMPOSTER-session-id-from-stderr",
+            "result": json.dumps({
+                "status": "IMPLEMENTATION_ATTEMPT_COMPLETE",
+                "summary": "STDERR ENVELOPE MUST NEVER WIN",
+                "files_touched": [],
+                "stop_condition_encountered": None,
+                "architecture_decision_required": False,
+            }),
+        }),
+        expect_ok=True,
+    ),
+}
+
+
+def _test_pre_fix_reproduction_historical_boundary_extra_data_signature() -> None:
+    """R2: deterministic, executable proof of the actual historical defect
+    signature -- NOT commentary. This reconstructs the exact pre-fix
+    `_run_subprocess` concatenation shape (`(stdout or "") + (stderr or
+    "")`, no separator -- see the historical git diff this milestone
+    corrects) directly from the same valid builder envelope + diagnostic
+    stderr text used as case B above (the exact defect shape from the
+    reproduced canary runs), and asserts that parsing that historical
+    concatenation with the unchanged `_parse_strict_json` full-document
+    parser fails with the real `json.JSONDecodeError` 'Extra data'
+    signature -- the literal error class that made the canary runs
+    (20260907T180932Z-656eae27, 20260907T193310Z-f6a756d2,
+    20260907T220348Z-3dacfcfd) fail. It then proves the FIX actually
+    closes this exact reproduction by parsing the identical stdout/stderr
+    pair through the current `_parse_provider_outer_envelope` boundary
+    (stdout/stderr kept separate) and confirming it succeeds -- so this
+    is a before/after pair over the same inputs, not just an isolated
+    failure assertion."""
+    stdout = _VALID_BUILDER_STDOUT
+    stderr = "Warning: deprecated flag used\n"
+    historical_combined_output = (stdout or "") + (stderr or "")
+    try:
+        mr._parse_strict_json(historical_combined_output)
+    except mr.InfrastructureError as exc:
+        assert_true(
+            "Extra data" in str(exc),
+            "pre-fix reproduction did not reproduce the historical 'Extra data' "
+            f"json.JSONDecodeError signature; got: {exc}",
+        )
+    else:
+        assert_true(
+            False,
+            "pre-fix reproduction is invalid: concatenating a valid stdout envelope "
+            "with non-empty stderr text (the historical _run_subprocess shape) must "
+            "fail strict JSON parsing, but it succeeded -- this reproduction no "
+            "longer demonstrates the defect it claims to demonstrate",
+        )
+    fixed_parse = mr._parse_provider_outer_envelope(stdout, stderr)
+    assert_true(
+        isinstance(fixed_parse, dict) and fixed_parse.get("session_id") == "canary-session-id",
+        "the corrected stdout-only boundary must successfully parse the identical "
+        f"stdout/stderr pair that failed when concatenated, got: {fixed_parse!r}",
+    )
+
+
+_test_pre_fix_reproduction_historical_boundary_extra_data_signature()
+print("PASS PROVIDER-ENVELOPE-TRANSPORT-0 (R2 pre-fix reproduction): concatenating valid builder stdout with diagnostic stderr text using the exact historical _run_subprocess shape deterministically reproduces the real json.JSONDecodeError 'Extra data' signature from the canary runs, and the corrected stdout-only boundary parses the identical inputs successfully.")
+
+
+def _test_provider_envelope_stdout_stderr_transport_boundary() -> None:
+    original_run = mr.subprocess.run
+    original_find_claude_binary = mr._find_claude_binary
+    mr._find_claude_binary = lambda: "claude-binary-path"
+    try:
+        for label, case in _BUILDER_TRANSPORT_CASES.items():
+            mr.subprocess.run = _fake_subprocess_run(case["returncode"], case["stdout"], case["stderr"])
+            try:
+                result = mr.real_claude_builder_invoker(
+                    prompt="x", cwd=Path("."), policy={"builder_timeout_seconds": 30}, session_id=None
+                )
+            except mr.InfrastructureError as exc:
+                if case["expect_ok"]:
+                    assert_true(
+                        False,
+                        f"Case {label}: REGRESSION -- a valid JSON provider envelope on stdout plus non-JSON "
+                        "diagnostic text on stderr must not fail strict outer-envelope parsing (this is the "
+                        "CAREER_OS_PROVIDER_ENVELOPE_STDOUT_STDERR_SEPARATION_V1 defect: stdout+stderr must "
+                        f"never be concatenated before parsing), but got: {exc}",
+                    )
+                expected_substrings = case["expect_error_substring"]
+                if isinstance(expected_substrings, str):
+                    expected_substrings = (expected_substrings,)
+                for expected_substring in expected_substrings:
+                    assert_true(
+                        expected_substring in str(exc),
+                        f"Case {label}: expected {expected_substring!r} in the raised error, got: {exc}",
+                    )
+            else:
+                assert_true(
+                    case["expect_ok"],
+                    f"Case {label}: expected an InfrastructureError (fail-closed) but the call succeeded with {result!r}",
+                )
+                assert_true(
+                    result.get("status") == "IMPLEMENTATION_ATTEMPT_COMPLETE",
+                    f"Case {label}: a valid builder envelope on stdout must still yield the real builder result "
+                    f"regardless of stderr content, got {result!r}",
+                )
+                assert_true(
+                    result.get("session_id") == "canary-session-id",
+                    f"Case {label}: session_id from the valid outer envelope must still be carried forward, got {result!r}",
+                )
+    finally:
+        mr.subprocess.run = original_run
+        mr._find_claude_binary = original_find_claude_binary
+
+
+_test_provider_envelope_stdout_stderr_transport_boundary()
+print("PASS PROVIDER-ENVELOPE-TRANSPORT-1: cases A-J, L, M establish and adversarially lock the stdout/stderr subprocess transport boundary for the builder adapter -- valid stdout survives empty/warning/multiline stderr (A, B, C -- B/C are the exact CAREER_OS_PROVIDER_ENVELOPE_STDOUT_STDERR_SEPARATION_V1 defect shape), nonzero exit always fails even over valid-looking stdout (D), stderr remains useful diagnostic evidence on empty-stdout/nonzero-exit failures (E) and on malformed/empty stdout at exit 0 (I, J), malformed/trailing-contaminated/multiple-document stdout itself still fails closed (F, G, H -- G and H are the deterministic stdout-only contamination negative controls), and stderr is never treated as provider data even when stderr itself is a fully valid, well-formed JSON envelope, whether stdout is empty/malformed (L) or stdout is itself valid and stderr's envelope conflicts with it (M). Case K (Cursor reviewer adapter shares the identical boundary) is proven separately below.")
+
+
+_VALID_REVIEWER_ENVELOPE = {
+    "is_error": False,
+    "type": "result",
+    "result": json.dumps({"outcome": "SAFE", "findings": []}),
+}
+_VALID_REVIEWER_STDOUT = json.dumps(_VALID_REVIEWER_ENVELOPE)
+
+
+def _test_case_k_provider_envelope_stdout_stderr_transport_boundary_cursor_reviewer() -> None:
+    """Case K. The acceptance condition names BOTH 'Claude and Cursor
+    provider outer-envelope parsing' -- the reviewer adapter shares the
+    exact same `_run_subprocess_streams`/`_parse_provider_outer_envelope`
+    boundary, so the same fix (and the same regression risk) applies to
+    it too. Also locks in that the reviewer invocation remains
+    read-only/strict: `--mode ask` (never a mutating mode) and no
+    `--force`/`--yolo` appear anywhere in the constructed argv."""
+    original_run = mr.subprocess.run
+    original_find_binary = mr._find_binary
+    recorded_args: list[list[str]] = []
+    mr._find_binary = lambda name, extra_candidates=(): "agent-binary-path"
+
+    def _recording_fake_run(args, *, cwd=None, capture_output=None, text=None, timeout=None, **kwargs):
+        recorded_args.append(list(args))
+        return _FakeCompletedProcess(0, _VALID_REVIEWER_STDOUT, "Warning: deprecated flag used\n")
+
+    mr.subprocess.run = _recording_fake_run
+    try:
+        try:
+            result = mr.real_cursor_reviewer_invoker(prompt="x", cwd=Path("."), policy={"reviewer_timeout_seconds": 30})
+        except mr.InfrastructureError as exc:
+            assert_true(
+                False,
+                "REGRESSION: the Cursor reviewer adapter's valid JSON stdout envelope plus stderr diagnostic "
+                f"text must not fail strict outer-envelope parsing, but got: {exc}",
+            )
+        else:
+            assert_true(result.get("outcome") == "SAFE", f"a valid reviewer envelope on stdout must still yield the real reviewer result regardless of stderr content, got {result!r}")
+        args = recorded_args[0]
+        assert_true("--mode" in args and args[args.index("--mode") + 1] == "ask", f"the Cursor reviewer must always invoke --mode ask (read-only), got {args}")
+        assert_true("--force" not in args and "--yolo" not in args, f"the Cursor reviewer must never pass --force/--yolo, got {args}")
+    finally:
+        mr.subprocess.run = original_run
+        mr._find_binary = original_find_binary
+
+
+_test_case_k_provider_envelope_stdout_stderr_transport_boundary_cursor_reviewer()
+print("PASS PROVIDER-ENVELOPE-TRANSPORT-2 (case K): the Cursor reviewer adapter shares the identical stdout/stderr transport boundary as the Claude builder adapter (valid stdout survives stderr diagnostic text), and remains read-only/strict (--mode ask, never --force/--yolo).")
 
 
 print("ALL milestone_run_v1_test CHECKS PASSED")
