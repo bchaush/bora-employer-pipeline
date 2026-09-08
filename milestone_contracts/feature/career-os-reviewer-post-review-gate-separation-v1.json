@@ -1,0 +1,50 @@
+{
+  "milestone_id": "CAREER_OS_REVIEWER_POST_REVIEW_GATE_SEPARATION_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Make the smallest evidence-backed reviewer-prompt correction so independent Cursor review judges the current diff, scope, governance, and supplied deterministic evidence without deadlocking on controller/human gates that intentionally occur later (full Assurance, final release diff-check, human approval, commit/PR verification), while preserving those later gates as mandatory and preserving Cursor's authority to flag any diff that weakens or removes them.",
+  "baseline_sha": "26ac740894b1657f957e583d035e9ba72279bcd3",
+  "allowed_paths": [
+    "prompts/milestone_reviewer_v1.md",
+    "tests/milestone_run_v1_test.py",
+    "milestone_contracts/feature/career-os-reviewer-post-review-gate-separation-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/rules/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/"
+  ],  "required_tests": [
+    "tests/milestone_run_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "reviewer prompt explicitly distinguishes current-review evidence from later controller/human gates",
+    "reviewer is told not to return CHANGES_REQUIRED solely because later-gate evidence is not yet present in the review packet",
+    "later gates including full Assurance, final release diff-check, human approval, and release verification remain mandatory and Cursor SAFE is explicitly not a substitute for them",
+    "reviewer retains authority to flag any diff that weakens, removes, bypasses, or misorders those later gates",
+    "reviewer still independently evaluates actual diff, allowed/forbidden scope, governance, fabricated/unsupported claims, weakened tests, and altered Golden expectations",
+    "no reviewer adapter, provider transport, timeout/retry policy, controller phase transition, or schema changes are introduced",
+    "tests include a deterministic regression proving the reviewer prompt carries the stage-boundary instruction and preserves the later-gate/non-substitution language",
+    "python tests/milestone_run_v1_test.py passes",
+    "python tests/career_os_state_v1_test.py passes",
+    "python scripts/verify_milestone_state.py passes",
+    "python scripts/verify_assurance_baseline.py reports ALL PHASES PASSED",
+    "git diff --check is clean",
+    "independent Cursor adversarial review returns SAFE"
+  ],
+  "stop_conditions": [
+    "closing the defect would require changing controller phase ordering or allowing Assurance/human gates to be skipped",
+    "closing the defect would require weakening Cursor independence or read-only authority",
+    "closing the defect would require changing reviewer adapter transport, provider parsing, retry/timeouts, schemas, governance, job logic, Candidate Truth, or resume doctrine",
+    "the correction would instruct Cursor to ignore substantive missing evidence that belongs to its current review stage"
+  ],  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}
