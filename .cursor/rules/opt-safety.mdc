@@ -125,6 +125,42 @@ Where employer confirmation is still necessary:
 
 Do not silently upgrade a weak signal into confirmed eligibility.
 
+## Three Distinct Immigration Facets (BLUEPRINT.md §139)
+
+Every serious role analysis must keep three facets visibly separate and must never merge two of them into one field, sentence, or verdict:
+
+* (a) Initial OPT practicality — can Bora start THIS opening now, without employer sponsorship, under whatever OPT/work-authorization status Candidate Truth currently and explicitly establishes for him;
+* (b) future STEM OPT employer support — would this employer plausibly support a STEM OPT extension and I-983 training-plan cooperation later;
+* (c) future sponsorship familiarity — does this employer have any track record or plausible willingness to sponsor a longer-term visa (e.g. H-1B) after OPT/STEM OPT.
+
+The existing Initial OPT vs STEM OPT distinction above is the (a)/(b) floor; (c) future sponsorship familiarity is an explicit third, equally distinct facet added on top of that floor.
+
+## Current-Opening Control Rule
+
+For facet (a), the current role-specific work-authorization/sponsorship wording on the actual job posting, or direct employer/HR confirmation, controls the employer-policy assessment of the current opening as against employer historical H-1B/LCA filing familiarity, which is a facet-(c) signal only. It must never override, soften, or reinterpret what the current opening's own wording says about the current opening, in either direction.
+
+This rule governs only which signal wins for the employer-policy assessment of the current opening. It does not resolve OPT/STEM eligibility or legal work-authorization status by itself, and it does not displace the Job-Posting Boundary or Stop Rule above: posting/HR wording is not legal authority, and where those rules already require `LEGAL_VERIFICATION_REQUIRED`, that requirement remains fully controlling.
+
+## No-Sponsorship Wording Is Not No-OPT-Eligibility
+
+"No sponsorship" / "no future sponsorship" wording concerns facet (c) (or facet (b)). It must never be silently converted into a facet-(a) conclusion about whether Bora is eligible to work the current opening under whatever OPT/work-authorization status Candidate Truth currently and explicitly establishes for him. This rule states a relationship between wording types; it does not itself assert that Bora currently holds OPT authorization or any other status — that fact, if any, comes only from Candidate Truth. If the posting's wording is ambiguous about which facet it addresses:
+
+`LEGAL_VERIFICATION_REQUIRED`
+
+or explicit HR confirmation. Never an inferred default in either direction.
+
+## E-Verify and I-983 Are Separately Visible
+
+E-Verify states above describe only E-Verify enrollment. They must never, by themselves, be read as evidence of the employer's I-983 STEM OPT training-plan willingness or operational capacity (facet (b)). I-983 willingness/support requires its own separate evidentiary basis (direct employer/HR confirmation, or an explicit prior/known I-983 program) before it may be reported as anything other than `UNKNOWN` or `HR_CONFIRMATION_NEEDED`.
+
+## No Employer-Size, Prestige, or Historical-Filing Shortcuts
+
+Company size, headcount, prestige, industry reputation, recruiter enthusiasm, and historical H-1B/LCA filing presence or absence remain non-determinative context signals only, never a substitute for direct evidence on any of the three facets above:
+
+* a large or well-known employer must not be assumed E-Verify-enrolled, I-983-willing, or sponsorship-willing without direct evidence;
+* a small employer or startup must not be assumed unable or unwilling on any facet without direct evidence;
+* no historical H-1B/LCA filings found must not become "will never sponsor."
+
 ## H-1B / Sponsorship History
 
 Historical H-1B or sponsorship evidence may be used as a signal of international-hiring familiarity.
@@ -174,7 +210,9 @@ Do not infer:
 * OPT acceptance from remote-work status;
 * STEM eligibility from a STEM-sounding title;
 * legal eligibility from recruiter enthusiasm;
-* sponsorship policy from historical filings alone.
+* sponsorship policy from historical filings alone;
+* I-983 willingness from E-Verify enrollment alone;
+* any of the three immigration facets (Initial OPT practicality, future STEM OPT employer support, future sponsorship familiarity) from employer size or prestige.
 
 ## Structured Output
 
@@ -203,4 +241,7 @@ Stop and return `LEGAL_VERIFICATION_REQUIRED` when:
 * E-Verify status cannot be safely resolved;
 * sponsorship meaning is unclear;
 * Initial OPT and STEM OPT implications are being conflated;
-* an application answer requires Bora's direct legal/work-authorization attestation.
+* an application answer requires Bora's direct legal/work-authorization attestation;
+* any two of Initial OPT practicality, future STEM OPT employer support, or future sponsorship familiarity are being merged into one conclusion;
+* historical H-1B/LCA familiarity is being used to override the current opening's own work-authorization/sponsorship wording;
+* E-Verify enrollment status is being used, by itself, as evidence of I-983 willingness.

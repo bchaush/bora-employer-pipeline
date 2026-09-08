@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.10**
+**Final Locked Blueprint v3.11**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -4314,4 +4314,95 @@ persist or alter Atominvest's Application Truth, which remains recorded
 separately (Atominvest — Implementation Analyst, SUBMITTED, 2026-09-06,
 exact approved application résumé retained); any Atominvest application-
 record persistence change is a separate, later, bounded change.
+
+**139. BORA IMMIGRATION ROLE ANALYSIS TIGHTENING — BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1 (LOCKED)**
+
+This section tightens §§24-27's existing immigration doctrine for serious-
+role analysis. It restates and sharpens; it does not redefine the
+underlying source hierarchy, evidence states, or the
+`LEGAL_VERIFICATION_REQUIRED` boundary, all of which remain fully
+authoritative as written.
+
+**139.1 Three distinct immigration facets, never collapsed.** Every
+serious role analysis must keep three facets visibly separate: (a)
+Initial OPT practicality — whether Bora can start this specific opening
+now, without employer sponsorship, under whatever OPT/work-authorization
+status Candidate Truth currently and explicitly establishes for him;
+(b) future STEM OPT employer support — whether this employer would
+plausibly support a STEM OPT extension and I-983 training-plan
+cooperation later, a separate, forward-looking question from (a); (c)
+future sponsorship familiarity — whether this employer has any track
+record or plausible willingness to sponsor a longer-term visa (e.g.,
+H-1B) after OPT/STEM OPT, a separate, even-further-forward question from
+(a) and (b). No single field, sentence, or verdict may merge two of
+these into one conclusion. §24's Initial-OPT/STEM-OPT separation is the
+floor; this subsection adds future sponsorship familiarity as a third,
+equally distinct facet.
+
+**139.2 Current-opening control rule.** For facet (a) — whether Bora can
+start THIS opening now — the current role-specific work-
+authorization/sponsorship wording on the actual job posting or from
+direct employer/HR confirmation controls the *employer-policy
+assessment* of the current opening as against employer historical
+H-1B/LCA filing familiarity (§27), which is a facet-(c) signal only and
+must never be used to override, soften, or reinterpret what the current
+opening's own wording says about the current opening. A strong
+historical sponsorship record does not make ambiguous or restrictive
+current-opening wording more favorable, and a weak or absent historical
+record does not make favorable current-opening wording less
+trustworthy. This control rule governs only which signal wins when
+assessing the employer's current-opening policy; it does not, by
+itself, resolve OPT/STEM eligibility or legal work-authorization status,
+and it does not displace §26's Immigration Boundary Guard. Current
+posting/HR wording is not legal authority: where §26 already requires
+`LEGAL_VERIFICATION_REQUIRED` because descriptive posting text alone
+cannot resolve a consequential legal conclusion, that requirement
+remains fully controlling regardless of this subsection.
+
+**139.3 No-sponsorship wording does not become no-OPT-eligibility.**
+"No sponsorship" or "no future sponsorship" wording on a posting
+concerns facet (c) (or, later, (b)) — it must never be silently
+converted into a facet-(a) conclusion about whether Bora is eligible to
+work the current opening under whatever OPT/work-authorization status
+Candidate Truth currently and explicitly establishes for him, since OPT
+work authorization is not the same event as employer visa sponsorship.
+This subsection states a relationship between wording types; it does
+not itself assert that Bora currently holds OPT authorization or any
+other status — that fact, if any, comes only from Candidate Truth.
+Where the posting's wording is genuinely ambiguous about which facet it
+addresses, the unresolved fact remains `LEGAL_VERIFICATION_REQUIRED` per
+§26's existing boundary guard, or explicit HR confirmation — never an
+inferred default in either direction.
+
+**139.4 E-Verify and I-983 support are separately visible.** §26's
+E-Verify states (CONFIRMED / SEARCH_MATCH_FOUND /
+NOT_FOUND_IN_PUBLIC_SEARCH / UNKNOWN / HR_CONFIRMATION_NEEDED) describe
+only E-Verify enrollment. They must never be read, by themselves, as
+evidence of the employer's I-983 STEM OPT training-plan willingness or
+operational capacity, which is a separate, additional fact under facet
+(b) requiring its own separate evidentiary basis (direct employer/HR
+confirmation, or an explicit prior/known I-983 program) before it may be
+reported as anything other than UNKNOWN or HR_CONFIRMATION_NEEDED.
+E-Verify enrollment, whatever its status for a given employer, is not
+proof of I-983 willingness.
+
+**139.5 No employer-size, prestige, or historical-filing shortcuts.**
+Company size, headcount, prestige, industry reputation, recruiter
+enthusiasm, and historical H-1B/LCA filing presence or absence remain
+non-determinative context signals only, never a substitute for direct
+evidence on any of the three facets above. In particular: a large or
+well-known employer must not be assumed E-Verify-enrolled, I-983-
+willing, or sponsorship-willing without direct evidence; a small
+employer or startup must not be assumed unable or unwilling on any
+facet without direct evidence; no historical H-1B/LCA filings found
+must not become "will never sponsor" (§27 already establishes this;
+this subsection extends the same non-determinative-signal treatment to
+size/prestige/industry).
+
+**139.6 Doctrine-only lock.** This section is a documentation/doctrine
+tightening only. It does not add, remove, or redefine any schema field,
+enum, qualification/decision runtime behavior, scoring model, or
+numeric probability. `.cursor/rules/opt-safety.mdc` is updated in the
+same change to operationally mirror 139.1-139.5; no other file's
+behavior changes.
 
