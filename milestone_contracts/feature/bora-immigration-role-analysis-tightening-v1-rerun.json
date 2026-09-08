@@ -1,0 +1,60 @@
+{
+  "milestone_id": "BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock the smallest Bora-specific immigration-practicality doctrine for serious-role analysis: keep Initial OPT, future STEM OPT employer support, and future sponsorship familiarity distinct; make current role-specific employer wording control the employer-policy assessment for the current opening without replacing legal immigration authority; make E-Verify and I-983 operational support separately visible; prohibit employer-size or historical-filing shortcuts; and keep doctrine status-neutral unless current Candidate Truth explicitly establishes a personal authorization fact.",
+  "baseline_sha": "fe397e5fd1dbf4d72aa36c26581488699a0050a7",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/opt-safety.mdc",
+    "project_state.json",
+    "CHANGELOG.md",
+    "milestone_contracts/feature/bora-immigration-role-analysis-tightening-v1-rerun.json"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "schemas/job.schema.json",
+    "schemas/job_analysis_result.schema.json",
+    "src/job_analysis.py",
+    "src/job_decision.py",
+    "src/application_logic.py",
+    "src/resume_validation.py",
+    ".cursor/rules/resume.mdc",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "resume/"
+  ],
+  "required_tests": [
+    "tests/career_os_state_v1_test.py",
+    "tests/job_schema_smoke_test.py"
+  ],
+  "acceptance_conditions": [
+    "BLUEPRINT version and project_state latest_locked_section/version remain mechanically consistent",
+    "Initial OPT practicality, future STEM OPT employer support, and future sponsorship familiarity are explicitly separate in serious-role analysis",
+    "E-Verify evidence and I-983 employer willingness/support are explicitly distinct; E-Verify alone must not imply I-983 willingness",
+    "current role-specific work-authorization/sponsorship wording outranks employer historical H-1B/LCA familiarity for the current opening",
+    "no-sponsorship wording is not automatically converted into no-OPT eligibility; consequential legal ambiguity remains LEGAL_VERIFICATION_REQUIRED or human/HR verification",
+    "company size, prestige, industry, recruiter enthusiasm, and historical filing absence remain non-determinative signals only",
+    "existing immigration source hierarchy and UNKNOWN/fail-closed semantics are preserved",
+    "python tests/career_os_state_v1_test.py passes",
+    "python tests/job_schema_smoke_test.py passes",
+    "python scripts/verify_milestone_state.py passes",
+    "python scripts/verify_assurance_baseline.py reports ALL PHASES PASSED",
+    "git diff --check is clean",
+    "independent Cursor adversarial review returns SAFE",
+    "No unsupported population-wide claim such as most employers already satisfy E-Verify may remain",
+    "Current role-specific posting/HR wording controls employer-policy assessment for that opening but must not be presented as legal authority for OPT/STEM eligibility",
+    "Doctrine wording about Initial OPT practicality is status-neutral unless a current verified Candidate Truth fact explicitly establishes Bora current authorization status"
+  ],
+  "stop_conditions": [
+    "closing the doctrine would require a new immigration/legal determination not supported by USCIS, DHS/SEVP, E-Verify, Brandeis ISSO, or another approved authority",
+    "closing the doctrine would require a new schema field or enum, qualification/decision runtime change, automated legal conclusion, or employer-size scoring model",
+    "closing the doctrine would require modifying Candidate Truth, resume/package doctrine, job-discovery providers, or application submission logic",
+    "the change would collapse Initial OPT, STEM OPT, E-Verify, I-983 support, or future sponsorship into one state",
+    "the change would create numeric sponsorship/immigration probabilities or weights"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

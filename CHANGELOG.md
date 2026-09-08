@@ -19,6 +19,29 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-08 — Bora immigration role analysis tightening (`BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1`, DOCTRINE ONLY)
+
+**Reason**
+
+§§24-27 already separated Initial OPT from future STEM OPT and warned against historical-filing/company-size shortcuts, but serious-role analysis had no explicit doctrine keeping future sponsorship familiarity distinct from those two, no rule stating that a current opening's own work-authorization/sponsorship wording controls the current opening over employer historical H-1B/LCA familiarity, and no rule keeping E-Verify enrollment separately visible from I-983 STEM OPT training-plan willingness/support.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.10 → v3.11; new locked Section 139 (`BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1`) tightens §§24-27 (restates, does not redefine, the existing source hierarchy, evidence states, or `LEGAL_VERIFICATION_REQUIRED` boundary): three distinct immigration facets that may never be collapsed (Initial OPT practicality / future STEM OPT employer support / future sponsorship familiarity); a current-opening control rule (current role-specific wording outranks historical H-1B/LCA familiarity for the current opening); a rule that no-sponsorship wording never becomes an inferred no-OPT-eligibility conclusion; a rule keeping E-Verify enrollment and I-983 willingness/support separately visible (E-Verify alone never implies I-983 willingness); and an explicit prohibition on employer-size/prestige/industry shortcuts alongside the existing historical-filing-absence prohibition. Declared a doctrine-only lock: no new schema field/enum, runtime behavior, scoring model, or numeric probability.
+* `.cursor/rules/opt-safety.mdc`: operational mirror of §139.1-139.5 (three-facets section, current-opening control rule, no-sponsorship-wording rule, E-Verify/I-983 separation section, employer-size/prestige/historical-filing shortcut prohibition) plus corresponding additions to the existing "No Plausible Filling" and "Stop Rule" sections.
+* `project_state.json`: `blueprint_version` 3.10 → 3.11, `latest_locked_section` 138 → 139, `semantic_state_updated_at` → 2026-09-08.
+* New `milestone_contracts/feature/bora-immigration-role-analysis-tightening-v1-rerun.json` (this milestone's own contract).
+
+**Not changed**
+
+`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`; every schema and qualification/decision runtime file (`schemas/job.schema.json`, `schemas/job_analysis_result.schema.json`, `src/job_analysis.py`, `src/job_decision.py`, `src/application_logic.py`, `src/resume_validation.py`, etc.); `.cursor/rules/resume.mdc`; `evidence/`, `claims/`, `experiences/`, `resume/`. No new schema field/enum, runtime scoring, or numeric immigration probability.
+
+**Validation**
+
+Required before commit/push per this milestone's contract: `python tests/career_os_state_v1_test.py`, `python tests/job_schema_smoke_test.py`, `python scripts/verify_milestone_state.py`, `python scripts/verify_assurance_baseline.py` (expect ALL PHASES PASSED), and independent Cursor adversarial review. The builder session that authored this doctrine-only change did not have shell permission to execute these scripts and did not run them; the controller runs and evidences all four mechanically after the builder exits, before this milestone is treated as validation-complete.
+
+---
+
 ## 2026-09-07 — Career OS milestone contract and state validation (`CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1`)
 
 **Reason**
