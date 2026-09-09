@@ -19,6 +19,34 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-09 — Discovery recency visibility gate (`DISCOVERY_RECENCY_VISIBILITY_GATE_V1`, DOCTRINE + REGRESSION LOCK)
+
+**Reason**
+
+The first live post-#31 run exposed a role whose exact first-party page still had a live
+resume-upload route but did not expose a reliable posting date or dated application window;
+a current exact-role platform state separately showed that applications were no longer
+being accepted. Bora explicitly required Career OS to fail closed before surfacing such
+roles: if recency cannot be anchored authoritatively, do not show or package the role.
+
+**Changed**
+
+* `BLUEPRINT.md` §138.5 now requires an authoritative recency anchor before Bora-facing
+  serious-role surfacing/package work: reliable employer/official-ATS posting date or a
+  dated application-intake window. Apply/upload availability alone is insufficient.
+* Exact current closed/expired/filled/no-longer-accepting role state suppresses the role
+  unless a newer first-party employer/official-ATS source explicitly reopens intake.
+* Aggregator/social/crawl/discovery timestamps remain forbidden as employer posting-date
+  substitutes; closure status and posting-age provenance are explicitly separated.
+* `.cursor/rules/role-selection.mdc` carries the same rule for fresh-chat inheritance.
+* `tests/discovery_recency_visibility_gate_v1_test.py` regression-locks the behavior.
+
+**Not changed**
+
+No runtime product code, schemas, Qualification Truth, Candidate Truth, Match Truth,
+authorization/immigration logic, first-party actionability semantics, résumé/package doctrine,
+or pinned Blueprint v3.13 banner changed. This is a Bora-specific discovery visibility rule.
+
 ## 2026-09-09 — Discovery recency + work-format priority lock (`DISCOVERY_RECENCY_WORK_FORMAT_PRIORITY_LOCK_V1`, DOCTRINE + REGRESSION LOCK)
 
 **Reason**

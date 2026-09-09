@@ -4243,13 +4243,36 @@ UNKNOWN_WINDOW** when the employer posting date cannot be established reliably.
 The overlay is presentation/governance vocabulary only; it is not a schema enum and does
 not replace `VERY_FRESH` / `FRESH` / `AGING` / `STALE_LEANING` / `UNKNOWN`. No age band
 means closed or unqualified, and there is no universal magical employer cutoff at 7, 14,
-21, or 22 days. First-party verified live/actionable evidence (§135) outranks age
-assumptions, so an excellent 16-day-old or older verified-live role may still deserve
+21, or 22 days. After the Bora-facing recency visibility gate below has first been
+satisfied by an authoritative recency anchor, first-party verified live/actionable evidence
+(§135) outranks age-band assumptions; it never rescues an unanchored role. Thus an excellent
+16-day-old or older verified-live role with authoritative recency evidence may still deserve
 pursuit when fit/value is unusually strong. Freshness is a tiebreaker/urgency/pursuit-
 economics factor only, never a qualification fact and never a claim about any employer's
 actual hiring behavior. Where `board_posted_date` is unavailable or unreliable, preserve
 `UNKNOWN`; never silently substitute `discovered_date` or `date_first_seen` as if it were
 the employer's own posting date.
+
+**Bora-facing recency visibility gate (fail closed).** `UNKNOWN_WINDOW` may exist during
+cheap internal discovery, but it is not sufficient for Bora-facing serious-role surfacing
+or package generation. Before a role may be shown to Bora as a serious discovery candidate
+or enter a package queue, Career OS must establish at least one authoritative recency anchor:
+(1) a reliable employer/official-ATS posting date, or (2) a dated application-intake window
+from the employer/official ATS or another current exact-role application platform that
+explicitly establishes when applications opened and/or the current open-through/close
+period. A live Apply button, résumé-upload form, current requisition shell, search-engine
+crawl date, `discovered_date`, `date_first_seen`, aggregator age, or social-platform age by
+itself does **not** satisfy this gate. If neither authoritative recency anchor exists, suppress
+the role from Bora-facing discovery, do not generate a package, and keep it internal only as
+recency-unverified if useful.
+
+A current exact-role state that explicitly says **closed**, **expired**, **filled**, or
+**no longer accepting applications** is an immediate Bora-facing suppression signal unless
+a newer first-party employer/official-ATS source explicitly says applications are currently
+open again. Closure-state evidence and posting-age provenance are distinct: a current
+application platform may establish that intake is closed without its displayed posting age
+becoming Employer Truth or `board_posted_date`. This is a Bora-specific discovery/pursuit
+visibility rule, not Qualification Truth and not a universal claim about employer hiring.
 
 **138.6 First-party actionability.** §135 remains fully authoritative and
 is not re-defined, narrowed, or duplicated here: before meaningful
@@ -4259,8 +4282,10 @@ exist, and current application route/instructions must be actionable.
 Discovery/search/index evidence alone supports only cheap preliminary
 triage. Failed or unresolved first-party actionability routes to `WATCH`/
 no serious application effort, unless an independent blocker already
-produces `REJECT`. This section creates no new, competing actionability
-axis.
+produces `REJECT`. First-party actionability is necessary but, after the
+§138.5 Bora-facing recency visibility gate, not sufficient by itself: a
+live Apply/upload route cannot rescue a role whose recency is unanchored.
+This section creates no new, competing actionability axis.
 
 **138.7 Remote authenticity.** Remote is not suspicious by itself; missing
 evidence is not proof of fraud. Remote authenticity is a separate Pursuit/
@@ -4294,9 +4319,14 @@ use a remote-job pretext to solicit crypto, money, or sensitive
 information) without encoding external URLs into runtime logic or
 treating one deviation from those examples as proof of fraud.
 
-**138.8 Serious-role output standard.** Every serious role analysis should
-present these distinct qualitative judgments, none of which is a numeric
-score, a fake probability, or an arbitrary point system: **Bora Fit**
+**138.8 Serious-role output standard.** Only roles that pass the §138.5
+Bora-facing recency visibility gate may be promoted into this serious-role
+output. When employer posting date remains unknown but an authoritative dated
+application-intake window independently passes that gate, Freshness remains
+`UNKNOWN` and Discovery Window remains `UNKNOWN_WINDOW`; never convert the
+application-window date into an employer posting date. Every serious role
+analysis should present these distinct qualitative judgments, none of which is
+a numeric score, a fake probability, or an arbitrary point system: **Bora Fit**
 (`HIGH` / `GOOD` / `STRETCH` / `LOW` — a synthesized qualitative
 functional/competitive fit judgment for pursuit, never Qualification
 Truth and never a hiring-probability claim); **Comparison Pool**

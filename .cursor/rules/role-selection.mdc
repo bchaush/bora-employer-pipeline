@@ -56,6 +56,19 @@ Do not convert, under any circumstance:
   `UNKNOWN` / `UNKNOWN_WINDOW`; never substitute `discovered_date` or
   `date_first_seen` as the employer posting date. These are governance/
   presentation labels only, never schema/runtime enums or employer cutoffs.
+* Bora-facing recency visibility gate (§138.5): before serious-role surfacing
+  or package work, require either a reliable employer/official-ATS posting
+  date or an authoritative dated application-intake window for the exact role.
+  A live Apply button, résumé-upload form, requisition shell, crawl date,
+  `discovered_date`, `date_first_seen`, aggregator age, or social-platform age
+  alone is insufficient. If neither recency anchor exists, suppress the role
+  from Bora-facing discovery and do not package it. An exact current role state
+  saying closed/expired/filled/no longer accepting applications suppresses it
+  unless a newer first-party employer/official-ATS source explicitly reopens
+  intake. A dated application-window rescue permits visibility without fabricating
+  an employer posting date: Freshness remains `UNKNOWN` and Discovery Window remains
+  `UNKNOWN_WINDOW`. Closure status never upgrades platform/aggregator age into Employer
+  Truth or `board_posted_date`.
 * Locked work-format preferences (§138.4): actively favor verified `REMOTE`,
   `CONTRACT`/contract-to-hire/temporary, and `PART_TIME` opportunities in
   discovery; combinations such as remote + contract or remote + part-time get
