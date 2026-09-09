@@ -36,25 +36,31 @@ Operational execution of `BLUEPRINT.md`'s fresh first-party employer source rule
 
 This applies to live career operations, not only implementation work: before meaningful employer-specific tailoring, package generation, or application execution, re-verify the exact requisition on the current first-party employer source in the same operating session (or same day) when reasonably retrievable — no universal freshness TTL is defined beyond that. When current first-party evidence conflicts with cached search results, search-engine indexes, aggregators/job boards, prior captures, chat summaries, or memory, the current first-party state controls current actionability; if it cannot be re-established from a first-party source, do not fabricate `VERIFIED_LIVE`. Preserve uncertainty on the existing independent axes — `source_verification_status` (e.g. `SOURCE_VERIFICATION_REQUIRED`) and `role_status` (e.g. `UNCLEAR` or `POSSIBLY_STALE`) — without collapsing them or inferring one from the other. A later closed/stale posting does not erase historical Employer Truth already captured (the prior JD, prior qualification analysis, or a previously submitted application) — only current actionability changes. "Already applied" is Application Truth, never a posting-freshness state.
 
-Cheap preliminary fit triage against discovery/index evidence is allowed before first-party verification (`BLUEPRINT.md` §135's `DiscoveryLead` → triage → gate → pursuit chain) — the gate applies before treating a role as actionable, not before any fit analysis. "Successfully established" requires the exact requisition to load as the matching current role/requisition identity and to satisfy the current-actionability test defined in `BLUEPRINT.md` §135 — not merely that a discovery/index source (including an employer-owned indexed/search snippet or stale ATS index) shows the requisition exists.
+Cheap preliminary fit triage against discovery/index evidence is allowed before first-party verification (`BLUEPRINT.md` §135's `DiscoveryLead` → triage → gate → pursuit chain) — the gate applies before treating a role as actionable, not before any fit analysis. "Successfully established" requires the exact requisition to positively establish matching role/title identity, matching requisition identity, substantive current job-description content, and a current actionable application route/instruction. HTTP 200, a surviving requisition token/string, an ATS shell, or an Apply-like control alone never passes; any explicit dead/error-page state vetoes PASS even when HTTP 200 is returned or the requisition token survives. This is the current-actionability test defined in `BLUEPRINT.md` §135 — not merely evidence that the requisition once existed.
 
 ## Package-Time First-Party Actionability Recheck and Gold-Artifact Spawn Gate
 Operational pointer: `BLUEPRINT.md` §141.13-§141.15
 (`CAREER_OS_PACKAGE_GATE_HARDENING_V1`) and
 `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json`, enforced by
-`.cursor/rules/resume.mdc`, lock the correction earned by two reproduced
+`.cursor/rules/resume.mdc`, lock the correction earned by three reproduced
 live defects: a Santander package produced before the exact first-party
-requisition was proven actionable, and a DraftKings resume that drifted
-from the canonical gold family and leaked internal-system language.
+requisition was proven actionable; a DraftKings resume that drifted from
+the canonical gold family and leaked internal-system language; and the
+Point32Health R9102 HTTP-200 dead-page false positive that continued despite
+`TITLE_MATCH=False`.
 
 Immediately before Claude drafting, DOCX mutation, cover-letter
 drafting, or any other meaningful package work, the exact current
 first-party employer requisition must be re-opened in the current
-operating session and must still establish matching requisition identity
-plus substantive current job-description content and a current
-actionable application route/instruction — this applies the Fresh
-First-Party Employer Source Rule above again at package time, since a
-prior pursuit-time pass does not by itself satisfy it. On failure, no
+operating session and must still establish the full positive semantic
+quorum: matching role/title identity, matching requisition identity,
+substantive current job-description content, and a current actionable
+application route/instruction. HTTP 200, a requisition token, ATS shell,
+or Apply-like control alone is never enough; any explicit dead/error-page
+state fails closed even if HTTP 200 is returned or the requisition string
+survives. This applies the Fresh First-Party Employer Source Rule above
+again at package time, since a prior pursuit-time pass does not by itself
+satisfy it. On failure, no
 resume, cover letter, or other candidate-facing package may be generated
 or revised for that role; report the role as non-actionable/
 verification-required using the existing `role_status`/

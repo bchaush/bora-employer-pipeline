@@ -2,7 +2,11 @@
   "record_id": "BORA_PACKAGE_SPAWN_GATE_V1",
   "kind": "DOCTRINE_LOCK_DATA_RECORD",
   "blueprint_section": 141,
-  "blueprint_subsections": ["141.13", "141.14", "141.15"],
+  "blueprint_subsections": [
+    "141.13",
+    "141.14",
+    "141.15"
+  ],
   "blueprint_subsections_note": "Recorded as BLUEPRINT.md Section 141 subsections, not a new top-level section, so that the pinned latest_locked_section=141 in tests/resume_reference_style_lock_v1_test.py and the live src/career_os_state.py max-heading validator both stay consistent -- the same reason §141.6 and §141.10 give.",
   "locked_date": "2026-09-09",
   "reproduced_failures": {
@@ -16,12 +20,17 @@
       "description": "A DraftKings resume drifted from the canonical Bora gold-quality presentation family (BLUEPRINT.md Section 141 / 141.10, docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json) by being reconstructed from doctrine text rather than spawned from the exact approved gold DOCX artifact, and leaked internal Career OS/governance/implementation-control language into candidate-facing text.",
       "gate_this_record_adds": "GOLD_ARTIFACT_SPAWN_GATE_AND_INTERNAL_JARGON_TRANSLATION"
     },
-    "scope_note": "Both reproduced failures are recorded as operating-discipline failures for this milestone's package-time gate only. Neither role's substantive job content or resume content becomes universal Candidate Truth, a new schema field, or a new persisted enum."
+    "scope_note": "All reproduced failures are recorded as operating-discipline failures for this package/live-actionability gate. None of the roles' substantive job content or resume content becomes universal Candidate Truth, a new schema field, or a new persisted enum.",
+    "point32health": {
+      "failure_id": "POINT32HEALTH_HTTP200_DEAD_PAGE_FALSE_POSITIVE_V1",
+      "description": "Point32Health Business Analyst R9102 returned HTTP 200 and retained the requisition token in source-level retrieval while the exact browser-rendered role page was a dead error state (The page you are looking for does not exist). A package was incorrectly allowed to proceed because transport/requisition-token evidence was treated as sufficient after the package-time probe returned `TITLE_MATCH=False`, despite the surviving requisition token.",
+      "gate_this_record_adds": "POSITIVE_SEMANTIC_QUORUM_FOR_LIVE_AND_PACKAGE_ACTIONABILITY"
+    }
   },
   "package_time_actionability_recheck": {
     "rule": "RECHECK_IMMEDIATELY_BEFORE_MEANINGFUL_PACKAGE_WORK",
     "extends_not_replaces": "BLUEPRINT.md Section 135 (LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1) and AGENTS.md's Fresh First-Party Employer Source Rule -- this record sharpens the timing of an already-locked gate to also cover package time; it does not create a competing actionability system.",
-    "description": "Immediately before Claude drafting, DOCX mutation, cover-letter drafting, or any other meaningful package work for a role, the exact current first-party employer requisition must be re-opened in the current operating session. The recheck must still establish matching requisition identity plus substantive current job-description content and a current actionable application route/instruction -- the same two-part 'successfully established' test Section 135 already defines. A prior pursuit-time pass of the Section 135 gate does not by itself satisfy this package-time recheck; the recheck happens again at package time because package work is the more consequential, harder-to-reverse action Santander's reproduced failure exposed.",
+    "description": "Immediately before Claude drafting, DOCX mutation, cover-letter drafting, or any other meaningful package work for a role, the exact current first-party employer requisition must be re-opened in the current operating session. The recheck must positively establish matching role/title identity, matching requisition identity, substantive current job-description content, and a current actionable application route/instruction. HTTP 200, a surviving requisition token/string, an ATS shell, or an Apply-like control alone never establishes actionability. Any explicit dead/error-page state fails closed even when HTTP 200 is returned or the requisition token survives. A prior pursuit-time pass of the Section 135 gate does not by itself satisfy this package-time recheck.",
     "trigger_points": [
       "immediately before Claude drafting candidate-facing wording",
       "immediately before any DOCX mutation of a resume derivative",
@@ -32,6 +41,8 @@
   "package_gate_disqualifying_conditions": {
     "rule": "ANY_ONE_CONDITION_FAILS_THE_GATE",
     "conditions": [
+      "an HTTP-200 response whose rendered/current page is an explicit dead/error state",
+      "a missing positive role/title identity match even when the requisition token is present",
       "a blank or contentless requisition shell",
       "a JavaScript-only page with no recoverable current job-description content",
       "a generic careers/search redirect with no matching current role",
@@ -51,14 +62,26 @@
         "memory"
       ],
       "description": "None of the listed sources, alone or combined, may substitute for the current first-party re-open when the package-time recheck fails -- consistent with BLUEPRINT.md Section 135's existing rule that discovery/index evidence may never by itself establish VERIFIED_LIVE or authorize meaningful tailoring/package/application work."
-    }
+    },
+    "semantic_quorum": "PASS requires all four positive signals together: matching role/title identity; matching requisition identity; substantive current JD content; current actionable application route/instruction. Any explicit dead/error marker is a veto. HTTP status and raw-token presence are transport/source clues only, never sufficient actionability evidence."
   },
   "package_gate_failure_handling": {
     "rule": "NO_NEW_ENUM_USE_EXISTING_TRUTH_AXES",
     "description": "When the package-time actionability recheck fails, no resume, cover letter, or other candidate-facing package may be generated or revised for that role. Preserve historical analysis if useful. Report the current role as non-actionable/verification-required using the existing, independent role_status and source_verification_status axes already defined in schemas/job.schema.json (Blueprint Sections 19-21/135) -- for example role_status=POSSIBLY_STALE or UNCLEAR, and/or source_verification_status=SOURCE_VERIFICATION_REQUIRED or DIRECT_SOURCE_UNAVAILABLE -- never a new persisted job/actionability enum. Do not collapse the two axes or infer one from the other. A later closed/stale posting does not erase historical Employer Truth, historical qualification analysis, or Submitted Application Truth already captured for that role; only current package-time actionability changes.",
     "existing_axes_used": {
-      "role_status_enum": ["VERIFIED_LIVE", "LIKELY_LIVE", "UNCLEAR", "POSSIBLY_STALE", "CONFIRMED_CLOSED"],
-      "source_verification_status_enum": ["VERIFIED_DIRECT", "SOURCE_VERIFICATION_REQUIRED", "DIRECT_SOURCE_UNAVAILABLE", "UNKNOWN"]
+      "role_status_enum": [
+        "VERIFIED_LIVE",
+        "LIKELY_LIVE",
+        "UNCLEAR",
+        "POSSIBLY_STALE",
+        "CONFIRMED_CLOSED"
+      ],
+      "source_verification_status_enum": [
+        "VERIFIED_DIRECT",
+        "SOURCE_VERIFICATION_REQUIRED",
+        "DIRECT_SOURCE_UNAVAILABLE",
+        "UNKNOWN"
+      ]
     }
   },
   "gold_artifact_spawn_gate": {
@@ -104,7 +127,7 @@
     "description": "AGENTS.md, BLUEPRINT.md, .cursor/rules/resume.mdc, and this machine-readable gate record express one consistent operating chain, so a fresh chat recovering the repository receives the same fail-closed package-time actionability recheck and gold-artifact-based spawning rules regardless of which surface it reads first."
   },
   "unchanged_doctrine": [
-    "BLUEPRINT.md Section 135's live-role verified actionability gate and its two-part 'successfully established' test",
+    "BLUEPRINT.md Section 135's live-role verified actionability gate, now explicitly requiring the positive semantic quorum (matching role/title identity, matching requisition identity, substantive current JD content, and current actionable route/instructions) with HTTP-200/token-only insufficiency and explicit dead/error-page veto",
     "BLUEPRINT.md Section 137's 92% meaningful-page-utilization floor",
     "BLUEPRINT.md Section 140's DOCX-first default, requirement/JD-to-evidence crosswalk, real-hyperlink-object rule, and rendered-artifact QA authority",
     "BLUEPRINT.md Section 141's presentation grammar and Section 141.7's research-backed writing constraints",
