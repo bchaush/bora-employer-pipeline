@@ -1,0 +1,67 @@
+{
+  "milestone_id": "BORA_RESUME_GOLD_QUALITY_REFERENCE_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock Bora's Claude-first, G-adjudicated Cable One DOCX as the gold-quality resume acceptance reference for future Career OS packages, preserving the current visual grammar while requiring truthful JD-to-evidence overlap, recruiter-natural story coherence, and interview-defensible wording without building a generator or changing Candidate Truth.",
+  "baseline_sha": "dbc3d42d076781876b2ddb51672cf077ab9d418c",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/resume.mdc",
+    "CHANGELOG.md",
+    "docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json",
+    "tests/resume_gold_quality_reference_v1_test.py",
+    "milestone_contracts/feature/bora-resume-gold-quality-reference-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],  "required_tests": [
+    "tests/resume_gold_quality_reference_v1_test.py",
+    "tests/resume_final_reference_calibration_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/resume_architecture_test.py",
+    "tests/resume_presentation_view_test.py",
+    "tests/resume_page_utilization_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "the exact gold-quality acceptance artifact is Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx with SHA-256 ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70; the binary need not be stored in the repository, but its identity and extracted acceptance contract must be recorded",
+    "this artifact supersedes prior Cable One and Spy Pond exemplars only as the latest resume package quality/presentation acceptance reference; it is never a source of Candidate Truth",
+    "the locked family remains one U.S.-Letter page by default, one column, centered name/contact block, readable roughly 10-11 point body type, thin section rules, conventional black-and-white hierarchy, natural vertical rhythm, at least 92 percent meaningful page utilization, DOCX-first when accepted, and real hyperlink objects",
+    "default section grammar remains natural summary with no PROFESSIONAL SUMMARY heading, then EDUCATION, SKILLS, WORK EXPERIENCE, RELEVANT PROJECT; work headers remain Title | Employer with right-aligned dates; two-school education and three natural skills rows remain the default grammar",
+    "future tailoring must operate through verified JD -> canonical Requirement/EvidenceMatch state -> approved Candidate Truth/evidence -> package decision; supported employer terminology may be used naturally, while NONE or UNKNOWN tools/capabilities remain absent",
+    "the package must surface the strongest role-relevant supported evidence across summary, skills, bullet ordering, project selection, and page-space allocation without changing the underlying qualification result or hiding material gaps",
+    "the resume must read as one coherent human career story rather than disconnected keyword blocks: current career stage and education establish context, skills preview evidenced capability, work bullets prove applied capability, and project evidence supplies technical/analytical proof where relevant",
+    "candidate-facing language is ordinary direct American English; internal Career OS, governance, evidence-system, implementation-control, or AI-process terminology must be translated into recruiter-natural wording unless that terminology is itself genuinely job-relevant evidence",
+    "bullets prefer action plus context plus evidence-supported outcome/value; when no measured outcome exists, use action plus context or purpose without manufacturing impact, and normally keep bullets to one or two rendered lines where practical",
+    "quantification is used only when approved evidence supports it and when it helps a recruiter understand scale, result, or complexity; no invented percentages, productivity estimates, derived annualized figures, or decorative metrics",
+    "the strongest current/relevant experience receives the most evidence space by default; secondary experiences and projects receive less, unless the JD crosswalk materially earns a different evidence budget",
+    "Norma_Resume is retained only as external comparison evidence supporting conventional one-column density, visible tools, action-led bullets, and substantial page use; it must never become a second Bora template or override Bora's own gold reference",
+    "final package QA must test truth fidelity, JD/evidence coverage, human naturalness, interview defensibility, reference conformance, rendered one-page quality, and functional hyperlinks before Bora's human gate",
+    "Claude may draft candidate-facing wording only from the verified JD, approved crosswalk, approved Candidate Truth/evidence, and canonical gold grammar; G must reject unsupported or less-natural language and remains responsible for final adjudication, document construction, render QA, and hyperlinks",
+    "no end-to-end generator, schema change, Candidate Truth change, Match Truth change, qualification/pursuit runtime change, or protected resume-master change is introduced"
+  ],  "stop_conditions": [
+    "the lock would require changing Candidate Truth, Match Truth, qualification/pursuit logic, schemas, runtime product code, or the protected resume master",
+    "the lock would turn Cable One-specific factual wording into universal resume text instead of preserving only the quality/presentation/story/overlap behavior",
+    "the lock would weaken first-party role verification, truth lineage, DOCX-first submission, the 92 percent page-utilization floor, real hyperlink verification, or rendered-artifact QA",
+    "the lock would authorize keyword stuffing, unsupported tools, invented results/metrics, or hiding a material qualification gap"
+  ],
+  "research_basis": [
+    "Cable One first-party Business Analyst I posting: operational data analysis, trends, reporting models/KPIs, operational efficiency, cross-functional work, reconciliation, 1-2 years or equivalent education/experience, and advanced Excel/data management preferred",
+    "Yale Office of Career Strategy: simple readable one-page formatting, standard fonts, role-relevant action-led accomplishment bullets, and JD-aligned transferable skills",
+    "University of Pennsylvania Career Services: one-page consistent formatting, 1-2 line action-led bullets with context, transferable skills, and results/quantification where meaningful",
+    "U.S. Department of Labor VETS Resume Essentials 2026: targeted achievement statements, everyday language, action verbs, and job-posting skill alignment",
+    "Indeed 2026 ATS guidance: use job-description keywords naturally while writing for both ATS and human recruiters",
+    "Norma_Resume external comparison: conventional one-column structure, dense-but-readable page use, visible tools, and action-led evidence; comparison evidence only, never Bora template authority"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

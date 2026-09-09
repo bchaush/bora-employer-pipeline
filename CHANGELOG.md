@@ -19,6 +19,59 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-09 — Bora resume gold-quality reference (`BORA_RESUME_GOLD_QUALITY_REFERENCE_V1`, DOCTRINE ONLY)
+
+**Reason**
+
+Bora explicitly approved a Claude-first, G-adjudicated Cable One DOCX as
+the gold-quality resume package acceptance reference for future Career
+OS packages, superseding the Cable One v2 (§141.6) and Spy Pond (§141)
+exemplars only as the latest presentation/quality acceptance reference,
+never as a source of Candidate Truth. The lock adds a seven-dimension
+final-package QA checklist and reaffirms (without loosening) truthful
+JD-to-evidence overlap, recruiter-natural story coherence, and
+interview-defensible wording, without building a generator or changing
+Candidate Truth.
+
+**Changed**
+
+* `BLUEPRINT.md`: new locked §141.10-§141.12
+  (`BORA_RESUME_GOLD_QUALITY_REFERENCE_V1`, recorded as §141 subsections
+  rather than a new top-level section for the same reason §141.6-§141.9
+  were -- `tests/resume_reference_style_lock_v1_test.py` pins the v3.13
+  version banner and `project_state.json`'s `latest_locked_section` to
+  their §141 values, and is a required, non-editable test for this
+  milestone) locks `Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx`
+  (SHA-256
+  `ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70`) as
+  the gold-quality resume package acceptance reference; confirms §141's
+  presentation grammar and §141.7's writing constraints unchanged; adds
+  a final-package QA-dimension checklist (truth fidelity, JD/evidence
+  coverage, human naturalness, interview defensibility, reference
+  conformance, rendered one-page quality, functional hyperlinks);
+  reaffirms the §141.8 Claude-first drafting pilot unchanged; and
+  records the Norma_Resume comparison-evidence-only boundary. §134's
+  Fixed visual/QA contract, §137's 92% floor, §140's
+  DOCX-first/crosswalk/hyperlink/rendered-QA rules, and §141/§141.7/
+  §141.8 are restated and cross-referenced, not redefined. Declared a
+  doctrine-only lock: no new schema field/enum, Candidate Truth change,
+  qualification/decision runtime change, or generator/renderer
+  implementation.
+* `docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json`: new doctrine data
+  record holding the gold-quality artifact identity, the dual-exemplar
+  supersession scope, the final-package QA-dimension checklist, the
+  JD-to-evidence crosswalk/evidence-budget/coherent-narrative/candidate-
+  facing-translation requirements, and the reaffirmed Claude
+  drafting-pilot boundary.
+* `.cursor/rules/resume.mdc`: new "Resume Gold-Quality Acceptance
+  Reference — Claude-First, G-Adjudicated Cable One DOCX" section
+  cross-referencing BLUEPRINT.md §141.10-§141.12.
+* `tests/resume_gold_quality_reference_v1_test.py`: new focused
+  regression test for the gold-quality reference record, the
+  final-package QA-dimension checklist, and doctrine cross-references.
+
+---
+
 ## 2026-09-08 — Bora resume final reference calibration (`BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1`, DOCTRINE ONLY)
 
 **Reason**
