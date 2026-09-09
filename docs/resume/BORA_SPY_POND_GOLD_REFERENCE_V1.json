@@ -1,0 +1,135 @@
+{
+  "record_id": "BORA_SPY_POND_GOLD_REFERENCE_V1",
+  "kind": "DOCTRINE_LOCK_DATA_RECORD",
+  "blueprint_section": 141,
+  "locked_date": "2026-09-08",
+  "source_artifact": {
+    "name": "Spy Pond FINAL_REFERENCE_STYLE DOCX",
+    "format": "DOCX",
+    "sha256": "330b600e8cc18bd4edd4aa75422df903cdf8a230a6e97192094c89a254851d43",
+    "stored_in_repository": false,
+    "note": "Consistent with existing repository practice for Bora-supplied source documents (BLUEPRINT.md Section 134): the binary is not stored; this record is the canonical description of the approved exemplar and its extracted contract."
+  },
+  "supersedes": {
+    "corrected_drift": "Cable One spawn drift",
+    "description": "A previously reproduced résumé package (spawned for the Cable One application) drifted from Bora's approved presentation grammar in several ways captured as drift_patterns_rejected below. This record locks the corrected, explicitly Bora-approved grammar so future spawns do not reproduce that drift."
+  },
+  "relationship_to_prior_doctrine": {
+    "BLUEPRINT_134": "RESUME_REFERENCE_STANDARD_V1 Fixed visual/QA contract (page size, one-column structure, typography scale, margins, section-rule headings, hyperlink rule) is restated and cross-referenced here, not redefined.",
+    "BLUEPRINT_137": "RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1's 92% meaningful-page-utilization floor is unchanged.",
+    "BLUEPRINT_140": "BORA_RESUME_PACKAGE_STANDARD_SYNC_V1's DOCX-first default, real-hyperlink-object rule, requirement/JD-to-evidence crosswalk, and rendered-artifact QA authority are unchanged.",
+    "note": "This record adds the presentation GRAMMAR (heading/section-order/entry-line structure) that §134 left as job-specific strategic variables. Only the grammar below is fixed; MGB-specific and Spy-Pond-specific wording/content choices remain job-specific."
+  },
+  "presentation_grammar": {
+    "summary_heading": {
+      "rule": "NO_PROFESSIONAL_SUMMARY_HEADING",
+      "description": "The natural-language summary paragraph sits directly below the centered contact line with no section heading above it (not 'PROFESSIONAL SUMMARY', not any other generic heading label)."
+    },
+    "section_order": [
+      "EDUCATION",
+      "SKILLS",
+      "WORK EXPERIENCE",
+      "RELEVANT PROJECT"
+    ],
+    "work_entry_grammar": {
+      "rule": "TITLE_PIPE_EMPLOYER_SINGLE_BOLD_LINE",
+      "description": "One bold left-side line using 'Title | Employer' grammar with the date range right-aligned on the same line. Do not use an employer-first heading with a separate italic title line underneath as the canonical grammar."
+    },
+    "education_grammar": {
+      "rule": "BOLD_SCHOOL_RIGHT_ALIGNED_DATE_DEGREE_LINE_BELOW",
+      "description": "Two-school gold-reference grammar: bold school name with the month-year date range right-aligned on the same line, and a degree line directly below it. Brandeis GPA presentation is retained when current Candidate Truth supports it; GPA is a truth-gated content choice, not itself part of the fixed grammar."
+    },
+    "skills_grammar": {
+      "rule": "THREE_NATURAL_RECRUITER_FACING_ROWS",
+      "rows_modeled_on": ["Process & quality", "Technical", "Operations"],
+      "description": "Three natural recruiter-facing rows, not an arbitrary skill list and not internal Career OS taxonomy. Internal Career OS terminology (e.g. schema/enum/state names, module identifiers, EvidenceMatch labels) must never appear in candidate-facing skills text."
+    },
+    "evidence_roster": {
+      "default_included": ["Winter Walk", "TELUS Digital Bulgaria", "D Commerce Bank", "MarketMind"],
+      "not_automatic": ["Bulmarma"],
+      "rule": "Bulmarma is not automatically inserted into the default roster and may replace space in the roster only when a role-specific Requirement/EvidenceMatch crosswalk (BLUEPRINT.md Section 140.4) materially earns its inclusion for that application."
+    },
+    "marketmind_heading_grammar": {
+      "rule": "TECH_LABEL_PLUS_RIGHT_SIDE_GITHUB_LINK",
+      "description": "MarketMind uses the gold-reference heading grammar: a technology label alongside the project name, and a genuine right-side GitHub hyperlink (real hyperlink object per BLUEPRINT.md Section 134/140.5) when the project is included."
+    },
+    "candidate_facing_prose_style": {
+      "rule": "HUMAN_EARLY_CAREER_CONCRETE_STYLE",
+      "description": "Mirrors the gold reference's human style: early-career role framing, concrete action/context/why wording, ordinary American English. No generic capability-stuffing summary. No internal/system jargon (e.g. 'human approval', 'operating system', other Career OS internal vocabulary) unless genuinely necessary and recruiter-natural in context.",
+      "extends_not_replaces": [".cursor/rules/resume.mdc Candidate-Facing Style", ".cursor/rules/resume.mdc Keyword Rule", "BLUEPRINT.md Section 134 Content-quality principles"]
+    }
+  },
+  "visual_metrics": {
+    "page_size": "US_LETTER",
+    "columns": 1,
+    "margins_inches": {
+      "top": 0.46,
+      "bottom": 0.32,
+      "left": 0.72,
+      "right": 0.72
+    },
+    "typography": {
+      "name": { "size_pt": 18.5, "weight": "bold", "alignment": "centered" },
+      "body_and_contact": { "size_pt": 10.5 },
+      "section_headings": { "size_pt": 11, "rule": "thin horizontal rule, not color/shading/boxes" },
+      "primary_font": "Liberation Sans",
+      "fallback_font": "Arial",
+      "fallback_condition": "only if Liberation Sans is unavailable, and only because Arial is metrically compatible"
+    },
+    "relationship_to_134": "These are the numeric instantiation of BLUEPRINT.md Section 134's Fixed visual/QA contract (page size, one-column structure, typography hierarchy, margins, thin-rule section headings) for the Spy Pond gold reference specifically; Section 134's contract itself is not redefined."
+  },
+  "unchanged_doctrine": [
+    "BLUEPRINT.md Section 137's 92% meaningful-page-utilization floor",
+    "BLUEPRINT.md Section 140.1's DOCX-first default",
+    "BLUEPRINT.md Section 134 / 140.5's real-hyperlink-object rule",
+    "BLUEPRINT.md Section 140.4's truthful Requirement/JD-to-evidence crosswalk",
+    "BLUEPRINT.md Section 140.6's submitted-artifact rendered QA authority"
+  ],
+  "role_tailoring_boundary": {
+    "may_change": ["truthful summary emphasis", "bullet selection/order", "skills emphasis", "evidence allocation within the crosswalk"],
+    "must_preserve": "the gold-reference presentation grammar above, unless an explicit employer requirement makes that grammar unusable for a specific application",
+    "gold_reference_authority_scope": "This record is a presentation-grammar, visual-metrics, and roster-structure authority only (heading presence/labels, section order, work-entry/education/skills line grammar, margins, typography, the default-roster mechanism). It is never a source of Candidate Truth: substantive factual content (wording, claims, evidence, metrics) must still trace only to approved Candidate Truth / claim-evidence lineage, exactly as before this lock.",
+    "must_never": ["invent or copy a resume fact merely because it appears in the Spy Pond exemplar's own MGB-specific wording or content", "invent resume facts not present in approved Candidate Truth", "change Candidate Truth, Match Truth, or qualification/pursuit logic", "weaken the 92% page-utilization floor, DOCX-first rule, hyperlink-object rule, or rendered-artifact QA"]
+  },
+  "drift_patterns_rejected": [
+    {
+      "id": "DRIFT_PROFESSIONAL_SUMMARY_HEADING",
+      "description": "A generic 'PROFESSIONAL SUMMARY' (or equivalent generic) section heading placed above the summary paragraph.",
+      "corrected_by": "summary_heading"
+    },
+    {
+      "id": "DRIFT_SECTION_ORDER",
+      "description": "Any default section order other than EDUCATION, SKILLS, WORK EXPERIENCE, RELEVANT PROJECT.",
+      "corrected_by": "section_order"
+    },
+    {
+      "id": "DRIFT_EMPLOYER_FIRST_ITALIC_TITLE",
+      "description": "Work entries built as an employer-first bold heading line with a separate italic job-title line beneath it, instead of a single bold 'Title | Employer' line with right-aligned dates.",
+      "corrected_by": "work_entry_grammar"
+    },
+    {
+      "id": "DRIFT_INTERNAL_TAXONOMY_IN_SKILLS",
+      "description": "Internal Career OS terminology (schema/enum/state names, module identifiers, EvidenceMatch labels) appearing in candidate-facing skills text.",
+      "corrected_by": "skills_grammar"
+    },
+    {
+      "id": "DRIFT_BULMARMA_AUTO_INSERTED",
+      "description": "Bulmarma automatically inserted into the default evidence roster without a role-specific crosswalk earning its inclusion.",
+      "corrected_by": "evidence_roster"
+    },
+    {
+      "id": "DRIFT_INTERNAL_JARGON_IN_PROSE",
+      "description": "Candidate-facing prose (summary/bullets) using internal/system jargon such as 'human approval' or 'operating system' language where not genuinely necessary or recruiter-natural.",
+      "corrected_by": "candidate_facing_prose_style"
+    }
+  ],
+  "non_goals": {
+    "reference": "BLUEPRINT.md Section 133 build-economy gate; Section 134 Non-Goals",
+    "excludes": [
+      "a DOCX/PDF generator or renderer",
+      "an automated grammar/style validator or linter beyond this doctrine record and its accompanying regression test",
+      "any change to Candidate Truth, Match Truth, qualification/pursuit logic, or schemas",
+      "any change to the protected resume master or resume patch/lineage architecture in .cursor/rules/resume.mdc"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "milestone_id": "BORA_RESUME_REFERENCE_STYLE_LOCK_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock Bora's explicitly approved Spy Pond FINAL_REFERENCE_STYLE DOCX as the canonical gold-standard presentation grammar for future Career OS resume packages, correcting the reproduced Cable One spawn drift without changing Candidate Truth, Match Truth, qualification logic, or building a generator.",
+  "baseline_sha": "ee22e24aeced45b8741efef2b58f48e062577fa4",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/resume.mdc",
+    "project_state.json",
+    "CHANGELOG.md",
+    "docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "milestone_contracts/feature/bora-resume-reference-style-lock-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/resume_architecture_test.py",
+    "tests/resume_presentation_view_test.py",
+    "tests/resume_page_utilization_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "the gold reference is identified by SHA-256 330b600e8cc18bd4edd4aa75422df903cdf8a230a6e97192094c89a254851d43 and by the user-approved Spy Pond FINAL_REFERENCE_STYLE artifact name",
+    "the canonical presentation grammar has no PROFESSIONAL SUMMARY section heading; the natural summary paragraph sits directly below the centered contact line",
+    "default section order is EDUCATION then SKILLS then WORK EXPERIENCE then RELEVANT PROJECT",
+    "work entries use one bold left-side line in Title | Employer grammar with dates right-aligned; do not use employer-first plus a separate italic title line as the canonical grammar",
+    "education preserves the two-school gold-reference grammar: bold school with right-aligned month-year range and a degree line below; Brandeis GPA presentation is retained when current Candidate Truth supports it",
+    "skills use three natural recruiter-facing rows modeled on Process & quality, Technical, and Operations; internal Career OS terminology must never appear",
+    "the gold-reference default evidence roster is Winter Walk, TELUS Digital Bulgaria, D Commerce Bank, and MarketMind; Bulmarma is not automatically inserted and may replace space only when a role-specific evidence crosswalk materially earns it",
+    "MarketMind uses the gold-reference heading grammar with technology label and a genuine right-side GitHub hyperlink when included",
+    "candidate-facing prose mirrors the gold reference's human style: early-career role framing, concrete action/context/why wording, ordinary American English, no generic capability-stuffing summary, and no internal/system jargon such as human approval or operating-system language unless genuinely necessary and recruiter-natural",
+    "gold-reference visual metrics are recorded: U.S. Letter; one column; approximately 0.46 top, 0.32 bottom, 0.72 left/right inch margins; 18.5 pt centered bold name; 10.5 pt body/contact; 11 pt section headings with thin rule; Liberation Sans primary with metrically compatible Arial fallback only if unavailable",
+    "existing 92% meaningful-page-utilization floor, DOCX-first rule, real hyperlink-object rule, truthful JD-to-evidence crosswalk, and submitted-artifact QA remain unchanged",
+    "role tailoring may change truthful summary emphasis, bullet selection/order, skills emphasis, and evidence allocation but must preserve the gold-reference grammar unless an explicit employer requirement makes that grammar unusable",
+    "no Candidate Truth, Match Truth, qualification logic, schema, generator/runtime, or protected resume-master change is introduced",
+    "focused regression test fails on the reproduced Cable One drift patterns and passes on the locked gold-reference contract",
+    "python scripts/verify_milestone_state.py passes",
+    "python scripts/verify_assurance_baseline.py reports ALL PHASES PASSED",
+    "git diff --check is clean",
+    "independent Cursor adversarial review returns SAFE"
+  ],
+  "stop_conditions": [
+    "the calibration would require changing Candidate Truth, Match Truth, qualification/pursuit logic, schemas, or runtime product code",
+    "the calibration would require inventing resume facts not present in approved Candidate Truth or the user-approved gold reference",
+    "the calibration would weaken the 92% page-utilization floor, DOCX-first rule, hyperlink-object rule, or rendered-artifact QA",
+    "the calibration would require a new automated DOCX generator or renderer rather than a doctrine/reference-style lock"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

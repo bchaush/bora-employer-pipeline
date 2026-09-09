@@ -308,6 +308,35 @@ destinations — for whichever format (DOCX and/or PDF) is actually
 submitted. This remains a manual QA step; no new automated DOCX renderer
 or geometry producer is authorized by this section.
 
+## Resume Reference Style Lock — Gold-Reference Presentation Grammar
+
+Operational reference: `BLUEPRINT.md` §141
+(`BORA_RESUME_REFERENCE_STYLE_LOCK_V1`) and
+`docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json` lock Bora's explicitly
+approved Spy Pond FINAL_REFERENCE_STYLE DOCX as the canonical
+presentation grammar, correcting a previously reproduced Cable One
+drift. Not restated here in full; the grammar record is the operative
+detail. In summary: no "PROFESSIONAL SUMMARY" heading (the summary
+paragraph sits directly below the centered contact line); default
+section order EDUCATION, SKILLS, WORK EXPERIENCE, RELEVANT PROJECT; work
+entries use one bold "Title | Employer" line with dates right-aligned,
+never an employer-first heading plus a separate italic title line;
+education keeps the two-school bold-school/right-aligned-date/degree-line
+grammar; skills use three natural recruiter-facing rows (never internal
+Career OS terminology); the default evidence roster is Winter Walk,
+TELUS Digital Bulgaria, D Commerce Bank, and MarketMind, with Bulmarma
+inserted only when a role-specific §140.4 crosswalk earns it; MarketMind
+keeps its technology-label-plus-right-side-GitHub-hyperlink heading
+grammar; candidate-facing prose stays in the gold reference's human,
+early-career, concrete style with no internal/system jargon. Role
+tailoring may still adjust truthful summary emphasis, bullet
+selection/order, skills emphasis, and evidence allocation, but must
+preserve this grammar unless an explicit employer requirement makes it
+unusable. §134's Fixed visual/QA contract, §137's 92% floor, and §140's
+DOCX-first/crosswalk/hyperlink/rendered-QA rules remain unchanged and
+fully apply. This is a doctrine/reference-style lock only — no generator,
+renderer, or automated validator is authorized by this section.
+
 ## Application-Specific Outputs
 
 Every generated resume derivative should have a distinct version identifier and traceability to:

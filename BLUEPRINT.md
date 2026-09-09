@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.12**
+**Final Locked Blueprint v3.13**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -3706,11 +3706,47 @@ Where written descriptions and the PDF differ on a visual detail, the
 PDF's actual visual grammar governs, unless doing so would violate
 Candidate Truth, ATS safety, accessibility/readability, an explicit
 employer submission requirement, or a stronger canonical governance rule.
-MGB-specific content itself (exact wording, section order, bullet
-selection, evidence allocation, role-family language, JD terminology,
-which links are exposed, Education-first ordering) is a job-specific
-strategic variable, never frozen as universal — only the visual/QA
-contract below is fixed.
+MGB-specific content itself (exact wording, bullet selection, evidence
+allocation, role-family language, JD terminology, which links are
+exposed) is a job-specific strategic variable, never frozen as
+universal — only the visual/QA contract below is fixed.
+
+**Presentation grammar — AMENDED BY §141.** This paragraph originally
+also named "section order" and "Education-first ordering" as job-
+specific strategic variables alongside MGB-specific wording/content.
+`BLUEPRINT.md` §141 (`BORA_RESUME_REFERENCE_STYLE_LOCK_V1`) **expressly
+amends and narrows** that original statement: default section order
+(heading presence/labels, section sequence, and work-entry line grammar)
+is no longer a free per-application variable — it is governed by §141's
+locked gold-reference presentation grammar, correcting the reproduced
+Cable One drift. Only job-specific wording/content choices (exact bullet
+text, evidence allocation, role-family language, JD terminology, which
+links are exposed) remain the free strategic variable this paragraph
+describes; an agent must not read this paragraph as authorizing a
+non-gold-reference section order, a "PROFESSIONAL SUMMARY" heading, or an
+employer-first work-entry line merely because it predates §141. §141
+governs presentation grammar going forward; this paragraph is retained,
+amended, as the historical location of the now-narrowed rule.
+
+**Numeric visual metrics — AMENDED BY §141 for gold-reference packages.**
+The Reference principle above ("the PDF is the authority for visual
+execution... the PDF's actual visual grammar governs") originally left
+the approved MGB PDF as the sole named visual-metrics authority, with no
+stated resolution for a second approved exemplar. §141.3 and
+`docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json` now lock numeric
+visual metrics (margins, point sizes, primary/fallback font) drawn from
+the Spy Pond FINAL_REFERENCE_STYLE DOCX as the metrics of record for any
+package built under §141's gold-reference grammar. This does not conflict
+with or redefine the Fixed visual/QA contract immediately below (page
+size, one-column structure, typographic hierarchy, thin-rule headings,
+hyperlink rule), which stays qualitative and applies to both exemplars
+identically; it resolves only the numeric-instantiation question. Where
+the MGB PDF and the Spy Pond DOCX numeric metrics differ, §141.3's
+Spy Pond-derived numbers govern for packages built under §141's grammar,
+and the MGB PDF's original numeric instantiation remains authoritative
+only for its own historical package. The Reference principle's PDF-
+authority sentence is amended accordingly and must not be read as
+overriding §141.3 for gold-reference packages.
 
 **Fixed visual/QA contract (stable across every résumé derivative).**
 U.S. Letter page; one page by default at Bora's current career stage;
@@ -4554,4 +4590,104 @@ gate continues to govern any future runtime-implementation proposal).
 mirror 140.1-140.7; `schemas/`, `src/`, `resume/`, and the existing
 protected-master/structured-patch/claim-lineage architecture remain
 unchanged.
+
+**141. BORA RESUME REFERENCE STYLE LOCK — BORA_RESUME_REFERENCE_STYLE_LOCK_V1 (LOCKED)**
+
+Earned under §133's build-economy gate: a previously reproduced résumé
+package (spawned for the Cable One application) drifted from Bora's
+actual approved presentation grammar — most visibly a generic
+"PROFESSIONAL SUMMARY" heading, wrong default section order, and an
+employer-first-plus-italic-title work-entry line the reference exemplar
+does not use. Bora explicitly approved the **Spy Pond FINAL_REFERENCE_STYLE
+DOCX** (SHA-256
+`330b600e8cc18bd4edd4aa75422df903cdf8a230a6e97192094c89a254851d43`) as the
+canonical gold-standard presentation grammar correcting that drift. The
+binary is not stored in this repository, consistent with §134's existing
+practice for Bora-supplied source documents; the full extracted contract
+is recorded at `docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json`, which
+this section incorporates by reference and does not restate in full here.
+This is a doctrine/reference-style lock only — no generator, renderer, or
+automated validator is authorized by this section (§133/§134 Non-Goals
+continue to govern).
+
+**141.1 Relationship to §134/§137/§140 (explicit, not silent).** §134's
+Fixed visual/QA contract (page size, one-column structure, typography
+hierarchy, margins, thin-rule section headings, real-hyperlink-object
+rule) and §137's 92% meaningful-page-utilization floor are restated and
+cross-referenced by the gold reference record, not redefined. §140's
+DOCX-first default, requirement/JD-to-evidence crosswalk, ATS-simple DOCX
+structure, and rendered-artifact final-QA-authority rule are unchanged.
+This section adds presentation GRAMMAR — heading/section-order/entry-line
+structure — that §134 previously left as a job-specific strategic
+variable; MGB-specific and Spy-Pond-specific wording/content choices
+themselves remain job-specific, only the grammar is fixed.
+
+**141.2 Canonical presentation grammar.** The gold-reference grammar
+(full detail in `docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json`):
+no "PROFESSIONAL SUMMARY" (or equivalent generic) section heading — the
+natural summary paragraph sits directly below the centered contact line;
+default section order EDUCATION, SKILLS, WORK EXPERIENCE, RELEVANT
+PROJECT; work entries use one bold left-side line in "Title | Employer"
+grammar with dates right-aligned, never an employer-first heading plus a
+separate italic title line; education preserves the two-school grammar —
+bold school with right-aligned month-year range and a degree line below,
+with Brandeis GPA retained when current Candidate Truth supports it;
+skills use three natural recruiter-facing rows modeled on Process &
+quality, Technical, and Operations, and internal Career OS terminology
+must never appear in candidate-facing skills text; the default evidence
+roster is Winter Walk, TELUS Digital Bulgaria, D Commerce Bank, and
+MarketMind — Bulmarma is not automatically inserted and may replace space
+only when a role-specific §140.4 crosswalk materially earns it; MarketMind
+uses the gold-reference heading grammar with a technology label and a
+genuine right-side GitHub hyperlink when included; candidate-facing prose
+mirrors the gold reference's human style (early-career role framing,
+concrete action/context/why wording, ordinary American English, no
+generic capability-stuffing summary, no internal/system jargon such as
+"human approval" or "operating system" language unless genuinely
+necessary and recruiter-natural).
+
+**141.3 Visual metrics of record.** U.S. Letter; one column;
+approximately 0.46 in top / 0.32 in bottom / 0.72 in left/right margins;
+18.5 pt centered bold name; 10.5 pt body/contact text; 11 pt section
+headings with a thin rule; Liberation Sans as the primary font with
+metrically compatible Arial as a fallback only if Liberation Sans is
+unavailable. These are the numeric instantiation of §134's existing Fixed
+visual/QA contract for this specific gold reference, not a redefinition
+of that contract.
+
+**141.4 Role-tailoring boundary.** Role-specific tailoring may still
+change truthful summary emphasis, bullet selection/order, skills
+emphasis, and evidence allocation within the existing §140.4 crosswalk.
+It must preserve the gold-reference grammar above unless an explicit
+employer requirement makes that grammar unusable for a specific
+application. The gold reference is a presentation-grammar, visual-
+metrics, and roster-structure authority only (heading presence/labels,
+section order, work-entry/education/skills line grammar, margins,
+typography, the default-roster mechanism) — it is never a source of
+Candidate Truth. Substantive factual content (wording, claims, evidence,
+metrics) must still trace only to approved Candidate Truth / claim-
+evidence lineage (`.cursor/rules/resume.mdc` Claim Lineage), exactly as
+before §141; nothing in the Spy Pond exemplar's own MGB-specific wording
+or content authorizes inventing or copying a fact merely because it
+appears in that DOCX. Role tailoring must never invent resume facts not
+present in approved Candidate Truth, change Candidate Truth, Match Truth,
+or qualification/pursuit logic, or weaken §137's 92% floor, §140's
+DOCX-first rule, the real-hyperlink-object rule, or §140.6's
+rendered-artifact QA authority.
+
+**141.5 Doctrine-only lock / build-economy boundary.** This section adds
+no new schema field or enum, no new Candidate Truth, no qualification or
+decision runtime change, and no generator/renderer/automated-validator
+implementation — none of that is pre-authorized merely because this
+doctrine exists (§133's build-economy gate continues to govern any future
+runtime-implementation proposal). `.cursor/rules/resume.mdc` is updated
+in the same change to cross-reference this section's gold-reference
+grammar; `schemas/`, `src/`, `resume/`, and the existing protected-
+master/structured-patch/claim-lineage architecture remain unchanged.
+`tests/resume_reference_style_lock_v1_test.py` is a focused regression
+test that fails on the reproduced Cable One drift patterns
+(`docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json`'s
+`drift_patterns_rejected`) and passes on the locked gold-reference
+grammar — it is a doctrine-record consistency check, not a résumé
+generator or renderer.
 
