@@ -1,0 +1,49 @@
+{
+  "milestone_id": "DISCOVERY_RECENCY_WORK_FORMAT_PRIORITY_LOCK_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock Bora's standing discovery preferences so every fresh Career OS chat prioritizes employer-posted roles in explicit one/two/three-week pursuit windows and actively favors remote, contract/contract-to-hire/temporary, and part-time work arrangements, while preserving all existing Candidate Truth, Match Truth, Qualification Truth, authorization, first-party actionability, and package gates.",
+  "baseline_sha": "8df9cd631996ba9e10b6f4f96fa1a1ac52b242fc",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    "CHANGELOG.md",
+    "tests/discovery_recency_work_format_priority_lock_v1_test.py",
+    "milestone_contracts/feature/discovery-recency-work-format-priority-lock-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/discovery_recency_work_format_priority_lock_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "reliable employer posting age 0-7 days is the GOLD_WINDOW and should be searched/surfaced first by default",
+    "reliable employer posting age 8-14 days is the STRETCH_WINDOW; 15-21 days is the FAR_STRETCH_WINDOW; 22+ days is EXCEPTION_ONLY_WINDOW unless unusually strong and first-party verified live/actionable",
+    "the existing Freshness vocabulary VERY_FRESH/FRESH/AGING/STALE_LEANING/UNKNOWN remains unchanged and the new pursuit-window labels are governance/presentation vocabulary only, not schema or runtime enum values",
+    "REMOTE, CONTRACT/CONTRACT-TO-HIRE/TEMPORARY, and PART_TIME are explicit positive discovery preferences; combinations such as remote plus contract or remote plus part-time receive strong tiebreak priority among otherwise comparable opportunities",
+    "work-format and recency preferences never rescue weak fit, change qualification, override authorization blockers, bypass first-party actionability, or suppress an unusually strong otherwise-accessible role",
+    "where employer posting date is unavailable or unreliable, preserve UNKNOWN and never substitute discovered_date/date_first_seen as employer posting date",
+    "fresh chats receive the rule through the always-on .cursor/rules/role-selection.mdc pointer without requiring Bora to repeat the preference",
+    "no runtime product code, schema, Candidate Truth, Match Truth, qualification, immigration/authorization, first-party actionability, resume/package doctrine, or pinned Blueprint v3.13 banner changes"
+  ],
+  "stop_conditions": [
+    "implementation requires any path outside allowed_paths",
+    "implementation would create numeric scoring, a persisted freshness/work-format enum, or a hard filter that changes Qualification Truth",
+    "implementation would weaken authorization, first-party actionability, Candidate/Match Truth, or package-gate controls",
+    "independent review finds a material ambiguity or contradiction with existing Section 138 doctrine"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THIS_DISCOVERY_DOCTRINE_LOCK_IN_THE_2026-09-09_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}

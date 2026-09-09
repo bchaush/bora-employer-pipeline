@@ -19,6 +19,39 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-09 — Discovery recency + work-format priority lock (`DISCOVERY_RECENCY_WORK_FORMAT_PRIORITY_LOCK_V1`, DOCTRINE + REGRESSION LOCK)
+
+**Reason**
+
+Live operating tests proved the package/discovery pipeline is functioning, but Bora
+requested two preferences be recoverable by every fresh Career OS chat without a
+manual reminder: prioritize newly posted roles by explicit one/two/three-week pursuit
+windows, and actively favor remote, contract/temporary/contract-to-hire, and part-time
+work arrangements during discovery. Existing §138 already had freshness bands and a
+remote part-time/contract lane, but did not distinguish 15-21 from 22+ days and
+explicitly declined to rank the search lanes.
+
+**Changed**
+
+* `BLUEPRINT.md` §138.4: locks REMOTE, CONTRACT/CONTRACT-TO-HIRE/TEMPORARY, and
+  PART_TIME as positive discovery preferences; combinations get strong tiebreak
+  priority while truth/actionability/authorization remain authoritative.
+* `BLUEPRINT.md` §138.5: retains existing Freshness vocabulary and adds the locked
+  discovery overlay `GOLD_WINDOW` 0-7, `STRETCH_WINDOW` 8-14,
+  `FAR_STRETCH_WINDOW` 15-21, `EXCEPTION_ONLY_WINDOW` 22+, and `UNKNOWN_WINDOW` when employer posting date is unreliable; overlay labels remain presentation/governance only and distinct from Freshness `UNKNOWN`.
+* `.cursor/rules/role-selection.mdc`: always-on quick-reference updated so fresh
+  chats inherit both preferences before discovery.
+* `tests/discovery_recency_work_format_priority_lock_v1_test.py`: focused textual
+  regression lock proving the doctrine and always-on pointer remain present.
+
+**Not changed**
+
+Schemas, runtime job-analysis/decision logic, Candidate Truth, Match Truth,
+Qualification Truth, authorization logic, first-party actionability, resume/package
+logic, and the pinned Blueprint v3.13 banner. No numeric scoring system added.
+
+---
+
 ## 2026-09-09 — Career OS package-gate hardening (`CAREER_OS_PACKAGE_GATE_HARDENING_V1`, DOCTRINE ONLY)
 
 **Reason**

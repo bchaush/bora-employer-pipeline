@@ -47,11 +47,30 @@ Do not convert, under any circumstance:
   `UNKNOWN` (§138.5) -- Bora-specific pursuit urgency, never a universal
   employer-hiring-probability claim, and never a modification of Employer
   Truth. `STALE_LEANING` never means closed or unqualified.
+* Locked discovery windows (§138.5): `GOLD_WINDOW` = 0-7 days;
+  `STRETCH_WINDOW` = 8-14 days; `FAR_STRETCH_WINDOW` = 15-21 days;
+  `EXCEPTION_ONLY_WINDOW` = 22+ days; `UNKNOWN_WINDOW` when employer posting
+  date is not reliable. `EXCEPTION_ONLY_WINDOW` is not a hard exclusion: an
+  unusually strong, strategically exceptional, first-party verified-live role
+  may still deserve pursuit. Missing/unreliable employer posting date stays
+  `UNKNOWN` / `UNKNOWN_WINDOW`; never substitute `discovered_date` or
+  `date_first_seen` as the employer posting date. These are governance/
+  presentation labels only, never schema/runtime enums or employer cutoffs.
+* Locked work-format preferences (§138.4): actively favor verified `REMOTE`,
+  `CONTRACT`/contract-to-hire/temporary, and `PART_TIME` opportunities in
+  discovery; combinations such as remote + contract or remote + part-time get
+  strong tiebreak priority among otherwise comparable opportunities. Boston/
+  Greater Boston contract, temporary, and part-time roles also get positive
+  preference even when hybrid or onsite. These are discovery biases, not hard
+  filters or a fixed Lane A/B/C hierarchy: they never override fit,
+  authorization, first-party actionability, Candidate/Match/Qualification
+  Truth, or suppress an unusually strong accessible full-time/hybrid/onsite
+  opportunity.
 * Remote authenticity: `VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
   `HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A` (§138.7) -- doctrine vocabulary
   for human/model assessment only; not a schema enum or runtime field.
 * Serious-role output standard (§138.8): Bora Fit, Comparison Pool,
-  Freshness, Location/Work Arrangement, First-Party Actionability, Remote
+  Freshness, Discovery Window, Location/Work Arrangement, First-Party Actionability, Remote
   Authenticity, Authorization, Opportunity Value, Pursuit Economics, and
   a Final Verdict (`PURSUE - DEEP` / `PURSUE - CONTROLLED HIGH-QUALITY` /
   `PURSUE - EFFICIENT` / `WATCH` / `REJECT`). No numeric score, no fake

@@ -4195,45 +4195,61 @@ existing Keyword Rule). Résumé/package generation may never invent a
 required skill to solve a gap (§§45/49/134, `.cursor/rules/resume.mdc`,
 unchanged).
 
-**138.4 Bora's primary search lanes.** Three primary practical lanes,
-none ranked above the others as a universal rule — each is evaluated
-through Opportunity Value and Pursuit Economics (§132) for the specific
-opportunity: **Lane A — Boston/Greater Boston** (Boston, Cambridge,
-Greater Boston, and realistically commute-accessible hybrid/onsite roles;
-especially useful for early-career implementation/systems/business-
-systems/applications/data-operations roles, including contract,
-temporary, part-time, and hybrid arrangements). **Lane B — verified U.S.
-remote part-time/contract/temporary**, especially attractive where it
-provides U.S. experience, income, references, implementation/UAT/data
-experience, or stronger future career capital. **Lane C — verified U.S.
-remote full-time**, strong when functional fit is strong, the comparison
-pool is appropriate, Massachusetts/U.S. work-location restrictions permit
-Bora's location, and first-party actionability (§135) is established.
-Other U.S. geographies are secondary unless an opportunity is unusually
-strong and realistically accessible. Location/work arrangement affects
-Pursuit Truth, Competitive Position, and Pursuit Economics — it never
-alters Qualification Truth; a candidate may be fully qualified for a role
-that is still low pursuit priority because location is impractical.
+**138.4 Bora's primary search lanes and work-format discovery preference.**
+Career OS still evaluates every opportunity through Opportunity Value and Pursuit
+Economics (§132); work format never changes Qualification Truth. The primary practical
+lanes remain: **Lane A — Boston/Greater Boston** (Boston, Cambridge, Greater Boston,
+and realistically commute-accessible hybrid/onsite roles); **Lane B — verified U.S.
+remote part-time/contract/temporary**; and **Lane C — verified U.S. remote full-time**.
 
-**138.5 Freshness — Bora-specific pursuit priority (not a universal
-employer-hiring-probability claim).** Extends §20's existing freshness
-fields without redefining them. Bands, keyed to the existing
-`board_posted_date` field (`schemas/job.schema.json`) when it is reliably
-available: **0-2 days = VERY_FRESH** (highest urgency); **3-7 days =
-FRESH** (strong urgency); **8-14 days = AGING** (lower priority relative
-to an otherwise-equivalent fresher role); **15+ days = STALE_LEANING**
-(requires stronger fit/value justification to spend Bora's time);
-**UNKNOWN** when posting date cannot be reliably established. `STALE_
-LEANING` does not mean closed, does not mean unqualified, and does not
-modify Employer Truth; first-party verified live/actionable evidence
-(§135) outranks age assumptions — an excellent 16-day-old verified-live
-role may still deserve pursuit. Freshness is a tiebreaker/urgency/pursuit-
-economics factor only, never a qualification fact, and there is no
-universal magical employer cutoff at 14/15 days — these bands are Bora-
-specific application-urgency doctrine, not a claim about any employer's
-actual hiring behavior. Where `board_posted_date` is unavailable or
-unreliable, preserve `UNKNOWN`; never silently substitute `discovered_
-date` or `date_first_seen` as if it were the employer's own posting date.
+Within discovery and pursuit prioritization, Bora's standing work-format preferences
+are now explicit and locked: **REMOTE**, **CONTRACT/CONTRACT-TO-HIRE/TEMPORARY**, and
+**PART_TIME** are positive discovery preferences. A role combining two or more of those
+traits (for example remote + contract, remote + part-time, or remote + temporary) gets
+strong tiebreak priority among otherwise comparable opportunities. Verified U.S. remote
+part-time/contract/temporary roles are therefore a favorite search lane and should be
+actively surfaced early, especially where they provide U.S. experience, income,
+references, implementation/UAT/data experience, finance/analytics experience, or
+stronger future career capital. Boston/Greater Boston contract, temporary, and part-time
+roles also receive positive preference even when hybrid or onsite. Verified U.S. remote
+full-time remains a strong preferred lane when functional fit and access are strong.
+
+These are **discovery/pursuit preferences, not hard filters and not qualification facts**.
+The three primary lanes are not ranked above one another as a universal rule, and this
+preference lock does not create a fixed Lane A > Lane B > Lane C hierarchy or a universal
+employment-type ranking (§138.11). The preferences bias search effort and break ties among
+otherwise comparable opportunities; they must never rescue a weak match, override an
+authorization blocker, bypass first-party actionability (§135/§138.6), or suppress an
+unusually strong accessible full-time/hybrid/onsite opportunity in another lane. Other
+U.S. geographies remain secondary unless an opportunity is unusually strong and
+realistically accessible.
+
+**138.5 Freshness — Bora-specific pursuit priority and discovery-window lock (not a
+universal employer-hiring-probability claim).** Extends §20's existing freshness fields
+without redefining them. The existing Freshness vocabulary remains keyed to the reliable
+`board_posted_date` field (`schemas/job.schema.json`): **0-2 days = VERY_FRESH**;
+**3-7 days = FRESH**; **8-14 days = AGING**; **15+ days = STALE_LEANING**; and
+**UNKNOWN** when posting date cannot be reliably established.
+
+For discovery effort, Career OS must additionally apply Bora's locked pursuit-window
+overlay: **0-7 days = GOLD_WINDOW** (default priority window; search and surface first);
+**8-14 days = STRETCH_WINDOW** (still actively pursue when fit/value is good);
+**15-21 days = FAR_STRETCH_WINDOW** (requires materially stronger fit/value and should
+normally rank behind comparable fresher roles); **22+ days = EXCEPTION_ONLY_WINDOW**
+(do not spend normal discovery/application effort unless the role is unusually strong,
+verified live/actionable, or otherwise strategically exceptional); **UNKNOWN =
+UNKNOWN_WINDOW** when the employer posting date cannot be established reliably.
+
+The overlay is presentation/governance vocabulary only; it is not a schema enum and does
+not replace `VERY_FRESH` / `FRESH` / `AGING` / `STALE_LEANING` / `UNKNOWN`. No age band
+means closed or unqualified, and there is no universal magical employer cutoff at 7, 14,
+21, or 22 days. First-party verified live/actionable evidence (§135) outranks age
+assumptions, so an excellent 16-day-old or older verified-live role may still deserve
+pursuit when fit/value is unusually strong. Freshness is a tiebreaker/urgency/pursuit-
+economics factor only, never a qualification fact and never a claim about any employer's
+actual hiring behavior. Where `board_posted_date` is unavailable or unreliable, preserve
+`UNKNOWN`; never silently substitute `discovered_date` or `date_first_seen` as if it were
+the employer's own posting date.
 
 **138.6 First-party actionability.** §135 remains fully authoritative and
 is not re-defined, narrowed, or duplicated here: before meaningful
@@ -4285,8 +4301,11 @@ score, a fake probability, or an arbitrary point system: **Bora Fit**
 functional/competitive fit judgment for pursuit, never Qualification
 Truth and never a hiring-probability claim); **Comparison Pool**
 (`STRONG` / `ACCEPTABLE` / `WEAK`); **Freshness** (`VERY_FRESH` / `FRESH`
-/ `AGING` / `STALE_LEANING` / `UNKNOWN`, per §138.5); **Location/Work
-Arrangement** (`STRONG` / `ACCEPTABLE` / `WEAK`); **First-Party
+/ `AGING` / `STALE_LEANING` / `UNKNOWN`, per §138.5); **Discovery Window**
+(`GOLD_WINDOW` / `STRETCH_WINDOW` / `FAR_STRETCH_WINDOW` /
+`EXCEPTION_ONLY_WINDOW` / `UNKNOWN_WINDOW`, per §138.5, shown alongside Freshness
+when reliable employer posting age is available and never persisted as a schema/runtime
+field); **Location/Work Arrangement** (`STRONG` / `ACCEPTABLE` / `WEAK`); **First-Party
 Actionability** (`VERIFIED` / `FAILED` / `UNKNOWN`, per §135/§138.6);
 **Remote Authenticity** (`VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
 `HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A`, per §138.7); **Authorization**
