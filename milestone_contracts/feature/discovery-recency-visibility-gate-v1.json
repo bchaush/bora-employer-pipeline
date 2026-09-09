@@ -1,0 +1,50 @@
+{
+  "milestone_id": "DISCOVERY_RECENCY_VISIBILITY_GATE_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Fail closed before Bora-facing discovery surfacing when role recency cannot be anchored by a reliable employer/official-ATS posting date or an authoritative dated application window, and suppress roles explicitly no longer accepting applications, without changing Qualification Truth, Candidate Truth, Match Truth, authorization, schemas, runtime decision logic, or package gates.",
+  "baseline_sha": "df185c1c8341cf25e23a253bc63cf328b7410fa8",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    "CHANGELOG.md",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "milestone_contracts/feature/discovery-recency-visibility-gate-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/discovery_recency_work_format_priority_lock_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "before a role is surfaced to Bora as a serious discovery candidate, recency must be anchored by either a reliable employer/official-ATS posting date or an authoritative dated application window that establishes when applications opened and/or the current open-through/close period",
+    "a live apply button, resume-upload form, current requisition shell, discovered_date, date_first_seen, search-engine crawl date, aggregator age, or social-platform age alone cannot substitute for authoritative recency evidence",
+    "when neither reliable posting date nor authoritative dated application-window evidence exists, suppress the role from Bora-facing serious-role discovery and do not generate a package; record internally as recency-unverified if useful",
+    "an exact current employer/official-ATS or current application-platform role state that says closed, expired, filled, or no longer accepting applications suppresses the role immediately unless a newer first-party employer/official-ATS source explicitly says applications are currently open again; platform closure status never authorizes using platform age as employer posting truth",
+    "the gate is a Bora-specific discovery visibility/pursuit rule only and must not fabricate Qualification Truth, Employer Truth, a schema enum, or a universal claim about employer hiring behavior",
+    "fresh chats inherit the gate through the always-on .cursor/rules/role-selection.mdc pointer",
+    "existing GOLD/STRETCH/FAR_STRETCH/EXCEPTION_ONLY windows remain unchanged for roles whose recency is authoritatively anchored",
+    "no runtime product code, schema, Candidate Truth, Match Truth, qualification, immigration/authorization, resume/package doctrine, or pinned Blueprint v3.13 banner changes"
+  ],
+  "stop_conditions": [
+    "implementation requires any path outside allowed_paths",
+    "implementation would use aggregator/social/discovery timestamps as employer posting truth",
+    "implementation would convert the discovery visibility rule into Qualification Truth or a persisted enum",
+    "implementation would weaken first-party actionability, authorization, Candidate/Match Truth, or package gates"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THIS_DISCOVERY_VISIBILITY_LOCK_IN_THE_2026-09-09_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}
