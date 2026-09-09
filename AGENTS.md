@@ -38,6 +38,38 @@ This applies to live career operations, not only implementation work: before mea
 
 Cheap preliminary fit triage against discovery/index evidence is allowed before first-party verification (`BLUEPRINT.md` §135's `DiscoveryLead` → triage → gate → pursuit chain) — the gate applies before treating a role as actionable, not before any fit analysis. "Successfully established" requires the exact requisition to load as the matching current role/requisition identity and to satisfy the current-actionability test defined in `BLUEPRINT.md` §135 — not merely that a discovery/index source (including an employer-owned indexed/search snippet or stale ATS index) shows the requisition exists.
 
+## Package-Time First-Party Actionability Recheck and Gold-Artifact Spawn Gate
+Operational pointer: `BLUEPRINT.md` §141.13-§141.15
+(`CAREER_OS_PACKAGE_GATE_HARDENING_V1`) and
+`docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json`, enforced by
+`.cursor/rules/resume.mdc`, lock the correction earned by two reproduced
+live defects: a Santander package produced before the exact first-party
+requisition was proven actionable, and a DraftKings resume that drifted
+from the canonical gold family and leaked internal-system language.
+
+Immediately before Claude drafting, DOCX mutation, cover-letter
+drafting, or any other meaningful package work, the exact current
+first-party employer requisition must be re-opened in the current
+operating session and must still establish matching requisition identity
+plus substantive current job-description content and a current
+actionable application route/instruction — this applies the Fresh
+First-Party Employer Source Rule above again at package time, since a
+prior pursuit-time pass does not by itself satisfy it. On failure, no
+resume, cover letter, or other candidate-facing package may be generated
+or revised for that role; report the role as non-actionable/
+verification-required using the existing `role_status`/
+`source_verification_status` axes, never a new enum.
+
+Resume spawning must clone the exact current Bora gold-quality DOCX
+artifact as the starting document when available, with its SHA-256
+verified against the canonical gold-reference record before making
+bounded content edits; if the exact artifact is unavailable or its hash
+does not match, stop with `GOLD_REFERENCE_ARTIFACT_REQUIRED` rather than
+reconstructing the gold family from scratch. Candidate-facing package
+text must not expose internal Career OS/governance/evidence-system/
+implementation-control language unless the exact term is independently
+job-relevant and recruiter-natural.
+
 ## Bora-Specific Hiring Relevance
 Operational pointer: `BLUEPRINT.md` §136 locks Bora-specific hiring relevance as a structured component of Competitive Position (not a fifth truth axis, not a schema field, not a score). Comparison-pool alignment is distinct from seniority; institutional-affinity strength is tiered; network/access leverage is a separate concept from hiring relevance. Positive relevance signals never override a hard qualification blocker, a failed §135 actionability gate, or any legal/OPT/credential blocker. No numeric scores or weights — see §136 for the full doctrine.
 

@@ -1,0 +1,56 @@
+{
+  "milestone_id": "CAREER_OS_PACKAGE_GATE_HARDENING_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Harden cross-chat package production after two reproduced live defects: a Santander package was produced before the exact first-party requisition was proven actionable, and the DraftKings resume drifted from the canonical gold family and leaked internal-system language. Make package-time first-party re-verification and gold-artifact-based spawning explicit fail-closed operating requirements without changing Candidate Truth, Match Truth, qualification logic, schemas, or runtime product code.",
+  "baseline_sha": "80337895eafdf4afb0f21c085980d2626710c3f5",
+  "allowed_paths": [
+    "AGENTS.md",
+    "BLUEPRINT.md",
+    ".cursor/rules/resume.mdc",
+    "CHANGELOG.md",
+    "docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json",
+    "tests/resume_package_spawn_gate_v1_test.py",
+    "milestone_contracts/feature/career-os-package-gate-hardening-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/resume_package_spawn_gate_v1_test.py",
+    "tests/resume_gold_quality_reference_v1_test.py",
+    "tests/resume_final_reference_calibration_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/resume_architecture_test.py",
+    "tests/resume_presentation_view_test.py",
+    "tests/resume_page_utilization_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],  "acceptance_conditions": [
+    "immediately before Claude drafting, DOCX mutation, cover-letter drafting, or any other meaningful package work, the exact current first-party employer requisition must be re-opened in the current operating session and must still establish matching requisition identity plus substantive current job-description content and a current actionable application route/instruction",
+    "a blank or contentless requisition shell, JavaScript-only page with no recoverable current JD content, generic careers/search redirect, page-not-found, expired/closed page, identity mismatch, or missing current application route fails the package gate; discovery indexes, aggregators, cached snippets, prior captures, chat summaries, and memory cannot rescue it",
+    "when the package-time actionability recheck fails, no resume, cover letter, or other candidate-facing package may be generated or revised for that role; preserve historical analysis if useful and report the current role as non-actionable/verification-required using existing truth axes rather than inventing a new schema enum",
+    "resume spawning must use the exact current Bora gold-quality DOCX artifact as the starting document when that artifact is available; verify its SHA-256 against the canonical gold-reference record before cloning and making bounded content edits",
+    "a chat or agent must not reconstruct the gold family from scratch with a fresh document/template, ad-hoc tables, margins, typography, or section grammar merely by reading doctrine; if the exact gold artifact is unavailable or its hash does not match, stop with GOLD_REFERENCE_ARTIFACT_REQUIRED rather than improvising a new resume template",
+    "candidate-facing package text must not expose internal Career OS/governance/evidence-system/implementation-control language such as human approval, operating system, fail-closed, queue-level eligibility, deterministic boundary, Candidate Truth, or similar internal mechanics unless the exact term is independently job-relevant and recruiter-natural; otherwise translate the supported work into ordinary professional American English",
+    "before delivery to Bora, package QA must explicitly reject a PROFESSIONAL SUMMARY heading, noncanonical section order, noncanonical Title | Employer work grammar, missing required gold-family hyperlink objects, rendered overflow/clipping/overlap, sub-92-percent meaningful utilization, or other material gold-family structural drift unless an explicit employer format instruction requires a documented exception",
+    "the new machine-readable gate record must cite Santander as the reproduced package-before-actionability failure and DraftKings as the reproduced gold-family/internal-jargon drift failure, without turning either role's substantive job or resume content into universal Candidate Truth",
+    "AGENTS.md, BLUEPRINT.md, .cursor/rules/resume.mdc, and the machine-readable gate record must express one consistent operating chain so a fresh chat recovering the repo receives the same fail-closed package rules",
+    "no Candidate Truth, Match Truth, qualification/pursuit logic, immigration logic, schema, runtime product code, protected resume master, or end-to-end generator implementation is changed"
+  ],
+  "stop_conditions": [
+    "hardening would require inventing a new persisted job/actionability enum instead of using existing role_status/source_verification_status semantics",
+    "hardening would require committing Bora's personal gold DOCX binary into the repository without separate explicit authorization",
+    "hardening would change Candidate Truth, Match Truth, qualification/pursuit logic, immigration logic, schemas, runtime product code, or protected resume master",
+    "hardening would weaken the current first-party actionability gate, gold reference grammar, 92 percent page-utilization floor, DOCX-first rule, real-hyperlink requirement, or truth-lineage requirements"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

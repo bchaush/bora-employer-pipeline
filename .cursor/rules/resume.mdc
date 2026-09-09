@@ -428,6 +428,67 @@ reference. This is a doctrine/reference-acceptance lock only — no
 generator, renderer, or automated validator is authorized by this
 section.
 
+## Package-Time First-Party Actionability Recheck and Gold-Artifact Spawn Gate
+
+Operational reference: `BLUEPRINT.md` §141.13-§141.15
+(`CAREER_OS_PACKAGE_GATE_HARDENING_V1`) and
+`docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json` lock the correction earned
+by two reproduced live defects: a Santander package produced before the
+exact first-party requisition was proven actionable, and a DraftKings
+resume that drifted from the canonical gold family and leaked internal-
+system language. This section operationally enforces §141.13-§141.15;
+not restated here in full.
+
+**Package-time recheck.** Immediately before Claude drafting, DOCX
+mutation, cover-letter drafting, or any other meaningful package work,
+re-open the exact current first-party employer requisition in the
+current operating session and re-establish matching requisition identity
+plus substantive current job-description content plus a current
+actionable application route — §135's existing two-part test, applied
+again at package time. A prior pursuit-time pass does not by itself
+satisfy this recheck. A blank/contentless shell, a JavaScript-only page
+with no recoverable JD content, a generic careers/search redirect, a
+page-not-found response, an expired/closed page, an identity mismatch,
+or a missing current application route fails the gate; discovery
+indexes, aggregators, cached snippets, prior captures, chat summaries,
+and memory cannot rescue it. On failure, generate or revise no package
+for that role; preserve historical analysis if useful; report the role
+as non-actionable/verification-required using the existing
+`role_status`/`source_verification_status` axes (`schemas/job.schema.json`)
+— never a new enum.
+
+**Gold-artifact spawn gate.** Resume spawning must clone the exact
+current Bora gold-quality DOCX artifact (§141.10,
+`docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json`) as the starting
+document when available, with its SHA-256 verified against that record
+before making bounded content edits. Do not reconstruct the gold family
+from scratch with a fresh document/template, ad-hoc tables, margins,
+typography, or section grammar merely by reading doctrine. If the exact
+artifact is unavailable or its hash does not match, stop with
+`GOLD_REFERENCE_ARTIFACT_REQUIRED` rather than improvising a new
+template.
+
+**Internal-jargon translation.** Candidate-facing package text must not
+expose internal Career OS/governance/evidence-system/implementation-
+control language (e.g. human approval, operating system, fail-closed,
+queue-level eligibility, deterministic boundary, Candidate Truth) unless
+the exact term is independently job-relevant and recruiter-natural;
+otherwise translate into ordinary professional American English. This
+extends the Candidate-Facing Style section above and §141.11's
+human-naturalness QA dimension.
+
+**Pre-delivery reject conditions.** Before delivery to Bora, package QA
+must explicitly reject a PROFESSIONAL SUMMARY heading, noncanonical
+section order, noncanonical Title | Employer work grammar, missing
+required gold-family hyperlink objects, rendered overflow/clipping/
+overlap, sub-92-percent meaningful utilization, or other material
+gold-family structural drift, unless an explicit employer format
+instruction requires a documented exception.
+
+This is a doctrine/operating-gate lock only — no generator, renderer, or
+automated validator is authorized by this section (§133/§134 Non-Goals
+continue to govern).
+
 ## Application-Specific Outputs
 
 Every generated resume derivative should have a distinct version identifier and traceability to:
