@@ -337,6 +337,54 @@ DOCX-first/crosswalk/hyperlink/rendered-QA rules remain unchanged and
 fully apply. This is a doctrine/reference-style lock only — no generator,
 renderer, or automated validator is authorized by this section.
 
+## Resume Final Reference Calibration — Presentation Reference of Record, Writing Constraints, Claude Drafting Pilot
+
+Operational reference: `BLUEPRINT.md` §141.6-§141.9
+(`BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1`) and
+`docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json` lock Bora's
+user-tweaked Cable One v2 DOCX
+(`Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx`) as the final
+human-approved presentation reference, superseding the Spy Pond
+exemplar (§141) only as the **latest presentation reference** — never
+as a source of Candidate Truth. §141's presentation grammar (no
+"PROFESSIONAL SUMMARY" heading, EDUCATION/SKILLS/WORK
+EXPERIENCE/RELEVANT PROJECT section order, single bold "Title |
+Employer" work-entry line, two-school education grammar, three natural
+skills rows, default evidence roster) is confirmed unchanged and fully
+governs. The TELUS display label and GPA presentation in this
+reference are presentation choices only and never silently alter
+Candidate Truth or evidence provenance.
+
+This section also adds research-backed recruiter/ATS writing
+constraints, extending (never replacing) the Keyword Rule and
+Candidate-Facing Style rules below and §134/§141's content-quality
+principles: human readability outranks keyword density; the summary is
+a short natural positioning paragraph, never a keyword inventory;
+bullets prefer action + context + outcome/value when evidence supports
+an outcome, else action + context/purpose without inventing impact,
+kept concise (normally one to two rendered lines where practical);
+quantification only when material and evidence-supported; JD
+terminology reused only where the §140.4 crosswalk establishes
+supported overlap, distributed naturally; skills prioritize
+role-relevant evidence-backed capability over generic filler; the
+résumé reads as one coherent early-career story, not disconnected
+keyword blocks.
+
+§141.8 also authorizes a bounded Claude-first drafting pilot at PRODUCE
+PACKAGE: Claude drafts candidate-facing wording from exactly the
+verified JD, the approved Requirement/EvidenceMatch crosswalk, approved
+Candidate Truth/evidence modules, and current reference grammar, and
+may not infer facts, tools, metrics, outcomes, or qualification
+states. This operates strictly inside the existing AI Boundaries below
+— it does not loosen them. G remains responsible for orchestration,
+truth/evidence adjudication, rejecting unsupported Claude language,
+final reference-grammar conformance, rendered DOCX QA, hyperlink
+verification, and the human approval gate. §134's Fixed visual/QA
+contract, §137's 92% floor, and §140's DOCX-first/crosswalk/
+hyperlink/rendered-QA rules remain unchanged and fully apply. This is a
+doctrine/reference-calibration lock only — no generator, renderer, or
+automated validator is authorized by this section.
+
 ## Application-Specific Outputs
 
 Every generated resume derivative should have a distinct version identifier and traceability to:

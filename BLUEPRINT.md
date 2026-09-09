@@ -4691,3 +4691,107 @@ test that fails on the reproduced Cable One drift patterns
 grammar — it is a doctrine-record consistency check, not a résumé
 generator or renderer.
 
+**141.6 Final reference calibration — latest presentation reference
+(BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1, extends §141, not a new
+top-level section — `project_state.json`'s `latest_locked_section`
+tracks the highest top-level Blueprint heading, and
+`tests/resume_reference_style_lock_v1_test.py` pins that field to 141;
+this calibration is deliberately recorded as §141 subsections so that
+pinned, non-editable regression check and the live
+`src/career_os_state.py` section-count validator agree).** Bora
+explicitly approved a further user-tweaked DOCX,
+**`Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx`** (SHA-256
+`236179c98b0e3ef68f7e79e392d73e57db41acb6f8493b0a7ab9eb8b2b353955`), as
+the final human-approved resume presentation reference. The full
+extracted contract is recorded at
+`docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json`, which this
+subsection incorporates by reference and does not restate in full here.
+This is a doctrine/reference-calibration lock only — no generator,
+renderer, or automated validator is authorized by this subsection
+(§133/§134/§141.5 Non-Goals continue to govern).
+
+This exemplar supersedes the Spy Pond FINAL_REFERENCE_STYLE DOCX
+(above) only as the **latest presentation reference** — never as a
+source of Candidate Truth. §141.1-§141.4's locked presentation grammar
+(no generic PROFESSIONAL SUMMARY heading; default section order
+EDUCATION, SKILLS, WORK EXPERIENCE, RELEVANT PROJECT; single bold
+"Title | Employer" work-entry line with right-aligned dates; two-school
+education grammar; three natural recruiter-facing skills rows; one
+page; one column; DOCX-first; real hyperlinks; §137's 92%+ meaningful
+utilization floor) is confirmed unchanged and remains fully
+authoritative — the Cable One v2 exemplar conforms to that grammar
+rather than replacing it. §134's Fixed visual/QA contract, §137's 92%
+floor, and §140's DOCX-first/crosswalk/hyperlink/rendered-QA rules
+remain unchanged and fully apply.
+
+The user-tweaked reference's TELUS Digital Bulgaria display label and
+GPA presentation are recorded
+(`docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json`
+`presentation_choices_not_truth`) as presentation choices only. Neither
+may silently alter underlying Candidate Truth or evidence provenance;
+any change to the underlying facts they display must still trace only
+to approved Candidate Truth / claim-evidence lineage
+(`.cursor/rules/resume.mdc` Claim Lineage).
+
+**141.7 Research-backed recruiter/ATS writing constraints.** Grounded in
+DOL VETS Resume Essentials 2026, University of Pennsylvania Career
+Services, Yale Office of Career Strategy, and Indeed ATS guidance and LinkedIn
+Talent Solutions recruiter guidance (full citations in the JSON
+record's `research_basis`), the following constraints extend — and do
+not replace — §134's Content-quality principles, §141.2's
+candidate-facing prose style, and `.cursor/rules/resume.mdc`'s Keyword
+Rule and Candidate-Facing Style: human readability outranks keyword
+density, with ordinary, concrete, direct, recruiter-natural American
+English and no internal-system jargon, capability stuffing, inflated
+adjectives, or robotic phrasing; the summary is a short natural
+positioning paragraph connecting current career stage, strongest
+approved evidence, and target role family, never a keyword inventory;
+experience/project bullets prefer action plus context plus
+outcome/value when evidence supports an outcome, and action plus
+context/purpose without inventing impact when it does not, kept concise
+and normally one to two rendered lines where practical without forcing
+uniform length; quantification is used only when it materially helps
+the reader and is evidence-supported, never manufactured; JD terminology
+is reused only where the §140.4 Requirement/EvidenceMatch crosswalk
+establishes supported overlap, distributed naturally rather than
+repeated for density; skills prioritize role-relevant, evidence-backed
+hard/operational capabilities over generic soft-skill filler; and the
+résumé reads as one coherent early-career story from education/skills
+into work evidence and project proof, not disconnected keyword blocks.
+
+**141.8 Bounded Claude-first drafting pilot.** At the PRODUCE PACKAGE
+stage, Claude is authorized to draft candidate-facing wording from
+exactly four inputs: the verified JD, the approved
+Requirement/EvidenceMatch crosswalk, approved Candidate Truth/evidence
+modules, and the current reference grammar (§141.1-§141.4 plus §141.6-
+§141.7). Claude may not infer facts, tools, metrics, outcomes, or
+qualification states. This operates strictly inside the AI Boundaries
+already locked in `.cursor/rules/resume.mdc` (AI may
+rank/draft/recommend/reorder/identify gaps; AI may not create
+unsupported achievements, rename titles, manufacture technologies,
+invent metrics, change dates, bypass lineage validation, or directly
+modify the protected master) — it assigns Claude to operate inside
+those existing boundaries at PRODUCE PACKAGE, it does not loosen them.
+G remains responsible for orchestration, truth/evidence adjudication,
+rejection of unsupported Claude language, final reference-grammar
+conformance, rendered DOCX QA, hyperlink verification, and the human
+approval gate; Bora retains consequential approval. This authorizes a
+bounded pilot only — not an autonomous or unsupervised Claude drafting
+runtime.
+
+**141.9 Doctrine-only lock / build-economy boundary (calibration
+addendum).** §141.6-§141.8 add no new schema field or enum, no new
+Candidate Truth, no qualification or decision runtime change, and no
+generator/renderer/automated-validator implementation — none of that is
+pre-authorized merely because this doctrine exists (§133's
+build-economy gate continues to govern any future
+runtime-implementation proposal). `.cursor/rules/resume.mdc` is updated
+in the same change to cross-reference this calibration's final-reference
+record; `schemas/`, `src/`, `resume/`, and the existing protected-
+master/structured-patch/claim-lineage architecture remain unchanged.
+`tests/resume_final_reference_calibration_v1_test.py` is a focused
+regression test verifying the final-reference record, the writing
+constraints, the Claude drafting-pilot boundary, and doctrine
+cross-references — it is a doctrine-record consistency check, not a
+résumé generator or renderer.
+
