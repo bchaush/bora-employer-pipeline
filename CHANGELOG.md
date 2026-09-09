@@ -19,6 +19,62 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-09 — Career OS package-gate hardening (`CAREER_OS_PACKAGE_GATE_HARDENING_V1`, DOCTRINE ONLY)
+
+**Reason**
+
+Two reproduced live defects: a Santander package was produced before the
+exact first-party requisition was proven actionable at package time, and
+a DraftKings resume drifted from the canonical gold family and leaked
+internal-system language. This lock makes package-time first-party
+re-verification and gold-artifact-based spawning explicit fail-closed
+operating requirements, without changing Candidate Truth, Match Truth,
+qualification logic, schemas, or runtime product code.
+
+**Changed**
+
+* `BLUEPRINT.md`: new locked §141.13-§141.15
+  (`CAREER_OS_PACKAGE_GATE_HARDENING_V1`, recorded as §141 subsections
+  rather than a new top-level section for the same reason §141.6/§141.10
+  were -- `tests/resume_reference_style_lock_v1_test.py` pins the v3.13
+  version banner and `project_state.json`'s `latest_locked_section` to
+  their §141 values, and is a required, non-editable test for this
+  milestone) locks a package-time first-party actionability recheck
+  (extending §135's gate to also fire immediately before Claude
+  drafting, DOCX mutation, cover-letter drafting, or any other
+  meaningful package work), a gold-artifact spawn gate requiring the
+  exact hash-verified current gold DOCX (`ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70`)
+  as the spawn source with a `GOLD_REFERENCE_ARTIFACT_REQUIRED` stop
+  condition, an internal-jargon translation requirement, and explicit
+  pre-delivery package QA reject conditions. On a failed recheck, no
+  package may be generated or revised for that role; the role is
+  reported as non-actionable/verification-required using the existing
+  `role_status`/`source_verification_status` axes, never a new enum.
+  §135's, §137's, §140's, and §141's prior locked rules are restated and
+  cross-referenced, not redefined. Declared a doctrine-only lock: no new
+  schema field/enum, Candidate Truth change, qualification/decision
+  runtime change, or generator/renderer implementation.
+* `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json`: new doctrine data
+  record holding the Santander/DraftKings reproduced-failure citations,
+  the package-time actionability recheck and its trigger points, the
+  disqualifying conditions and rescue prohibition, the existing-axes
+  failure-handling rule, the gold-artifact spawn gate and stop
+  condition, the internal-jargon translation requirement, and the
+  pre-delivery QA reject conditions.
+* `AGENTS.md`: new "Package-Time First-Party Actionability Recheck and
+  Gold-Artifact Spawn Gate" section cross-referencing BLUEPRINT.md
+  §141.13-§141.15.
+* `.cursor/rules/resume.mdc`: new "Package-Time First-Party
+  Actionability Recheck and Gold-Artifact Spawn Gate" section
+  operationally enforcing §141.13-§141.15.
+* `tests/resume_package_spawn_gate_v1_test.py`: new focused regression
+  test for the package-time recheck, the gold-artifact spawn gate and
+  stop condition, the internal-jargon translation requirement, the
+  pre-delivery QA reject conditions, the reproduced-failure citations,
+  and doctrine cross-references.
+
+---
+
 ## 2026-09-09 — Bora resume gold-quality reference (`BORA_RESUME_GOLD_QUALITY_REFERENCE_V1`, DOCTRINE ONLY)
 
 **Reason**

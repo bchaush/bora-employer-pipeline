@@ -4867,3 +4867,105 @@ QA-dimension checklist, the Norma_Resume comparison-evidence-only
 boundary, and doctrine cross-references — it is a doctrine-record
 consistency check, not a résumé generator or renderer.
 
+**141.13 Package-time first-party actionability recheck —
+CAREER_OS_PACKAGE_GATE_HARDENING_V1 (extends §141, not a new top-level
+section — for the same reason §141.6 and §141.10 give: `project_state.json`'s
+`latest_locked_section` tracks the highest top-level Blueprint heading,
+and `tests/resume_reference_style_lock_v1_test.py` pins that field to
+141; this lock is recorded as §141 subsections so that pinned,
+non-editable regression check and the live `src/career_os_state.py`
+section-count validator agree).** Earned by two reproduced live
+defects, recorded in full at `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json`:
+a Santander resume/cover-letter package was produced before the exact
+current first-party requisition had been re-opened and proven actionable
+in the operating session doing the package work, and a DraftKings resume
+drifted from the canonical gold family and leaked internal Career OS
+language. This section sharpens the timing of the already-locked §135
+gate (`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1`) to also cover package
+time — it does not create a competing actionability system, a new
+posting-state axis, or a new enum.
+
+Immediately before Claude drafting, DOCX mutation, cover-letter
+drafting, or any other meaningful package work, the exact current
+first-party employer requisition must be re-opened in the current
+operating session and must still establish matching requisition identity
+plus substantive current job-description content and a current
+actionable application route/instruction — §135's existing two-part
+"successfully established" test. A prior pursuit-time pass of §135 does
+not by itself satisfy this package-time recheck. A blank or contentless
+requisition shell, a JavaScript-only page with no recoverable current JD
+content, a generic careers/search redirect, a page-not-found response,
+an expired/closed page, an identity mismatch, or a missing current
+application route fails the package gate; discovery indexes,
+aggregators, cached snippets, prior captures, chat summaries, and memory
+cannot rescue it — consistent with §135's existing rule that discovery/
+index evidence may never by itself authorize meaningful tailoring,
+package, or application work.
+
+When the package-time actionability recheck fails, no resume, cover
+letter, or other candidate-facing package may be generated or revised
+for that role. Preserve historical analysis if useful, and report the
+current role as non-actionable/verification-required using the existing,
+independent `role_status`/`source_verification_status` axes already
+defined in `schemas/job.schema.json` (§§19-21/135) — never a new
+persisted job/actionability enum. Do not collapse the two axes or infer
+one from the other. A later closed/stale posting does not erase
+historical Employer Truth, historical qualification analysis, or
+Submitted Application Truth already captured for that role; only current
+package-time actionability changes.
+
+**141.14 Gold-artifact-based spawning gate and internal-jargon
+translation.** Resume spawning must use the exact current Bora
+gold-quality DOCX artifact (`Bora_Chaush_Cable_One_Claude_First_G_
+Adjudicated.docx`, §141.10) as the starting document when that artifact
+is available; its SHA-256 must be verified against the canonical
+gold-reference record
+(`ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70`)
+before cloning and making bounded content edits. A chat or agent must
+not reconstruct the gold family from scratch with a fresh document/
+template, ad-hoc tables, margins, typography, or section grammar merely
+by reading doctrine — this is exactly how the DraftKings drift
+reproduced. If the exact gold artifact is unavailable or its hash does
+not match, stop with `GOLD_REFERENCE_ARTIFACT_REQUIRED` rather than
+improvising a new resume template.
+
+Candidate-facing package text must not expose internal Career OS/
+governance/evidence-system/implementation-control language — such as
+"human approval," "operating system," "fail-closed," "queue-level
+eligibility," "deterministic boundary," or "Candidate Truth" — unless the
+exact term is independently job-relevant and recruiter-natural; otherwise
+translate the supported work into ordinary professional American
+English. This extends, and does not replace, §141.11's human-naturalness
+QA dimension and `.cursor/rules/resume.mdc`'s Candidate-Facing Style
+section.
+
+Before delivery to Bora, package QA must explicitly reject a
+PROFESSIONAL SUMMARY heading, noncanonical section order, noncanonical
+Title | Employer work grammar, missing required gold-family hyperlink
+objects, rendered overflow/clipping/overlap, sub-92-percent meaningful
+utilization, or other material gold-family structural drift, unless an
+explicit employer format instruction requires a documented exception.
+This makes §141.11's "reference conformance" and "rendered one-page
+quality" dimensions explicit reject conditions rather than leaving the
+structural drift patterns implicit.
+
+**141.15 Doctrine-only lock / build-economy boundary (package-gate
+addendum).** §141.13-§141.14 add no new schema field or enum, no new
+Candidate Truth, no qualification or decision runtime change, and no
+generator/renderer/automated-validator implementation — none of that is
+pre-authorized merely because this doctrine exists (§133's build-economy
+gate continues to govern any future runtime-implementation proposal).
+`AGENTS.md` and `.cursor/rules/resume.mdc` are updated in the same change
+to cross-reference this package-gate record so that AGENTS.md,
+BLUEPRINT.md, `.cursor/rules/resume.mdc`, and
+`docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json` express one consistent
+fail-closed operating chain; `schemas/`, `src/`, `resume/`, and the
+existing protected-master/structured-patch/claim-lineage architecture
+remain unchanged. `tests/resume_package_spawn_gate_v1_test.py` is a
+focused regression test verifying the package-time actionability
+recheck, the gold-artifact spawn gate and `GOLD_REFERENCE_ARTIFACT_
+REQUIRED` stop condition, the internal-jargon translation requirement,
+the pre-delivery QA reject conditions, the Santander/DraftKings
+reproduced-failure citations, and doctrine cross-references — it is a
+doctrine-record consistency check, not a résumé generator or renderer.
+

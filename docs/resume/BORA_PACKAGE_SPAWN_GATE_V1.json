@@ -1,0 +1,137 @@
+{
+  "record_id": "BORA_PACKAGE_SPAWN_GATE_V1",
+  "kind": "DOCTRINE_LOCK_DATA_RECORD",
+  "blueprint_section": 141,
+  "blueprint_subsections": ["141.13", "141.14", "141.15"],
+  "blueprint_subsections_note": "Recorded as BLUEPRINT.md Section 141 subsections, not a new top-level section, so that the pinned latest_locked_section=141 in tests/resume_reference_style_lock_v1_test.py and the live src/career_os_state.py max-heading validator both stay consistent -- the same reason §141.6 and §141.10 give.",
+  "locked_date": "2026-09-09",
+  "reproduced_failures": {
+    "santander": {
+      "failure_id": "SANTANDER_PACKAGE_BEFORE_ACTIONABILITY_V1",
+      "description": "A Santander resume/cover-letter package was produced before the exact current first-party requisition had been re-opened and proven actionable in the operating session doing the package work. Prior/cached/discovery-level verification was treated as sufficient at package time, reproducing the same class of failure BLUEPRINT.md Section 135 already locked for pursuit-time actionability, but at the later package-generation stage.",
+      "gate_this_record_adds": "PACKAGE_TIME_FIRST_PARTY_ACTIONABILITY_RECHECK"
+    },
+    "draftkings": {
+      "failure_id": "DRAFTKINGS_GOLD_FAMILY_DRIFT_V1",
+      "description": "A DraftKings resume drifted from the canonical Bora gold-quality presentation family (BLUEPRINT.md Section 141 / 141.10, docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json) by being reconstructed from doctrine text rather than spawned from the exact approved gold DOCX artifact, and leaked internal Career OS/governance/implementation-control language into candidate-facing text.",
+      "gate_this_record_adds": "GOLD_ARTIFACT_SPAWN_GATE_AND_INTERNAL_JARGON_TRANSLATION"
+    },
+    "scope_note": "Both reproduced failures are recorded as operating-discipline failures for this milestone's package-time gate only. Neither role's substantive job content or resume content becomes universal Candidate Truth, a new schema field, or a new persisted enum."
+  },
+  "package_time_actionability_recheck": {
+    "rule": "RECHECK_IMMEDIATELY_BEFORE_MEANINGFUL_PACKAGE_WORK",
+    "extends_not_replaces": "BLUEPRINT.md Section 135 (LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1) and AGENTS.md's Fresh First-Party Employer Source Rule -- this record sharpens the timing of an already-locked gate to also cover package time; it does not create a competing actionability system.",
+    "description": "Immediately before Claude drafting, DOCX mutation, cover-letter drafting, or any other meaningful package work for a role, the exact current first-party employer requisition must be re-opened in the current operating session. The recheck must still establish matching requisition identity plus substantive current job-description content and a current actionable application route/instruction -- the same two-part 'successfully established' test Section 135 already defines. A prior pursuit-time pass of the Section 135 gate does not by itself satisfy this package-time recheck; the recheck happens again at package time because package work is the more consequential, harder-to-reverse action Santander's reproduced failure exposed.",
+    "trigger_points": [
+      "immediately before Claude drafting candidate-facing wording",
+      "immediately before any DOCX mutation of a resume derivative",
+      "immediately before cover-letter drafting",
+      "immediately before any other meaningful candidate-facing package work for that role"
+    ]
+  },
+  "package_gate_disqualifying_conditions": {
+    "rule": "ANY_ONE_CONDITION_FAILS_THE_GATE",
+    "conditions": [
+      "a blank or contentless requisition shell",
+      "a JavaScript-only page with no recoverable current job-description content",
+      "a generic careers/search redirect with no matching current role",
+      "a page-not-found response",
+      "an expired or closed posting page",
+      "an identity mismatch between the requisition opened and the requisition the package is for",
+      "a missing current application route or instructions"
+    ],
+    "rescue_prohibition": {
+      "rule": "NO_SOURCE_BELOW_CURRENT_FIRST_PARTY_MAY_RESCUE_A_FAILED_RECHECK",
+      "sources_that_cannot_rescue": [
+        "discovery indexes",
+        "aggregators",
+        "cached snippets",
+        "prior captures",
+        "chat summaries",
+        "memory"
+      ],
+      "description": "None of the listed sources, alone or combined, may substitute for the current first-party re-open when the package-time recheck fails -- consistent with BLUEPRINT.md Section 135's existing rule that discovery/index evidence may never by itself establish VERIFIED_LIVE or authorize meaningful tailoring/package/application work."
+    }
+  },
+  "package_gate_failure_handling": {
+    "rule": "NO_NEW_ENUM_USE_EXISTING_TRUTH_AXES",
+    "description": "When the package-time actionability recheck fails, no resume, cover letter, or other candidate-facing package may be generated or revised for that role. Preserve historical analysis if useful. Report the current role as non-actionable/verification-required using the existing, independent role_status and source_verification_status axes already defined in schemas/job.schema.json (Blueprint Sections 19-21/135) -- for example role_status=POSSIBLY_STALE or UNCLEAR, and/or source_verification_status=SOURCE_VERIFICATION_REQUIRED or DIRECT_SOURCE_UNAVAILABLE -- never a new persisted job/actionability enum. Do not collapse the two axes or infer one from the other. A later closed/stale posting does not erase historical Employer Truth, historical qualification analysis, or Submitted Application Truth already captured for that role; only current package-time actionability changes.",
+    "existing_axes_used": {
+      "role_status_enum": ["VERIFIED_LIVE", "LIKELY_LIVE", "UNCLEAR", "POSSIBLY_STALE", "CONFIRMED_CLOSED"],
+      "source_verification_status_enum": ["VERIFIED_DIRECT", "SOURCE_VERIFICATION_REQUIRED", "DIRECT_SOURCE_UNAVAILABLE", "UNKNOWN"]
+    }
+  },
+  "gold_artifact_spawn_gate": {
+    "rule": "SPAWN_FROM_EXACT_CURRENT_GOLD_ARTIFACT_HASH_VERIFIED",
+    "extends_not_replaces": "BLUEPRINT.md Section 141.10 / docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json, which remains the gold-quality presentation/quality acceptance reference of record.",
+    "description": "Resume spawning must use the exact current Bora gold-quality DOCX artifact (Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx) as the starting document when that artifact is available. Its SHA-256 must be verified against the canonical gold-reference record (docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json source_artifact.sha256, ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70) before cloning and making bounded content edits.",
+    "reconstruction_prohibition": "A chat or agent must not reconstruct the gold family from scratch with a fresh document/template, ad-hoc tables, margins, typography, or section grammar merely by reading doctrine -- this is exactly how the DraftKings drift reproduced.",
+    "stop_condition": {
+      "code": "GOLD_REFERENCE_ARTIFACT_REQUIRED",
+      "when": "the exact gold artifact is unavailable, or its hash does not match the canonical gold-reference record",
+      "action": "stop rather than improvising a new resume template"
+    }
+  },
+  "internal_jargon_translation_requirement": {
+    "rule": "TRANSLATE_INTERNAL_MECHANICS_TO_RECRUITER_NATURAL_ENGLISH",
+    "extends_not_replaces": "BLUEPRINT.md Section 141.11's human_naturalness QA dimension and .cursor/rules/resume.mdc's Candidate-Facing Style section -- this record sharpens both with the exact leaked-term pattern the DraftKings failure reproduced.",
+    "description": "Candidate-facing package text must not expose internal Career OS/governance/evidence-system/implementation-control language unless the exact term is independently job-relevant and recruiter-natural. Otherwise translate the supported work into ordinary professional American English.",
+    "example_forbidden_terms_unless_job_relevant": [
+      "human approval",
+      "operating system",
+      "fail-closed",
+      "queue-level eligibility",
+      "deterministic boundary",
+      "Candidate Truth"
+    ]
+  },
+  "pre_delivery_package_qa_reject_conditions": {
+    "rule": "REJECT_BEFORE_DELIVERY_TO_BORA_UNLESS_DOCUMENTED_EMPLOYER_EXCEPTION",
+    "extends_not_replaces": "BLUEPRINT.md Section 141.11's seven-dimension final-package QA checklist -- this record makes the structural drift patterns explicit reject conditions rather than leaving them implicit in 'reference conformance'.",
+    "conditions": [
+      "a PROFESSIONAL SUMMARY heading (or equivalent generic heading)",
+      "noncanonical section order",
+      "noncanonical Title | Employer work-entry grammar",
+      "missing required gold-family hyperlink objects",
+      "rendered overflow, clipping, or overlap",
+      "sub-92-percent meaningful page utilization",
+      "other material gold-family structural drift"
+    ],
+    "exception": "unless an explicit employer format instruction requires a documented exception"
+  },
+  "operating_chain_consistency": {
+    "rule": "ONE_CONSISTENT_FAIL_CLOSED_CHAIN_ACROSS_SURFACES",
+    "description": "AGENTS.md, BLUEPRINT.md, .cursor/rules/resume.mdc, and this machine-readable gate record express one consistent operating chain, so a fresh chat recovering the repository receives the same fail-closed package-time actionability recheck and gold-artifact-based spawning rules regardless of which surface it reads first."
+  },
+  "unchanged_doctrine": [
+    "BLUEPRINT.md Section 135's live-role verified actionability gate and its two-part 'successfully established' test",
+    "BLUEPRINT.md Section 137's 92% meaningful-page-utilization floor",
+    "BLUEPRINT.md Section 140's DOCX-first default, requirement/JD-to-evidence crosswalk, real-hyperlink-object rule, and rendered-artifact QA authority",
+    "BLUEPRINT.md Section 141's presentation grammar and Section 141.7's research-backed writing constraints",
+    "BLUEPRINT.md Section 141.10-141.11's gold-quality acceptance reference and final-package QA-dimension checklist",
+    "schemas/job.schema.json's existing role_status and source_verification_status enums, unmodified and uncollapsed",
+    "Candidate Truth, Match Truth, and qualification/pursuit runtime logic"
+  ],
+  "role_tailoring_boundary": {
+    "must_never": [
+      "generate or revise a resume, cover letter, or other candidate-facing package for a role that fails the package-time actionability recheck",
+      "spawn a resume derivative from a freshly reconstructed template instead of the exact hash-verified gold artifact when that artifact is available",
+      "leave internal Career OS/governance/evidence-system/implementation-control language in candidate-facing text absent genuine job relevance",
+      "invent a new persisted job/actionability enum instead of using the existing role_status/source_verification_status axes",
+      "treat a discovery index, aggregator, cached snippet, prior capture, chat summary, or memory as sufficient to rescue a failed package-time recheck",
+      "deliver a package to Bora with an unaddressed reject condition from pre_delivery_package_qa_reject_conditions absent a documented employer exception"
+    ],
+    "gold_reference_authority_scope": "This record is a package-time operating gate only. It is never a source of Candidate Truth: substantive factual content must still trace only to approved Candidate Truth / claim-evidence lineage, exactly as before this lock."
+  },
+  "non_goals": {
+    "reference": "BLUEPRINT.md Section 133 build-economy gate; Section 134 Non-Goals; Section 141.5/141.9/141.12 Doctrine-only locks",
+    "excludes": [
+      "a DOCX/PDF generator or renderer",
+      "an automated grammar/style/ATS-score validator or linter beyond this doctrine record and its accompanying regression test",
+      "any change to Candidate Truth, Match Truth, qualification/pursuit logic, immigration logic, or schemas",
+      "any change to the protected resume master or resume patch/lineage architecture in .cursor/rules/resume.mdc",
+      "a new persisted job/actionability enum",
+      "an autonomous or unsupervised package-generation runtime -- the recheck and spawn gate locked here remain human-operated operating discipline, not a validator implementation"
+    ]
+  }
+}
