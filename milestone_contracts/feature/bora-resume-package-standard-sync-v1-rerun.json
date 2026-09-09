@@ -1,0 +1,62 @@
+{
+  "milestone_id": "BORA_RESUME_PACKAGE_STANDARD_SYNC_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock the smallest production resume/package standard earned by live Spy Pond and Teradyne applications: DOCX-first editable/default application artifact with employer-format override; preserve the approved one-page U.S. visual/ATS standard and 92% utilization floor; require an explicit JD/requirement-to-approved-evidence package crosswalk using existing Match Truth states; and require ATS-simple DOCX structure, rendered visual QA, and exact submitted-artifact traceability without redesigning Candidate Truth, qualification, schemas, or runtime generation.",
+  "baseline_sha": "86098603d284879f2244b0ce48253c07fd618dfe",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/resume.mdc",
+    "project_state.json",
+    "CHANGELOG.md",
+    "milestone_contracts/feature/bora-resume-package-standard-sync-v1-rerun.json"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "schemas/",
+    "src/",
+    "tests/",
+    "golden-tests/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "resume/"
+  ],  "required_tests": [
+    "tests/career_os_state_v1_test.py",
+    "tests/resume_architecture_test.py",
+    "tests/resume_presentation_view_test.py",
+    "tests/resume_page_utilization_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "BLUEPRINT version and project_state latest_locked_section/version remain mechanically consistent",
+    "DOCX is the canonical editable/default resume artifact when accepted by the employer/application system; explicit employer/application format instructions override",
+    "PDF remains a supported export/QA representation when required or useful, but is no longer the universal default submitted artifact",
+    "the approved one-page U.S. Letter, one-column, centered-header, restrained ATS-safe visual standard remains unchanged",
+    "the existing 92% meaningful page-utilization floor remains unchanged and may never authorize filler, unreadable type, crushed margins, or unsupported content",
+    "every serious-role resume/package uses a requirement/JD-to-evidence crosswalk derived from existing Requirement/EvidenceMatch truth rather than a new matching schema",
+    "crosswalk semantics preserve existing STRONG/SUPPORTED/PARTIAL/NONE/UNKNOWN states: positive states may guide supported emphasis; PARTIAL must retain transfer boundaries; NONE remains a gap; UNKNOWN remains unresolved",
+    "the crosswalk may drive summary emphasis, bullet selection/order, skills ordering, project selection, truthful lexical alignment, and evidence budget only; it may never repair Qualification Truth or invent unsupported capabilities",
+    "ATS-simple DOCX guidance prohibits graphics, sidebars, icons, text boxes, skill bars, multi-column layouts, and other structures likely to harm parsing/read order; simple paragraphs/tab stops are preferred for alignment",
+    "human-readable hyperlinks remain functional where relevant and the document must be rendered/visually inspected before submission",
+    "the exact submitted resume artifact/version remains traceable as Application/Package Truth",
+    "no fake ATS percentage, generic keyword stuffing, new Candidate Truth, new schema, or runtime generator is introduced by this milestone",
+    "python tests/career_os_state_v1_test.py passes",
+    "python tests/resume_architecture_test.py passes",
+    "python tests/resume_presentation_view_test.py passes",
+    "python tests/resume_page_utilization_v1_test.py passes",
+    "python scripts/verify_milestone_state.py passes",
+    "python scripts/verify_assurance_baseline.py reports ALL PHASES PASSED",
+    "git diff --check is clean",
+    "independent Cursor adversarial review returns SAFE"
+  ],  "stop_conditions": [
+    "closing the doctrine would require a new resume schema field/enum, Candidate Truth change, claim/evidence rewrite, qualification/decision runtime change, or generator implementation",
+    "closing the doctrine would require weakening the protected-master/structured-patch/claim-lineage architecture",
+    "closing the doctrine would require replacing existing EvidenceMatch semantics with a duplicate package-match scoring system",
+    "closing the doctrine would require a numeric ATS/fit score or unsupported keyword insertion",
+    "closing the doctrine would weaken the one-page U.S. Letter standard, 92% floor, readability, hyperlink, or visual-QA requirements",
+    "closing the doctrine would require modifying existing tests or golden fixtures"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

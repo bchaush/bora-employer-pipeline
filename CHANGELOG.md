@@ -19,6 +19,123 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-08 — Bora resume package standard sync (`BORA_RESUME_PACKAGE_STANDARD_SYNC_V1`, DOCTRINE ONLY)
+
+**Reason**
+
+Live Spy Pond and Teradyne application experience showed that always
+defaulting the submitted resume artifact to PDF did not fit every
+employer/application system's actual accepted/preferred format, and
+serious-role packages had no explicit, locked requirement to build from a
+requirement/JD-to-approved-evidence crosswalk grounded in existing Match
+Truth (`EvidenceMatch`) states.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.11 → v3.12; new locked Section 140
+  (`BORA_RESUME_PACKAGE_STANDARD_SYNC_V1`) locks: DOCX as the canonical
+  editable/default submitted resume artifact with explicit
+  employer/application-format instructions overriding that default; PDF
+  retained as a supported export/QA representation, no longer the
+  universal default; §134's visual/ATS standard and §137's 92%
+  utilization floor explicitly unchanged for either format; a
+  requirement/JD-to-approved-evidence crosswalk requirement for every
+  serious-role package, driven only by the existing
+  Requirement/`EvidenceMatch` truth (`STRONG`/`SUPPORTED`/`PARTIAL`/
+  `NONE`/`UNKNOWN`, `schemas/evidence_match.schema.json`) and never a new
+  parallel matching/scoring schema; ATS-simple DOCX structure guidance
+  (no graphics/sidebars/icons/text boxes/skill bars/multi-column layouts;
+  simple paragraphs/tab stops preferred); a rendered-visual-QA-before-
+  submission requirement extending §134's existing QA checklist to DOCX;
+  and exact submitted-artifact traceability (which format was actually
+  submitted) added to the existing Application-Specific Outputs record.
+  Declared a doctrine-only lock: no new schema field/enum, Candidate
+  Truth change, qualification/decision runtime change, or generator
+  implementation.
+* `.cursor/rules/resume.mdc`: new "Resume Package Standard — DOCX-First
+  Default and Requirement Crosswalk" section operationally mirrors
+  §140.1-140.6; the existing Application-Specific Outputs section gained
+  the submitted-artifact-format traceability field.
+* `project_state.json`: `blueprint_version` 3.11 → 3.12,
+  `latest_locked_section` 139 → 140.
+* `milestone_contracts/feature/bora-resume-package-standard-sync-v1-rerun.json`:
+  this milestone's own contract.
+
+**Correction pass (same date, reviewer findings REV-001/REV-002/REV-003).**
+An independent adversarial review found that §134's original "PDF-first
+output rule" paragraph (PDF as canonical/default submitted artifact,
+DOCX as an optional companion only, rendered PDF always final QA
+authority) remained live and directly contradicted new §140, and that
+`.cursor/rules/resume.mdc`'s §134 pointer still asserted "PDF as the
+canonical submission artifact." Resolved by explicit amendment rather
+than silent reversal: §134's submitted-artifact-default/final-QA-
+authority paragraph is now marked SUPERSEDED BY §140 in place (kept as a
+historical record, not an operative instruction), §140's own preamble
+and §140.3/§140.6 now state explicitly that §140 amends that one §134
+paragraph while the rest of §134 (Fixed visual/QA contract) and §137
+remain unchanged, and final-QA-authority ambiguity is resolved: QA
+authority belongs to the rendered version of whichever format
+(DOCX/PDF) is actually submitted, never a mandatory PDF gate on a
+DOCX-only submission. `.cursor/rules/resume.mdc`'s §134 pointer and its
+§140 mirror section were updated to match. (REV-004, verify-script
+execution evidence, remains the controller's responsibility per this
+builder's role boundary — not addressed by this pass.)
+
+**Correction pass 2 (same date, reviewer findings REV-001/REV-002/REV-003
+of the follow-up review, REV-005).** A second independent review found
+that correction pass 1 left three residual PDF-exclusive/PDF-mandatory
+fragments of the same class it claimed to close: §134's QA checklist
+still gated only "any résumé PDF" and required "final rendered-PDF
+visual QA"; §137's "what remains human/manual" section still assumed
+Bora's actual submitted artifact is always a PDF; and the Fixed
+visual/QA contract's hyperlink rule still required clickable URIs only
+"in the exported PDF." Resolved: §134's QA checklist now reads "any
+résumé package," "final rendered visual QA," and states it applies to
+whichever format is actually submitted per §140.6; §137's human/manual
+section now reads "actual submitted résumé package" (DOCX by default per
+§140.1, PDF/other only on explicit override) without changing the 92%
+floor or `evaluate_resume_page_utilization()`'s mechanical semantics;
+the Fixed visual/QA contract's hyperlink rule now names both DOCX
+hyperlink runs and PDF URI annotations, cross-referenced to §140.5/140.6;
+and §140.5 gained an explicit sentence extending the same clickable-URI
+rule to the DOCX artifact. `.cursor/rules/resume.mdc`'s matching
+pointers (Resume Reference Visual Standard QA-checklist wording, Résumé
+Page-Utilization Enforcement's "actual submitted" wording) were updated
+to match. REV-005 (verify-script execution evidence) is unaddressed by
+this pass for the same reason as REV-004 above: running
+`scripts/verify_milestone_state.py` and `scripts/verify_assurance_baseline.py`
+and deciding they pass is the controller's mechanical gate, not this
+builder's to assert.
+
+**Not changed**
+
+`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`; every schema and
+qualification/decision runtime file (`schemas/evidence_match.schema.json`,
+`src/job_analysis.py`, `src/qualification_gate.py`,
+`src/resume_validation.py`, `src/resume_page_utilization.py`, etc.);
+`evidence/`, `claims/`, `experiences/`, `resume/`; the protected-master/
+structured-patch/claim-lineage architecture; §134's visual/QA standard and
+§137's 92% page-utilization floor (both cross-referenced, not redefined).
+No new schema field/enum, `EvidenceMatch`-parallel scoring system, or
+DOCX/PDF generator/renderer implementation.
+
+**Validation**
+
+Required before commit/push per this milestone's contract:
+`python tests/career_os_state_v1_test.py`,
+`python tests/resume_architecture_test.py`,
+`python tests/resume_presentation_view_test.py`,
+`python tests/resume_page_utilization_v1_test.py`,
+`python scripts/verify_milestone_state.py`,
+`python scripts/verify_assurance_baseline.py` (expect ALL PHASES PASSED),
+and independent Cursor adversarial review. The builder session that
+authored this doctrine-only change did not have shell permission to
+execute these scripts and did not run them; the controller runs and
+evidences all of them mechanically after the builder exits, before this
+milestone is treated as validation-complete.
+
+---
+
 ## 2026-09-08 — Bora immigration role analysis tightening (`BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1`, DOCTRINE ONLY)
 
 **Reason**

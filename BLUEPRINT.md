@@ -1,6 +1,6 @@
 **BORA EMPLOYER PIPELINE OS**
 
-**Final Locked Blueprint v3.11**
+**Final Locked Blueprint v3.12**
 
 **Owner:** Bora Chaush  
 **Date locked:** August 2026  
@@ -2480,7 +2480,8 @@ For every accepted role:
 
 **RÉSUMÉ DIFF**
 
-**GENERATED PDF**
+**GENERATED PACKAGE (DOCX default; PDF only on explicit
+employer/application-system override — §140.1/§140.7)**
 
 **NETWORK ACTION**
 
@@ -3102,7 +3103,8 @@ Must:
 
 6.  test formatting;
 
-7.  export PDF;
+7.  export submitted artifact (DOCX default; PDF only on explicit
+    employer/application-system override — §140.1);
 
 8.  log output.
 
@@ -3728,18 +3730,30 @@ evidence exists to fill it. Explicitly excluded: decorative graphics,
 sidebars, skill bars/meters, icons, and text-box-based visual gimmicks.
 Hyperlinks (e.g. LinkedIn, GitHub, Live Demo) use short, human-readable
 visible labels, not raw URLs, and must be genuinely clickable (a real URI
-annotation) in the exported PDF, not merely styled to look like a link.
+annotation/hyperlink, not merely styled to look like a link) in whichever
+artifact format is actually submitted — a real DOCX hyperlink run when
+DOCX is submitted, a real URI annotation in the exported PDF when PDF is
+submitted — per §140.5/§140.6, which apply this same clickable-URI rule
+to the DOCX default; this is not a PDF-only requirement.
 
-**PDF-first output rule.** The PDF is Bora's canonical/default submitted
-résumé artifact, unless the employer or application system explicitly
-requires or recommends another supported format — employer submission
-instructions win. Final visual/format QA authority is always the
-rendered PDF, never an intermediate document format, even when a
-different format is what is actually submitted. A DOCX version, if ever produced,
-is an optional companion only, not required unless a specific employer or
-workflow needs one; if generated, its content must match the approved
-résumé and visual drift from the PDF should be minimized, but it never
-carries final QA authority.
+**Submitted-artifact format rule — SUPERSEDED by §140.** This paragraph's
+original text locked PDF as the canonical/default submitted artifact,
+DOCX as an optional companion only, and the rendered PDF as always the
+final visual/format QA authority even when a different format was
+submitted. §140 (`BORA_RESUME_PACKAGE_STANDARD_SYNC_V1`) expressly
+reverses the default: **DOCX is now the canonical/default submitted
+résumé artifact**, and PDF is a supported export/QA representation, not
+the universal default — see §140.1-§140.2, which control. QA authority
+is likewise resolved by §140.6, not by the rule this paragraph
+originally stated: final visual/format QA authority belongs to whichever
+format is actually going to be submitted (DOCX or PDF), rendered and
+visually inspected before submission; the rendered PDF is no longer
+mandated as final QA authority for a submission where DOCX is what is
+actually submitted. This paragraph is retained only as a historical
+record of the superseded rule and a pointer to §140 — it is not itself
+an operative instruction. Everything else in this section (the Fixed
+visual/QA contract, above, and the remaining paragraphs below) remains
+fully authoritative and unchanged for both formats.
 
 **Full-page utilization, honestly.** Substantially using the page with
 relevant, evidence-supported material is the goal — not eliminating every
@@ -3801,16 +3815,20 @@ Section 48 / `resume.mdc`):**
   the résumé, never an independent channel for asserting a capability
   that is not otherwise demonstrated.
 
-**QA checklist (verification, not implementation — see Non-Goals below).**
-Before any résumé PDF is treated as submission-ready: one-page-default overflow
-check; clipping/overlap check (no visual element cut off or colliding);
-plain-text extraction/read-order check (the PDF's underlying text extracts
-in the correct logical order, relevant to ATS parsing); hyperlink
-destination verification (each visible link label resolves to its correct
-URI); final rendered-PDF visual QA (a human look at the actual rendered
-page, not just the source data). These are QA requirements this standard
-locks — not an instruction to build automated tooling for them now (see
-Non-Goals).
+**QA checklist (verification, not implementation — see Non-Goals below;
+format scope amended by §140.6).** Before any résumé package is treated
+as submission-ready: one-page-default overflow check; clipping/overlap
+check (no visual element cut off or colliding); plain-text
+extraction/read-order check (the document's underlying text extracts in
+the correct logical order, relevant to ATS parsing); hyperlink
+destination verification (each visible link label resolves to its
+correct URI); final rendered visual QA (a human look at the actual
+rendered document, not just the source data). This checklist applies to
+whichever artifact format is actually going to be submitted — DOCX, PDF,
+or both — per §140.6's final-QA-authority rule; it is no longer
+PDF-exclusive now that §140 makes DOCX the default submitted artifact.
+These are QA requirements this standard locks — not an instruction to
+build automated tooling for them now (see Non-Goals).
 
 **General GitHub contact-block inclusion.** Not made universally mandatory by
 this section. It was appropriate and approved for the MGB reference PDF;
@@ -4056,17 +4074,22 @@ export-approval gate (`approve_derivative_for_export`,
 optional `page_geometry` parameter; when supplied, a failing result blocks
 export approval exactly like any other eligibility failure.
 
-**What remains human/manual (not mechanically enforced).** No PDF
-generator, renderer, or rendered-page-geometry producer exists anywhere in
-this repository; Bora's actual submitted PDF is produced by a
-human-controlled process outside this repository (§134) and never passes
-through this validator today. The correspondence between a supplied
-geometry payload and the real exported PDF, and every item in §134's QA
-checklist (clipping/overlap, plain-text extraction/read-order, hyperlink
-destination verification, final rendered-PDF visual QA), remain manual
-human review. This section does not claim end-to-end automated PDF
-enforcement — only that a geometry payload, once supplied, is checked
-mechanically and fail-closed at the export-approval boundary.
+**What remains human/manual (not mechanically enforced; format scope
+amended by §140).** No DOCX/PDF generator, renderer, or
+rendered-page-geometry producer exists anywhere in this repository;
+Bora's actual submitted résumé package — DOCX by default per §140.1, or
+PDF when an explicit employer/application-system instruction overrides
+that default — is produced by a human-controlled
+process outside this repository (§134/§140) and never passes through
+this validator today. The correspondence between a supplied geometry
+payload and the real exported document, and every item in §134's QA
+checklist as amended by §140.6 (clipping/overlap, plain-text
+extraction/read-order, hyperlink destination verification, final
+rendered visual QA of whichever format is actually submitted), remain
+manual human review. This section does not claim end-to-end automated
+document enforcement — only that a geometry payload, once supplied, is
+checked mechanically and fail-closed at the export-approval boundary,
+regardless of which format that geometry payload describes.
 
 **138. BORA ROLE SELECTION AND PURSUIT PRIORITY STANDARD — BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1 (LOCKED)**
 
@@ -4405,4 +4428,130 @@ enum, qualification/decision runtime behavior, scoring model, or
 numeric probability. `.cursor/rules/opt-safety.mdc` is updated in the
 same change to operationally mirror 139.1-139.5; no other file's
 behavior changes.
+
+**140. BORA RESUME PACKAGE STANDARD SYNC — BORA_RESUME_PACKAGE_STANDARD_SYNC_V1 (LOCKED)**
+
+Earned under §133's build-economy gate by live Spy Pond and Teradyne
+application experience: a submission workflow that defaulted to PDF as
+the universal submitted artifact did not fit every employer/application
+system's actual accepted/preferred format. This section locks the
+smallest correction — which submitted-artifact format is default and how
+it stays traceable — and adds an explicit requirement/JD-to-evidence
+crosswalk requirement for serious-role packages.
+
+**Relationship to §134 (explicit, not silent).** This section
+**expressly amends and supersedes** §134's now-struck "PDF-first output
+rule" paragraph (submitted-artifact default and final-QA-authority
+rule only, see §134's own superseded-paragraph note) — §140.1, §140.2,
+and §140.6 below control that rule going forward. Everything else in
+§134 — the Fixed visual/QA contract (page size, one-column structure,
+typography, margins, section-rule headings, hyperlink requirements) and
+§137's 92% page-utilization floor — is restated and cross-referenced,
+not redefined, and remains fully unchanged for both formats (§140.3).
+This section also cross-references, without redefining,
+`.cursor/rules/resume.mdc`'s protected-master/structured-patch/claim-
+lineage architecture and the existing `EvidenceMatch` states
+(`schemas/evidence_match.schema.json`: `STRONG` / `SUPPORTED` /
+`PARTIAL` / `NONE` / `UNKNOWN`). This is a doctrine lock, not a runtime
+implementation.
+
+**140.1 DOCX-first default, employer-format override.** For a normal Bora
+application, the canonical editable/default submitted resume artifact is
+DOCX. Where the employer/application system states or requires PDF (an
+ATS upload field restricted to PDF, or an explicit employer instruction
+requiring PDF), that explicit instruction controls for that application
+and overrides the DOCX default. Absent any such instruction, DOCX is the
+default, not PDF. This override is scoped to DOCX|PDF only, matching
+§140.7's traceability record below; it does not admit a third submitted-
+artifact format.
+
+**140.2 PDF remains a supported representation, not the universal
+default.** PDF stays fully available whenever it is required, requested,
+or useful for visual-fidelity QA (§134) — it is no longer treated as the
+universal default submitted artifact for every application regardless of
+what the employer/application system actually accepts.
+
+**140.3 Visual/ATS standard and 92% floor unchanged.** §134's Fixed
+visual/QA contract (one-page U.S. Letter, one-column, restrained
+black-and-white visual/ATS standard) and §137's 92%
+meaningful-page-utilization floor apply identically regardless of
+whether the submitted artifact is DOCX or PDF. Neither is redefined,
+narrowed, or weakened by this section — only §134's now-superseded
+submitted-artifact-default/final-QA-authority paragraph is amended, per
+this section's preamble; a DOCX-first default never authorizes a
+shorter, sparser, or less ATS-careful document than the standard already
+required.
+
+**140.4 Requirement/JD-to-approved-evidence crosswalk.** Every serious-
+role resume/package must be built from an explicit crosswalk between the
+job's stated requirements and Bora's approved evidence, driven entirely
+by the existing Requirement/`EvidenceMatch` truth already produced by
+`src/job_analysis.py` / `src/qualification_gate.py` — never a new,
+duplicate, or parallel matching/scoring schema. Crosswalk semantics
+preserve the existing states exactly: `STRONG` and `SUPPORTED` may guide
+which approved bullets/summary language get emphasis and ordering;
+`PARTIAL` may be used only within its recorded transfer boundary (never
+promoted to a false direct-experience equivalence, consistent with
+`.cursor/rules/resume.mdc`'s existing Transferable Experience section);
+`NONE` remains a visible gap (§48's existing Gap Visibility rule) and
+must never be resolved through creative wording; `UNKNOWN` remains
+unresolved and must never be silently treated as `SUPPORTED` or `NONE`.
+The crosswalk may drive summary emphasis, bullet selection/order, skills
+ordering, project selection, truthful lexical alignment (§48's existing
+Keyword Rule, unchanged), and how much space approved evidence is given —
+it may never repair Qualification Truth, invent an unsupported
+capability, or manufacture a requirement match that current
+`EvidenceMatch` truth does not support.
+
+**140.5 ATS-simple DOCX structure.** A DOCX package must be built for
+reliable ATS parsing and plain-text extraction: no graphics, sidebars,
+icons, text boxes, skill-bar graphics, or multi-column layouts likely to
+scramble read order or defeat parsers. Prefer simple paragraphs and tab
+stops for alignment over tables or floating text frames. This extends
+§134's existing plain-text-extraction/read-order QA checklist item to the
+DOCX artifact specifically; it does not relax any existing visual-standard
+requirement. §134's Fixed visual/QA contract hyperlink rule (short
+human-readable labels, genuinely clickable, never a raw URL) applies
+identically to the DOCX artifact: a real DOCX hyperlink run, not text
+merely styled to look like a link.
+
+**140.6 Rendered visual QA before submission — final QA-authority rule
+(amends §134).** Before any package is treated as submission-ready, it
+must be rendered and visually inspected — not only spot-checked as raw
+text — covering the same category of checks §134 already requires
+(page-count/overflow, clipping/overlap, read order, and functional
+human-readable hyperlink destinations). **Final visual/format QA
+authority belongs to the rendered version of whichever format is
+actually going to be submitted** — the rendered DOCX when DOCX is
+submitted, the rendered PDF when PDF is submitted, or both when both are
+submitted — never an intermediate/unrendered document, and never a
+format other than the one actually going out. This explicitly replaces
+§134's original rule that the rendered PDF is always final QA authority
+even when a different format is submitted; PDF-rendered QA remains
+required only when PDF is the artifact actually being submitted (or is
+separately produced for visual-fidelity comparison per §140.2), not as a
+mandatory gate on a DOCX-only submission. This remains a manual QA step
+today, consistent with §134 and §137's existing "what remains
+human/manual" boundary — no new automated DOCX renderer or geometry
+producer is authorized by this section.
+
+**140.7 Exact submitted-artifact traceability.** `.cursor/rules/resume.mdc`'s
+existing Application-Specific Outputs requirement (distinct version
+identifier; traceability to Job_ID, resume version, patch used,
+claims/evidence used, validation result, export result) applies
+identically regardless of submitted format. The record must additionally
+capture which artifact format (DOCX or PDF) was actually submitted for
+that application, so the exact submitted-artifact version remains
+recoverable as Application/Package Truth.
+
+**140.8 Doctrine-only lock / build-economy boundary.** This section adds
+no new schema field or enum, no new Candidate Truth, no qualification or
+decision runtime change, no new `EvidenceMatch`-parallel scoring system,
+and no DOCX/PDF generator or renderer implementation — none of that is
+pre-authorized merely because this doctrine exists (§133's build-economy
+gate continues to govern any future runtime-implementation proposal).
+`.cursor/rules/resume.mdc` is updated in the same change to operationally
+mirror 140.1-140.7; `schemas/`, `src/`, `resume/`, and the existing
+protected-master/structured-patch/claim-lineage architecture remain
+unchanged.
 

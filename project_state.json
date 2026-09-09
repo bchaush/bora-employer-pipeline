@@ -1,6 +1,6 @@
 {
-  "blueprint_version": "3.11",
-  "latest_locked_section": 139,
+  "blueprint_version": "3.12",
+  "latest_locked_section": 140,
   "latest_closed_milestone_id": "BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1",
   "latest_closed_milestone_pr": 17,
   "current_phase": "OPERATE_WHILE_BUILDING (BLUEPRINT.md Section 133)",
