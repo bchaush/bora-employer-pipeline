@@ -126,16 +126,16 @@ sys.stdout.flush()
 
 # ======================================================================
 # 2. The package-time actionability recheck fires at the correct trigger
-# points, extends (never replaces) §135, and requires the same two-part
-# "successfully established" test.
+# points, extends (never replaces) §135, and requires the same positive
+# semantic-quorum "successfully established" test.
 # ======================================================================
 def _test_2() -> None:
     recheck = RECORD["package_time_actionability_recheck"]
     assert_true(recheck["rule"] == "RECHECK_IMMEDIATELY_BEFORE_MEANINGFUL_PACKAGE_WORK", "package_time_actionability_recheck.rule mismatch")
     assert_true("Section 135" in recheck["extends_not_replaces"], "recheck must extend Section 135, not replace it")
     assert_true(
-        "matching requisition identity" in recheck["description"] and "actionable application route" in recheck["description"],
-        "recheck description must restate §135's two-part successfully-established test",
+        "role/title identity" in recheck["description"] and "matching requisition identity" in recheck["description"] and "substantive current job-description content" in recheck["description"] and "actionable application route" in recheck["description"],
+        "recheck description must restate §135's positive semantic-quorum successfully-established test",
     )
     triggers = recheck["trigger_points"]
     for expected in ("drafting", "DOCX mutation", "cover-letter drafting", "meaningful"):
@@ -146,7 +146,7 @@ def _test_2() -> None:
 
 
 _run("_test_2", _test_2)
-print("PASS 2: the package-time actionability recheck fires at drafting/DOCX-mutation/cover-letter/other meaningful-work trigger points and extends §135's two-part test.")
+print("PASS 2: the package-time actionability recheck fires at drafting/DOCX-mutation/cover-letter/other meaningful-work trigger points and extends §135's positive semantic-quorum test.")
 sys.stdout.flush()
 
 

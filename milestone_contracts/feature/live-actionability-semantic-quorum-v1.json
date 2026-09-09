@@ -1,0 +1,51 @@
+{
+  "milestone_id": "LIVE_ACTIONABILITY_SEMANTIC_QUORUM_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Prevent false-positive live/package actionability when HTTP 200 or a requisition token survives on a dead, generic, or contentless page by requiring a positive semantic quorum before Bora-facing package work.",
+  "baseline_sha": "f65bcc5edb314499298bb2c686a5a61a8e2cc9cb",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    ".cursor/rules/resume.mdc",
+    "CHANGELOG.md",
+    "docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "milestone_contracts/feature/live-actionability-semantic-quorum-v1.json",
+    "tests/resume_package_spawn_gate_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/resume_package_spawn_gate_v1_test.py",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "HTTP status 200 alone never establishes current actionability",
+    "a surviving requisition token/string alone never establishes current actionability",
+    "positive matching role/title identity, matching requisition identity, substantive current JD content, and current application route/instructions are all required together",
+    "explicit dead/error-page markers force fail-closed even if HTTP 200 and requisition text are present",
+    "the Point32Health R9102 HTTP-200 dead-page failure is captured as the reproduced defect",
+    "no schema/runtime/Qualification Truth/Candidate Truth/Match Truth/immigration/recency-window changes"
+  ],
+  "stop_conditions": [
+    "implementation requires runtime/browser automation or schema changes",
+    "implementation weakens existing Section 135 or 141 actionability requirements",
+    "implementation turns transport success or raw token presence into positive actionability evidence",
+    "implementation changes resume content/layout doctrine or recency policy"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_A_PREVENTIVE_LOCK_IN_THE_2026-09-09_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}

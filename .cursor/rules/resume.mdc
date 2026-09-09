@@ -433,19 +433,25 @@ section.
 Operational reference: `BLUEPRINT.md` §141.13-§141.15
 (`CAREER_OS_PACKAGE_GATE_HARDENING_V1`) and
 `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json` lock the correction earned
-by two reproduced live defects: a Santander package produced before the
-exact first-party requisition was proven actionable, and a DraftKings
-resume that drifted from the canonical gold family and leaked internal-
-system language. This section operationally enforces §141.13-§141.15;
+by three reproduced live defects: a Santander package produced before the
+exact first-party requisition was proven actionable; a DraftKings resume
+that drifted from the canonical gold family and leaked internal-system
+language; and Point32Health Business Analyst R9102, where an HTTP-200 dead
+page retained the requisition token and the operator incorrectly continued
+despite `TITLE_MATCH=False`. This section operationally enforces §141.13-§141.15;
 not restated here in full.
 
 **Package-time recheck.** Immediately before Claude drafting, DOCX
 mutation, cover-letter drafting, or any other meaningful package work,
 re-open the exact current first-party employer requisition in the
-current operating session and re-establish matching requisition identity
-plus substantive current job-description content plus a current
-actionable application route — §135's existing two-part test, applied
-again at package time. A prior pursuit-time pass does not by itself
+current operating session and re-establish the full positive semantic
+quorum: matching role/title identity, matching requisition identity,
+substantive current job-description content, and a current actionable
+application route. HTTP 200, a requisition token, ATS shell, or Apply-like
+control alone never satisfies this gate; explicit dead/error-page text
+fails closed even when HTTP 200 or the requisition token is present. This
+is §135's existing successfully-established test, applied again at package
+time. A prior pursuit-time pass does not by itself
 satisfy this recheck. A blank/contentless shell, a JavaScript-only page
 with no recoverable JD content, a generic careers/search redirect, a
 page-not-found response, an expired/closed page, an identity mismatch,

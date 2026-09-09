@@ -19,6 +19,27 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+
+## 2026-09-09 — Live actionability semantic quorum (`LIVE_ACTIONABILITY_SEMANTIC_QUORUM_V1`, DOCTRINE + REGRESSION LOCK)
+
+**Reason**
+
+A post-#32 live run reproduced a false-positive package gate: Point32Health Business Analyst R9102 returned HTTP 200 and retained the requisition token in source-level retrieval, but the exact rendered employer page was a dead error state saying the page did not exist. The operator incorrectly continued after `TITLE_MATCH=False`. Existing §135/§141.13 doctrine already required matching role/requisition identity, substantive current JD content, and current actionability; this milestone makes the positive semantic quorum explicit and regression-locks the reproduced failure.
+
+**Changed**
+
+* `BLUEPRINT.md` §135 now states the full positive semantic quorum directly and makes HTTP 200, requisition-token, ATS-shell, and Apply-like-control evidence insufficient on their own; explicit dead/error-page state vetoes PASS.
+* `BLUEPRINT.md` §141.13 requires positive role/title identity + requisition identity + substantive current JD + current application route/instructions; HTTP 200/requisition token/ATS shell/Apply-like control alone never passes; explicit dead/error-page state vetoes PASS.
+* `AGENTS.md` and `.cursor/rules/resume.mdc` inherit the same always-on operating rule.
+* `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json` records the Point32Health reproduced failure and semantic-quorum rule.
+* `tests/live_actionability_semantic_quorum_v1_test.py` locks the exact HTTP-200 + requisition-token + missing-title/dead-page failure.
+
+**Not changed**
+
+No schema/runtime enum, Candidate Truth, Match Truth, Qualification Truth, immigration logic, resume layout/content standard, recency-window policy, or package-folder hygiene behavior changed.
+
+---
+
 ## 2026-09-09 — Discovery recency visibility gate (`DISCOVERY_RECENCY_VISIBILITY_GATE_V1`, DOCTRINE + REGRESSION LOCK)
 
 **Reason**

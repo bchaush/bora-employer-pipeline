@@ -3921,11 +3921,18 @@ indexed listing is evidence that a requisition existed at index time,
 never evidence that it is currently actionable.
 
 **What "successfully established" means.** Not narrowly "contains an
-Apply button." The exact current requisition must (a) load as the
-matching current role/requisition identity, and (b) provide a current
-actionable application route, or explicit current application
-instructions/status sufficient to establish actionability. Both are
-required.
+Apply button" and not merely HTTP transport success. The exact current
+requisition must positively establish the full semantic quorum: (a)
+matching role/title identity, (b) matching requisition identity, (c)
+substantive current job-description content, and (d) a current actionable
+application route, or explicit current application instructions/status
+sufficient to establish actionability. HTTP 200, a surviving requisition
+string/token, an ATS shell, or an Apply-like control alone never satisfies
+this gate. Any explicit dead/error-page state (including page-not-found,
+"page you are looking for doesn't exist", expired, closed, filled, or no
+longer accepting applications) vetoes PASS even when HTTP 200 is returned
+or the requisition token remains in page/source text. All four positive
+signals are required and any explicit dead/error state fails closed.
 
 **Examples that fail to establish current actionability:** the exact
 requisition returns page-not-found; the exact requisition redirects only
@@ -4923,13 +4930,16 @@ section — for the same reason §141.6 and §141.10 give: `project_state.json`'
 and `tests/resume_reference_style_lock_v1_test.py` pins that field to
 141; this lock is recorded as §141 subsections so that pinned,
 non-editable regression check and the live `src/career_os_state.py`
-section-count validator agree).** Earned by two reproduced live
+section-count validator agree).** Earned by three reproduced live
 defects, recorded in full at `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json`:
 a Santander resume/cover-letter package was produced before the exact
 current first-party requisition had been re-opened and proven actionable
-in the operating session doing the package work, and a DraftKings resume
+in the operating session doing the package work; a DraftKings resume
 drifted from the canonical gold family and leaked internal Career OS
-language. This section sharpens the timing of the already-locked §135
+language; and Point32Health Business Analyst R9102 returned HTTP 200 with
+the requisition token still present while the exact rendered employer page
+was a dead error page and the package incorrectly continued despite
+`TITLE_MATCH=False`. This section sharpens the timing of the already-locked §135
 gate (`LIVE_ROLE_VERIFIED_ACTIONABILITY_GATE_V1`) to also cover package
 time — it does not create a competing actionability system, a new
 posting-state axis, or a new enum.
@@ -4937,10 +4947,16 @@ posting-state axis, or a new enum.
 Immediately before Claude drafting, DOCX mutation, cover-letter
 drafting, or any other meaningful package work, the exact current
 first-party employer requisition must be re-opened in the current
-operating session and must still establish matching requisition identity
-plus substantive current job-description content and a current
-actionable application route/instruction — §135's existing two-part
-"successfully established" test. A prior pursuit-time pass of §135 does
+operating session and must still establish a positive semantic quorum:
+matching role/title identity, matching requisition identity, substantive
+current job-description content, and a current actionable application
+route/instruction — §135's existing successfully-established test made
+explicit for package-time operation. HTTP 200, a surviving requisition
+string/token, an ATS shell, or an Apply-like control alone never satisfies
+this quorum. Any explicit dead/error state (including page-not-found,
+"page you are looking for doesn't exist", expired, closed, filled, or no
+longer accepting applications) fails closed even when the transport
+status is HTTP 200 or the requisition token remains in page/source text. A prior pursuit-time pass of §135 does
 not by itself satisfy this package-time recheck. A blank or contentless
 requisition shell, a JavaScript-only page with no recoverable current JD
 content, a generic careers/search redirect, a page-not-found response,
@@ -5010,8 +5026,9 @@ BLUEPRINT.md, `.cursor/rules/resume.mdc`, and
 `docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json` express one consistent
 fail-closed operating chain; `schemas/`, `src/`, `resume/`, and the
 existing protected-master/structured-patch/claim-lineage architecture
-remain unchanged. `tests/resume_package_spawn_gate_v1_test.py` is a
-focused regression test verifying the package-time actionability
+remain unchanged. `tests/resume_package_spawn_gate_v1_test.py` and
+`tests/live_actionability_semantic_quorum_v1_test.py` are focused regression
+tests verifying the package-time actionability
 recheck, the gold-artifact spawn gate and `GOLD_REFERENCE_ARTIFACT_
 REQUIRED` stop condition, the internal-jargon translation requirement,
 the pre-delivery QA reject conditions, the Santander/DraftKings
