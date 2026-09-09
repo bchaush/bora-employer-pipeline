@@ -19,6 +19,104 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-08 — Bora resume reference style lock (`BORA_RESUME_REFERENCE_STYLE_LOCK_V1`, DOCTRINE ONLY)
+
+**Reason**
+
+A previously reproduced résumé package (spawned for the Cable One
+application) drifted from Bora's actual approved presentation grammar —
+a generic "PROFESSIONAL SUMMARY" heading, wrong default section order,
+and an employer-first-plus-italic-title work-entry line the reference
+exemplar does not use. Bora explicitly approved the Spy Pond
+FINAL_REFERENCE_STYLE DOCX as the canonical gold-standard grammar
+correcting that drift, without changing Candidate Truth, Match Truth,
+qualification logic, or authorizing a generator.
+
+**Changed**
+
+* `BLUEPRINT.md` bumped v3.12 → v3.13; new locked Section 141
+  (`BORA_RESUME_REFERENCE_STYLE_LOCK_V1`) locks the Spy Pond
+  FINAL_REFERENCE_STYLE DOCX (SHA-256
+  `330b600e8cc18bd4edd4aa75422df903cdf8a230a6e97192094c89a254851d43`) as
+  the canonical presentation grammar: no PROFESSIONAL SUMMARY heading;
+  default section order EDUCATION/SKILLS/WORK EXPERIENCE/RELEVANT
+  PROJECT; single bold "Title | Employer" work-entry line with
+  right-aligned dates; two-school education grammar with Brandeis GPA
+  retained when supported; three natural recruiter-facing skills rows
+  with no internal Career OS terminology; default evidence roster of
+  Winter Walk, TELUS Digital Bulgaria, D Commerce Bank, and MarketMind
+  (Bulmarma only when a role-specific §140.4 crosswalk earns it);
+  MarketMind's technology-label-plus-GitHub-link heading grammar; and the
+  gold reference's human, early-career candidate-facing prose style.
+  §134's Fixed visual/QA contract, §137's 92% floor, and §140's
+  DOCX-first/crosswalk/hyperlink/rendered-QA rules are restated and
+  cross-referenced, not redefined. Declared a doctrine-only lock: no new
+  schema field/enum, Candidate Truth change, qualification/decision
+  runtime change, or generator/renderer implementation.
+* `docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json`: new doctrine data
+  record holding the full extracted grammar, visual metrics, evidence
+  roster, role-tailoring boundary, and the specific Cable One
+  `drift_patterns_rejected` this lock corrects.
+* `.cursor/rules/resume.mdc`: new "Resume Reference Style Lock —
+  Gold-Reference Presentation Grammar" section operationally mirrors
+  §141.
+* `project_state.json`: `blueprint_version` 3.12 → 3.13,
+  `latest_locked_section` 140 → 141.
+* `tests/resume_reference_style_lock_v1_test.py`: new focused regression
+  test asserting the gold-reference record encodes the locked grammar and
+  that each recorded Cable One drift pattern is rejected by it.
+* `milestone_contracts/feature/bora-resume-reference-style-lock-v1.json`:
+  this milestone's own contract.
+
+**Correction pass (same date, reviewer findings REV-001/REV-002).** An
+independent adversarial review found two unresolved conflicts. First,
+§134's original "Reference principle" paragraph still named "section
+order" and "Education-first ordering" as free job-specific strategic
+variables, directly contradicting new §141's locked default section
+order and work-entry grammar, with no explicit supersession note (unlike
+§140's pattern for its own §134 amendment). Second, §141.4 and the
+gold-reference record's `role_tailoring_boundary.must_never` clause read
+"or the gold reference itself" as though the Spy Pond exemplar were a
+freestanding source of resume facts, contradicting §141.1's own statement
+that Spy-Pond-specific wording/content remains job-specific and
+`.cursor/rules/resume.mdc`'s Claim Lineage rule that the resume is never
+the source of truth. Resolved by explicit amendment: §134's paragraph now
+carries a new "Presentation grammar — AMENDED BY §141" note narrowing
+what remains a free variable (wording/content only, not section
+order/heading/work-entry grammar) and pointing at §141 as the governing
+rule; §141.4 and the gold-reference record's `role_tailoring_boundary`
+now state explicitly that the gold reference is a presentation-grammar/
+visual-metrics/roster-structure authority only, never a source of
+Candidate Truth, and that substantive factual content still traces only
+to approved Candidate Truth / claim-evidence lineage.
+
+**Second correction pass (same date, reviewer findings REV-001/REV-002/
+REV-003).** A further independent adversarial review found: (1) §134's
+"Reference principle" paragraph still stated unqualifiedly that the MGB
+PDF is the visual-execution authority, with no note resolving which
+exemplar's numeric visual metrics (margins, point sizes, fonts) govern
+now that §141.3 locks Spy-Pond-derived numbers alongside it; (2)
+`tests/resume_reference_style_lock_v1_test.py`'s `_test_1` asserted
+section order, work/education/skills grammar, evidence roster, and
+visual metrics but never asserted `marketmind_heading_grammar`, so that
+key could be deleted without failing the test despite being a named
+acceptance condition; (3) the same test's `_test_6` verified this lock's
+own presence but never asserted the prior correction pass's own fixes
+(the "AMENDED BY §141" notes, the gold reference's never-a-source-of-
+Candidate-Truth language), so those fixes could be silently reverted
+without failing anything. Resolved: §134 gained a new "Numeric visual
+metrics — AMENDED BY §141 for gold-reference packages" paragraph stating
+Spy Pond-derived numbers in §141.3 govern for gold-reference packages
+while the Fixed visual/QA contract stays qualitative and unchanged;
+`_test_1` now asserts `marketmind_heading_grammar.rule` and its
+right-side-GitHub-hyperlink-object requirement; a new `_test_7` asserts
+both "AMENDED BY §141" notes remain present in `BLUEPRINT.md` and the
+gold reference's `gold_reference_authority_scope`/`must_never` language
+remains present in the JSON record, regression-locking the prior
+correction pass itself.
+
+---
+
 ## 2026-09-08 — Bora resume package standard sync (`BORA_RESUME_PACKAGE_STANDARD_SYNC_V1`, DOCTRINE ONLY)
 
 **Reason**
