@@ -1,0 +1,64 @@
+{
+  "milestone_id": "BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Promote Bora's user-tweaked Cable One v2 DOCX to the final human-approved resume presentation reference, add research-backed recruiter/ATS writing constraints that reinforce that artifact, and authorize a bounded Claude-first drafting pilot without changing Candidate Truth, Match Truth, qualification logic, or building a generator.",
+  "baseline_sha": "d58689774f3d2e889afe7867905ea4a06cca1810",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/resume.mdc",
+    "project_state.json",
+    "CHANGELOG.md",
+    "docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json",
+    "tests/resume_final_reference_calibration_v1_test.py",
+    "milestone_contracts/feature/bora-resume-final-reference-calibration-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],  "required_tests": [
+    "tests/resume_final_reference_calibration_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/resume_architecture_test.py",
+    "tests/resume_presentation_view_test.py",
+    "tests/resume_page_utilization_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "the final human-approved reference is identified as Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx with SHA-256 236179c98b0e3ef68f7e79e392d73e57db41acb6f8493b0a7ab9eb8b2b353955 and explicitly supersedes Spy Pond only as the latest presentation reference, never as a source of Candidate Truth",
+    "the existing hard presentation grammar remains: no generic PROFESSIONAL SUMMARY heading; EDUCATION then SKILLS then WORK EXPERIENCE then RELEVANT PROJECT; Title | Employer with right-aligned dates; two-school education grammar; three natural skills rows; one page; one column; DOCX-first; real hyperlinks; 92%+ meaningful utilization",
+    "human readability outranks keyword density: candidate-facing language is ordinary American English, concrete, direct, and recruiter-natural, with no internal-system jargon, capability stuffing, inflated adjectives, or robotic phrasing",
+    "summary is a short natural positioning paragraph that connects current career stage, strongest approved evidence, and target role family; it must not become a keyword inventory",
+    "experience and project bullets prefer action plus context plus outcome/value when evidence supports an outcome; when no defensible outcome exists, use action plus context/purpose without inventing impact",
+    "bullets are kept concise and scan-friendly, normally one to two rendered lines where practical; relevance and clarity matter more than forcing every bullet to the same length",
+    "quantification is used when it materially helps the reader understand scale or result and is supported by approved evidence; numbers are never manufactured merely to make a bullet look stronger",
+    "JD terminology may be reused only when the Requirement/EvidenceMatch crosswalk establishes supported overlap; exact employer terms should be distributed naturally across summary, skills, experience, and project evidence rather than repeated for keyword density",
+    "skills prioritize role-relevant hard skills and evidence-backed operational capabilities; generic soft-skill filler is excluded unless it is concretely supported by experience evidence",
+    "the resume tells one coherent early-career story from education and skills into work evidence and project proof, rather than reading as disconnected keyword blocks",
+    "the user-tweaked reference's TELUS display label and GPA presentation are recorded as presentation choices only and may not silently alter underlying Candidate Truth or evidence provenance",
+    "a Claude-first drafting pilot is authorized at PRODUCE PACKAGE: Claude receives only the exact verified JD, approved Requirement/EvidenceMatch crosswalk, approved Candidate Truth/evidence modules, and current reference grammar; Claude may draft candidate-facing wording but may not infer facts, tools, metrics, outcomes, or qualification states",
+    "G remains responsible for orchestration, truth/evidence adjudication, rejection of unsupported Claude language, final reference-grammar conformance, rendered DOCX QA, hyperlink verification, and the human approval gate",
+    "no automated DOCX generator, renderer, schema change, Candidate Truth change, Match Truth change, qualification/pursuit runtime change, or protected resume-master change is introduced"
+  ],  "stop_conditions": [
+    "the calibration would require changing Candidate Truth, Match Truth, qualification/pursuit logic, schemas, or runtime product code",
+    "the calibration would weaken truth lineage, first-party job verification, the 92% page-utilization floor, DOCX-first submission, hyperlink-object verification, or rendered-artifact QA",
+    "the calibration would turn external resume advice into a rule that conflicts with Bora's explicit human-approved reference or would force invented outcomes/metrics",
+    "the Claude drafting pilot would require granting Claude authority to create facts or make consequential pursuit/qualification decisions"
+  ],
+  "research_basis": [
+    "U.S. Department of Labor VETS Resume Essentials 2026: targeted achievement statements and job-description keyword alignment",
+    "University of Pennsylvania Career Services: 1-2 line bullets, action verbs, context/transferable skills/results, consistent readable formatting",
+    "Yale Office of Career Strategy: Action + Project + Result / WHO-style bullets, role-relevant accomplishments, simple ATS-friendly formatting",
+    "Indeed 2026 ATS guidance: write for both ATS and recruiter/hiring manager; reuse role-specific job-description keywords naturally",
+    "LinkedIn Talent Solutions recruiter guidance: strong organization/format, real achievements, and evidence that matches the role"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

@@ -19,6 +19,62 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-08 — Bora resume final reference calibration (`BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1`, DOCTRINE ONLY)
+
+**Reason**
+
+Bora further hand-tweaked the Cable One package into
+`Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx` and explicitly
+approved it as the final human-approved resume presentation reference,
+superseding Spy Pond (§141) only as the latest presentation reference,
+never as a source of Candidate Truth. Research-backed recruiter/ATS
+writing constraints reinforce that artifact, and a bounded Claude-first
+drafting pilot is authorized at PRODUCE PACKAGE, without changing
+Candidate Truth, Match Truth, qualification logic, or building a
+generator.
+
+**Changed**
+
+* `BLUEPRINT.md`: new locked §141.6-§141.9
+  (`BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1`, recorded as §141
+  subsections rather than a new top-level section so the v3.13 version
+  banner and `project_state.json`'s `latest_locked_section` do not need
+  to change -- `tests/resume_reference_style_lock_v1_test.py` pins both
+  to their §141 values and is a required, non-editable test for this
+  milestone, and this keeps that pin consistent with the live
+  `src/career_os_state.py` max-heading validator) locks
+  `Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx` (SHA-256
+  `236179c98b0e3ef68f7e79e392d73e57db41acb6f8493b0a7ab9eb8b2b353955`) as
+  the final human-approved presentation reference; confirms §141's
+  presentation grammar unchanged; records the TELUS display label and
+  GPA presentation as presentation choices only; adds research-backed
+  recruiter/ATS writing constraints (human readability over keyword
+  density, natural positioning summary, action/context/outcome bullets,
+  disciplined quantification, crosswalk-gated JD terminology,
+  evidence-backed skills, one coherent narrative); and authorizes a
+  bounded Claude-first drafting pilot at PRODUCE PACKAGE strictly inside
+  the existing `.cursor/rules/resume.mdc` AI Boundaries. §134's Fixed
+  visual/QA contract, §137's 92% floor, §140's
+  DOCX-first/crosswalk/hyperlink/rendered-QA rules, and §141's
+  presentation grammar are restated and cross-referenced, not
+  redefined. Declared a doctrine-only lock: no new schema field/enum,
+  Candidate Truth change, qualification/decision runtime change, or
+  generator/renderer implementation.
+* `docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json`: new doctrine
+  data record holding the final-reference artifact identity, the
+  §141-supersession scope, the TELUS/GPA presentation-choice
+  boundaries, the writing constraints and their research basis, and the
+  Claude drafting-pilot authorization and boundaries.
+* `.cursor/rules/resume.mdc`: new "Resume Final Reference Calibration —
+  Presentation Reference of Record, Writing Constraints, Claude
+  Drafting Pilot" section cross-referencing BLUEPRINT.md §141.6-§141.9.
+* `tests/resume_final_reference_calibration_v1_test.py`: new focused
+  regression test for the final-reference record, the writing
+  constraints, the Claude drafting-pilot boundary, and doctrine
+  cross-references.
+
+---
+
 ## 2026-09-08 — Bora resume reference style lock (`BORA_RESUME_REFERENCE_STYLE_LOCK_V1`, DOCTRINE ONLY)
 
 **Reason**
