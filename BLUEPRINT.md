@@ -4795,3 +4795,75 @@ constraints, the Claude drafting-pilot boundary, and doctrine
 cross-references — it is a doctrine-record consistency check, not a
 résumé generator or renderer.
 
+**141.10 Gold-quality acceptance reference — Claude-first, G-adjudicated
+Cable One DOCX (BORA_RESUME_GOLD_QUALITY_REFERENCE_V1, extends §141, not
+a new top-level section — for the same reason §141.6 gives:
+`project_state.json`'s `latest_locked_section` tracks the highest
+top-level Blueprint heading, and
+`tests/resume_reference_style_lock_v1_test.py` pins that field to 141;
+this lock is recorded as §141 subsections so that pinned, non-editable
+regression check and the live `src/career_os_state.py` section-count
+validator agree).** Bora explicitly approved the Claude-first,
+G-adjudicated Cable One DOCX,
+**`Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx`** (SHA-256
+`ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70`), as
+Bora's gold-quality resume package acceptance reference for future
+Career OS packages. The full extracted contract is recorded at
+`docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json`, which this subsection
+incorporates by reference and does not restate in full here. This
+artifact supersedes the Cable One v2 exemplar (§141.6) and the Spy Pond
+exemplar (§141) only as the **latest resume package quality/presentation
+acceptance reference** — never as a source of Candidate Truth. §141.1-
+§141.4's locked presentation grammar and §141.7's research-backed
+writing constraints are confirmed unchanged and remain fully
+authoritative; the Claude-first, G-adjudicated exemplar conforms to that
+grammar and those constraints rather than replacing them. This is a
+doctrine/reference-acceptance lock only — no generator, renderer, or
+automated validator is authorized by this subsection (§133/§134/§141.5/
+§141.9 Non-Goals continue to govern).
+
+**141.11 Final-package QA-dimension checklist and evidence-budget/
+narrative discipline.** Every gold-quality package must be checked, before
+Bora's human approval gate, across seven QA dimensions recorded in full at
+`docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json`
+`final_package_qa_dimensions`: truth fidelity (traces only to approved
+Candidate Truth / claim-evidence lineage), JD/evidence coverage (checked
+against the verified §140.4 Requirement/EvidenceMatch crosswalk, with
+NONE/UNKNOWN requirements remaining visible gaps), human naturalness
+(ordinary recruiter-natural American English, no internal Career OS,
+governance, evidence-system, implementation-control, or AI-process
+terminology unless genuinely job-relevant), interview defensibility
+(every claim must be truthfully explainable live, without embellishment),
+reference conformance (§141's locked grammar), rendered one-page quality
+(§137's 92% floor, no overflow/clipping/overlap), and functional
+hyperlinks (real hyperlink objects with verified destinations per
+§140.5/§140.6). This is a manual QA checklist, not an automated
+validator. Future tailoring must operate through verified JD ->
+canonical Requirement/EvidenceMatch state -> approved Candidate
+Truth/evidence -> package decision; supported employer terminology may be
+used naturally, while NONE or UNKNOWN tools/capabilities remain absent.
+The strongest current/relevant experience receives the most evidence
+space by default, without changing the underlying qualification result or
+hiding a material gap; the résumé must read as one coherent human career
+story rather than disconnected keyword blocks. Norma_Resume is retained
+only as external comparison evidence supporting conventional one-column
+density, visible tools, action-led bullets, and substantial page use; it
+must never become a second Bora template or override Bora's own gold
+reference.
+
+**141.12 Doctrine-only lock / build-economy boundary (gold-quality
+acceptance addendum).** §141.10-§141.11 add no new schema field or enum,
+no new Candidate Truth, no qualification or decision runtime change, and
+no generator/renderer/automated-validator implementation — none of that
+is pre-authorized merely because this doctrine exists (§133's
+build-economy gate continues to govern any future runtime-implementation
+proposal). `.cursor/rules/resume.mdc` is updated in the same change to
+cross-reference this gold-quality reference record; `schemas/`, `src/`,
+`resume/`, and the existing protected-master/structured-patch/claim-
+lineage architecture remain unchanged.
+`tests/resume_gold_quality_reference_v1_test.py` is a focused regression
+test verifying the gold-quality reference record, the final-package
+QA-dimension checklist, the Norma_Resume comparison-evidence-only
+boundary, and doctrine cross-references — it is a doctrine-record
+consistency check, not a résumé generator or renderer.
+

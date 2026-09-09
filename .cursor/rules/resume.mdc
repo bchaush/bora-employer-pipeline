@@ -337,23 +337,29 @@ DOCX-first/crosswalk/hyperlink/rendered-QA rules remain unchanged and
 fully apply. This is a doctrine/reference-style lock only — no generator,
 renderer, or automated validator is authorized by this section.
 
-## Resume Final Reference Calibration — Presentation Reference of Record, Writing Constraints, Claude Drafting Pilot
+## Resume Final Reference Calibration — Writing Constraints, Claude Drafting Pilot
 
 Operational reference: `BLUEPRINT.md` §141.6-§141.9
 (`BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1`) and
-`docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json` lock Bora's
+`docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json` locked Bora's
 user-tweaked Cable One v2 DOCX
-(`Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx`) as the final
-human-approved presentation reference, superseding the Spy Pond
-exemplar (§141) only as the **latest presentation reference** — never
-as a source of Candidate Truth. §141's presentation grammar (no
-"PROFESSIONAL SUMMARY" heading, EDUCATION/SKILLS/WORK
+(`Bora_Chaush_Cable_One_Business_Analyst_I_v2(1).docx`) at the time as
+the then-current human-approved presentation reference, superseding the
+Spy Pond exemplar (§141) only as the presentation reference then of
+record — never as a source of Candidate Truth. **That acceptance-
+reference role has since passed to §141.10 / `BORA_RESUME_GOLD_QUALITY_
+REFERENCE_V1` (below): the Claude-first, G-adjudicated Cable One DOCX is
+now the current gold-quality presentation/quality acceptance reference
+of record, and Cable One v2 is retained here only as the historical
+artifact this subsection's still-authoritative writing constraints and
+drafting pilot were calibrated against.** §141's presentation grammar
+(no "PROFESSIONAL SUMMARY" heading, EDUCATION/SKILLS/WORK
 EXPERIENCE/RELEVANT PROJECT section order, single bold "Title |
 Employer" work-entry line, two-school education grammar, three natural
 skills rows, default evidence roster) is confirmed unchanged and fully
-governs. The TELUS display label and GPA presentation in this
-reference are presentation choices only and never silently alter
-Candidate Truth or evidence provenance.
+governs. The TELUS display label and GPA presentation recorded for that
+historical reference were presentation choices only and never silently
+altered Candidate Truth or evidence provenance.
 
 This section also adds research-backed recruiter/ATS writing
 constraints, extending (never replacing) the Keyword Rule and
@@ -384,6 +390,43 @@ contract, §137's 92% floor, and §140's DOCX-first/crosswalk/
 hyperlink/rendered-QA rules remain unchanged and fully apply. This is a
 doctrine/reference-calibration lock only — no generator, renderer, or
 automated validator is authorized by this section.
+
+## Resume Gold-Quality Acceptance Reference — Claude-First, G-Adjudicated Cable One DOCX
+
+Operational reference: `BLUEPRINT.md` §141.10-§141.12
+(`BORA_RESUME_GOLD_QUALITY_REFERENCE_V1`) and
+`docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json` lock Bora's
+Claude-first, G-adjudicated Cable One DOCX
+(`Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx`) as the
+gold-quality resume package acceptance reference for future Career OS
+packages, superseding the Cable One v2 exemplar (§141.6) and the Spy
+Pond exemplar (§141) only as the **latest presentation/quality
+acceptance reference** — never as a source of Candidate Truth. §141's
+presentation grammar and §141.7's research-backed writing constraints
+are confirmed unchanged and remain fully authoritative.
+
+Every gold-quality package must be checked, before Bora's human approval
+gate, across seven QA dimensions (full detail in the JSON record's
+`final_package_qa_dimensions`): truth fidelity, JD/evidence coverage
+against the verified §140.4 crosswalk (NONE/UNKNOWN requirements remain
+visible gaps), human naturalness (recruiter-natural English, no internal
+Career OS/governance/evidence-system/AI-process jargon unless genuinely
+job-relevant), interview defensibility (every claim must be truthfully
+explainable live), reference conformance (§141's grammar), rendered
+one-page quality (§137's 92% floor), and functional hyperlinks (real
+hyperlink objects with verified destinations). This is a manual QA
+checklist, not an automated validator.
+
+The strongest current/relevant experience receives the most evidence
+space by default without changing the underlying qualification result
+or hiding a material gap, and the résumé must read as one coherent human
+career story rather than disconnected keyword blocks. Norma_Resume
+remains external comparison evidence only (conventional one-column
+density, visible tools, action-led bullets, substantial page use) — it
+must never become a second Bora template or override this gold
+reference. This is a doctrine/reference-acceptance lock only — no
+generator, renderer, or automated validator is authorized by this
+section.
 
 ## Application-Specific Outputs
 

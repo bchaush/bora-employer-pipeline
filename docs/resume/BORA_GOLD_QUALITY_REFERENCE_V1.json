@@ -1,0 +1,144 @@
+{
+  "record_id": "BORA_GOLD_QUALITY_REFERENCE_V1",
+  "kind": "DOCTRINE_LOCK_DATA_RECORD",
+  "blueprint_section": 141,
+  "blueprint_subsections": ["141.10", "141.11", "141.12"],
+  "blueprint_subsections_note": "Recorded as BLUEPRINT.md Section 141 subsections, not a new top-level section, so that the pinned latest_locked_section=141 in tests/resume_reference_style_lock_v1_test.py and the live src/career_os_state.py max-heading validator both stay consistent.",
+  "locked_date": "2026-09-09",
+  "source_artifact": {
+    "name": "Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx",
+    "format": "DOCX",
+    "sha256": "ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70",
+    "stored_in_repository": false,
+    "note": "Consistent with existing repository practice for Bora-supplied source documents (BLUEPRINT.md Section 134/141): the binary is not stored; this record is the canonical description of the approved exemplar and its extracted contract."
+  },
+  "supersedes": {
+    "prior_references": [
+      "BORA_CABLE_ONE_FINAL_REFERENCE_V1 (BLUEPRINT.md Section 141.6)",
+      "BORA_SPY_POND_GOLD_REFERENCE_V1 (BLUEPRINT.md Section 141)"
+    ],
+    "scope": "LATEST_RESUME_PACKAGE_QUALITY_PRESENTATION_ACCEPTANCE_REFERENCE_ONLY",
+    "description": "This Claude-first, G-adjudicated Cable One DOCX is Bora's gold-quality resume package acceptance reference, superseding the Cable One v2 and Spy Pond exemplars only as the latest resume package quality/presentation acceptance reference. It never supersedes anything as a source of Candidate Truth -- Candidate Truth continues to trace only to approved Candidate Truth / claim-evidence lineage (.cursor/rules/resume.mdc Claim Lineage), unchanged by this record."
+  },
+  "relationship_to_prior_doctrine": {
+    "BLUEPRINT_134": "RESUME_REFERENCE_STANDARD_V1 Fixed visual/QA contract (page size, one-column structure, typography scale, margins, section-rule headings, hyperlink rule) is restated and cross-referenced here, not redefined.",
+    "BLUEPRINT_137": "RESUME_REFERENCE_DERIVATIVE_AND_PAGE_UTILIZATION_ENFORCEMENT_V1's 92% meaningful-page-utilization floor is unchanged.",
+    "BLUEPRINT_140": "BORA_RESUME_PACKAGE_STANDARD_SYNC_V1's DOCX-first default, real-hyperlink-object rule, requirement/JD-to-evidence crosswalk, and rendered-artifact QA authority are unchanged.",
+    "BLUEPRINT_141": "BORA_RESUME_REFERENCE_STYLE_LOCK_V1's presentation grammar (no PROFESSIONAL SUMMARY heading, EDUCATION/SKILLS/WORK EXPERIENCE/RELEVANT PROJECT section order, single bold Title | Employer work-entry line with right-aligned dates, two-school education grammar, three natural skills rows, default evidence roster, MarketMind heading grammar) is confirmed unchanged and remains the operative grammar.",
+    "BLUEPRINT_141_6": "BORA_RESUME_FINAL_REFERENCE_CALIBRATION_V1's research-backed writing constraints and bounded Claude-first drafting pilot are confirmed unchanged and remain fully authoritative; this record adds final-package QA dimensions layered on top of that unchanged pilot and grammar.",
+    "note": "This record does not redefine any prior section's grammar, writing constraints, or drafting-pilot boundary. It promotes a newer, Claude-first-drafted and G-adjudicated artifact conforming to that same grammar as the gold-quality acceptance reference of record, and adds a final-package QA-dimension checklist."
+  },
+  "presentation_grammar_confirmation": {
+    "rule": "UNCHANGED_FROM_SECTION_141",
+    "description": "The Claude-first, G-adjudicated Cable One exemplar conforms to and reconfirms, without modification, BLUEPRINT.md Section 141's locked grammar: no generic PROFESSIONAL SUMMARY heading; default section order EDUCATION, SKILLS, WORK EXPERIENCE, RELEVANT PROJECT; single bold 'Title | Employer' work-entry line with right-aligned dates; two-school education grammar; three natural recruiter-facing skills rows; one page; one column; DOCX-first; real hyperlinks; 92%+ meaningful page utilization."
+  },
+  "jd_to_evidence_crosswalk_requirement": {
+    "rule": "VERIFIED_CROSSWALK_ONLY_NO_INVENTED_TOOLS",
+    "description": "Future tailoring must operate through verified JD -> canonical Requirement/EvidenceMatch state (BLUEPRINT.md Section 140.4) -> approved Candidate Truth/evidence -> package decision. Supported employer terminology may be used naturally when the crosswalk establishes overlap, while NONE or UNKNOWN tools/capabilities remain absent from candidate-facing text."
+  },
+  "evidence_budget_allocation": {
+    "rule": "STRONGEST_RELEVANT_EVIDENCE_SURFACED_WITHOUT_HIDING_GAPS",
+    "description": "The package must surface the strongest role-relevant supported evidence across summary, skills, bullet ordering, project selection, and page-space allocation without changing the underlying qualification result or hiding a material gap. The strongest current/relevant experience receives the most evidence space by default; secondary experiences and projects receive less, unless the JD crosswalk materially earns a different evidence budget."
+  },
+  "coherent_narrative_requirement": {
+    "rule": "ONE_COHERENT_HUMAN_CAREER_STORY",
+    "description": "The resume must read as one coherent human career story rather than disconnected keyword blocks: current career stage and education establish context, skills preview evidenced capability, work bullets prove applied capability, and project evidence supplies technical/analytical proof where relevant."
+  },
+  "candidate_facing_translation_requirement": {
+    "rule": "RECRUITER_NATURAL_LANGUAGE_ONLY",
+    "description": "Candidate-facing language is ordinary direct American English; internal Career OS, governance, evidence-system, implementation-control, or AI-process terminology must be translated into recruiter-natural wording unless that terminology is itself genuinely job-relevant evidence."
+  },
+  "bullet_and_quantification_discipline": {
+    "rule": "ACTION_CONTEXT_OUTCOME_NO_MANUFACTURED_METRICS",
+    "description": "Bullets prefer action plus context plus evidence-supported outcome/value; when no measured outcome exists, use action plus context or purpose without manufacturing impact, and normally keep bullets to one or two rendered lines where practical. Quantification is used only when approved evidence supports it and when it helps a recruiter understand scale, result, or complexity; no invented percentages, productivity estimates, derived annualized figures, or decorative metrics.",
+    "extends_not_replaces": [
+      "BLUEPRINT.md Section 141.7 research-backed recruiter/ATS writing constraints",
+      "docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json writing_constraints"
+    ]
+  },
+  "norma_resume_comparison_boundary": {
+    "rule": "COMPARISON_EVIDENCE_ONLY_NEVER_A_BORA_TEMPLATE",
+    "description": "Norma_Resume is retained only as external comparison evidence supporting conventional one-column density, visible tools, action-led bullets, and substantial page use. It must never become a second Bora template or override Bora's own gold reference."
+  },
+  "final_package_qa_dimensions": {
+    "truth_fidelity": {
+      "rule": "TRACES_ONLY_TO_APPROVED_CANDIDATE_TRUTH",
+      "description": "Every candidate-facing statement traces to approved Claim_ID/Evidence_ID lineage within its recorded boundaries (.cursor/rules/resume.mdc Claim Lineage); no invented fact, tool, metric, or outcome."
+    },
+    "jd_evidence_coverage": {
+      "rule": "VERIFIED_CROSSWALK_COVERAGE",
+      "description": "The package is checked against the verified JD -> Requirement/EvidenceMatch crosswalk (BLUEPRINT.md Section 140.4) for truthful overlap; STRONG/SUPPORTED requirements are represented, PARTIAL stays within its transfer boundary, and NONE/UNKNOWN requirements remain visible gaps rather than being solved through wording."
+    },
+    "human_naturalness": {
+      "rule": "RECRUITER_NATURAL_READABILITY",
+      "description": "Candidate-facing wording reads as ordinary, concrete, direct American English written by a person, not as disconnected keyword blocks or internal-system jargon (see candidate_facing_translation_requirement and coherent_narrative_requirement above)."
+    },
+    "interview_defensibility": {
+      "rule": "WORDING_A_CANDIDATE_CAN_DEFEND_LIVE",
+      "description": "Every bullet and summary claim must be something Bora could truthfully explain and defend in a live interview without embellishment; no wording is permitted that a truthful follow-up question would contradict."
+    },
+    "reference_conformance": {
+      "rule": "CONFORMS_TO_SECTION_141_GRAMMAR",
+      "description": "The rendered package conforms to BLUEPRINT.md Section 141's locked presentation grammar (see presentation_grammar_confirmation above), not a freehand redesign."
+    },
+    "rendered_one_page_quality": {
+      "rule": "ONE_PAGE_92_PERCENT_FLOOR",
+      "description": "The rendered document is one U.S.-Letter page by default meeting BLUEPRINT.md Section 137's 92% meaningful-page-utilization floor, with no overflow, clipping, or overlap."
+    },
+    "functional_hyperlinks": {
+      "rule": "REAL_HYPERLINK_OBJECTS_VERIFIED",
+      "description": "Human-readable link labels are backed by genuine hyperlink objects (a real DOCX hyperlink run, or a real URI annotation for PDF) and their destinations are verified before submission, per BLUEPRINT.md Section 140.5/140.6."
+    },
+    "gate": {
+      "rule": "ALL_DIMENSIONS_BEFORE_HUMAN_APPROVAL",
+      "description": "Final package QA must test all seven dimensions above before Bora's human approval gate; this is a manual QA checklist, not an automated validator or generator."
+    }
+  },
+  "claude_drafting_pilot_reaffirmed": {
+    "rule": "UNCHANGED_FROM_SECTION_141_8",
+    "description": "Claude may draft candidate-facing wording only from the verified JD, the approved Requirement/EvidenceMatch crosswalk, approved Candidate Truth/evidence, and canonical gold grammar (BLUEPRINT.md Section 141.8, unchanged by this record). G must reject unsupported or less-natural language and remains responsible for final adjudication, document construction, render QA, and hyperlinks. This does not loosen the existing AI Boundaries in .cursor/rules/resume.mdc."
+  },
+  "research_basis": [
+    "Cable One first-party Business Analyst I posting: operational data analysis, trends, reporting models/KPIs, operational efficiency, cross-functional work, reconciliation, 1-2 years or equivalent education/experience, and advanced Excel/data management preferred",
+    "Yale Office of Career Strategy: simple readable one-page formatting, standard fonts, role-relevant action-led accomplishment bullets, and JD-aligned transferable skills",
+    "University of Pennsylvania Career Services: one-page consistent formatting, 1-2 line action-led bullets with context, transferable skills, and results/quantification where meaningful",
+    "U.S. Department of Labor VETS Resume Essentials 2026: targeted achievement statements, everyday language, action verbs, and job-posting skill alignment",
+    "Indeed 2026 ATS guidance: use job-description keywords naturally while writing for both ATS and human recruiters",
+    "Norma_Resume external comparison: conventional one-column structure, dense-but-readable page use, visible tools, and action-led evidence; comparison evidence only, never Bora template authority"
+  ],
+  "unchanged_doctrine": [
+    "BLUEPRINT.md Section 137's 92% meaningful-page-utilization floor",
+    "BLUEPRINT.md Section 140.1's DOCX-first default",
+    "BLUEPRINT.md Section 134 / 140.5's real-hyperlink-object rule",
+    "BLUEPRINT.md Section 140.4's truthful Requirement/JD-to-evidence crosswalk",
+    "BLUEPRINT.md Section 140.6's submitted-artifact rendered QA authority",
+    "BLUEPRINT.md Section 141's presentation grammar, visual metrics, and evidence-roster mechanism",
+    "BLUEPRINT.md Section 141.7's research-backed recruiter/ATS writing constraints",
+    "BLUEPRINT.md Section 141.8's bounded Claude-first drafting pilot",
+    "Candidate Truth, Match Truth, and qualification/pursuit runtime logic"
+  ],
+  "role_tailoring_boundary": {
+    "may_change": ["truthful summary emphasis", "bullet selection/order", "skills emphasis", "evidence allocation within the crosswalk", "candidate-facing wording within the writing constraints referenced above"],
+    "must_preserve": "BLUEPRINT.md Section 141's presentation grammar and Section 141.7's writing constraints, unless an explicit employer requirement makes the grammar unusable for a specific application",
+    "gold_reference_authority_scope": "This record is a gold-quality presentation-reference-of-record and final-package QA-dimension record only. It is never a source of Candidate Truth: substantive factual content (wording, claims, evidence, metrics) must still trace only to approved Candidate Truth / claim-evidence lineage, exactly as before this lock.",
+    "must_never": [
+      "invent or copy a resume fact merely because it appears in the Claude-first, G-adjudicated Cable One exemplar's own wording or content",
+      "invent resume facts not present in approved Candidate Truth",
+      "change Candidate Truth, Match Truth, or qualification/pursuit logic",
+      "weaken the 92% page-utilization floor, DOCX-first rule, hyperlink-object rule, or rendered-artifact QA",
+      "authorize keyword stuffing, unsupported tools, invented results/metrics, or hiding a material qualification gap",
+      "let Norma_Resume comparison evidence become a second Bora template or override Bora's own gold reference",
+      "grant Claude authority to create facts or make consequential pursuit/qualification decisions"
+    ]
+  },
+  "non_goals": {
+    "reference": "BLUEPRINT.md Section 133 build-economy gate; Section 134 Non-Goals; Section 141.5/141.9 Doctrine-only locks",
+    "excludes": [
+      "a DOCX/PDF generator or renderer",
+      "an automated grammar/style/ATS-score validator or linter beyond this doctrine record and its accompanying regression test",
+      "any change to Candidate Truth, Match Truth, qualification/pursuit logic, or schemas",
+      "any change to the protected resume master or resume patch/lineage architecture in .cursor/rules/resume.mdc",
+      "an autonomous or unsupervised Claude drafting runtime -- the drafting pilot reaffirmed here remains bounded, input-restricted, and still gated by G adjudication and Bora's human approval"
+    ]
+  }
+}
