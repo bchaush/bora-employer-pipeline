@@ -38,6 +38,43 @@ This applies to live career operations, not only implementation work: before mea
 
 Cheap preliminary fit triage against discovery/index evidence is allowed before first-party verification (`BLUEPRINT.md` §135's `DiscoveryLead` → triage → gate → pursuit chain) — the gate applies before treating a role as actionable, not before any fit analysis. "Successfully established" requires the exact requisition to positively establish matching role/title identity, matching requisition identity, substantive current job-description content, and a current actionable application route/instruction. HTTP 200, a surviving requisition token/string, an ATS shell, or an Apply-like control alone never passes; any explicit dead/error-page state vetoes PASS even when HTTP 200 is returned or the requisition token survives. This is the current-actionability test defined in `BLUEPRINT.md` §135 — not merely evidence that the requisition once existed.
 
+## End-User Application Transition Validation
+Operational pointer: `BLUEPRINT.md` §135.1
+(`END_USER_APPLICATION_TRANSITION_QUORUM_V1`) extends §135's current
+actionability gate: establishing current first-party actionability, and
+passing the §141.13 package-time recheck, both require end-to-end
+validation, in the same operating session, of (1) the exact public
+job-detail URL Bora would open for the exact role/requisition and (2) the
+actual application transition/destination reached from that exact page.
+An explicit dead/error page, a generic careers/search-landing redirect
+with no matching current role, loss of exact role/requisition identity,
+or an unusable application transition (broken link, dead-end redirect,
+login/paywall dead end with no recoverable application path, or
+a destination that no longer matches the exact role) vetoes
+actionability even when the job-detail page itself returns HTTP 200,
+still shows the requisition token, or displays an Apply-like control. An
+Apply-looking control, an ATS API record, embedded page metadata, a
+search/index result, or a requisition token may support discovery and
+role/requisition identity but never substitutes for successful end-user
+transition validation.
+
+**Auth carve-out (not a veto).** A role-preserving login, SSO, or other
+authentication step that continues into a usable, exact-role application
+destination is not itself a veto — role identity must survive the auth
+step and a recoverable application path must exist beyond it. Only a
+login/paywall/auth dead end with no recoverable application path, or
+identity loss across the auth step, fails closed. Operationally: the
+application transition must be exercised or otherwise directly resolved
+to the actual current end-user destination; an Apply control, ATS
+API/index/metadata, HTTP 200, or a requisition token cannot substitute
+for that resolution.
+
+This does not blacklist Workday or any ATS vendor
+and does not create a new actionability system, posting-state axis, or
+enum; it does not alter Qualification Truth, Candidate Truth, Match
+Truth, immigration, recency, start-horizon, employer-exclusion,
+resume-content, or cover-letter-content doctrine.
+
 ## Package-Time First-Party Actionability Recheck and Gold-Artifact Spawn Gate
 Operational pointer: `BLUEPRINT.md` §141.13-§141.15
 (`CAREER_OS_PACKAGE_GATE_HARDENING_V1`) and
@@ -55,12 +92,22 @@ first-party employer requisition must be re-opened in the current
 operating session and must still establish the full positive semantic
 quorum: matching role/title identity, matching requisition identity,
 substantive current job-description content, and a current actionable
-application route/instruction. HTTP 200, a requisition token, ATS shell,
-or Apply-like control alone is never enough; any explicit dead/error-page
-state fails closed even if HTTP 200 is returned or the requisition string
-survives. This applies the Fresh First-Party Employer Source Rule above
-again at package time, since a prior pursuit-time pass does not by itself
-satisfy it. On failure, no
+application route/instruction — including the requirement to repeat both
+elements of §135.1 again in the current operating session: (1) exact job-detail validation (the exact public
+job-detail URL still establishes the current exact role) and (2) the
+actual application transition/destination reached from it, exercised or
+otherwise directly resolved. Prior pursuit-time success on either element
+alone is insufficient at package time. §135.1's auth carve-out applies
+unchanged: a role-preserving login/SSO step into a usable, exact-role
+destination is not itself a veto; only a login/auth dead end with no
+recoverable application path, or identity loss across it, fails closed.
+HTTP 200, a requisition token, ATS shell, Apply-like control, or ATS
+API/index/search metadata alone is never enough; any explicit dead/error-page
+state, generic careers/search redirect, loss of exact role/requisition
+identity, or unusable application transition fails closed even if HTTP
+200 is returned or the requisition string survives. This applies the
+Fresh First-Party Employer Source Rule above again at package time, since
+a prior pursuit-time pass does not by itself satisfy it. On failure, no
 resume, cover letter, or other candidate-facing package may be generated
 or revised for that role; report the role as non-actionable/
 verification-required using the existing `role_status`/

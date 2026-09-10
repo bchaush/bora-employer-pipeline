@@ -72,4 +72,86 @@ require("http-200 response" in conditions and "dead/error state" in conditions,
 require("missing positive role/title identity" in conditions and "requisition token" in conditions,
         "record must explicitly disqualify missing title identity even when token survives")
 
-print("PASS: live actionability semantic quorum blocks HTTP-200/token-only dead-page false positives")
+# --- END_USER_APPLICATION_TRANSITION_QUORUM_V1 extension ---
+# An Apply-looking control, ATS API record, embedded metadata, search/index
+# result, or requisition token surviving on the job-detail page must never
+# substitute for actually resolving the application transition itself.
+#
+# `route_present` here means only "an Apply-like control/ATS metadata is
+# present on the job-detail page" -- it is a distinct, weaker signal from
+# `exact_job_detail_url_ok` (the exact job-detail URL itself is resolved
+# and establishes the current exact role) and must never be mapped onto
+# either job-detail-URL resolution or application-transition resolution.
+def end_user_route_resolved(*, exact_job_detail_url_ok, application_transition_resolved,
+                             dead_marker, generic_search_redirect, identity_lost):
+    if dead_marker or generic_search_redirect or identity_lost:
+        return False
+    return bool(exact_job_detail_url_ok and application_transition_resolved)
+
+
+def semantic_quorum_v2(*, http_200, title_match, req_match, jd_present, route_present, dead_marker,
+                        exact_job_detail_url_ok=True, application_transition_resolved=True,
+                        generic_search_redirect=False, identity_lost=False):
+    """route_present (an Apply-like control/ATS metadata on the page) is
+    independent of, and never substitutes for, exact_job_detail_url_ok or
+    application_transition_resolved; both of the latter must independently
+    hold for the route element of the quorum to pass."""
+    route_quorum = end_user_route_resolved(
+        exact_job_detail_url_ok=exact_job_detail_url_ok,
+        application_transition_resolved=application_transition_resolved,
+        dead_marker=dead_marker,
+        generic_search_redirect=generic_search_redirect,
+        identity_lost=identity_lost,
+    )
+    return bool(title_match and req_match and jd_present and route_quorum)
+
+
+require(not semantic_quorum_v2(http_200=True, title_match=True, req_match=True, jd_present=True,
+                                route_present=True, dead_marker=False, application_transition_resolved=False),
+        "an Apply-like control/ATS metadata/requisition token on the job-detail page without a resolved "
+        "application transition must fail closed")
+require(not semantic_quorum_v2(http_200=True, title_match=True, req_match=True, jd_present=True,
+                                route_present=True, dead_marker=False, exact_job_detail_url_ok=False,
+                                application_transition_resolved=True),
+        "route_present (Apply control/ATS metadata) must never substitute for an unresolved "
+        "exact job-detail URL, even when the application transition step itself is resolved")
+require(semantic_quorum_v2(http_200=True, title_match=True, req_match=True, jd_present=True,
+                            route_present=True, dead_marker=False, exact_job_detail_url_ok=True,
+                            application_transition_resolved=True),
+        "a resolved job-detail URL and a resolved application transition together should pass")
+require(semantic_quorum_v2(http_200=True, title_match=True, req_match=True, jd_present=True,
+                            route_present=False, dead_marker=False, exact_job_detail_url_ok=True,
+                            application_transition_resolved=True),
+        "the quorum must pass on resolved URL + resolved transition even when route_present "
+        "(Apply control/ATS metadata) is absent -- route_present is not a required quorum member")
+require(not semantic_quorum_v2(http_200=True, title_match=True, req_match=True, jd_present=True,
+                                route_present=True, dead_marker=False, application_transition_resolved=True,
+                                generic_search_redirect=True),
+        "a generic careers/search redirect must veto even a positive title/req/JD/transition quorum")
+require(not semantic_quorum_v2(http_200=True, title_match=True, req_match=True, jd_present=True,
+                                route_present=True, dead_marker=False, application_transition_resolved=True,
+                                identity_lost=True),
+        "loss of exact role/requisition identity mid-transition must veto an otherwise-positive quorum")
+
+for text, name in ((BLUEPRINT, "BLUEPRINT.md"), (AGENTS, "AGENTS.md"), (RESUME_MDC, ".cursor/rules/resume.mdc")):
+    lower = " ".join(text.lower().split())
+    require("end_user_application_transition_quorum_v1" in lower,
+            f"{name} must reference END_USER_APPLICATION_TRANSITION_QUORUM_V1")
+    require("application transition" in lower, f"{name} must name the application transition requirement")
+    require("ats api" in lower, f"{name} must name ATS API metadata as insufficient on its own")
+    require("exercised or otherwise directly resolved" in lower,
+            f"{name} must use the exact operational clause: the transition must be exercised or "
+            "otherwise directly resolved to the actual current end-user destination")
+    require("cannot substitute" in lower,
+            f"{name} must state that an Apply control, ATS API/index/metadata, HTTP 200, or "
+            "requisition token cannot substitute for that resolution")
+    require("auth carve-out" in lower or "role-preserving login" in lower,
+            f"{name} must carry the explicit auth carve-out: a role-preserving login/SSO step into "
+            "a usable, exact-role destination is not itself a veto")
+    require("recoverable application path" in lower,
+            f"{name} must name the recoverable-application-path condition distinguishing an auth "
+            "carve-out from an auth dead end")
+
+print("PASS: live actionability semantic quorum blocks HTTP-200/token-only dead-page false positives, "
+      "and an Apply-like control/ATS metadata alone no longer satisfies the route element without a "
+      "resolved end-user application transition")
