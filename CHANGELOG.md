@@ -19,6 +19,52 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-09 — Bora-specific excluded application-route host (`BORA_EXCLUDED_APPLICATION_ROUTE_HOST_V1`, DOCTRINE LOCK)
+
+**Reason**
+
+Bora's direct usability attempt against `massanf.taleo.net` failed for
+MassDOT — IT Data Analyst I, requisition 260005JH, a cold-start failure.
+Rather than treat that host as generally reachable and re-attempt
+package generation on future roles that route through it, this locks a
+Bora-specific exclusion of that host for application-route actionability
+purposes only.
+
+**Changed**
+
+* `BLUEPRINT.md` adds §138.6.1: `massanf.taleo.net` is recorded as a
+  Bora-specific excluded application-route host under §135/§138.6. If a
+  role's only current application route depends on it, first-party
+  actionability fails and this routes through the existing §135/§138.6
+  actionability consequence: `WATCH`/no serious application effort,
+  unless an independent blocker already produces `REJECT`. This creates
+  no new gate and does not amend §138.8; package/tailoring/application
+  work for such a role remains blocked under the existing
+  actionability/package gates, the same way it already is for any other
+  first-party actionability failure. MassDOT, MassCareers, Massachusetts
+  government employers, and Taleo globally are not blacklisted — a
+  different verified working official ATS/application route may still be
+  evaluated normally. The exclusion remains active until Bora explicitly
+  revokes it after a successful direct usability re-test. MassDOT IT
+  Data Analyst I requisition 260005JH is recorded as the motivating
+  cold-start failure.
+* `.cursor/rules/role-selection.mdc` quick-reference adds the same rule
+  so fresh chats inherit it without reading full `BLUEPRINT.md` prose.
+* `tests/bora_excluded_application_route_host_v1_test.py` added to
+  regression-lock the exclusion, the non-blacklist boundaries, and the
+  revocation condition.
+
+**Not changed**
+
+No schema/runtime enum, Qualification Truth, Employer Truth, Candidate
+Truth, Match Truth, authorization, immigration, recency/start-horizon
+behavior, resume/package layout, or any other doctrine changed. This is a
+Bora-specific pursuit/actionability rule under the existing §135/§138.6
+gate, not a universal claim that Taleo or the employer is globally
+unavailable, and not a new competing actionability axis.
+
+---
+
 ## 2026-09-09 — Discovery start horizon gate 0-30 day band semantic correction (`DISCOVERY_START_HORIZON_GATE_V1`, DOCTRINE CORRECTION)
 
 **Reason**

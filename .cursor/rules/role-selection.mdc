@@ -82,6 +82,22 @@ Do not convert, under any circumstance:
 * Remote authenticity: `VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
   `HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A` (§138.7) -- doctrine vocabulary
   for human/model assessment only; not a schema enum or runtime field.
+* Bora-specific excluded application-route host (§138.6.1): based on
+  Bora's own direct usability evidence, `massanf.taleo.net` is excluded --
+  if a role's only current application route depends on it, first-party
+  actionability fails and this routes through the existing §135/§138.6
+  actionability consequence: `WATCH`/no serious application effort,
+  unless an independent blocker already produces `REJECT`. This creates
+  no new gate and does not amend §138.8; package/tailoring/application
+  work for such a role remains blocked under the existing
+  actionability/package gates, the same way it already is for any other
+  first-party actionability failure. This does not blacklist MassDOT,
+  MassCareers, Massachusetts government employers, or Taleo globally; a
+  different verified working official application route may still pass.
+  Remains active until Bora explicitly revokes it after a successful
+  direct usability re-test. Motivating example: MassDOT -- IT Data
+  Analyst I, requisition 260005JH, the cold-start failure that would now
+  route to `WATCH`/no serious application effort under this doctrine.
 * Start horizon gate (§138.14): known intended start 0-30 days from the
   current operating date = TARGETED near-term window (actively target —
   Career OS should actively seek out and prioritize discovery/application
