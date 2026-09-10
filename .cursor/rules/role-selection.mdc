@@ -98,6 +98,50 @@ Do not convert, under any circumstance:
   direct usability re-test. Motivating example: MassDOT -- IT Data
   Analyst I, requisition 260005JH, the cold-start failure that would now
   route to `WATCH`/no serious application effort under this doctrine.
+* Bora-specific excluded employer family (§138.6.2,
+  `BORA_EXCLUDED_EMPLOYER_FAMILY_V1`): Mass General Brigham system roles --
+  first-party-identified, including Mass General Brigham, Massachusetts
+  General Hospital / The General Hospital Corporation, Brigham and Women's
+  Hospital, and other MGB-system entities a first-party source itself
+  identifies -- are excluded from serious Bora-facing discovery and package
+  generation. Pursuit/preference exclusion only, not a claim that Mass
+  General Brigham is a bad employer, and not
+  Qualification/Employer/Candidate/Match Truth. Integrated into §138.8
+  serious-role promotion as a required third check alongside the §138.5
+  recency visibility gate and the §138.14 start horizon gate: promotion
+  requires all three to PASS, and this employer-family-exclusion check
+  cannot be skipped once recency and start-horizon pass. When an excluded
+  role is referenced for audit/debugging only, its reason is labeled
+  `BORA_EXCLUDED_EMPLOYER`, never presented as a Qualification Truth
+  REJECT; any independent REJECT from a separate blocker is preserved
+  unchanged. No unsupported global MGB-affiliate list -- only
+  first-party-identified entities are covered. Remains active for the
+  whole employer family until Bora explicitly overrides one specific role
+  or explicitly revokes the family exclusion; a per-role override does not
+  revoke the family exclusion for any other MGB-system role -- it applies
+  only to that one specific role. Historical Submitted Application Truth
+  for any already-submitted Mass General Brigham system application is not
+  rewritten.
+* Discovery-source ladder (§18.1, `DISCOVERY_SOURCE_LADDER_V1` -- source-
+  ladder ordering only, a distinct identifier from
+  `BORA_EXCLUDED_EMPLOYER_FAMILY_V1` above, with no cross-ID coupling):
+  LinkedIn Free and Brandeis Handshake are preferred first-wave discovery
+  surfaces, alongside targeted direct employer/official ATS searches, for
+  efficient high-signal inventory discovery. Simplify Free, Built In,
+  HigherEdJobs, Idealist, staffing/recruiting firms, company lists,
+  referrals, recruiter outreach, and other credible job sources remain
+  valid secondary/specialized discovery channels. Generic aggregators and
+  generic search/index snippet results remain the lowest-confidence tier:
+  lead generation only. Discovery source and verification/application
+  source remain separate; a LinkedIn/Handshake listing may justify
+  checking a role but by itself never establishes Employer Truth, the
+  §138.5 recency-anchor requirement, first-party actionability, or
+  package-time semantic quorum -- LinkedIn/Handshake posting age alone
+  cannot satisfy the §138.5 recency-anchor requirement. Serious-role
+  promotion still requires the existing §138.5 recency visibility gate,
+  §138.14 start horizon gate, the §138.6.2 employer-family-exclusion check
+  PASS, §135/§138.6 first-party actionability, and the package-time
+  first-party recheck.
 * Start horizon gate (§138.14): known intended start 0-30 days from the
   current operating date = TARGETED near-term window (actively target —
   Career OS should actively seek out and prioritize discovery/application
@@ -116,7 +160,19 @@ Do not convert, under any circumstance:
 * Serious-role output standard (§138.8): promotion into serious-role output
   requires passing BOTH the §138.5 recency visibility gate AND the §138.14
   start horizon gate; failing either one suppresses the role regardless of
-  the other, absent an explicit Bora override of that specific gate. Every
+  the other, absent an explicit Bora override of that specific gate.
+  Promotion additionally requires the §138.6.2 Bora-specific
+  employer-family-exclusion check to PASS as a required third check
+  alongside those two gates -- this is a three-check requirement, not a
+  two-check one: the employer-family-exclusion check cannot be skipped
+  once the §138.5 and §138.14 gates both pass, and a role suppressed
+  under it does not enter serious-role output or package generation
+  regardless of its status under the other two, absent an explicit Bora
+  override of that specific check per §138.6.2's own override terms. When
+  an excluded role is referenced for audit/debugging only, its reason is
+  labeled `BORA_EXCLUDED_EMPLOYER`, never presented as a Qualification
+  Truth REJECT, and any independent REJECT from a separate blocker is
+  preserved unchanged. Every
   serious role analysis presents Bora Fit, Comparison Pool,
   Freshness, Discovery Window, Location/Work Arrangement, First-Party Actionability, Remote
   Authenticity, Authorization, Opportunity Value, Pursuit Economics, and

@@ -111,6 +111,48 @@ this gold reference; §141's resume-specific presentation grammar and
 §137's 92% meaningful-page-utilization floor are resume-scoped and do
 not govern cover letters.
 
+## Bora-Specific Employer-Family Exclusion and Discovery-Source Ladder
+Operational pointer: `BLUEPRINT.md` §138.6.2
+(`BORA_EXCLUDED_EMPLOYER_FAMILY_V1`) and §18.1
+(`DISCOVERY_SOURCE_LADDER_V1` — a distinct identifier naming the source-
+ladder ordering only, with no cross-ID coupling to the exclusion
+identifier), enforced by `.cursor/rules/role-selection.mdc`. Mass General
+Brigham system roles (first-party-identified, including Mass General
+Brigham, Massachusetts General Hospital / The General Hospital
+Corporation, Brigham and Women's Hospital, and other MGB-system entities a
+first-party source itself identifies) are a Bora-specific pursuit/
+preference exclusion from serious Bora-facing discovery and package
+generation — not a claim that Mass General Brigham is a bad employer, and
+not Qualification/Employer/Candidate/Match Truth. No unsupported global
+affiliate list. This exclusion is integrated into §138.8 serious-role
+promotion as a required third check alongside the §138.5 recency
+visibility gate and the §138.14 start horizon gate: promotion requires all
+three to PASS, and the employer-family-exclusion check cannot be skipped
+once recency and start-horizon pass. When an excluded role is referenced
+for audit/debugging only, its reason is labeled `BORA_EXCLUDED_EMPLOYER`
+and must never be presented as a Qualification Truth REJECT; any
+independent REJECT caused by a separate blocker is preserved unchanged.
+Remains active until Bora explicitly overrides one specific role or
+explicitly revokes the family exclusion; a per-role override does not
+revoke the family exclusion for any other MGB-system role — it applies
+only to that one specific role. Historical Submitted Application Truth for
+any already-submitted Mass General Brigham system application is not
+rewritten.
+Separately, LinkedIn Free and Brandeis Handshake are preferred first-wave
+discovery surfaces alongside targeted direct employer/official ATS
+searches; Simplify Free, Built In, HigherEdJobs, Idealist, staffing/
+recruiting firms, company lists, referrals, recruiter outreach, and other
+credible job sources remain valid secondary/specialized discovery; generic
+aggregators/generic search/index snippet results remain the
+lowest-confidence tier — lead-generation only. Discovery source and
+verification/application source stay separate: a LinkedIn/Handshake
+listing may justify checking a role but never alone establishes Employer
+Truth, the §138.5 recency anchor, first-party actionability, or
+package-time semantic quorum — serious-role promotion still requires the
+existing §138.5/§138.14/§135/§138.6 gates, the §138.6.2
+employer-family-exclusion check PASS, and the package-time first-party
+recheck above.
+
 ## Bora-Specific Hiring Relevance
 Operational pointer: `BLUEPRINT.md` §136 locks Bora-specific hiring relevance as a structured component of Competitive Position (not a fifth truth axis, not a schema field, not a score). Comparison-pool alignment is distinct from seniority; institutional-affinity strength is tiered; network/access leverage is a separate concept from hiring relevance. Positive relevance signals never override a hard qualification blocker, a failed §135 actionability gate, or any legal/OPT/credential blocker. No numeric scores or weights — see §136 for the full doctrine.
 
