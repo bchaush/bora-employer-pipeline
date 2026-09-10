@@ -1,0 +1,53 @@
+{
+  "milestone_id": "PACKAGE_OUTPUT_COVER_LETTER_GOLD_LOCK_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock complete four-artifact survivor packages and a hash-verified cover-letter gold reference for fresh Career OS chats.",
+  "baseline_sha": "a13e3546a72676912d41651cebe26ec506f90afd",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/resume.mdc",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "docs/resume/BORA_COVER_LETTER_GOLD_REFERENCE_V1.json",
+    "docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json",
+    "tests/package_output_cover_letter_gold_lock_v1_test.py",
+    "milestone_contracts/feature/package-output-cover-letter-gold-lock-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/package_output_cover_letter_gold_lock_v1_test.py",
+    "tests/resume_gold_quality_reference_v1_test.py",
+    "tests/resume_package_spawn_gate_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/resume_page_utilization_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],  "acceptance_conditions": [
+    "every genuine survivor package produces resume DOCX and PDF in FINAL regardless of which format is submitted",
+    "every genuine survivor package produces cover-letter DOCX and PDF in FINAL unless Bora explicitly opts out",
+    "employer upload-format rules govern submission choice but do not reduce durable package generation",
+    "cover-letter DOCX must clone the exact hash-verified Bora_Chaush_Cover_Letter_Gold_Reference.docx source rather than reconstructing a template",
+    "cover-letter gold DOCX sha256 is 264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90",
+    "cover-letter visual reference PDF sha256 is 0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42",
+    "cover letters remain one-page recruiter-natural truthful role-specific artifacts with real links and no invented domain claims",
+    "resume gold grammar and all Candidate Truth Match Truth qualification actionability recency start-horizon and immigration doctrine remain unchanged"
+  ],
+  "stop_conditions": [
+    "implementation requires schema or src runtime changes",
+    "implementation weakens resume gold quality or truth gates",
+    "implementation treats the cover-letter exemplar as Candidate Truth",
+    "implementation modifies either canonical gold binary artifact"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

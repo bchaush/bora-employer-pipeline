@@ -4720,6 +4720,19 @@ mirror 140.1-140.7; `schemas/`, `src/`, `resume/`, and the existing
 protected-master/structured-patch/claim-lineage architecture remain
 unchanged.
 
+**140.9 Durable package-output completeness is distinct from the
+submission-format default (extended by §141.16).** §140.1's DOCX-first
+default and §140.2's PDF-as-supported-representation rule govern which
+single format is actually **submitted** to an employer for a given
+application. Neither rule has ever authorized generating only that one
+submitted format as the durable FINAL package. Every genuine survivor
+role's FINAL package must durably contain both the résumé DOCX and the
+résumé PDF regardless of which single format is actually submitted for
+that application; an employer/application-system format instruction
+under §140.1 controls submission choice only and never reduces which
+artifacts are generated and retained in the FINAL package. §141.16
+extends this same durable-completeness rule to the cover letter.
+
 **141. BORA RESUME REFERENCE STYLE LOCK — BORA_RESUME_REFERENCE_STYLE_LOCK_V1 (LOCKED)**
 
 Earned under §133's build-economy gate: a previously reproduced résumé
@@ -5107,4 +5120,111 @@ REQUIRED` stop condition, the internal-jargon translation requirement,
 the pre-delivery QA reject conditions, the Santander/DraftKings
 reproduced-failure citations, and doctrine cross-references — it is a
 doctrine-record consistency check, not a résumé generator or renderer.
+
+**141.16 Complete four-artifact survivor package standard —
+PACKAGE_OUTPUT_COVER_LETTER_GOLD_LOCK_V1 (extends §141 and §140.9, not a
+new top-level section — the same reason §141.6, §141.10, and §141.13
+give).** Recorded in full at
+`docs/resume/BORA_COVER_LETTER_GOLD_REFERENCE_V1.json`. Every genuine
+survivor role's FINAL package — one that has passed qualification, the
+§135/§141.13 live/package-time actionability gates, and the §141.14
+gold-artifact spawn gate — must durably contain four artifacts: résumé
+DOCX, résumé PDF, cover-letter DOCX, and cover-letter PDF, unless Bora
+explicitly opts out of the cover letter for that specific application. A
+missing employer cover-letter upload field is not, by itself, an
+opt-out — it affects submission choice only, not durable package
+generation. This governs package output completeness only; §140.1's
+DOCX-first submission default and §140.7's exact submitted-artifact
+traceability are unchanged.
+
+**141.17 Cover-letter gold-artifact clone requirement — hash-verified
+source, presentation authority only.** Cover-letter DOCX construction
+must clone the exact hash-verified `Bora_Chaush_Cover_Letter_Gold_
+Reference.docx` (SHA-256
+`264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90`) as
+the starting document, mirroring §141.14's resume gold-artifact spawn
+gate, rather than reconstructing a cover-letter template from doctrine
+text — this is exactly how the DraftKings resume drift reproduced
+(§141.13-§141.14). A rendered visual-reference PDF of that same gold
+DOCX is separately recorded with SHA-256
+`0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42` for
+visual-fidelity QA per §140.6/§140.2; it is a rendering of the same gold
+artifact, never an independent source. **Stop-condition control.** The
+gold DOCX's existence and its SHA-256 match against the hash above alone
+control clone authority and spawn permission: if the exact gold DOCX
+artifact is unavailable or its SHA-256 does not match, stop with
+`COVER_LETTER_GOLD_REFERENCE_ARTIFACT_REQUIRED` rather than improvising a
+new cover-letter template. The visual-reference PDF's SHA-256 remains
+canonically recorded and must be verified whenever that PDF is actually
+used for visual-fidelity QA per §140.6/§140.2 — but a missing or
+mismatched visual-reference PDF hash alone does not trigger this stop
+condition. This gold reference is presentation/quality/
+template authority only — never Candidate Truth. Role-specific
+cover-letter content must remain grounded exclusively in the verified
+current JD (§135/§141.13's package-time actionability recheck), Match
+Truth via the §140.4 Requirement/EvidenceMatch crosswalk, and approved
+Candidate Truth/evidence — never invented merely because it would read
+naturally in the gold reference's own wording. Bora's approved
+Northeastern University R141882 cover-letter family is recorded as the
+motivating approved exemplar for this lock; its own role-specific facts
+must never be copied into this universal doctrine or into any other
+role's cover letter.
+
+**141.18 Cover-letter content and style doctrine.** Every generated
+cover letter must remain one U.S. Letter page; use recruiter-natural
+American business English consistent with `.cursor/rules/resume.mdc`'s
+Candidate-Facing Style section; include a full contact block (name,
+phone, email, location, relevant profile links), the current date, and
+hiring-team/employer-unit and location addressing consistent with
+whatever the verified JD/employer source actually names; carry a concise
+role-specific narrative grounded in the verified JD, Match Truth, and
+approved evidence — never a generic template paragraph reused verbatim
+across roles; handle unsupported requirements truthfully as visible gaps
+per the existing Gap Visibility rule and Transferable Experience section
+in `.cursor/rules/resume.mdc`, never resolving a gap through
+confident-sounding wording; use real functional hyperlink objects for
+every link per §140.5's hyperlink rule; and contain no internal Career
+OS/governance/evidence-system/implementation-control jargon per
+§141.14's internal-jargon translation requirement. This extends, and
+does not replace, §141.7's research-backed writing-quality principles
+(human readability over keyword density, truthful concise wording,
+quantification only when material and evidence-supported) and
+§141.11's non-résumé-specific final-package QA dimensions (truth
+fidelity, JD/evidence coverage against the §140.4 crosswalk, human
+naturalness, interview defensibility, functional hyperlinks) — all of
+which apply to the cover letter exactly as they apply to the résumé.
+**Scope exclusion — resume-specific presentation grammar and the 92%
+floor do not govern cover letters.** §141's resume-specific
+presentation grammar (no "PROFESSIONAL SUMMARY" heading, the
+EDUCATION/SKILLS/WORK EXPERIENCE/RELEVANT PROJECT section order, the
+single bold "Title | Employer" work-entry line, the two-school
+education grammar, the three-row skills grammar) and §137's 92%
+meaningful-page-utilization floor are résumé-specific and do not apply
+to cover letters. §141.11's reference-conformance QA dimension (§141's
+grammar) and its rendered one-page 92%-utilization QA dimension
+(§137's floor) likewise remain résumé-specific and are not imported
+onto the cover letter by this section. A cover letter's own
+presentation/quality conformance is governed instead by this section
+and by the cover-letter gold reference (§141.17,
+`docs/resume/BORA_COVER_LETTER_GOLD_REFERENCE_V1.json`): one U.S.
+Letter page, visually clean, recruiter-natural, and conforming to that
+gold reference — never §141's résumé grammar or §137's résumé floor.
+
+**141.19 Doctrine-only lock / build-economy boundary (package-
+completeness and cover-letter addendum).** §141.16-§141.18 add no new
+schema field or enum, no new Candidate Truth, no qualification/
+pursuit/immigration runtime change, and no DOCX/PDF generator, renderer,
+or automated validator implementation — none of that is pre-authorized
+merely because this doctrine exists (§133's build-economy gate continues
+to govern any future runtime-implementation proposal).
+`.cursor/rules/resume.mdc` and `AGENTS.md` are updated in the same
+change to cross-reference this record; `schemas/`, `src/`, `resume/`,
+and the existing protected-master/structured-patch/claim-lineage
+architecture remain unchanged.
+`tests/package_output_cover_letter_gold_lock_v1_test.py` is the focused
+regression test verifying this record's artifact hashes, four-artifact
+completeness rule, opt-out provision, gold-clone/stop-condition, content/
+style requirements, motivating-exemplar citation boundary, and doctrine
+cross-references — it is a doctrine-record consistency check, not a
+cover-letter generator or renderer.
 

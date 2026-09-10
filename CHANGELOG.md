@@ -19,6 +19,69 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-10 — Complete four-artifact survivor package and cover-letter gold reference (`PACKAGE_OUTPUT_COVER_LETTER_GOLD_LOCK_V1`, DOCTRINE LOCK)
+
+**Reason**
+
+Package-output completeness and cover-letter presentation quality needed
+the same fail-closed discipline already locked for the résumé: every
+genuine survivor role's FINAL package must durably contain résumé DOCX,
+résumé PDF, cover-letter DOCX, and cover-letter PDF regardless of which
+single format is actually submitted, and cover-letter construction must
+clone an exact hash-verified gold artifact rather than being
+reconstructed from doctrine text.
+
+**Changed**
+
+* `BLUEPRINT.md` adds §140.9 (durable package-output completeness is
+  distinct from the §140.1 submission-format default) and §141.16-§141.19
+  (`PACKAGE_OUTPUT_COVER_LETTER_GOLD_LOCK_V1`): the complete four-artifact
+  survivor package standard, the cover-letter gold-artifact clone
+  requirement (`Bora_Chaush_Cover_Letter_Gold_Reference.docx`, SHA-256
+  `264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90`;
+  visual-reference PDF SHA-256
+  `0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42`), the
+  `COVER_LETTER_GOLD_REFERENCE_ARTIFACT_REQUIRED` stop condition, and the
+  cover-letter content/style doctrine (one page, recruiter-natural,
+  full contact/date/hiring-team block, truthful gap handling, real
+  hyperlinks, no internal jargon). Recorded as §141 subsections, not a
+  new top-level section, so `latest_locked_section=141` stays consistent.
+* `docs/resume/BORA_COVER_LETTER_GOLD_REFERENCE_V1.json` records the
+  full doctrine data: artifact hashes, the complete-package requirement,
+  the Bora explicit-opt-out provision, the gold-clone/stop-condition
+  gate, the content/style requirements, and the Northeastern University
+  R141882 motivating-exemplar citation (cited by name only, never copied
+  into universal text or another role's cover letter).
+* `.cursor/rules/resume.mdc` and `AGENTS.md` cross-reference this lock so
+  a fresh chat recovering the repository inherits it regardless of which
+  surface it reads first.
+* `tests/package_output_cover_letter_gold_lock_v1_test.py` is the new
+  focused regression test verifying the artifact hashes, four-artifact
+  completeness rule, opt-out provision, gold-clone stop condition,
+  content/style requirements, motivating-exemplar boundary, and doctrine
+  cross-references.
+
+**Not changed**
+
+* Candidate Truth, Match Truth, qualification/pursuit/immigration
+  runtime logic, and all existing schemas remain unchanged.
+* The résumé gold-quality reference (§141.10-§141.12), the resume
+  package spawn gate (§141.13-§141.15), and the §134/§137/§140/§141
+  presentation grammar and 92% page-utilization floor are unchanged --
+  for the résumé. §141's resume-specific presentation grammar and
+  §137's 92% meaningful-page-utilization floor are resume-scoped only
+  and do NOT apply to cover letters; cover letters remain one-page,
+  visually clean, recruiter-natural, and governed by their own
+  cover-letter gold reference (§141.17). Only §141.7's general
+  writing-quality principles and §141.11's non-résumé-specific QA
+  dimensions (truth fidelity, JD/evidence coverage, human naturalness,
+  interview defensibility, functional hyperlinks) extend to the cover
+  letter.
+* No DOCX/PDF generator, renderer, or automated validator is authorized
+  by this lock — it is a doctrine/reference lock only.
+
+---
+
 ## 2026-09-09 — Bora-specific excluded application-route host (`BORA_EXCLUDED_APPLICATION_ROUTE_HOST_V1`, DOCTRINE LOCK)
 
 **Reason**
