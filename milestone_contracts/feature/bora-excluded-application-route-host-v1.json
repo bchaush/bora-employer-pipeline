@@ -1,0 +1,51 @@
+{
+  "milestone_id": "BORA_EXCLUDED_APPLICATION_ROUTE_HOST_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Suppress Bora-facing pursuit and package work when a role's only current application path depends on the user-verified unusable massanf.taleo.net host, without blacklisting MassDOT or Massachusetts government employers when a different verified working official application route exists.",
+  "baseline_sha": "582ee79370ed075a3e7caa063025a6a4e6097fa8",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    "CHANGELOG.md",
+    "tests/bora_excluded_application_route_host_v1_test.py",
+    "milestone_contracts/feature/bora-excluded-application-route-host-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],  "required_tests": [
+    "tests/bora_excluded_application_route_host_v1_test.py",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/discovery_start_horizon_gate_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "massanf.taleo.net is explicitly recorded as a Bora-specific excluded application-route host based on direct user usability evidence",
+    "if a role's only current application route depends on massanf.taleo.net, current first-party actionability fails and this routes through the existing §135/§138.6 actionability consequence: WATCH/no serious application effort, unless an independent blocker already produces REJECT; this creates no new gate and does not amend §138.8, and package/tailoring/application work remains blocked under the existing actionability/package gates",
+    "MassDOT, MassCareers, and Massachusetts government employers are not globally blacklisted; a different verified working official ATS/application route may still be evaluated normally",
+    "the host exclusion is a Bora-specific pursuit/actionability rule, not a universal claim that Taleo or the employer is globally unavailable",
+    "the exclusion remains active until Bora explicitly revokes it after a successful direct usability re-test",
+    "fresh chats inherit the rule through .cursor/rules/role-selection.mdc",
+    "the MassDOT IT Data Analyst I 260005JH cold-start package is recorded as the motivating live failure and would now route to WATCH/no serious application effort under this doctrine, absent an independent blocker already producing REJECT",
+    "no resume, qualification, Candidate Truth, Match Truth, immigration, recency-window, start-horizon, schema, or runtime behavior is changed"
+  ],
+  "stop_conditions": [
+    "implementation requires any path outside allowed_paths",
+    "implementation would blacklist an employer rather than the specific unusable application-route host",
+    "implementation would make a universal claim about Taleo availability beyond Bora's verified usability evidence",
+    "implementation would alter Qualification Truth, Candidate Truth, Match Truth, immigration, resume/package doctrine, schemas, or runtime code"
+  ],
+  "review_requirements": "CLAUDE_BUILDER_REVIEW_THEN_CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THIS_APPLICATION_ROUTE_HOST_EXCLUSION_IN_THE_2026-09-09_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}

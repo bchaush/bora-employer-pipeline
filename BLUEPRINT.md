@@ -4294,6 +4294,39 @@ produces `REJECT`. First-party actionability is necessary but, after the
 live Apply/upload route cannot rescue a role whose recency is unanchored.
 This section creates no new, competing actionability axis.
 
+**138.6.1 Bora-specific excluded application-route host —
+BORA_EXCLUDED_APPLICATION_ROUTE_HOST_V1 (Bora-specific pursuit/
+actionability doctrine only).** Based on Bora's own direct usability
+evidence, `massanf.taleo.net` is recorded as a Bora-specific excluded
+application-route host under §135/§138.6. If a role's only current
+application route depends on `massanf.taleo.net`, current first-party
+actionability fails, and this routes through the existing §135/§138.6
+actionability consequence: `WATCH`/no serious application effort, unless
+an independent blocker already produces `REJECT`. This creates no new
+gate and does not amend §138.8; package generation for such a role
+remains blocked under the existing actionability/package gates, the same
+way it already is for any other first-party actionability failure. This exclusion does
+not blacklist MassDOT, MassCareers, Massachusetts government employers,
+or Taleo globally: a different, verified working official ATS/application
+route for the same or another Massachusetts-government role may still be
+evaluated normally under §135/§138.6. This is a Bora-specific pursuit/
+actionability rule keyed to Bora's own verified usability experience, not
+a universal claim that Taleo or the employer is globally unavailable. The
+exclusion remains active until Bora explicitly revokes it after a
+successful direct usability re-test of `massanf.taleo.net`.
+
+**Motivating live failure.** MassDOT — IT Data Analyst I, requisition
+260005JH, is the motivating cold-start failure: Bora's direct usability
+attempt against `massanf.taleo.net` failed, and under this doctrine that
+role's application route would now be suppressed before Bora-facing
+package generation rather than treated as actionable.
+
+This subsection creates no new, competing actionability axis and changes
+no Qualification Truth, Employer Truth, Candidate Truth, Match Truth,
+authorization, resume/package doctrine, schema, or runtime behavior; it
+does not itself authorize runtime implementation — no new schema, enum,
+database field, or automation change is pre-authorized.
+
 **138.7 Remote authenticity.** Remote is not suspicious by itself; missing
 evidence is not proof of fraud. Remote authenticity is a separate Pursuit/
 Trust assessment — never Bora Fit and never Qualification Truth. This
