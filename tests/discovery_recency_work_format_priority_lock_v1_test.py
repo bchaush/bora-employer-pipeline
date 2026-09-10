@@ -16,7 +16,7 @@ for token in (
     "0-7 days = GOLD_WINDOW",
     "8-14 days = STRETCH_WINDOW",
     "15-21 days = FAR_STRETCH_WINDOW",
-    "22+ days = EXCEPTION_ONLY_WINDOW",
+    "22+ days = SUPPRESSED_WINDOW",
     "UNKNOWN_WINDOW",
     "REMOTE",
     "CONTRACT/CONTRACT-TO-HIRE/TEMPORARY",
@@ -29,7 +29,7 @@ for token in (
     "`GOLD_WINDOW` = 0-7 days",
     "`STRETCH_WINDOW` = 8-14 days",
     "`FAR_STRETCH_WINDOW` = 15-21 days",
-    "`EXCEPTION_ONLY_WINDOW` = 22+ days",
+    "`SUPPRESSED_WINDOW` = 22+ days",
     "Locked work-format preferences",
     "remote + contract",
     "remote + part-time",
@@ -37,7 +37,8 @@ for token in (
     assert_true(token in RULE, f"role-selection rule missing locked token: {token}")
 
 assert_true("alwaysApply: true" in RULE, "cross-chat role-selection pointer must remain always-on")
-assert_true("unusually strong, strategically exceptional, first-party verified-live role" in RULE, "EXCEPTION_ONLY quick-ref must preserve the older-role escape hatch")
+assert_true("SUPPRESSED_WINDOW` is a hard cutoff" in RULE and "no automatic strength-based escape hatch" in RULE, "quick-ref must teach the SUPPRESSED_WINDOW hard cutoff, not an automatic-strength escape hatch")
+assert_true("only an explicit Bora override\n  of the recency cutoff for that specific role" in RULE, "quick-ref must preserve the explicit per-role Bora override as the only path past the hard cutoff")
 assert_true("never substitute `discovered_date` or" in RULE and "`date_first_seen`" in RULE, "quick-ref must preserve posting-date UNKNOWN/no-substitution rule")
 assert_true("not hard" in RULE and "fixed Lane A/B/C hierarchy" in RULE, "quick-ref work-format preferences must remain non-hard and non-hierarchical")
 assert_true("Boston/" in RULE and "Greater Boston contract, temporary, and part-time" in RULE, "quick-ref must preserve Boston non-remote preferred work formats")
@@ -45,7 +46,7 @@ assert_true("0-2 days = VERY_FRESH" in BLUEPRINT and "3-7 days = FRESH" in BLUEP
 assert_true("presentation/governance vocabulary only" in BLUEPRINT and "not a schema enum" in BLUEPRINT, "window overlay must remain presentation/governance only")
 assert_true("not ranked above one another as a universal rule" in BLUEPRINT, "primary lanes must not become a universal hierarchy")
 assert_true("§138.11" in BLUEPRINT and "fixed Lane A > Lane B > Lane C hierarchy" in BLUEPRINT, "work-format preference must reconcile with employment-type principle")
-assert_true("**Discovery Window**" in BLUEPRINT and "`FAR_STRETCH_WINDOW`" in BLUEPRINT and "`EXCEPTION_ONLY_WINDOW`" in BLUEPRINT, "serious-role output must surface the new window overlay alongside Freshness")
+assert_true("**Discovery Window**" in BLUEPRINT and "`FAR_STRETCH_WINDOW`" in BLUEPRINT and "`SUPPRESSED_WINDOW`" in BLUEPRINT, "serious-role output must surface the new window overlay alongside Freshness")
 assert_true("Freshness, Discovery Window" in RULE, "always-on quick-reference must surface Discovery Window in serious-role output")
 assert_true("no universal magical employer cutoff" in BLUEPRINT, "age windows must not be misrepresented as employer hiring cutoffs")
 assert_true("never override fit" in RULE and "authorization, first-party actionability" in RULE, "rule must preserve truth/actionability boundary")

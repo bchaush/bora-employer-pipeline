@@ -712,7 +712,10 @@ promotion still requires the existing §138.5 Bora-facing recency visibility
 gate, the §138.14 start horizon gate, the §138.6.2 employer-family-exclusion
 check PASS, §135/§138.6 first-party actionability, and the package-time
 first-party recheck (`AGENTS.md`'s Package-Time First-Party Actionability
-Recheck). This subsection sharpens
+Recheck). This gate stack also includes the §138.5 recency hard cutoff PASS
+(the role is not `SUPPRESSED_WINDOW`, absent an explicit Bora per-role
+recency override) — LinkedIn/Handshake discovery-source preference does not
+soften that cutoff. This subsection sharpens
 discovery-channel preference ordering only; it does not reorder or remove
 any existing §18 channel, create a new gate, or amend §138.8.
 
@@ -4270,21 +4273,29 @@ For discovery effort, Career OS must additionally apply Bora's locked pursuit-wi
 overlay: **0-7 days = GOLD_WINDOW** (default priority window; search and surface first);
 **8-14 days = STRETCH_WINDOW** (still actively pursue when fit/value is good);
 **15-21 days = FAR_STRETCH_WINDOW** (requires materially stronger fit/value and should
-normally rank behind comparable fresher roles); **22+ days = EXCEPTION_ONLY_WINDOW**
-(do not spend normal discovery/application effort unless the role is unusually strong,
-verified live/actionable, or otherwise strategically exceptional); **UNKNOWN =
-UNKNOWN_WINDOW** when the employer posting date cannot be established reliably.
+normally rank behind comparable fresher roles); **22+ days = SUPPRESSED_WINDOW** (a
+reliable employer posting age of 22 days or more is a hard cutoff: the role is
+suppressed from normal Bora-facing serious discovery and package generation; this is
+not an automatic strength-based escape hatch — only an explicit Bora override of the
+recency cutoff for that specific role may allow a `SUPPRESSED_WINDOW` role to proceed);
+**UNKNOWN = UNKNOWN_WINDOW** when the employer posting date cannot be established
+reliably — `UNKNOWN_WINDOW` is never treated as `SUPPRESSED_WINDOW` or otherwise stale
+merely because the posting date is missing.
 
 The overlay is presentation/governance vocabulary only; it is not a schema enum and does
 not replace `VERY_FRESH` / `FRESH` / `AGING` / `STALE_LEANING` / `UNKNOWN`. No age band
 means closed or unqualified, and there is no universal magical employer cutoff at 7, 14,
 21, or 22 days. After the Bora-facing recency visibility gate below has first been
 satisfied by an authoritative recency anchor, first-party verified live/actionable evidence
-(§135) outranks age-band assumptions; it never rescues an unanchored role. Thus an excellent
-16-day-old or older verified-live role with authoritative recency evidence may still deserve
-pursuit when fit/value is unusually strong. Freshness is a tiebreaker/urgency/pursuit-
-economics factor only, never a qualification fact and never a claim about any employer's
-actual hiring behavior. Where `board_posted_date` is unavailable or unreliable, preserve
+(§135) may influence ranking/pursuit strength only within the `FAR_STRETCH_WINDOW` (15-21
+days): a 15-21-day-old verified-live role with authoritative recency evidence and unusually
+strong fit/value may still deserve pursuit, ranked on its own merits against comparable
+fresher roles. This narrow allowance never rescues an unanchored role, and it never extends
+to or rescues `SUPPRESSED_WINDOW` (22+ days) — no first-party verified-live/actionable
+evidence, and no degree of fit/value strength, lifts the 22-day hard cutoff below; only an
+explicit Bora per-role recency override can do that. Freshness is a tiebreaker/urgency/
+pursuit-economics factor only, never a qualification fact and never a claim about any
+employer's actual hiring behavior. Where `board_posted_date` is unavailable or unreliable, preserve
 `UNKNOWN`; never silently substitute `discovered_date` or `date_first_seen` as if it were
 the employer's own posting date.
 
@@ -4308,6 +4319,24 @@ open again. Closure-state evidence and posting-age provenance are distinct: a cu
 application platform may establish that intake is closed without its displayed posting age
 becoming Employer Truth or `board_posted_date`. This is a Bora-specific discovery/pursuit
 visibility rule, not Qualification Truth and not a universal claim about employer hiring.
+
+**Recency hard cutoff (`SUPPRESSED_WINDOW`, fail closed).** Once a role clears the
+Bora-facing recency visibility gate above with a reliable employer posting date, a
+posting age of 22 days or more (`SUPPRESSED_WINDOW`) is suppressed from normal
+Bora-facing serious discovery and package generation, the same way an unanchored
+role is suppressed above. This suppression can be lifted only by an explicit Bora
+override of the recency cutoff for that specific role; there is no automatic
+strength-based, verified-live, or otherwise-exceptional escape hatch.
+`UNKNOWN_WINDOW` (posting date not reliably established) remains governed only by
+the visibility gate above and is never itself treated as `SUPPRESSED_WINDOW`,
+`FAR_STRETCH_WINDOW`, or otherwise stale merely because the date is missing.
+
+**Motivating live example.** PCG — Apprentice Business Analyst, requisition
+JR102087, at 29 days' reliable employer posting age, is the motivating live
+example: the role was a strong/good fit and was historically submitted, but a
+comparable future normal Career OS run — absent an explicit Bora override for
+that specific role — would now suppress it under this `SUPPRESSED_WINDOW` hard
+cutoff rather than surface or package it.
 
 **138.6 First-party actionability.** §135 remains fully authoritative and
 is not re-defined, narrowed, or duplicated here: before meaningful
@@ -4388,7 +4417,11 @@ family exclusion; an explicit per-role override does not revoke the family
 exclusion for any other MGB-system role. Historical Submitted Application
 Truth, Employer Truth, Candidate Truth, Match Truth, and Qualification
 Truth for any already-submitted Mass General Brigham system application are
-not rewritten by this exclusion.
+not rewritten by this exclusion. This §138.6.2 check is evaluated alongside,
+not instead of, the §138.5 recency hard cutoff PASS requirement (the role is
+not `SUPPRESSED_WINDOW`, absent an explicit Bora per-role recency override):
+an MGB-family PASS never substitutes for, and is never substituted by, the
+recency hard cutoff.
 
 This subsection creates no new, competing actionability axis and changes no
 Qualification Truth, Employer Truth, Candidate Truth, Match Truth,
@@ -4447,6 +4480,14 @@ Truth, or Match Truth; when an excluded role is referenced for audit or
 debugging only, its exclusion reason is labeled `BORA_EXCLUDED_EMPLOYER`
 and is never presented as a Qualification Truth REJECT, and any independent
 REJECT verdict caused by a separate blocker is preserved unchanged.
+Promotion under the §138.5 recency visibility gate additionally requires the
+§138.5 recency hard cutoff to PASS — the role is not `SUPPRESSED_WINDOW`
+(22+ days' reliable employer posting age) — as part of that same gate, not a
+separate optional check; a `SUPPRESSED_WINDOW` role is never promoted on the
+strength of fit/value, first-party verified live/actionable evidence, or any
+other factor, and the §138.14/§138.6.2 checks above do not run in place of
+this cutoff. Only an explicit Bora per-role recency override lifts the
+cutoff for that specific role.
 When employer posting date remains unknown but an authoritative dated
 application-intake window independently passes that gate, Freshness remains
 `UNKNOWN` and Discovery Window remains `UNKNOWN_WINDOW`; never convert the
@@ -4459,7 +4500,7 @@ Truth and never a hiring-probability claim); **Comparison Pool**
 (`STRONG` / `ACCEPTABLE` / `WEAK`); **Freshness** (`VERY_FRESH` / `FRESH`
 / `AGING` / `STALE_LEANING` / `UNKNOWN`, per §138.5); **Discovery Window**
 (`GOLD_WINDOW` / `STRETCH_WINDOW` / `FAR_STRETCH_WINDOW` /
-`EXCEPTION_ONLY_WINDOW` / `UNKNOWN_WINDOW`, per §138.5, shown alongside Freshness
+`SUPPRESSED_WINDOW` / `UNKNOWN_WINDOW`, per §138.5, shown alongside Freshness
 when reliable employer posting age is available and never persisted as a schema/runtime
 field); **Location/Work Arrangement** (`STRONG` / `ACCEPTABLE` / `WEAK`); **First-Party
 Actionability** (`VERIFIED` / `FAILED` / `UNKNOWN`, per §135/§138.6);

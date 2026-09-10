@@ -1,0 +1,58 @@
+{
+  "milestone_id": "DISCOVERY_RECENCY_HARD_CUTOFF_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Stop normal Career OS pursuit of roles with a reliable employer posting age of 22 days or more, while preserving the existing 0-7, 8-14, 15-21 bands and UNKNOWN recency semantics.",
+  "baseline_sha": "f106fcabfbca1982d983ed112724bb2f1063f523",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    "CHANGELOG.md",
+    "tests/discovery_recency_work_format_priority_lock_v1_test.py",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/discovery_recency_hard_cutoff_v1_test.py",
+    "milestone_contracts/feature/discovery-recency-hard-cutoff-v1.json",
+    "tests/discovery_start_horizon_gate_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/discovery_recency_hard_cutoff_v1_test.py",
+    "tests/discovery_recency_work_format_priority_lock_v1_test.py",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/discovery_start_horizon_gate_v1_test.py",
+    "tests/employer_exclusion_discovery_source_ladder_v1_test.py",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/package_output_cover_letter_gold_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "0-7 days remains GOLD_WINDOW",
+    "8-14 days remains STRETCH_WINDOW",
+    "15-21 days remains FAR_STRETCH_WINDOW",
+    "a reliable employer posting age of 22 days or more is suppressed from normal Bora-facing serious discovery and package generation",
+    "a role at 22+ days may only proceed when Bora explicitly overrides the recency cutoff for that specific role",
+    "UNKNOWN or unpublished posting age remains UNKNOWN_WINDOW and is not treated as 22+ merely because the date is missing",
+    "posting age remains Pursuit Truth only and does not change Qualification Truth, Employer Truth, Candidate Truth, Match Truth, authorization, actionability, start-horizon, or package doctrine",
+    "PCG Apprentice Business Analyst JR102087 at 29 days is recorded as the motivating live example: good fit and submitted historically, but a comparable future normal run would suppress it on recency",
+    "fresh chats inherit the cutoff through .cursor/rules/role-selection.mdc"
+  ],
+  "stop_conditions": [
+    "implementation requires any path outside allowed_paths",
+    "implementation changes the 0-7, 8-14, or 15-21 band boundaries",
+    "implementation turns UNKNOWN_WINDOW into a stale/old classification",
+    "implementation changes qualification, actionability, start-horizon, resume, cover-letter, package-output, or runtime/schema behavior"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THE_22_PLUS_DAY_RECENCY_CUTOFF_IN_THE_2026-09-10_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}
