@@ -688,6 +688,34 @@ Use existing discovery channels:
 
 Discovery source and application source are separate fields.
 
+**18.1 Discovery-source ladder — DISCOVERY_SOURCE_LADDER_V1
+(Bora-specific pursuit preference; discovery confidence only, never Employer
+Truth or actionability; this identifier names the source-ladder ordering
+only — the separate Bora-specific employer-family exclusion has its own
+identifier, `BORA_EXCLUDED_EMPLOYER_FAMILY_V1`, at §138.6.2, and neither
+identifier governs the other).** Among the §18 discovery channels, LinkedIn
+Free and Brandeis Handshake are preferred first-wave discovery surfaces,
+alongside targeted direct employer/official ATS searches, because they are
+efficient high-signal inventory-discovery sources for Bora. Simplify Free,
+Built In, HigherEdJobs, Idealist, staffing/recruiting firms, company lists,
+referrals, recruiter outreach, and other credible job sources remain valid
+secondary/specialized discovery channels — useful for inventory breadth but
+not first-wave preferred. Generic aggregators and generic search/index
+snippet results remain the lowest-confidence tier: lead generation only.
+Discovery source and verification/application source remain separate fields
+(§18); a LinkedIn Free or Brandeis Handshake listing may justify checking a
+role but by itself never establishes Employer Truth, an authoritative
+posting-date/intake-recency anchor, current first-party application
+actionability, or package-time semantic quorum — LinkedIn/Handshake posting
+age alone cannot satisfy the §138.5 recency-anchor requirement. Serious-role
+promotion still requires the existing §138.5 Bora-facing recency visibility
+gate, the §138.14 start horizon gate, the §138.6.2 employer-family-exclusion
+check PASS, §135/§138.6 first-party actionability, and the package-time
+first-party recheck (`AGENTS.md`'s Package-Time First-Party Actionability
+Recheck). This subsection sharpens
+discovery-channel preference ordering only; it does not reorder or remove
+any existing §18 channel, create a new gate, or amend §138.8.
+
 **19. DIRECT-SOURCE RULE**
 
 Whenever practical:
@@ -4327,6 +4355,47 @@ authorization, resume/package doctrine, schema, or runtime behavior; it
 does not itself authorize runtime implementation — no new schema, enum,
 database field, or automation change is pre-authorized.
 
+**138.6.2 Bora-specific excluded employer family —
+BORA_EXCLUDED_EMPLOYER_FAMILY_V1 (Bora-specific pursuit preference only,
+not Qualification/Employer/Candidate/Match Truth).** Based on Bora's own
+explicit preference, the Mass General Brigham system is recorded as a
+Bora-specific excluded employer family. When a first-party source identifies
+a role as part of the Mass General Brigham system — including Mass General
+Brigham, Massachusetts General Hospital / The General Hospital Corporation,
+Brigham and Women's Hospital, and other MGB-system entities/affiliates/
+aliases the first-party source itself identifies as part of that system —
+the role does not enter serious Bora-facing discovery or package generation.
+This is a pursuit/preference exclusion, not a claim that Mass General
+Brigham is a bad employer. This is integrated into §138.8 serious-role
+promotion as a distinct third check: serious-role promotion and package
+generation require the §138.5 Bora-facing recency visibility gate PASS, the
+§138.14 start horizon gate PASS, AND this §138.6.2 employer-family-exclusion
+check PASS (the role's employer family carries no active Bora-specific
+exclusion, or Bora has explicitly overridden the exclusion for that specific
+role). This check is strictly a Pursuit Truth criterion — it never becomes,
+and never gates, Qualification Truth, Employer Truth, Candidate Truth, or
+Match Truth. When an excluded role is referenced only for audit or
+debugging purposes, its exclusion reason is labeled `BORA_EXCLUDED_EMPLOYER`
+and must never be presented as, or trigger, a Qualification Truth REJECT;
+any independent REJECT verdict caused by a separate blocker (e.g. a failed
+qualification or actionability gate) is preserved unchanged and is not
+altered or explained away by this exclusion. This does not create an unsupported global
+MGB-affiliate list: only entities a first-party source itself identifies as
+part of the Mass General Brigham system are covered, never a name-similarity
+guess. The exclusion remains active for the whole employer family until
+Bora explicitly overrides it for one specific role or explicitly revokes the
+family exclusion; an explicit per-role override does not revoke the family
+exclusion for any other MGB-system role. Historical Submitted Application
+Truth, Employer Truth, Candidate Truth, Match Truth, and Qualification
+Truth for any already-submitted Mass General Brigham system application are
+not rewritten by this exclusion.
+
+This subsection creates no new, competing actionability axis and changes no
+Qualification Truth, Employer Truth, Candidate Truth, Match Truth,
+authorization, resume/package doctrine, schema, or runtime behavior; it does
+not itself authorize runtime implementation — no new schema, enum, database
+field, or automation change is pre-authorized.
+
 **138.7 Remote authenticity.** Remote is not suspicious by itself; missing
 evidence is not proof of fraud. Remote authenticity is a separate Pursuit/
 Trust assessment — never Bora Fit and never Qualification Truth. This
@@ -4365,6 +4434,19 @@ be promoted into this serious-role output; a role suppressed under either
 gate does not enter serious-role output or package generation regardless of
 its status under the other gate, unless Bora explicitly overrides that
 specific gate for that specific role per that gate's own override terms.
+Promotion into this serious-role output additionally requires the §138.6.2
+Bora-specific employer-family-exclusion check to PASS; this check cannot be
+skipped once the §138.5 and §138.14 gates both pass — it is evaluated as a
+required third check on every promotion, not an optional afterthought, and
+a role suppressed under it does not enter serious-role output or package
+generation regardless of its status under the other two, unless Bora
+explicitly overrides that specific check for that specific role per
+§138.6.2's own override terms. The §138.6.2 check is strictly a Pursuit
+Truth criterion, never Qualification Truth, Employer Truth, Candidate
+Truth, or Match Truth; when an excluded role is referenced for audit or
+debugging only, its exclusion reason is labeled `BORA_EXCLUDED_EMPLOYER`
+and is never presented as a Qualification Truth REJECT, and any independent
+REJECT verdict caused by a separate blocker is preserved unchanged.
 When employer posting date remains unknown but an authoritative dated
 application-intake window independently passes that gate, Freshness remains
 `UNKNOWN` and Discovery Window remains `UNKNOWN_WINDOW`; never convert the

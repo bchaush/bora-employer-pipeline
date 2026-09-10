@@ -1,0 +1,54 @@
+{
+  "milestone_id": "EMPLOYER_EXCLUSION_DISCOVERY_SOURCE_LADDER_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock Bora's Mass General Brigham employer-family exclusion and a preferred discovery-source verification ladder for fresh Career OS operation.",
+  "baseline_sha": "cfeaf0b2ebfdb29c52c0bd1891dd88d8ae412579",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "tests/employer_exclusion_discovery_source_ladder_v1_test.py",
+    "milestone_contracts/feature/employer-exclusion-source-ladder-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "required_tests": [
+    "tests/employer_exclusion_discovery_source_ladder_v1_test.py",
+    "tests/bora_excluded_application_route_host_v1_test.py",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/discovery_start_horizon_gate_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],  "acceptance_conditions": [
+    "Mass General Brigham system roles are Bora-specific employer-family exclusions and do not enter serious Bora-facing discovery or package generation unless Bora explicitly overrides or revokes the exclusion",
+    "the exclusion includes first-party roles identified as part of the Mass General Brigham system even when the employing legal entity or affiliate name differs",
+    "the exclusion is a pursuit preference and never rewrites historical Submitted Application Truth, Employer Truth, Candidate Truth, Match Truth, or Qualification Truth",
+    "LinkedIn Free and Brandeis Handshake are preferred first-wave discovery surfaces, alongside targeted employer/official ATS searches, for efficient high-signal inventory discovery",
+    "specialized credible boards and staffing/recruiting sources remain valid secondary discovery channels",
+    "generic aggregators and search/index results remain lead-generation sources only and receive lower discovery confidence",
+    "discovery-source preference never upgrades a platform listing into Employer Truth or current actionability",
+    "serious-role promotion still requires the existing authoritative recency gate, start-horizon gate, the §138.6.2 employer-family-exclusion check PASS, exact first-party semantic actionability quorum, and package-time recheck",
+    "LinkedIn or Handshake posting age alone cannot satisfy the authoritative recency-anchor requirement",
+    "resume package qualification immigration and runtime doctrine remain unchanged"
+  ],
+  "stop_conditions": [
+    "implementation requires schema or src runtime changes",
+    "implementation weakens first-party semantic actionability or recency verification",
+    "implementation treats LinkedIn or Handshake as final Employer Truth authority",
+    "implementation globally blacklists Workday or any non-MGB employer family",
+    "implementation alters resume or cover-letter gold doctrine"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_APPROVAL_REQUIRED_NO_COMMIT_PUSH_PR_MERGE"
+}

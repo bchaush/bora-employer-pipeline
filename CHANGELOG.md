@@ -19,6 +19,76 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-10 — Bora employer-family exclusion and discovery-source ladder (`EMPLOYER_EXCLUSION_DISCOVERY_SOURCE_LADDER_V1`, DOCTRINE LOCK)
+
+**Reason**
+
+Bora has an explicit preference that Mass General Brigham system roles are
+excluded from serious Bora-facing discovery and package generation, and
+existing §18/§138 discovery doctrine needed sharpening so LinkedIn Free and
+Brandeis Handshake are recognized as preferred first-wave discovery
+surfaces without ever compensating for the existing first-party recency/
+actionability verification hierarchy.
+
+**Changed**
+
+* `BLUEPRINT.md` adds §18.1 (`DISCOVERY_SOURCE_LADDER_V1` — source-ladder
+  ordering only, a distinct identifier from the employer-exclusion
+  identifier below, with no cross-ID coupling): LinkedIn Free and Brandeis
+  Handshake are preferred first-wave discovery surfaces alongside targeted
+  direct employer/official ATS searches; Simplify Free, Built In,
+  HigherEdJobs, Idealist, staffing/recruiting firms, company lists,
+  referrals, recruiter outreach, and other credible job sources are named
+  explicitly as secondary/specialized discovery channels; generic
+  aggregators/generic search/index snippet results remain the
+  lowest-confidence tier (lead-generation only); a LinkedIn/Handshake
+  listing never alone establishes Employer Truth, the §138.5 recency
+  anchor, first-party actionability, or package-time semantic quorum.
+* `BLUEPRINT.md` adds §138.6.2 (`BORA_EXCLUDED_EMPLOYER_FAMILY_V1`): the
+  Mass General Brigham system (first-party-identified, including Mass
+  General Brigham, Massachusetts General Hospital / The General Hospital
+  Corporation, Brigham and Women's Hospital, and other MGB-system entities
+  a first-party source itself identifies) is a Bora-specific excluded
+  employer family for serious Bora-facing discovery and package
+  generation — a pursuit/preference exclusion, not a bad-employer claim
+  and not Qualification/Employer/Candidate/Match Truth. No unsupported
+  global affiliate list. Remains active until Bora explicitly overrides
+  one specific role or explicitly revokes the family exclusion; a per-role
+  override never cascades to revoke the exclusion for any other MGB-system
+  role; historical Submitted Application Truth for already-submitted
+  MGB-system applications is not rewritten.
+* **Correction pass:** `BLUEPRINT.md` §138.6.2 no longer claims the MGB
+  exclusion "creates no new gate" / is equivalent to §138.5/§138.14 —
+  that was a false equivalence. It is now modeled honestly as a required
+  third check integrated into §138.8: serious-role promotion and package
+  generation require §138.5 recency PASS, §138.14 start-horizon PASS, AND
+  the §138.6.2 employer-family-exclusion PASS, and the third check cannot
+  be skipped once the first two pass. §138.8's own text, the
+  `.cursor/rules/role-selection.mdc` quick-reference, and `AGENTS.md` were
+  all updated to state this integration explicitly. Audit/debug mentions
+  of an excluded role are labeled `BORA_EXCLUDED_EMPLOYER` and must never
+  be presented as a Qualification Truth REJECT; an independent REJECT from
+  a separate blocker is preserved unchanged. This remains strictly Pursuit
+  Truth — never Qualification/Employer/Candidate/Match Truth.
+* `.cursor/rules/role-selection.mdc` adds quick-reference pointers to both
+  §18.1 and §138.6.2, preserving `alwaysApply: true`.
+* `AGENTS.md` adds an operational pointer summarizing both doctrine
+  additions, including the §138.8 integration and per-role-override
+  non-cascade statement.
+* Added `tests/employer_exclusion_discovery_source_ladder_v1_test.py`
+  regression coverage for the MGB exclusion, alias/system-family
+  treatment, §138.8 integration, explicit override/revocation and its
+  non-cascade scope, historical-truth non-rewrite, `BORA_EXCLUDED_EMPLOYER`
+  audit-label semantics, discovery-source tiering (including Simplify Free
+  classification), LinkedIn/Handshake posting-age non-compensation, and
+  the distinct §18.1/§138.6.2 identifiers.
+* No schema, runtime, resume/cover-letter gold, Candidate/Match/
+  Qualification Truth, immigration, actionability-semantics, recency-band,
+  or start-horizon-band change. Pinned `Final Locked Blueprint v3.13`
+  banner unchanged.
+
+---
+
 ## 2026-09-10 — Complete four-artifact survivor package and cover-letter gold reference (`PACKAGE_OUTPUT_COVER_LETTER_GOLD_LOCK_V1`, DOCTRINE LOCK)
 
 **Reason**
