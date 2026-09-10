@@ -19,6 +19,67 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-10 — End-user application transition quorum (`END_USER_APPLICATION_TRANSITION_QUORUM_V1`, DOCTRINE LOCK)
+
+**Reason**
+
+Bora explicitly authorized closing a remaining gap in the §135/§141.13
+actionability gates: an Apply-looking control, an ATS API record,
+embedded page metadata, a search/index result, or a surviving
+requisition token on an otherwise-live job-detail page could still be
+treated as if it proved Bora could actually apply, without the
+application transition itself ever being followed.
+
+**Changed**
+
+* `BLUEPRINT.md` §135.1 (new subsection extending §135, no new top-level
+  heading): current first-party actionability, and the §141.13
+  package-time recheck, now both require end-to-end validation, in the
+  same operating session, of (1) the exact public job-detail URL Bora
+  would open for the exact role/requisition and (2) the actual
+  application transition/destination reached from that exact page.
+  Explicit dead/error, generic careers/search-landing redirect, loss of
+  exact role/requisition identity, or an unusable application transition
+  vetoes actionability even when the job-detail page returns HTTP 200,
+  still shows the requisition token, or displays an Apply-like control.
+  **Affirmative auth carve-out (not a veto):** a role-preserving
+  login/SSO/account-creation step that continues into a usable,
+  exact-role application destination -- role identity preserved and a
+  recoverable application path exists beyond it -- is not itself a veto;
+  only an auth dead end (no recoverable application path beyond the auth
+  step) or loss of exact role/requisition identity across the auth step
+  fails closed.
+* `BLUEPRINT.md` §141.13: package-time recheck text now cross-references
+  §135.1 and makes explicit that the recheck must repeat end-to-end
+  validation of the job-detail URL and application transition, not
+  merely re-confirm the page/control is present.
+* `AGENTS.md`: new "End-User Application Transition Validation" section
+  pointing to §135.1, and the package-time recheck paragraph updated to
+  require repeating end-user transition validation.
+* `.cursor/rules/resume.mdc`: package-time recheck section updated to
+  require repeating §135.1 end-user transition validation before package
+  work.
+* `.cursor/rules/role-selection.mdc`: new quick-reference bullet pointing
+  to §135.1's end-user transition requirement in the actionability chain.
+* `tests/end_user_application_transition_quorum_v1_test.py`: new
+  doctrine-consistency regression test locking the §135.1 language and
+  veto conditions across all four doctrine files.
+* `tests/live_actionability_semantic_quorum_v1_test.py`: strengthened to
+  also require the end-user application transition language and to
+  reject a model where an Apply-like control/ATS API/index metadata
+  alone satisfies the application-route quorum member.
+
+**Not changed**
+
+No blacklist of Workday or any ATS vendor. No runtime/browser automation
+implementation, schema change, or change to Qualification Truth,
+Candidate Truth, Match Truth, immigration, recency, start-horizon,
+employer-exclusion, resume-content, or cover-letter-content doctrine.
+The existing semantic quorum and explicit dead/error veto are preserved,
+not replaced.
+
+---
+
 ## 2026-09-10 — Discovery recency hard cutoff (`DISCOVERY_RECENCY_HARD_CUTOFF_V1`, DOCTRINE LOCK)
 
 **Reason**

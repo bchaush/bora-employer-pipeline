@@ -85,6 +85,36 @@ Do not convert, under any circumstance:
 * Remote authenticity: `VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
   `HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A` (§138.7) -- doctrine vocabulary
   for human/model assessment only; not a schema enum or runtime field.
+* End-user application transition validation (§135.1,
+  `END_USER_APPLICATION_TRANSITION_QUORUM_V1`): §135/§138.6 first-party
+  actionability and the §141.13 package-time recheck both require
+  end-to-end validation, in the same operating session, of (1) the exact
+  public job-detail URL Bora would open for the exact role/requisition
+  and (2) the actual application transition/destination reached from
+  that exact page. An explicit dead/error page, a generic
+  careers/search-landing redirect, loss of exact role/requisition
+  identity, or an unusable application transition (including a
+  login/paywall dead end with no recoverable application path) vetoes
+  actionability even when the job-detail page itself returns HTTP 200,
+  still shows the requisition token, or displays an Apply-like control. An
+  Apply-looking control, an ATS API record, embedded page metadata, a
+  search/index result, or a requisition token may support discovery/identity but never
+  substitutes for successful end-user transition validation.
+  **Auth carve-out (not a veto):** a role-preserving login/SSO step that
+  continues into a usable, exact-role application destination -- role
+  identity preserved and a recoverable application path exists beyond
+  it -- is not itself a veto; only an auth dead end with no recoverable
+  path, or identity loss across it, fails closed. Operationally: the
+  application transition must be exercised or otherwise directly
+  resolved to the actual current end-user destination; an Apply control,
+  ATS API/index/metadata, HTTP 200, or a requisition token cannot
+  substitute for that resolution. Does not
+  blacklist Workday or any ATS vendor and creates no new actionability
+  system, posting-state axis, or enum. Prior pursuit-time success on
+  either element alone is insufficient at package time: §141.13's
+  package-time recheck must repeat both elements of §135.1 again in the
+  current operating session, not merely re-confirm that a job-detail page
+  or Apply-like control is present.
 * Bora-specific excluded application-route host (§138.6.1): based on
   Bora's own direct usability evidence, `massanf.taleo.net` is excluded --
   if a role's only current application route depends on it, first-party

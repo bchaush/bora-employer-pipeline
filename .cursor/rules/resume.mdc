@@ -447,11 +447,31 @@ re-open the exact current first-party employer requisition in the
 current operating session and re-establish the full positive semantic
 quorum: matching role/title identity, matching requisition identity,
 substantive current job-description content, and a current actionable
-application route. HTTP 200, a requisition token, ATS shell, or Apply-like
-control alone never satisfies this gate; explicit dead/error-page text
-fails closed even when HTTP 200 or the requisition token is present. This
-is §135's existing successfully-established test, applied again at package
-time. A prior pursuit-time pass does not by itself
+application route. This route/instruction element requires repeating
+`BLUEPRINT.md` §135.1's (`END_USER_APPLICATION_TRANSITION_QUORUM_V1`)
+end-user application transition validation: the package-time recheck
+must repeat both elements of §135.1 again, fresh, in the current operating
+session -- (1) exact job-detail validation (the exact public job-detail
+URL still establishes the current exact role) and (2) the application
+transition exercised or otherwise directly resolved to the actual
+current end-user application destination. Prior pursuit-time success on
+either element alone is insufficient at package time; both must be
+repeated. HTTP 200,
+a requisition token, ATS shell, Apply-like control, or ATS API/index/
+search metadata alone never satisfies this gate; explicit dead/error-page
+text, a generic careers/search redirect, loss of exact role/requisition
+identity, or an unusable application transition (including a
+login/paywall dead end with no recoverable application path) fails closed even when
+HTTP 200 or the requisition token is present.
+**Auth carve-out (not a veto):** a role-preserving login/SSO step that
+continues into a usable, exact-role destination -- identity preserved
+and a recoverable application path beyond it -- is not itself a veto;
+only an auth dead end with no recoverable path, or identity loss across
+it, fails closed. An Apply control, ATS API/index/metadata, HTTP 200, or
+a requisition token cannot substitute for that resolution. This does not blacklist
+Workday or any ATS vendor. This is §135's existing
+successfully-established test, applied again at package time. A prior
+pursuit-time pass does not by itself
 satisfy this recheck. A blank/contentless shell, a JavaScript-only page
 with no recoverable JD content, a generic careers/search redirect, a
 page-not-found response, an expired/closed page, an identity mismatch,

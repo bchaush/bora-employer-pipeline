@@ -3985,6 +3985,71 @@ qualification analysis already performed, or Submitted Application Truth
 for a prior, genuinely-verified application. Only current actionability
 changes.
 
+**135.1 End-user application transition validation —
+END_USER_APPLICATION_TRANSITION_QUORUM_V1 (LOCKED, extends §135, not a new
+top-level section).** Bora explicitly authorized this hardening in the
+2026-09-10 operating chat after §135's existing semantic quorum still left
+room to treat an Apply-looking control, an ATS API record, embedded page
+metadata, a search/index result, or a surviving requisition token as if it
+were proof that Bora could actually apply. It does not create a competing
+actionability system, a new posting-state axis, or a new enum, and it does
+not blacklist Workday or any other ATS vendor.
+
+Establishing current first-party actionability, and passing the §141.13
+package-time recheck, both require end-to-end validation of two distinct
+things in the same operating session: (1) the exact public job-detail URL
+Bora would open for this exact role/requisition, and (2) the actual
+application transition/destination reached from that exact page when the
+application path is followed from it. Discovery/index metadata, an ATS
+API record, or a requisition token may support finding the URL and
+establishing role/requisition identity, but each of them never
+substitutes for successful end-user transition validation — actually resolving what
+happens when the application route on that page is followed.
+
+An explicit dead/error page, a generic careers/search-landing redirect
+with no matching current role, loss of exact role/requisition identity
+anywhere in the chain, or an unusable application transition
+(broken link, dead-end redirect, login/paywall dead end with no
+recoverable application path, or a destination that no longer matches the
+exact role) vetoes actionability — even when the job-detail page itself
+otherwise looks live, returns HTTP 200, still shows the requisition
+token, or displays an Apply-like control. HTTP 200, a surviving
+requisition token/string, an ATS shell, embedded Apply-control markup, or
+API/index metadata alone still never satisfies this gate, exactly as
+under §135's existing successfully-established test — this subsection
+sharpens that this includes the application-transition step itself, not
+only the job-detail page's own content quorum.
+
+**Auth carve-out (not a veto).** A role-preserving login, SSO, account-
+creation, or other authentication step encountered during the
+application transition is not itself a veto when it continues into a
+usable, exact-role application destination — i.e. role identity survives
+the auth step and a recoverable application path exists on the other side
+of it. Only a login/paywall/auth dead end that leaves no recoverable
+application path, or that loses exact role/requisition identity across
+the auth step, fails closed. In operational terms: the application
+transition must be exercised or otherwise directly resolved to the actual
+current end-user destination; an Apply control, ATS API/index/metadata,
+HTTP 200, or a requisition token cannot substitute for that resolution.
+
+`135` continues to govern the full positive semantic quorum (matching
+role/title identity, matching requisition identity, substantive current
+job-description content, and a current actionable application
+route/instruction); this subsection makes explicit that the fourth
+element — a current actionable application route/instruction — is not
+satisfied merely by the presence of an application control or metadata on
+the job-detail page, and requires the transition itself to be exercised
+or otherwise directly resolved to the actual current end-user application
+destination. §141.13's package-time recheck must repeat this same
+end-user route validation; a prior pursuit-time pass of this subsection,
+like a prior pursuit-time pass of §135 generally, does not by itself
+satisfy the package-time recheck. This subsection changes no
+Qualification Truth, Candidate Truth, Match Truth, immigration, recency,
+start-horizon, employer-exclusion, resume-content, or cover-letter-content
+doctrine, and pre-authorizes no runtime/browser automation
+implementation — verification remains an operator/session-time action
+under the existing §135/§141.13 doctrine-lock pattern.
+
 **136. BORA-SPECIFIC HIRING RELEVANCE — BORA_SPECIFIC_HIRING_RELEVANCE_V1 (LOCKED)**
 
 Serious roles are evaluated through four axes: **Qualification Truth**
@@ -5160,9 +5225,23 @@ operating session and must still establish a positive semantic quorum:
 matching role/title identity, matching requisition identity, substantive
 current job-description content, and a current actionable application
 route/instruction — §135's existing successfully-established test made
-explicit for package-time operation. HTTP 200, a surviving requisition
-string/token, an ATS shell, or an Apply-like control alone never satisfies
-this quorum. Any explicit dead/error state (including page-not-found,
+explicit for package-time operation, including §135.1's end-user
+application transition requirement: the package-time recheck must
+repeat both elements of §135.1 again in the current operating session —
+(1) exact job-detail validation (the exact public job-detail URL still
+establishes the current exact role) and (2) the application transition
+exercised or otherwise directly resolved to the actual current end-user
+application destination — not merely re-confirm that a job-detail page or
+Apply-like control is present. A prior pursuit-time success on either
+element alone is insufficient at package time; both must be
+repeated fresh. §135.1's auth carve-out applies unchanged here: a
+role-preserving login/SSO step that continues into a usable, exact-role
+destination is not itself a veto, but a login/auth dead end with no
+recoverable application path, or one that loses exact role/requisition
+identity, fails closed. HTTP 200, a surviving requisition string/token,
+an ATS shell, an Apply-like control, or ATS API/index/search metadata
+alone never satisfies this quorum. Any
+explicit dead/error state (including page-not-found,
 "page you are looking for doesn't exist", expired, closed, filled, or no
 longer accepting applications) fails closed even when the transport
 status is HTTP 200 or the requisition token remains in page/source text. A prior pursuit-time pass of §135 does

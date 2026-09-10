@@ -1,0 +1,51 @@
+{
+  "milestone_id": "END_USER_APPLICATION_TRANSITION_QUORUM_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Require end-to-end validation of the exact public job-detail URL and the actual application transition Bora would use before serious-role promotion or package generation.",
+  "baseline_sha": "2588ec021857a024776dee94d320ddcd2cda1904",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    ".cursor/rules/resume.mdc",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/end_user_application_transition_quorum_v1_test.py",
+    "milestone_contracts/feature/end-user-application-transition-quorum-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json"
+  ],
+  "required_tests": [
+    "tests/end_user_application_transition_quorum_v1_test.py",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/bora_excluded_application_route_host_v1_test.py",
+    "tests/discovery_recency_hard_cutoff_v1_test.py",
+    "tests/package_output_cover_letter_gold_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "the exact public job-detail URL Bora would open must itself establish the current exact role and must not be a dead/error/generic-search state",
+    "the application transition reached from that exact public job-detail page must be exercised or otherwise directly resolved to the actual current end-user application destination before actionability PASS",
+    "an Apply-looking control, ATS API record, embedded metadata, search/index result, or requisition token cannot substitute for successful end-user transition validation",
+    "any explicit dead/error page, generic careers/search redirect, lost role/requisition identity, or unusable application transition vetoes actionability",
+    "package-time recheck must repeat the same end-user route validation; prior pursuit-time success alone is insufficient",
+    "the rule does not blacklist Workday or any ATS vendor and does not alter Qualification Truth, Candidate Truth, Match Truth, recency, start horizon, employer exclusion, immigration, resume, or cover-letter doctrine",
+    "fresh chats inherit the requirement through always-on role-selection/resume rules and AGENTS.md"
+  ],
+  "stop_conditions": [
+    "implementation requires runtime/browser automation code or schema changes",
+    "implementation requires any path outside allowed_paths",
+    "implementation weakens the existing semantic quorum or explicit dead/error veto",
+    "implementation changes qualification, Candidate Truth, Match Truth, immigration, recency, start-horizon, employer-exclusion, resume-content, or cover-letter-content doctrine"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THE_END_USER_APPLICATION_PATH_HARDENING_IN_THE_2026-09-10_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}
