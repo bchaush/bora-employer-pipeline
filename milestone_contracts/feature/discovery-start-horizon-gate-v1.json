@@ -1,0 +1,51 @@
+{
+  "milestone_id": "DISCOVERY_START_HORIZON_GATE_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Prioritize roles that can realistically start around Bora's near-term hiring objective and suppress known far-future starts from Bora-facing serious discovery/package work, without treating an unstated start date as a blocker or changing Qualification Truth.",
+  "baseline_sha": "e22a80c852d0266785cdbb315b328fe3eebfa432",
+  "allowed_paths": [
+    "BLUEPRINT.md",
+    ".cursor/rules/role-selection.mdc",
+    "CHANGELOG.md",
+    "tests/discovery_start_horizon_gate_v1_test.py",
+    "milestone_contracts/feature/discovery-start-horizon-gate-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "project_state.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],  "required_tests": [
+    "tests/discovery_start_horizon_gate_v1_test.py",
+    "tests/discovery_recency_visibility_gate_v1_test.py",
+    "tests/discovery_recency_work_format_priority_lock_v1_test.py",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/resume_reference_style_lock_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "known intended start dates 0-30 days from the current operating date are the TARGETED near-term start window that Career OS should actively target for discovery and application effort",
+    "known intended start dates 31-60 days from the current operating date are an acceptable around-target window",
+    "known intended start dates more than 60 days away are suppressed from Bora-facing serious discovery and package generation unless Bora explicitly requests a future-start pipeline or explicitly overrides the timing gate for that role",
+    "an unstated or unreliably inferred start date remains UNKNOWN and is not suppressed merely because the employer omitted a start date",
+    "a near application deadline or recently posted role cannot rescue a known far-future start date",
+    "the rule is Bora-specific discovery/pursuit timing doctrine only and never changes Qualification Truth, Employer Truth, Candidate Truth, Match Truth, authorization, or actionability",
+    "fresh chats inherit the rule through .cursor/rules/role-selection.mdc",
+    "Brattle Research Analyst July 2027 is recorded as the motivating live example and would be suppressed under this gate on 2026-09-09",
+    "no resume or cover-letter doctrine is changed"
+  ],  "stop_conditions": [
+    "implementation requires any path outside allowed_paths",
+    "implementation would treat UNKNOWN start date as a far-future start",
+    "implementation would allow posting freshness or application deadline to override a known start date beyond 60 days without Bora override",
+    "implementation would create a schema/runtime enum or alter Qualification Truth, Candidate Truth, Match Truth, authorization, actionability, resume, or package generation"
+  ],
+  "review_requirements": "CURSOR_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THIS_NEAR_TERM_START_HORIZON_LOCK_IN_THE_2026-09-09_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}

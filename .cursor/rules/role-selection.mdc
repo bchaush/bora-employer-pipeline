@@ -82,7 +82,26 @@ Do not convert, under any circumstance:
 * Remote authenticity: `VERIFIED` / `LIKELY_LEGITIMATE` / `UNCLEAR` /
   `HIGH_RISK` / `CONFIRMED_FRAUD` / `N/A` (§138.7) -- doctrine vocabulary
   for human/model assessment only; not a schema enum or runtime field.
-* Serious-role output standard (§138.8): Bora Fit, Comparison Pool,
+* Start horizon gate (§138.14): known intended start 0-30 days from the
+  current operating date = TARGETED near-term window (actively target —
+  Career OS should actively seek out and prioritize discovery/application
+  effort toward roles expected to start within this window); 31-60 days =
+  acceptable around-target window; more than 60 days = suppress from
+  Bora-facing serious discovery and package generation unless Bora
+  explicitly requests a future-start pipeline or explicitly overrides the
+  timing gate for that role. An unstated/unreliable start date remains
+  `UNKNOWN` and is never suppressed merely because it was omitted. A near
+  application deadline or recent posting never rescues a known far-future
+  start. Bora-specific pursuit/discovery timing doctrine only — never
+  Qualification/Employer/Candidate/Match Truth, authorization, or
+  actionability. Motivating live example: Brattle — Research Analyst
+  (Economics and Finance), known start July 2027, suppressed on
+  2026-09-09 despite a September 14 application deadline.
+* Serious-role output standard (§138.8): promotion into serious-role output
+  requires passing BOTH the §138.5 recency visibility gate AND the §138.14
+  start horizon gate; failing either one suppresses the role regardless of
+  the other, absent an explicit Bora override of that specific gate. Every
+  serious role analysis presents Bora Fit, Comparison Pool,
   Freshness, Discovery Window, Location/Work Arrangement, First-Party Actionability, Remote
   Authenticity, Authorization, Opportunity Value, Pursuit Economics, and
   a Final Verdict (`PURSUE - DEEP` / `PURSUE - CONTROLLED HIGH-QUALITY` /
