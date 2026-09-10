@@ -76,6 +76,41 @@ text must not expose internal Career OS/governance/evidence-system/
 implementation-control language unless the exact term is independently
 job-relevant and recruiter-natural.
 
+## Complete Four-Artifact Survivor Package Standard and Cover-Letter Gold Reference
+Operational pointer: `BLUEPRINT.md` §141.16-§141.19
+(`PACKAGE_OUTPUT_COVER_LETTER_GOLD_LOCK_V1`) and
+`docs/resume/BORA_COVER_LETTER_GOLD_REFERENCE_V1.json`, enforced by
+`.cursor/rules/resume.mdc`, lock complete survivor packages and a
+hash-verified cover-letter gold reference.
+
+Every genuine survivor role's FINAL package must durably contain résumé
+DOCX, résumé PDF, cover-letter DOCX, and cover-letter PDF, unless Bora
+explicitly opts out of the cover letter for that application. An
+employer/application-system format instruction controls submission
+choice only (§140.1) and never reduces which artifacts are generated in
+the FINAL package (§140.9). Cover-letter DOCX construction must clone
+the exact hash-verified `Bora_Chaush_Cover_Letter_Gold_Reference.docx`
+(SHA-256 `264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90`)
+rather than reconstructing a template from doctrine text. The gold
+DOCX's existence and SHA-256 match alone control clone authority and
+spawn permission: if the exact gold DOCX artifact is unavailable or its
+SHA-256 does not match, stop with
+`COVER_LETTER_GOLD_REFERENCE_ARTIFACT_REQUIRED`. A rendered
+visual-reference PDF of that same gold DOCX is separately recorded
+(SHA-256 `0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42`)
+and must be verified whenever that PDF is actually used for
+visual-fidelity QA — but a missing or mismatched visual-reference PDF
+hash alone does not trigger this stop condition. This reference is
+presentation/quality/template authority only — never Candidate Truth.
+Role-specific cover-letter content must remain grounded exclusively in
+the verified current JD, Match Truth, and approved Candidate
+Truth/evidence — never copied from the Northeastern University R141882
+motivating exemplar's own role-specific facts. Cover letters are one
+U.S. Letter page, visually clean, recruiter-natural, and conform to
+this gold reference; §141's resume-specific presentation grammar and
+§137's 92% meaningful-page-utilization floor are resume-scoped and do
+not govern cover letters.
+
 ## Bora-Specific Hiring Relevance
 Operational pointer: `BLUEPRINT.md` §136 locks Bora-specific hiring relevance as a structured component of Competitive Position (not a fifth truth axis, not a schema field, not a score). Comparison-pool alignment is distinct from seniority; institutional-affinity strength is tiered; network/access leverage is a separate concept from hiring relevance. Positive relevance signals never override a hard qualification blocker, a failed §135 actionability gate, or any legal/OPT/credential blocker. No numeric scores or weights — see §136 for the full doctrine.
 

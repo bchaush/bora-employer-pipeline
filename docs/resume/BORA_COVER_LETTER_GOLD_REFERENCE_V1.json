@@ -1,0 +1,108 @@
+{
+  "record_id": "BORA_COVER_LETTER_GOLD_REFERENCE_V1",
+  "kind": "DOCTRINE_LOCK_DATA_RECORD",
+  "blueprint_section": 141,
+  "blueprint_subsections": ["141.16", "141.17", "141.18", "141.19"],
+  "blueprint_subsections_note": "Recorded as BLUEPRINT.md Section 141 subsections, not a new top-level section, so that the pinned latest_locked_section=141 in tests/resume_reference_style_lock_v1_test.py and the live src/career_os_state.py max-heading validator both stay consistent -- the same reason §141.6, §141.10, and §141.13 give.",
+  "locked_date": "2026-09-10",
+  "source_artifact": {
+    "name": "Bora_Chaush_Cover_Letter_Gold_Reference.docx",
+    "format": "DOCX",
+    "sha256": "264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90",
+    "stored_in_repository": false,
+    "note": "Consistent with existing repository practice for Bora-supplied source documents (BLUEPRINT.md Section 134/141/141.10): the binary is not stored; this record is the canonical description of the approved cover-letter exemplar and its extracted contract."
+  },
+  "visual_reference_pdf": {
+    "name": "Bora_Chaush_Cover_Letter_Gold_Reference.pdf",
+    "format": "PDF",
+    "sha256": "0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42",
+    "stored_in_repository": false,
+    "role": "RENDERED_VISUAL_REFERENCE_OF_THE_SAME_GOLD_DOCX_NOT_AN_INDEPENDENT_SOURCE",
+    "note": "This PDF is a rendered visual-fidelity reference of source_artifact above, used for QA per BLUEPRINT.md Section 140.6/140.2 -- it never becomes a second, independent cover-letter source."
+  },
+  "motivating_exemplar": {
+    "rule": "MOTIVATING_EXEMPLAR_NEVER_UNIVERSAL_TEXT",
+    "family": "Northeastern University R141882 cover-letter family",
+    "description": "Bora's approved Northeastern University R141882 cover-letter family is recorded as the motivating approved exemplar that earned this lock. It is cited by name only for provenance -- its own role-specific facts, employer details, and wording must never be copied into this universal doctrine record or reused verbatim in any other role's cover letter. This mirrors how BLUEPRINT.md Section 141.13 cites the Santander/DraftKings/Point32Health reproduced failures by name without turning either role's content into universal Candidate Truth."
+  },
+  "complete_package_requirement": {
+    "rule": "COMPLETE_FOUR_ARTIFACT_SURVIVOR_PACKAGE",
+    "description": "Every genuine survivor role's FINAL package (a role that has passed qualification, the Section 135/141.13 live/package-time actionability gates, and the Section 141.14 gold-artifact spawn gate) must contain four durable artifacts: resume DOCX, resume PDF, cover-letter DOCX, and cover-letter PDF -- unless Bora explicitly opts out of the cover letter for that application per opt_out_provision below. This applies regardless of which single format is actually submitted to the employer.",
+    "submission_format_is_distinct": "BLUEPRINT.md Section 140.1's DOCX-first default and Section 140.2's PDF-as-supported-representation rule govern which single format is actually submitted to the employer for that application. Neither rule has ever authorized generating only the submitted format as the durable FINAL package; an employer/application-system format instruction controls submission choice only and never reduces which artifacts are generated and retained in the FINAL package.",
+    "extends_not_replaces": [
+      "BLUEPRINT.md Section 140.1 DOCX-first default",
+      "BLUEPRINT.md Section 140.2 PDF as a supported representation",
+      "BLUEPRINT.md Section 140.7 exact submitted-artifact traceability"
+    ]
+  },
+  "opt_out_provision": {
+    "rule": "BORA_EXPLICIT_OPT_OUT_ONLY",
+    "description": "The cover-letter DOCX/PDF requirement in complete_package_requirement may be skipped only when Bora explicitly opts out of a cover letter for that specific application. Absent an explicit opt-out, the cover letter is a required FINAL package artifact exactly like the resume. A missing employer cover-letter upload field is not, by itself, an opt-out -- it only affects submission choice, not durable package generation."
+  },
+  "gold_artifact_clone_requirement": {
+    "rule": "CLONE_EXACT_HASH_VERIFIED_ARTIFACT_NO_TEMPLATE_RECONSTRUCTION",
+    "extends_not_replaces": "BLUEPRINT.md Section 141.14's gold-artifact-based resume spawning gate -- this record applies the same discipline to the cover letter.",
+    "description": "Cover-letter DOCX construction must clone the exact hash-verified Bora_Chaush_Cover_Letter_Gold_Reference.docx (source_artifact.sha256 above) as the starting document, with its SHA-256 verified against this record before making bounded, role-specific content edits. A chat or agent must not reconstruct the cover-letter family from scratch with a fresh document/template, ad-hoc layout, margins, or typography merely by reading doctrine -- this is exactly how the DraftKings resume drift reproduced (BLUEPRINT.md Section 141.13-141.14, docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json) for the resume gold family.",
+    "stop_condition": {
+      "code": "COVER_LETTER_GOLD_REFERENCE_ARTIFACT_REQUIRED",
+      "when": "the exact gold cover-letter DOCX artifact is unavailable, or its hash does not match this record's source_artifact.sha256",
+      "action": "stop rather than improvising a new cover-letter template",
+      "controls_clone_authority": "the gold DOCX's existence and source_artifact.sha256 match alone control clone authority and spawn permission -- this is the only condition that triggers COVER_LETTER_GOLD_REFERENCE_ARTIFACT_REQUIRED",
+      "visual_reference_pdf_hash_scope": "visual_reference_pdf.sha256 above remains canonically recorded and must be verified separately for visual-reference integrity/QA whenever that PDF is actually used per BLUEPRINT.md Section 140.6/140.2, but a missing or mismatched visual-reference PDF hash alone does NOT trigger this stop_condition"
+    }
+  },
+  "authority_scope": {
+    "rule": "PRESENTATION_QUALITY_TEMPLATE_AUTHORITY_ONLY_NEVER_CANDIDATE_TRUTH",
+    "description": "The gold cover-letter reference is presentation/quality/template authority only -- never a source of Candidate Truth. Role-specific cover-letter content (employer name, hiring-team/unit, role-specific narrative, claimed skills or outcomes) must remain grounded exclusively in the verified current JD (per Section 135/141.13's package-time actionability recheck), Match Truth via the Section 140.4 Requirement/EvidenceMatch crosswalk, and approved Candidate Truth/evidence (.cursor/rules/resume.mdc's Claim Lineage) -- never invented merely because it would read naturally in the gold reference's own wording, and never copied from the Northeastern R141882 motivating exemplar's own role-specific facts."
+  },
+  "content_and_style_requirements": {
+    "rule": "ONE_PAGE_RECRUITER_NATURAL_FULL_BLOCK_TRUTHFUL_GAP_HANDLING",
+    "description": "Every generated cover letter must remain one U.S. Letter page; use recruiter-natural American business English consistent with .cursor/rules/resume.mdc's Candidate-Facing Style section; include a full contact block (name, phone, email, location, relevant profile links), the current date, and hiring-team/employer-unit and location addressing consistent with whatever the verified JD/employer source actually names; carry a concise role-specific narrative grounded in the verified JD, Match Truth, and approved evidence -- never a generic template paragraph reused verbatim across roles; handle unsupported requirements truthfully as visible gaps consistent with the existing Gap Visibility rule and Transferable Experience section in .cursor/rules/resume.mdc, never resolving a gap through confident-sounding wording; use real functional hyperlink objects for every link per BLUEPRINT.md Section 140.5's hyperlink rule; and contain no internal Career OS/governance/evidence-system/implementation-control jargon per BLUEPRINT.md Section 141.14's internal-jargon translation requirement.",
+    "extends_not_replaces": [
+      "BLUEPRINT.md Section 141.7 research-backed recruiter/ATS writing-quality principles (human readability, truthful concise wording, evidence-supported quantification only)",
+      "BLUEPRINT.md Section 141.11 final-package QA-dimension checklist, limited to its non-resume-specific dimensions (truth fidelity, JD/evidence coverage, human naturalness, interview defensibility, functional hyperlinks)",
+      "BLUEPRINT.md Section 141.14 internal-jargon translation requirement",
+      ".cursor/rules/resume.mdc Candidate-Facing Style, Gap Visibility, and Transferable Experience sections"
+    ],
+    "not_applicable_resume_specific_rules": {
+      "rule": "RESUME_PRESENTATION_GRAMMAR_AND_92_PERCENT_FLOOR_DO_NOT_GOVERN_COVER_LETTERS",
+      "description": "BLUEPRINT.md Section 141's resume-specific presentation grammar (no PROFESSIONAL SUMMARY heading, EDUCATION/SKILLS/WORK EXPERIENCE/RELEVANT PROJECT section order, single bold Title | Employer work-entry line, two-school education grammar, three-row skills grammar) and Section 137's 92% meaningful-page-utilization floor -- including Section 141.11's reference-conformance and rendered-one-page-92%-utilization QA dimensions, which restate those two rules -- are resume-specific and do NOT apply to cover letters. Cover-letter presentation/quality conformance is governed instead by content_and_style_requirements below (one U.S. Letter page, visually clean, recruiter-natural) and by this gold reference's own template, never by Section 141's resume grammar or Section 137's resume floor."
+    }
+  },
+  "unchanged_doctrine": [
+    "BLUEPRINT.md Section 135's live-role verified actionability gate",
+    "BLUEPRINT.md Section 137's 92% meaningful-page-utilization floor (resume-scoped only -- see not_applicable_resume_specific_rules above; not imported onto cover letters)",
+    "BLUEPRINT.md Section 140's DOCX-first submission default, requirement/JD-to-evidence crosswalk, real-hyperlink-object rule, and rendered-artifact QA authority",
+    "BLUEPRINT.md Section 141's presentation grammar (resume-scoped only -- see not_applicable_resume_specific_rules above; not imported onto cover letters) and Section 141.7's research-backed writing-quality principles",
+    "BLUEPRINT.md Section 141.10-141.11's gold-quality acceptance reference and final-package QA-dimension checklist",
+    "BLUEPRINT.md Section 141.13-141.14's package-time actionability recheck and resume gold-artifact spawn gate",
+    "Candidate Truth, Match Truth, and qualification/pursuit runtime logic",
+    "immigration/work-authorization doctrine",
+    "discovery/actionability/start-horizon doctrine"
+  ],
+  "role_tailoring_boundary": {
+    "must_never": [
+      "invent or copy a cover-letter fact merely because it appears in the gold reference's own wording or in the Northeastern R141882 motivating exemplar's role-specific facts",
+      "invent cover-letter facts not present in approved Candidate Truth or the verified current JD",
+      "change Candidate Truth, Match Truth, or qualification/pursuit/immigration logic",
+      "reconstruct the cover-letter gold family from scratch instead of cloning the exact hash-verified artifact when it is available",
+      "reduce durable FINAL package generation because of an employer submission-format instruction",
+      "skip the cover letter for a survivor role absent an explicit Bora opt-out",
+      "leave internal Career OS/governance/evidence-system/implementation-control language in candidate-facing cover-letter text absent genuine job relevance",
+      "solve an unsupported requirement through confident-sounding cover-letter wording instead of leaving it a visible gap",
+      "apply Section 141's resume-specific presentation grammar or Section 137's 92% meaningful-page-utilization floor to a cover letter",
+      "treat a missing or mismatched visual-reference PDF hash alone as sufficient to trigger COVER_LETTER_GOLD_REFERENCE_ARTIFACT_REQUIRED -- only the gold DOCX's existence and hash match control that stop condition"
+    ],
+    "gold_reference_authority_scope": "This record is a gold-quality cover-letter presentation/template reference and package-completeness lock only. It is never a source of Candidate Truth: substantive factual content must still trace only to approved Candidate Truth / claim-evidence lineage and the verified current JD, exactly as required for the resume."
+  },
+  "non_goals": {
+    "reference": "BLUEPRINT.md Section 133 build-economy gate; Section 134 Non-Goals; Section 141.5/141.9/141.12/141.15/141.19 Doctrine-only locks",
+    "excludes": [
+      "a DOCX/PDF generator or renderer",
+      "an automated grammar/style/ATS-score validator or linter beyond this doctrine record and its accompanying regression test",
+      "any change to Candidate Truth, Match Truth, qualification/pursuit logic, immigration logic, or schemas",
+      "any change to the protected resume master or resume patch/lineage architecture in .cursor/rules/resume.mdc",
+      "an autonomous or unsupervised cover-letter drafting runtime -- drafting remains bounded, input-restricted, and still gated by G adjudication and Bora's human approval, exactly as the resume drafting pilot is (Section 141.8)"
+    ]
+  }
+}
