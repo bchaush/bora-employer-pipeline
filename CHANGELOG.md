@@ -19,6 +19,70 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-09 — Discovery start horizon gate 0-30 day band semantic correction (`DISCOVERY_START_HORIZON_GATE_V1`, DOCTRINE CORRECTION)
+
+**Reason**
+
+Bora clarified that the 0-30 day start-horizon band is not merely a
+passive preference but an active discovery target: Career OS should
+actively target roles expected to start within the next 30 days, not
+just favor them when encountered. The prior wording ("preferred
+near-term window") understated this and read as equivalent in posture
+to the 31-60 day "acceptable around-target window" band.
+
+**Changed**
+
+* `BLUEPRINT.md` §138.14: the 0-30 day band is now **TARGETED near-term
+  window** — actively target for serious discovery and application
+  effort, not merely favor if encountered. 31-60 days remains the
+  acceptable around-target window; >60 days remains suppressed absent an
+  explicit Bora future-start override; `UNKNOWN` start dates remain
+  neutral and are never suppressed merely because omitted; freshness/
+  application-deadline proximity still cannot rescue a known far-future
+  (>60 day) start; §138.8's serious-role output standard still requires
+  passing BOTH the §138.5 recency visibility gate AND the §138.14 start
+  horizon gate. No other band, gate, or cross-reference changed.
+* `.cursor/rules/role-selection.mdc` quick-reference updated to the same
+  TARGETED wording so fresh chats inherit the corrected posture.
+* `tests/discovery_start_horizon_gate_v1_test.py` updated to assert the
+  TARGETED wording and its active-target rationale in both `BLUEPRINT.md`
+  and the quick-reference rule.
+* `milestone_contracts/feature/discovery-start-horizon-gate-v1.json`'s
+  first acceptance condition reworded to match.
+
+**Not changed**
+
+No schema/runtime enum, Qualification Truth, Employer Truth, Candidate
+Truth, Match Truth, authorization, actionability, or resume/cover-letter
+doctrine changed. The 31-60 day, >60 day, `UNKNOWN`, deadline-cannot-
+rescue, and dual-gate serious-role-promotion rules are unchanged in
+substance — only the 0-30 day band's characterization was corrected.
+
+---
+
+
+## 2026-09-09 — Discovery start horizon gate (`DISCOVERY_START_HORIZON_GATE_V1`, DOCTRINE + REGRESSION LOCK)
+
+**Reason**
+
+Bora needs discovery/pursuit effort to favor roles that can realistically start around his near-term hiring objective, and to stop known far-future-start roles from consuming serious discovery/package effort merely because they carry a fresh posting or a near application deadline. Brattle — Research Analyst (Economics and Finance), known intended start July 2027, is the motivating live example: on 2026-09-09 it would otherwise look actionable because of a September 14 application deadline, despite the known start being far more than 60 days out.
+
+**Changed**
+
+* `BLUEPRINT.md` §138.14 (new) locks the start horizon bands: 0-30 days = preferred near-term window; 31-60 days = acceptable around-target window; >60 days = suppressed from Bora-facing serious discovery/package generation unless Bora explicitly requests a future-start pipeline or overrides the gate for that role. `UNKNOWN`/unreliable start dates are never suppressed merely because omitted. Freshness/deadline proximity cannot rescue a known far-future start.
+* `.cursor/rules/role-selection.mdc` quick-reference inherits the same rule so fresh chats pick it up automatically.
+* `tests/discovery_start_horizon_gate_v1_test.py` locks the bands, the UNKNOWN-is-not-suppressed rule, the deadline-cannot-rescue rule, and the Brattle motivating example text.
+
+**Not changed**
+
+No schema/runtime enum, Qualification Truth, Employer Truth, Candidate Truth, Match Truth, authorization, actionability, or resume/cover-letter doctrine changed. Existing recency-visibility (§138.5) and work-format (§138.4) discovery locks, and the live-actionability semantic quorum (§135/§141.13), are unchanged.
+
+**Repair (same day, Cursor adversarial review finding)**
+
+Cursor found that §138.8's serious-role output standard still gated promotion on only the §138.5 recency visibility gate, so a known far-future-start role (e.g. Brattle) could in principle still satisfy §138.8's literal gate condition even though §138.14 suppressed it. `BLUEPRINT.md` §138.8 now requires passing BOTH the §138.5 recency visibility gate AND the §138.14 start horizon gate before serious-role promotion; failing either suppresses the role regardless of the other, absent an explicit Bora override of that specific gate. `.cursor/rules/role-selection.mdc`'s §138.8 quick-reference and `tests/discovery_start_horizon_gate_v1_test.py` were updated to lock this cross-section dependency.
+
+---
+
 
 ## 2026-09-09 — Live actionability semantic quorum (`LIVE_ACTIONABILITY_SEMANTIC_QUORUM_V1`, DOCTRINE + REGRESSION LOCK)
 

@@ -4327,8 +4327,12 @@ information) without encoding external URLs into runtime logic or
 treating one deviation from those examples as proof of fraud.
 
 **138.8 Serious-role output standard.** Only roles that pass the §138.5
-Bora-facing recency visibility gate may be promoted into this serious-role
-output. When employer posting date remains unknown but an authoritative dated
+Bora-facing recency visibility gate AND the §138.14 start horizon gate may
+be promoted into this serious-role output; a role suppressed under either
+gate does not enter serious-role output or package generation regardless of
+its status under the other gate, unless Bora explicitly overrides that
+specific gate for that specific role per that gate's own override terms.
+When employer posting date remains unknown but an authoritative dated
 application-intake window independently passes that gate, Freshness remains
 `UNKNOWN` and Discovery Window remains `UNKNOWN_WINDOW`; never convert the
 application-window date into an employer posting date. Every serious role
@@ -4429,6 +4433,42 @@ persist or alter Atominvest's Application Truth, which remains recorded
 separately (Atominvest — Implementation Analyst, SUBMITTED, 2026-09-06,
 exact approved application résumé retained); any Atominvest application-
 record persistence change is a separate, later, bounded change.
+
+**138.14 Start horizon gate — DISCOVERY_START_HORIZON_GATE_V1 (Bora-specific
+pursuit/discovery timing doctrine only).** This is a Bora-facing discovery
+and pursuit-timing rule keyed to the current operating date; it never
+changes Qualification Truth, Employer Truth, Candidate Truth, Match Truth,
+authorization, or actionability (§135/§138.6), and it is not a schema/
+runtime enum. A known, reliable intended-start date for a role is banded
+relative to the current operating date: **0-30 days = TARGETED near-term
+window** (actively target — Career OS should actively seek out and
+prioritize discovery/application effort toward roles expected to start
+within this window, not merely favor them if encountered); **31-60
+days = acceptable around-target window** (still pursue normally); **more
+than 60 days = suppressed from Bora-facing serious discovery and package
+generation** unless Bora explicitly requests a future-start pipeline for
+that role or explicitly overrides the timing gate for that specific role.
+
+An unstated or unreliably inferred start date remains `UNKNOWN` and is
+never suppressed merely because the employer omitted a start date —
+`UNKNOWN` is not treated as far-future. A near application deadline or a
+recently posted/fresh role (§138.5) cannot rescue a role with a known
+start date more than 60 days out; posting freshness and start-date horizon
+are independent axes, and freshness never overrides a known far-future
+start.
+
+**Motivating live example.** Brattle — Research Analyst (Economics and
+Finance), known intended start July 2027, is the motivating live example:
+evaluated on 2026-09-09, the known start date is far more than 60 days
+out, so the role is suppressed from Bora-facing serious discovery and
+package generation under this gate even though it carries a September 14,
+2026 application deadline. The near deadline does not rescue the known
+far-future start.
+
+This subsection does not itself authorize runtime implementation — no new
+schema, enum, database field, or automation change is pre-authorized;
+per §138.12's build-economy boundary, a separate earned architecture audit
+is required before any deterministic code is built for this gate.
 
 **139. BORA IMMIGRATION ROLE ANALYSIS TIGHTENING — BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1 (LOCKED)**
 
