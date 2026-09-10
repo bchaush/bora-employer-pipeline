@@ -19,6 +19,79 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-10 — Discovery recency hard cutoff (`DISCOVERY_RECENCY_HARD_CUTOFF_V1`, DOCTRINE LOCK)
+
+**Reason**
+
+Bora explicitly authorized a hard cutoff on Career OS pursuit of roles with
+a reliable employer posting age of 22 days or more, so that normal
+discovery/package generation stops spending effort on stale postings
+without weakening the existing 0-7/8-14/15-21 day bands or the
+`UNKNOWN_WINDOW` no-substitution guard.
+
+**Changed**
+
+* `BLUEPRINT.md` §138.5: the `22+ days` label changes from
+  `EXCEPTION_ONLY_WINDOW` (an automatic strength-based escape hatch) to
+  `SUPPRESSED_WINDOW` (a hard cutoff). A reliable employer posting age of
+  22 days or more is now suppressed from normal Bora-facing serious
+  discovery and package generation; the only way past the cutoff is an
+  explicit Bora override of the recency cutoff for that specific role —
+  there is no automatic rescue based on role strength, verified-live
+  status, or strategic exceptionalism. The 0-7 `GOLD_WINDOW`, 8-14
+  `STRETCH_WINDOW`, and 15-21 `FAR_STRETCH_WINDOW` bands are unchanged.
+  `UNKNOWN_WINDOW` (posting date not reliably established) remains
+  governed only by the existing Bora-facing recency visibility gate and is
+  never itself treated as `SUPPRESSED_WINDOW` merely because the date is
+  missing. §138.8's Discovery Window vocabulary list is updated to match.
+* `BLUEPRINT.md` §138.5 records PCG — Apprentice Business Analyst,
+  requisition JR102087, at 29 days' reliable employer posting age, as the
+  motivating live example: a strong/good fit that was historically
+  submitted, but which a comparable future normal Career OS run would now
+  suppress under `SUPPRESSED_WINDOW` absent an explicit Bora override.
+* `.cursor/rules/role-selection.mdc` quick-reference updated to teach the
+  same `SUPPRESSED_WINDOW` hard cutoff and per-role-override-only rule,
+  preserving `alwaysApply: true`.
+* This is Pursuit Truth only: no change to Qualification, Employer,
+  Candidate, or Match Truth, authorization, actionability, start-horizon,
+  resume, cover-letter, package-output, schema, or runtime behavior.
+* Updated `tests/discovery_recency_work_format_priority_lock_v1_test.py`
+  and `tests/discovery_recency_visibility_gate_v1_test.py` (the two prior
+  regressions that locked `22+ days = EXCEPTION_ONLY_WINDOW`) to assert the
+  new `SUPPRESSED_WINDOW` canonical rule instead, without weakening any of
+  their other locked protections.
+* Added `tests/discovery_recency_hard_cutoff_v1_test.py` with direct
+  regression coverage: 21-day roles survive as `FAR_STRETCH_WINDOW`, 22-day
+  roles are suppressed as `SUPPRESSED_WINDOW`, an explicit per-role Bora
+  override is the only path past the cutoff, `UNKNOWN_WINDOW` is neutral
+  and never treated as 22+, the old `EXCEPTION_ONLY_WINDOW` label is fully
+  retired, and the PCG JR102087 motivating example is recorded.
+
+**Correction pass (Cursor REQUIRES_CORRECTION)**
+
+* `BLUEPRINT.md` §138.5's freshness-overlay paragraph retained
+  EXCEPTION_ONLY-era rescue language ("outranks age-band assumptions",
+  "16-day-old or older ... may still deserve pursuit"). Rewritten so
+  first-party verified live/actionable evidence may influence
+  ranking/pursuit strength only within `FAR_STRETCH_WINDOW` (15-21 days);
+  it never extends to or rescues `SUPPRESSED_WINDOW` (22+ days) — no
+  degree of fit/value strength lifts that cutoff, only an explicit Bora
+  per-role recency override does.
+* `BLUEPRINT.md` §138.8 and `.cursor/rules/role-selection.mdc`'s §138.8
+  quick-reference each gained an additive closing clause pinning the
+  §138.5 recency hard cutoff (not `SUPPRESSED_WINDOW`) as part of the
+  recency visibility gate required for serious-role promotion/package
+  eligibility, alongside the existing start-horizon and employer-family
+  checks — without altering the pre-existing, separately locked
+  two-gate/three-check sentences those files share with
+  `tests/discovery_start_horizon_gate_v1_test.py` and
+  `tests/employer_exclusion_discovery_source_ladder_v1_test.py`.
+* `tests/discovery_recency_hard_cutoff_v1_test.py` strengthened to forbid
+  the retired unbounded rescue language and to require the §138.8
+  promotion wiring to name the hard cutoff explicitly.
+
+---
+
 ## 2026-09-10 — Bora employer-family exclusion and discovery-source ladder (`EMPLOYER_EXCLUSION_DISCOVERY_SOURCE_LADDER_V1`, DOCTRINE LOCK)
 
 **Reason**

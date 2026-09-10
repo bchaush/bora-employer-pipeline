@@ -41,9 +41,13 @@ for token in (
     "0-7 days = GOLD_WINDOW",
     "8-14 days = STRETCH_WINDOW",
     "15-21 days = FAR_STRETCH_WINDOW",
-    "22+ days = EXCEPTION_ONLY_WINDOW",
+    "22+ days = SUPPRESSED_WINDOW",
 ):
     require(token in BLUEPRINT, f"prior discovery window drifted: {token}")
+
+require("Recency hard cutoff (`SUPPRESSED_WINDOW`, fail closed)" in BLUEPRINT, "hard cutoff section missing from Blueprint")
+require("lifted only by an explicit Bora\noverride of the recency cutoff for that specific role" in BLUEPRINT, "hard cutoff explicit per-role override missing")
+require("never itself treated as `SUPPRESSED_WINDOW`" in BLUEPRINT, "UNKNOWN_WINDOW neutrality under the hard cutoff missing")
 
 require("**Final Locked Blueprint v3.13**" in BLUEPRINT, "pinned Blueprint banner drifted")
 require(CONTRACT["baseline_sha"] == "df185c1c8341cf25e23a253bc63cf328b7410fa8", "contract baseline drifted")

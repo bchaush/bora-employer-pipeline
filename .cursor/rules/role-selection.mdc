@@ -49,13 +49,16 @@ Do not convert, under any circumstance:
   Truth. `STALE_LEANING` never means closed or unqualified.
 * Locked discovery windows (§138.5): `GOLD_WINDOW` = 0-7 days;
   `STRETCH_WINDOW` = 8-14 days; `FAR_STRETCH_WINDOW` = 15-21 days;
-  `EXCEPTION_ONLY_WINDOW` = 22+ days; `UNKNOWN_WINDOW` when employer posting
-  date is not reliable. `EXCEPTION_ONLY_WINDOW` is not a hard exclusion: an
-  unusually strong, strategically exceptional, first-party verified-live role
-  may still deserve pursuit. Missing/unreliable employer posting date stays
-  `UNKNOWN` / `UNKNOWN_WINDOW`; never substitute `discovered_date` or
-  `date_first_seen` as the employer posting date. These are governance/
-  presentation labels only, never schema/runtime enums or employer cutoffs.
+  `SUPPRESSED_WINDOW` = 22+ days; `UNKNOWN_WINDOW` when employer posting
+  date is not reliable. `SUPPRESSED_WINDOW` is a hard cutoff: a reliable
+  employer posting age of 22+ days is suppressed from normal Bora-facing
+  serious discovery and package generation; only an explicit Bora override
+  of the recency cutoff for that specific role may allow it to proceed —
+  there is no automatic strength-based escape hatch. Missing/unreliable
+  employer posting date stays `UNKNOWN` / `UNKNOWN_WINDOW` and is never
+  treated as `SUPPRESSED_WINDOW` merely because the date is missing; never substitute `discovered_date` or
+  `date_first_seen` as the employer posting date. These are governance/presentation
+  labels only, never schema/runtime enums or employer cutoffs.
 * Bora-facing recency visibility gate (§138.5): before serious-role surfacing
   or package work, require either a reliable employer/official-ATS posting
   date or an authoritative dated application-intake window for the exact role.
@@ -141,7 +144,10 @@ Do not convert, under any circumstance:
   promotion still requires the existing §138.5 recency visibility gate,
   §138.14 start horizon gate, the §138.6.2 employer-family-exclusion check
   PASS, §135/§138.6 first-party actionability, and the package-time
-  first-party recheck.
+  first-party recheck. This gate stack also includes the §138.5 recency
+  hard cutoff PASS (not `SUPPRESSED_WINDOW`, absent an explicit Bora
+  per-role recency override) -- discovery-source preference never softens
+  that cutoff.
 * Start horizon gate (§138.14): known intended start 0-30 days from the
   current operating date = TARGETED near-term window (actively target —
   Career OS should actively seek out and prioritize discovery/application
@@ -178,7 +184,14 @@ Do not convert, under any circumstance:
   Authenticity, Authorization, Opportunity Value, Pursuit Economics, and
   a Final Verdict (`PURSUE - DEEP` / `PURSUE - CONTROLLED HIGH-QUALITY` /
   `PURSUE - EFFICIENT` / `WATCH` / `REJECT`). No numeric score, no fake
-  probability, no point system, ever.
+  probability, no point system, ever. Promotion under the §138.5 recency
+  visibility gate additionally requires the §138.5 recency hard cutoff to
+  PASS -- the role is not `SUPPRESSED_WINDOW` (22+ days' reliable employer
+  posting age) -- as part of that same gate, not a separate optional check;
+  a `SUPPRESSED_WINDOW` role is never promoted on the strength of fit/value
+  or first-party verified live/actionable evidence, and the §138.14/§138.6.2
+  checks above do not run in place of this cutoff. Only an explicit Bora
+  per-role recency override lifts the cutoff for that specific role.
 
 **Disambiguation (§138.8):** every §138.8 label is presentation
 vocabulary for Pursuit Truth only -- never a value of, or synonym for,

@@ -58,6 +58,11 @@ require(
     "promotion into serious-role output\n  requires passing BOTH the §138.5 recency visibility gate AND the §138.14\n  start horizon gate; failing either one suppresses the role regardless of\n  the other" in RULE,
     "role-selection.mdc quick-reference must restate the §138.8/§138.14 cross-gate dependency",
 )
+require(
+    "Promotion under the §138.5 recency visibility gate additionally requires the §138.5 recency hard cutoff to PASS"
+    in BLUEPRINT.replace("\n", " "),
+    "§138.8 must additionally require the §138.5 recency hard cutoff to PASS as part of the recency visibility gate",
+)
 
 require("alwaysApply: true" in RULE, "role-selection rule must remain always-on")
 require("Start horizon gate (§138.14)" in RULE, "always-on start horizon pointer missing")
@@ -78,7 +83,7 @@ for token in (
     "0-7 days = GOLD_WINDOW",
     "8-14 days = STRETCH_WINDOW",
     "15-21 days = FAR_STRETCH_WINDOW",
-    "22+ days = EXCEPTION_ONLY_WINDOW",
+    "22+ days = SUPPRESSED_WINDOW",
 ):
     require(token in BLUEPRINT, f"prior discovery window drifted: {token}")
 
