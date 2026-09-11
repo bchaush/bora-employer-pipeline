@@ -9,19 +9,27 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - Phase B Accepted / Phase C Completed by Operator, Pending Bora Acceptance
+## Current Checkpoint - Agent Context & Usage Efficiency Policy Completed by Operator, Pending Bora Acceptance
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
-Prior phase: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
-Operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**
-Human acceptance: **BORA_ACCEPTED**
-Current phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` - **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY**
-Report: `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`
-Exact next allowed action: Bora reviews and accepts or rejects the Phase C checkpoint. No implementation, and no phase beyond Phase C, is authorized by this record.
+
+PRIOR PHASE (already Bora-accepted; recorded here only as context for the current milestone below -- these fields do NOT describe the current policy milestone):
+Prior phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` (Phase C, READ_ONLY)
+Prior-phase operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**
+Prior-phase human acceptance: **BORA_ACCEPTED**
+
+CURRENT POLICY MILESTONE (distinct from the prior phase above; not yet governing):
+Current milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1`
+Current-milestone mode: **GOVERNANCE_ONLY**
+Current-milestone operator status: **COMPLETED_BY_OPERATOR**
+Current-milestone human acceptance: **PENDING_BORA_ACCEPTANCE**
+Current-milestone governing status: **NOT_YET_GOVERNING**
+ADR: `docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md`
+Exact next allowed action: Bora reviews and accepts or rejects this policy milestone/checkpoint. No implementation, and no Phase D, is authorized by this record.
 
 ## Eval & Harness Audit - Roadmap Reference
 
-Status: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** (see the Checkpoint block above). Next phase `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY**; Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**.
+Prior-phase status (Phase C `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`): **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** (see the Checkpoint block above). The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone is a SEPARATE, CURRENT record: **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / GOVERNANCE_ONLY / NOT_YET_GOVERNING**; Phase D and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 

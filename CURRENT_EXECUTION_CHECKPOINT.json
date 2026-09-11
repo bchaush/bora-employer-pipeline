@@ -1,29 +1,31 @@
 {
   "schema_version": "1.0",
-  "checkpoint_id": "CAREER_OS_CHECKPOINT_2026-09-11_PHASE_C_COMPLETE",
+  "checkpoint_id": "CAREER_OS_CHECKPOINT_2026-09-11_AGENT_CONTEXT_USAGE_EFFICIENCY_POLICY",
   "recorded_at": "2026-09-11",
-  "canonical_basis_sha": "2ce84321e8095b622328c77ea348b8f1fe874f5c",
-  "phase_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
-  "phase_mode": "READ_ONLY",
+  "canonical_basis_sha": "ba6530498be3410e3524aacd1ff5fba0c815d8d0",
+  "phase_id": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1",
+  "phase_mode": "GOVERNANCE_ONLY",
   "operator_status": "COMPLETED_BY_OPERATOR",
   "human_acceptance_status": "PENDING_BORA_ACCEPTANCE",
   "implementation_authorized": false,
   "prior_phase": {
-    "phase_id": "CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1",
+    "phase_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
     "phase_mode": "READ_ONLY",
     "operator_status": "COMPLETED_BY_OPERATOR",
     "human_acceptance_status": "BORA_ACCEPTED",
     "accepted_at": "2026-09-11"
   },
-  "terminal_adjudication": "PHASE B (CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1) BORA ACCEPTED - PHASE C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY - PHASE D (FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP) PROPOSED_NOT_AUTHORIZED - IMPLEMENTATION NOT AUTHORIZED",
+  "terminal_adjudication": "PHASE C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) BORA ACCEPTED - CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / GOVERNANCE_ONLY - PHASE D (FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP) PROPOSED_NOT_AUTHORIZED - IMPLEMENTATION NOT AUTHORIZED",
   "completed_actions": [
-    "Rendered the read-only Phase C real trace and failure corpus inventory into durable canonical documentation at docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md",
-    "Inventoried the OBSERVED 14-entry BORA_DIRECT_CONFIRMATION submitted-application corpus in docs/application/BORA_APPLICATION_HISTORY_V1.json",
-    "Reconstructed, from durable secondary evidence (merged-PR bodies, CHANGELOG.md, CURRENT_STATE.md, milestone contracts, tests) rather than raw traces, the stale/dead/actionability failure cases MGB RQ4055007, Fresenius R0266808, MGB RQ4075857, Point32Health R9102, and the MassDOT 260005JH application-route failure",
-    "Reconstructed the package/artifact-quality failure cases Atominvest under-filled resume, Santander premature package generation, and DraftKings resume drift/internal-jargon leakage",
-    "Reconstructed the controller/reviewer integrity findings F1-F9 and the provider stdout/stderr transport defect (citing run 20260907T220348Z-3dacfcfd, with historical runs 20260907T180932Z-656eae27 and 20260907T193310Z-f6a756d2), and separately cited the reviewer stdin-transport closure (run 20260908T184816Z-d3a8a974), the resume gold-quality closure (run 20260909T040202Z-811bdf0a), and the package-gate closure (run 20260909T172902Z-7add4b47) as non-defect governed runs",
-    "Explicitly recorded that .career-os/ run artifacts and local PDF/DOCX package artifacts are gitignored and therefore MISSING from repository history where not separately persisted",
-    "Recorded open-coding qualitative tags (current-role/actionability; package/artifact quality/spawn; controller/reviewer transport/evidence integrity; duplicate/application-lifecycle continuity; human-handoff/submission continuity) as Phase C tags only, not a Phase D taxonomy or evaluator map"
+    "Drafted docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md as a candidate policy (pending Bora acceptance; not yet governing): quality-preserving Claude Code / Cursor context-and-usage discipline, with every material claim labeled SOURCE_DIRECT / CAREER_OS_ADAPTATION / OBSERVED_REPO_FACT / OPEN_HYPOTHESIS and cited to source URLs/dates",
+    "Drafted the 17 candidate policy principles, the Cursor economy rule, and the Claude economy rule as CAREER_OS_ADAPTATION governance, subordinate to the existing Authority Order and every existing truth/evidence/review/approval rule, pending Bora acceptance",
+    "Recorded OBSERVED_REPO_FACT baseline measurements (CLAUDE.md, AGENTS.md, and the seven .cursor/rules alwaysApply files' byte/line counts) as a future comparison point, without changing any of those files",
+    "Explicitly deferred any context-surface structural refactor (splitting or reducing CLAUDE.md/.cursor/rules/.claude/ loaded context) to a later, separately authorized, measured context-surface audit, labeled OPEN_HYPOTHESIS",
+    "Added a concise AGENTS.md operational pointer to the new ADR, without restating the policy",
+    "Created milestone_contracts/governance/career-os-agent-context-and-usage-efficiency-v1.json with baseline_sha ba6530498be3410e3524aacd1ff5fba0c815d8d0",
+    "Updated docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md to reflect Bora's acceptance of the Phase C checkpoint (2026-09-11), preserved as historical accepted evidence",
+    "Synchronized project_state.json, CURRENT_MILESTONE.md, and CURRENT_STATE.md with this checkpoint's Phase C acceptance and this policy milestone's governance-only/pending-acceptance state",
+    "Updated docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md's Phase C status references to BORA_ACCEPTED, keeping Phase D PROPOSED_NOT_AUTHORIZED and the single canonical Section 6 recovery order unchanged"
   ],
   "phase_b_completed_actions_reference": [
     "Recovered live canonical main and governing eval/harness ADR",
@@ -48,9 +50,11 @@
     "No formal Phase D failure taxonomy, severity ranking, or evaluator-coverage map",
     "No trace infrastructure, database, dashboard, orchestration automation, new agent, model router, or LLM judge implemented",
     "No production Career OS behavior changed",
+    "No structural change to CLAUDE.md, .cursor/rules/*, .cursorignore, or .claude/ settings/skills/subagents/hooks -- any such change remains OPEN_HYPOTHESIS pending a separately authorized measured context-surface audit",
+    "No numerical context/usage savings claim measured or asserted",
     "No phase beyond Phase C (Phase D and later) is authorized by this checkpoint",
     "No claim that raw run traces exist beyond what durable secondary records establish"
   ],
-  "exact_next_allowed_action": "Bora reviews and accepts or rejects the Phase C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) checkpoint and its operator inventory report at docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md. No Phase D work, taxonomy, evaluator design, trace architecture, or implementation may begin from any other premise, and no later phase may begin until Bora separately accepts this checkpoint and separately authorizes a next phase.",
-  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B, and operator completion of Phase C, never imply that Phase C is Bora-accepted, that implementation is authorized, or that Phase D or any later phase is authorized."
+  "exact_next_allowed_action": "Bora reviews and accepts or rejects this policy milestone/checkpoint (CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1) and its candidate ADR at docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md. No Phase D work, taxonomy, evaluator design, trace architecture, or implementation may begin from any other premise, and no later phase may begin until Bora separately accepts this checkpoint and separately authorizes a next phase.",
+  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B and Phase C, and operator completion of this governance-only policy milestone, never imply that this policy milestone is Bora-accepted, that implementation is authorized, or that Phase D or any later phase is authorized."
 }

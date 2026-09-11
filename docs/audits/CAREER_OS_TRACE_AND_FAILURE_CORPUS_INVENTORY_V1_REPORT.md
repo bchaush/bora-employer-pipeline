@@ -1,7 +1,7 @@
-# OPERATOR INVENTORY REPORT / PENDING BORA ACCEPTANCE
+# OPERATOR INVENTORY REPORT / BORA ACCEPTED
 
 **Phase:** `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` (Phase C, read-only)
-**Status:** Operator-completed; **PENDING_BORA_ACCEPTANCE**. This report is a durable rendering of the read-only Phase C inventory into canonical documentation. It does not itself authorize Phase D, a failure taxonomy, an evaluator map, trace infrastructure, or any implementation. Acceptance/rejection of this checkpoint is recorded in `CURRENT_EXECUTION_CHECKPOINT.json`. See `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md` for the governing roadmap and authority order.
+**Status:** Operator-completed; **BORA ACCEPTED** (2026-09-11). This report remains a historical operator finding and durable rendering of the read-only Phase C inventory into canonical documentation. It does not itself authorize Phase D, a failure taxonomy, an evaluator map, trace infrastructure, or any implementation. At the time of this Phase C acceptance, Bora separately authorized `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` (a governance-only policy milestone) to begin as the next step before Phase D. Acceptance is recorded in `CURRENT_EXECUTION_CHECKPOINT.json`; that live checkpoint, not this historical report, governs current phase state. See `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md` for the governing roadmap and authority order.
 
 ## Scope
 
@@ -101,4 +101,4 @@ These are qualitative groupings applied to the cases above for this read-only in
 
 ## Acceptance
 
-This report is **PENDING_BORA_ACCEPTANCE**, recorded in `CURRENT_EXECUTION_CHECKPOINT.json`. Bora's review and acceptance or rejection of this checkpoint is the sole next allowed action; no Phase D work, taxonomy, evaluator design, trace architecture, or implementation is authorized until that acceptance is separately recorded and a next phase is separately authorized.
+Bora has explicitly accepted the Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) checkpoint and this operator inventory report (2026-09-11), recorded as `prior_phase` in `CURRENT_EXECUTION_CHECKPOINT.json` (see `phase_c_completed_actions_reference` there for the same completed inventory actions listed above). This acceptance is the accepted basis for Bora's separate authorization of `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` (governance-only policy milestone), which at the time of this Phase C acceptance had not yet started. Bora's acceptance of this historical report does not constitute acceptance of any later phase's current state; current state is governed solely by the live `CURRENT_EXECUTION_CHECKPOINT.json`. This report does not authorize implementation, trace infrastructure, a database/UI, orchestration automation, a new agent, model routing, an LLM judge, or Phase D.
