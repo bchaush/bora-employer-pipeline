@@ -4691,6 +4691,12 @@ schema, enum, database field, or automation change is pre-authorized;
 per §138.12's build-economy boundary, a separate earned architecture audit
 is required before any deterministic code is built for this gate.
 
+**138.15 Previously-submitted opportunity suppression - SUBMITTED_OPPORTUNITY_DEDUPE_V1.** Before a discovered role may enter serious Bora-facing output or package generation, Career OS must deterministically check whether the **same employer + exact requisition/opportunity identity** already has historical Submitted Application Truth. If yes, suppress that role from fresh discovery/pursuit output and do not regenerate or replace its package merely because the posting remains live, fresh, attractive, or newly rediscovered. The role may still be referenced for application-status follow-up, outcome tracking, audit, or an explicit Bora request to revisit it; suppression is only against treating the same opportunity as a new application target.
+
+A current first-party ATS state that explicitly says Bora **already applied** to that exact opportunity is authoritative Application Truth for this dedupe decision and immediately suppresses the role from new-opportunity promotion. Likewise, a persisted exact-role application lifecycle state of `SUBMITTED`, `INTERVIEWING`, `REJECTED`, `WITHDRAWN`, `OFFER`, or `CLOSED` is not a new application target. `PREPARING` or `READY_FOR_REVIEW` is not treated as already submitted and remains a continuation of the existing application workflow, never a second discovery survivor. A durable package folder by itself is not proof of submission.
+
+Identity matching must be deterministic and role-specific: employer/system identity plus exact requisition/opportunity identifier controls when available. Title similarity, fuzzy company matching, or a recycled title alone must never suppress a genuinely different requisition. This rule never rewrites historical Employer Truth, Qualification Truth, Candidate Truth, Match Truth, package artifacts, or outcome history. It is a Bora-facing dedupe/pursuit rule, not a posting-freshness or actionability judgment.
+
 **139. BORA IMMIGRATION ROLE ANALYSIS TIGHTENING — BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1 (LOCKED)**
 
 This section tightens §§24-27's existing immigration doctrine for serious-
