@@ -6,7 +6,8 @@
   "phase_id": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1",
   "phase_mode": "GOVERNANCE_ONLY",
   "operator_status": "COMPLETED_BY_OPERATOR",
-  "human_acceptance_status": "PENDING_BORA_ACCEPTANCE",
+  "human_acceptance_status": "BORA_ACCEPTED",
+  "accepted_at": "2026-09-11",
   "implementation_authorized": false,
   "prior_phase": {
     "phase_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
@@ -15,7 +16,7 @@
     "human_acceptance_status": "BORA_ACCEPTED",
     "accepted_at": "2026-09-11"
   },
-  "terminal_adjudication": "PHASE C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) BORA ACCEPTED - CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / GOVERNANCE_ONLY - PHASE D (FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP) PROPOSED_NOT_AUTHORIZED - IMPLEMENTATION NOT AUTHORIZED",
+  "terminal_adjudication": "PHASE C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) BORA ACCEPTED - CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING - implementation_authorized remains false - PHASE D (FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP) PROPOSED_NOT_AUTHORIZED - no later roadmap phase authorized - IMPLEMENTATION NOT AUTHORIZED",
   "completed_actions": [
     "Drafted docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md as a candidate policy (pending Bora acceptance; not yet governing): quality-preserving Claude Code / Cursor context-and-usage discipline, with every material claim labeled SOURCE_DIRECT / CAREER_OS_ADAPTATION / OBSERVED_REPO_FACT / OPEN_HYPOTHESIS and cited to source URLs/dates",
     "Drafted the 17 candidate policy principles, the Cursor economy rule, and the Claude economy rule as CAREER_OS_ADAPTATION governance, subordinate to the existing Authority Order and every existing truth/evidence/review/approval rule, pending Bora acceptance",
@@ -25,7 +26,8 @@
     "Created milestone_contracts/governance/career-os-agent-context-and-usage-efficiency-v1.json with baseline_sha ba6530498be3410e3524aacd1ff5fba0c815d8d0",
     "Updated docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md to reflect Bora's acceptance of the Phase C checkpoint (2026-09-11), preserved as historical accepted evidence",
     "Synchronized project_state.json, CURRENT_MILESTONE.md, and CURRENT_STATE.md with this checkpoint's Phase C acceptance and this policy milestone's governance-only/pending-acceptance state",
-    "Updated docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md's Phase C status references to BORA_ACCEPTED, keeping Phase D PROPOSED_NOT_AUTHORIZED and the single canonical Section 6 recovery order unchanged"
+    "Updated docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md's Phase C status references to BORA_ACCEPTED, keeping Phase D PROPOSED_NOT_AUTHORIZED and the single canonical Section 6 recovery order unchanged",
+    "Recorded Bora's 2026-09-11 explicit acceptance of CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 and synchronized canonical state/cold-start recovery surfaces with that acceptance, explicitly including AGENTS.md and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md, to COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING; Phase D (FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP) remains PROPOSED_NOT_AUTHORIZED and implementation_authorized remains false"
   ],
   "phase_b_completed_actions_reference": [
     "Recovered live canonical main and governing eval/harness ADR",
@@ -55,6 +57,6 @@
     "No phase beyond Phase C (Phase D and later) is authorized by this checkpoint",
     "No claim that raw run traces exist beyond what durable secondary records establish"
   ],
-  "exact_next_allowed_action": "Bora reviews and accepts or rejects this policy milestone/checkpoint (CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1) and its candidate ADR at docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md. No Phase D work, taxonomy, evaluator design, trace architecture, or implementation may begin from any other premise, and no later phase may begin until Bora separately accepts this checkpoint and separately authorizes a next phase.",
-  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B and Phase C, and operator completion of this governance-only policy milestone, never imply that this policy milestone is Bora-accepted, that implementation is authorized, or that Phase D or any later phase is authorized."
+  "exact_next_allowed_action": "Bora explicitly accepted this policy milestone/checkpoint (CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1) and its ADR at docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md on 2026-09-11, stating explicitly that Phase D remains unauthorized until separately approved. This policy is now GOVERNING (governance-only; implementation_authorized remains false). Bora may separately authorize a next phase; absent that authorization, no Phase D work, taxonomy, evaluator design, trace architecture, or other substantive next-phase work may begin.",
+  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B, Phase C, and this governance-only policy milestone (2026-09-11) never implies that implementation is authorized or that Phase D or any later phase is authorized; that acceptance was recorded canonically by this checkpoint, not self-granted by the operator."
 }

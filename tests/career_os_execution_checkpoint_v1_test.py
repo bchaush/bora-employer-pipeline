@@ -16,7 +16,8 @@ assert cp['canonical_basis_sha'] == CANONICAL_BASELINE_SHA
 assert cp['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
 assert cp['phase_mode'] == 'GOVERNANCE_ONLY'
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['accepted_at'] == '2026-09-11'
 assert cp['implementation_authorized'] is False
 
 # Phase C human acceptance must be recorded distinctly from this policy
@@ -30,14 +31,17 @@ assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
 assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 
 assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allowed_action'].strip()
-assert 'Bora reviews and accepts or rejects this policy milestone/checkpoint' in cp['exact_next_allowed_action']
+assert 'Bora explicitly accepted this policy milestone/checkpoint' in cp['exact_next_allowed_action']
+assert 'Bora may separately authorize a next phase' in cp['exact_next_allowed_action']
+assert 'no Phase D work' in cp['exact_next_allowed_action']
 
-# terminal_adjudication must reflect Bora's acceptance of Phase C and
-# operator completion (not Bora acceptance) of this policy milestone,
-# while still stating Phase D is not authorized and implementation is not
-# authorized.
+# terminal_adjudication must reflect Bora's acceptance of Phase C AND of
+# this policy milestone (a genuine, distinctly-dated Bora human event, not
+# operator self-acceptance), while still stating Phase D is not authorized
+# and implementation is not authorized.
 assert 'BORA ACCEPTED' in cp['terminal_adjudication']
-assert 'PENDING_BORA_ACCEPTANCE' in cp['terminal_adjudication']
+assert 'BORA_ACCEPTED (2026-09-11)' in cp['terminal_adjudication']
+assert 'GOVERNING' in cp['terminal_adjudication']
 assert 'PROPOSED_NOT_AUTHORIZED' in cp['terminal_adjudication']
 assert 'IMPLEMENTATION NOT AUTHORIZED' in cp['terminal_adjudication']
 
@@ -60,14 +64,29 @@ assert 'CLAUDE.md' in not_done and '.cursor/rules' in not_done
 assert 'phase_b_completed_actions_reference' in cp
 assert 'phase_c_completed_actions_reference' in cp
 
+# The live action trail must not end on the earlier pending-state sync --
+# the final completed_actions item must be the acceptance-sync record.
+final_action = cp['completed_actions'][-1]
+assert "Bora's 2026-09-11 explicit acceptance" in final_action
+assert 'AGENTS.md' in final_action
+assert 'docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md' in final_action
+assert 'BORA_ACCEPTED (2026-09-11)' in final_action
+assert 'GOVERNING' in final_action
+assert 'PROPOSED_NOT_AUTHORIZED' in final_action
+assert 'implementation_authorized remains false' in final_action
+
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (COMPLETED_BY_OPERATOR')
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED 2026-09-11' in PROJECT_STATE['current_phase']
+assert 'GOVERNING' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1' in PROJECT_STATE['next_authorized_action']
+assert 'Bora explicitly accepted' in PROJECT_STATE['next_authorized_action']
 assert 'Phase D' in PROJECT_STATE['next_authorized_action']
 assert 'PROPOSED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
 assert 'CURRENT_EXECUTION_CHECKPOINT.json' in AGENTS
-assert 'PENDING_BORA_ACCEPTANCE' in AGENTS
+assert 'BORA_ACCEPTED (2026-09-11)' in AGENTS
+assert 'GOVERNING' in AGENTS
+assert 'PENDING_BORA_ACCEPTANCE' not in AGENTS
 
 # AGENTS.md must keep requiring project_state.json to be read before
 # CURRENT_EXECUTION_CHECKPOINT.json, and must not restate a competing

@@ -1,0 +1,64 @@
+{
+  "milestone_id": "CAREER_OS_AGENT_CONTEXT_USAGE_EFFICIENCY_ACCEPTANCE_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Record Bora's explicit 2026-09-11 human acceptance of the CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 governance-only policy ('I accept CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as governing policy. Phase D remains unauthorized until separately approved.') as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING, with implementation_authorized remaining false and Phase D remaining PROPOSED_NOT_AUTHORIZED. This is a bounded correction/sync pass only -- not a re-adjudication of the policy content itself.",
+  "baseline_sha": "7d795d6c06a67965d70d219e901f1c7f67328d58",
+  "allowed_paths": [
+    "CHANGELOG.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "AGENTS.md",
+    "project_state.json",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "milestone_contracts/governance/career-os-agent-context-usage-efficiency-acceptance-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/audits/**"
+  ],
+  "required_tests": [
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md records Status/Decision as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING, quotes Bora's exact acceptance statement, and keeps implementation_authorized as false with Phase D PROPOSED_NOT_AUTHORIZED",
+    "CURRENT_EXECUTION_CHECKPOINT.json records human_acceptance_status=BORA_ACCEPTED, accepted_at=2026-09-11, implementation_authorized=false, and preserves prior_phase (Phase C) as its own distinct BORA_ACCEPTED record",
+    "project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, and CHANGELOG.md are mutually consistent with the checkpoint: this policy milestone COMPLETED_BY_OPERATOR/BORA_ACCEPTED(2026-09-11)/GOVERNANCE_ONLY/GOVERNING, Phase D PROPOSED_NOT_AUTHORIZED, implementation_authorized=false",
+    "CHANGELOG.md preserves the historical PENDING_BORA_ACCEPTANCE candidate-policy entry as a distinct, explicitly superseded historical record beneath the new acceptance entry",
+    "the acceptance is recorded as a genuine Bora human event, never as an operator self-grant or self-acceptance",
+    "the three required tests fail closed on this acceptance state",
+    "no BLUEPRINT.md, CLAUDE.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, or golden-tests/** change exists in the diff",
+    "no Phase D, trace, or other runtime/product work is introduced or authorized",
+    "AGENTS.md and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md's cold-start pointer text for this policy milestone are mutually consistent with CURRENT_EXECUTION_CHECKPOINT.json/project_state.json: policy milestone COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING, implementation_authorized remaining false, and Phase D remaining PROPOSED_NOT_AUTHORIZED"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would modify BLUEPRINT.md, CLAUDE.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, or golden-tests/**",
+    "change would author, design, or implement Phase D, CAREER_OS_RUN_TRACE_V1, or any other runtime/product surface",
+    "change would authorize or imply authorization of Phase D or any later roadmap phase",
+    "change would represent this acceptance as operator self-granted rather than a Bora human event"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED",
+  "human_approval_requirements": "BORA_EXPLICITLY_ACCEPTED_CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1_AS_GOVERNING_POLICY_ON_2026-09-11_STATING_PHASE_D_REMAINS_UNAUTHORIZED_UNTIL_SEPARATELY_APPROVED; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}
