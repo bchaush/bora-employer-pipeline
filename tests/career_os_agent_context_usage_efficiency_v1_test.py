@@ -6,11 +6,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / 'docs' / 'decisions' / 'ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md'
 CONTRACT = ROOT / 'milestone_contracts' / 'governance' / 'career-os-agent-context-and-usage-efficiency-v1.json'
+ACCEPTANCE_CONTRACT = ROOT / 'milestone_contracts' / 'governance' / 'career-os-agent-context-usage-efficiency-acceptance-v1.json'
 CURRENT_MILESTONE = ROOT / 'CURRENT_MILESTONE.md'
 CURRENT_STATE = ROOT / 'CURRENT_STATE.md'
 CHANGELOG = ROOT / 'CHANGELOG.md'
 AGENTS = (ROOT / 'AGENTS.md').read_text(encoding='utf-8')
 BASELINE_SHA = 'ba6530498be3410e3524aacd1ff5fba0c815d8d0'
+ACCEPTANCE_BASELINE_SHA = '7d795d6c06a67965d70d219e901f1c7f67328d58'
 
 assert ADR.exists(), 'canonical agent context/usage-efficiency ADR missing'
 text = ADR.read_text(encoding='utf-8')
@@ -155,27 +157,28 @@ assert 'must not become the Career OS default' in text
 # The consequential-work effort rule must remain unaltered by this correction pass.
 assert 'Never lower reasoning effort on consequential semantic/architecture/truth/debugging/adversarial-review work merely to preserve quota' in text
 
-# Status/decision must be governance-only, pending Bora acceptance, with
-# Phase D explicitly not authorized and implementation_authorized false.
-assert 'PENDING_BORA_ACCEPTANCE' in text
+# Status/decision must reflect Bora's explicit 2026-09-11 acceptance:
+# governance-only, GOVERNING, with Phase D explicitly not authorized and
+# implementation_authorized false.
+assert 'BORA_ACCEPTED (2026-09-11)' in text
 assert 'GOVERNANCE_ONLY' in text
+assert 'GOVERNING' in text
 assert 'PROPOSED_NOT_AUTHORIZED' in text
 assert '`implementation_authorized` is `false`' in text
 
-# The operator/builder must never be represented as able to self-grant
-# acceptance of its own policy on Bora's behalf: the ADR must not assert
-# itself as already ACCEPTED/LOCKED/governing, and must instead record
-# that it only governs once Bora explicitly accepts it.
-assert 'ACCEPTED POLICY' not in text
-assert 'NOT_YET_GOVERNING' in text
-assert 'cannot self-grant' in text
-assert 'This ADR locks' not in text
-assert '**LOCKED:**' not in text
+# The acceptance must be recorded as a genuine Bora human event, not an
+# operator self-grant: the ADR must positively state Bora's explicit
+# acceptance quote and must not claim the operator itself accepted or
+# self-authorized the policy.
+assert 'Bora explicitly accepted this ADR on 2026-09-11' in text
+assert 'I accept CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as governing policy' in text
+assert 'self-grant' not in text
+assert 'DECISION (BORA_ACCEPTED, GOVERNING):' in text
 
 # Section 5 must contain exactly 17 numbered candidate policy principles
 # (lines beginning "1." through "17."), mechanically counted rather than
 # assumed from the prose above.
-_section5_start = text.index('## 5. Candidate policy principles')
+_section5_start = text.index('## 5. Policy principles')
 _section5_end = text.index('## 6. Cursor economy rule')
 _section5_text = text[_section5_start:_section5_end]
 _numbered_principles = re.findall(r'^(\d+)\. ', _section5_text, flags=re.MULTILINE)
@@ -192,6 +195,60 @@ for forbidden_path in ('BLUEPRINT.md', 'CLAUDE.md', '.cursor/**', '.cursorignore
     assert forbidden_path in contract['forbidden_paths'], f'contract must forbid {forbidden_path}'
 assert 'docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md' in contract['allowed_paths']
 
+# The separate acceptance-sync contract governs this bounded correction
+# pass (recording Bora's explicit acceptance) and must not be confused
+# with the earlier ADR-authoring contract above.
+assert ACCEPTANCE_CONTRACT.exists(), 'governance acceptance-sync milestone contract missing'
+acceptance_contract = json.loads(ACCEPTANCE_CONTRACT.read_text(encoding='utf-8'))
+assert acceptance_contract['baseline_sha'] == ACCEPTANCE_BASELINE_SHA
+
+# The acceptance-sync contract schema forbids a top-level
+# `implementation_authorized` property; the semantic invariant that
+# implementation_authorized remains false and Phase D remains unauthorized
+# must instead be carried in the contract's goal/acceptance_conditions/
+# stop_conditions text, verified mechanically below.
+assert 'implementation_authorized' not in acceptance_contract, (
+    'acceptance_contract must not carry a top-level implementation_authorized property'
+)
+assert 'implementation_authorized remaining false' in acceptance_contract['goal']
+assert 'Phase D remaining PROPOSED_NOT_AUTHORIZED' in acceptance_contract['goal']
+assert any(
+    'implementation_authorized=false' in condition or 'implementation_authorized as false' in condition
+    for condition in acceptance_contract['acceptance_conditions']
+), 'acceptance_conditions must preserve implementation_authorized=false as a checked invariant'
+assert any(
+    'Phase D PROPOSED_NOT_AUTHORIZED' in condition
+    for condition in acceptance_contract['acceptance_conditions']
+), 'acceptance_conditions must preserve Phase D PROPOSED_NOT_AUTHORIZED as a checked invariant'
+assert any(
+    'authorize or imply authorization of Phase D' in condition
+    for condition in acceptance_contract['stop_conditions']
+), 'stop_conditions must forbid authorizing or implying authorization of Phase D'
+assert 'NO_IMPLEMENTATION_AUTHORIZED' in acceptance_contract['human_approval_requirements']
+
+for forbidden_path in (
+    'BLUEPRINT.md', 'CLAUDE.md', '.cursor/**', '.claude/**', 'src/**', 'schemas/**',
+    'claims/**', 'evidence/**', 'experiences/**', 'resume/**', 'golden-tests/**',
+):
+    assert forbidden_path in acceptance_contract['forbidden_paths'], f'acceptance contract must forbid {forbidden_path}'
+_expected_acceptance_allowed_paths = {
+    'CHANGELOG.md',
+    'CURRENT_EXECUTION_CHECKPOINT.json',
+    'CURRENT_MILESTONE.md',
+    'CURRENT_STATE.md',
+    'docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md',
+    'docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md',
+    'AGENTS.md',
+    'project_state.json',
+    'tests/career_os_agent_context_usage_efficiency_v1_test.py',
+    'tests/career_os_execution_checkpoint_v1_test.py',
+    'tests/career_os_eval_harness_sequence_v1_test.py',
+    'milestone_contracts/governance/career-os-agent-context-usage-efficiency-acceptance-v1.json',
+}
+assert set(acceptance_contract['allowed_paths']) == _expected_acceptance_allowed_paths, (
+    f'acceptance contract allowed_paths must be exactly the bounded correction-pass surface, got: {acceptance_contract["allowed_paths"]}'
+)
+
 # AGENTS.md must carry a concise operational pointer only -- it must not
 # restate the full policy body (e.g. must not itself enumerate all 16
 # principles verbatim).
@@ -202,36 +259,41 @@ assert 'One bounded milestone per primary Claude/Cursor session' not in AGENTS
 # CURRENT_MILESTONE.md's live checkpoint block must explicitly separate the
 # PRIOR (already Bora-accepted, read-only Phase C) mode/operator/acceptance
 # fields from the CURRENT policy milestone's own fields -- no unscoped
-# BORA_ACCEPTED / READ_ONLY may appear as if it applies to the current
-# policy milestone, and the current milestone must read
-# GOVERNANCE_ONLY / COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE /
-# NOT_YET_GOVERNING.
+# BORA_ACCEPTED / READ_ONLY may appear as if it applies to the prior phase
+# rather than the current milestone, and the current milestone must read
+# GOVERNANCE_ONLY / COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) /
+# GOVERNING.
 milestone_text = CURRENT_MILESTONE.read_text(encoding='utf-8')
 assert 'Prior-phase operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**' in milestone_text
 assert 'Prior-phase human acceptance: **BORA_ACCEPTED**' in milestone_text
 assert 'Current-milestone mode: **GOVERNANCE_ONLY**' in milestone_text
 assert 'Current-milestone operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Current-milestone human acceptance: **PENDING_BORA_ACCEPTANCE**' in milestone_text
-assert 'Current-milestone governing status: **NOT_YET_GOVERNING**' in milestone_text
+assert 'Current-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
+assert 'Current-milestone governing status: **GOVERNING**' in milestone_text
 _checkpoint_block_end = milestone_text.index('## Eval & Harness Audit - Roadmap Reference')
 _checkpoint_block = milestone_text[:_checkpoint_block_end]
 assert 'Current milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1`\nCurrent-milestone mode: **GOVERNANCE_ONLY**' in _checkpoint_block, (
     'the current policy milestone line must be immediately followed by its own scoped fields, not unscoped prior-phase fields'
 )
+assert 'Bora may separately authorize a next phase' in _checkpoint_block
+assert 'PROPOSED_NOT_AUTHORIZED' in _checkpoint_block
 
-# CURRENT_STATE.md must never call the pending policy "controlling" or
-# already governing -- it must be candidate/pending-acceptance, becoming
-# governing only if Bora accepts it.
+# CURRENT_STATE.md must record this policy as Bora-accepted and governing
+# (a genuine human acceptance event, not operator self-acceptance), while
+# still stating implementation_authorized remains false and Phase D
+# remains unauthorized.
 state_text = CURRENT_STATE.read_text(encoding='utf-8')
-assert 'controlling context/usage-efficiency policy' not in state_text
-assert 'the candidate, not-yet-governing context/usage-efficiency policy' in state_text
-assert 'NOT_YET_GOVERNING' in state_text
-assert 'becomes governing only if and when Bora accepts it' in state_text
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in state_text
+assert 'not self-granted by the operator' in state_text
+assert '`implementation_authorized` remains `false`' in state_text
+assert 'PROPOSED_NOT_AUTHORIZED' in state_text
 
-# CHANGELOG.md's candidate-milestone heading must not claim POLICY LOCK for
-# this pending policy.
+# CHANGELOG.md must carry a dated entry recording Bora's explicit
+# acceptance as a distinct historical event from the earlier candidate
+# policy draft entry (preserved below it as historical, superseded record).
 changelog_text = CHANGELOG.read_text(encoding='utf-8')
-assert 'GOVERNANCE-ONLY POLICY LOCK' not in changelog_text
+assert 'accepted by Bora (GOVERNANCE-ONLY, BORA ACCEPTED)' in changelog_text
 assert 'GOVERNANCE-ONLY CANDIDATE POLICY, PENDING BORA ACCEPTANCE' in changelog_text
+assert 'historical, superseded by the acceptance entry above' in changelog_text
 
-print('PASS: Career OS agent context/usage-efficiency governance-only candidate policy verified.')
+print('PASS: Career OS agent context/usage-efficiency governance-only accepted policy verified.')

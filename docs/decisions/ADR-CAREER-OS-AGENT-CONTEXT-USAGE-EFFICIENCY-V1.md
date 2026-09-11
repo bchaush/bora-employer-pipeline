@@ -1,6 +1,6 @@
 # ADR — Career OS Agent Context & Usage Efficiency v1
 
-Status: **CANDIDATE_POLICY / GOVERNANCE_ONLY / COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / NOT_YET_GOVERNING / NO IMPLEMENTATION AUTHORIZED**
+Status: **GOVERNANCE_ONLY / COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNING / NO IMPLEMENTATION AUTHORIZED**
 Date: 2026-09-11
 Owner: Bora + ChatGPT architecture/adjudication layer; implemented by Claude Code as bounded governance builder
 Milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1`
@@ -9,7 +9,7 @@ Milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1`
 
 Bora explicitly accepted the Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) checkpoint and explicitly authorized this governance-only policy milestone before Phase D (see `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`). Phase D remains **PROPOSED_NOT_AUTHORIZED**.
 
-This ADR sets out a candidate policy to lock quality-preserving Claude Code / Cursor context-and-usage discipline: minimize irrelevant context, duplicated reasoning, and unnecessary model work, without ever reducing evidence depth, validation depth, required intelligence, truth standards, independent review, or human-approval boundaries. The operator cannot self-grant acceptance of this policy; it is COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / NOT_YET_GOVERNING until Bora explicitly accepts it. If and when Bora accepts this ADR, it will govern subsequent Career OS engineering work as described below. It authorizes **no** product/runtime implementation, no `CAREER_OS_RUN_TRACE_V1`, no Phase D taxonomy/evaluator work, and no structural change to any currently loaded context surface (`CLAUDE.md`, `.cursor/rules/*`, `.cursorignore`, `.claude/` settings/skills/subagents/hooks).
+This ADR locks a policy for quality-preserving Claude Code / Cursor context-and-usage discipline: minimize irrelevant context, duplicated reasoning, and unnecessary model work, without ever reducing evidence depth, validation depth, required intelligence, truth standards, independent review, or human-approval boundaries. Bora explicitly accepted this ADR on 2026-09-11 ("I accept CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as governing policy. Phase D remains unauthorized until separately approved."); it is now COMPLETED_BY_OPERATOR / BORA_ACCEPTED / GOVERNANCE_ONLY / GOVERNING and governs subsequent Career OS engineering work as described below. It authorizes **no** product/runtime implementation, no `CAREER_OS_RUN_TRACE_V1`, no Phase D taxonomy/evaluator work, and no structural change to any currently loaded context surface (`CLAUDE.md`, `.cursor/rules/*`, `.cursorignore`, `.claude/` settings/skills/subagents/hooks).
 
 ## 2. Source-label discipline
 
@@ -55,7 +55,7 @@ Measured deterministically via `git show <baseline>:<path> | wc -c` / `wc -l` (t
 
 These are facts only, recorded for future measured comparison. This ADR does **not** change `CLAUDE.md`, `.cursor/rules/*`, `.cursorignore`, or any `alwaysApply` rule. `AGENTS.md` receives only a concise operational pointer to this ADR (Section 8), not a restatement of policy. Any later reduction/splitting of loaded context is **OPEN_HYPOTHESIS**, requiring a separately authorized, measured context-surface audit before any change.
 
-## 5. Candidate policy principles (quality first; pending Bora acceptance)
+## 5. Policy principles (quality first; Bora-accepted, governing)
 
 CAREER_OS_ADAPTATION, derived from Sections 3-4 above plus existing Career OS governance:
 
@@ -77,17 +77,17 @@ CAREER_OS_ADAPTATION, derived from Sections 3-4 above plus existing Career OS go
 16. Context optimization must never weaken Candidate Truth, evidence lineage, deterministic gates, independent review, or human-approval boundaries.
 17. `bypassPermissions` (which skips normal Claude Code permission prompts and is, per Anthropic's own documentation, intended only for isolated environments) must not become the Career OS default.
 
-## 6. Cursor economy rule (candidate; pending Bora acceptance)
+## 6. Cursor economy rule (Bora-accepted, governing)
 
 CAREER_OS_ADAPTATION: Cursor is a consequential adversarial reviewer, not an exploratory assistant, by default. Before spending review: Claude bounded builder work is complete; ChatGPT independently adjudicates obvious scope/provenance issues; deterministic required checks are green; the exact consequential diff is frozen/fingerprinted; Cursor receives the milestone contract plus the exact diff plus relevant authority only. Findings return to ChatGPT adjudication; accepted corrections go only to Claude; deterministic gates rerun before another Cursor pass.
 
-## 7. Claude economy rule (candidate; pending Bora acceptance)
+## 7. Claude economy rule (Bora-accepted, governing)
 
 CAREER_OS_ADAPTATION: Claude Code is a bounded builder, not project memory or architecture owner. A new implementation/governance milestone starts from canonical repo/checkpoint state with a concise bounded contract. Do not revive an unrelated multi-day session merely because it exists. A same-session correction loop is appropriate only while the same milestone/context remains directly relevant and clean.
 
 ## 8. `AGENTS.md` operational pointer
 
-`AGENTS.md` gains one concise pointer to this ADR (not a restatement of the policy): the candidate context-and-usage-efficiency principles, if and when Bora accepts this ADR, will govern Claude Code / Cursor session and context discipline, subordinate to the existing Authority Order and never overriding a locked rule, validation schema, or the existing review/approval boundaries. Until Bora accepts this ADR, it is not yet governing.
+`AGENTS.md` gains one concise pointer to this ADR (not a restatement of the policy): the context-and-usage-efficiency principles, now Bora-accepted (2026-09-11), govern Claude Code / Cursor session and context discipline, subordinate to the existing Authority Order and never overriding a locked rule, validation schema, or the existing review/approval boundaries.
 
 ## 9. Deferred structural work (OPEN_HYPOTHESIS)
 
@@ -104,9 +104,9 @@ Any later reduction, splitting, or restructuring of a currently loaded context s
 
 ## 11. Decision
 
-**CANDIDATE DECISION (NOT YET GOVERNING):** the policy principles in Sections 5-7, if and when Bora explicitly accepts this ADR, will govern Claude Code and Cursor session/context discipline going forward, as a quality-preserving usage-efficiency layer subordinate to the existing Authority Order in `AGENTS.md` and to every existing truth/evidence/review/approval rule. The operator/builder cannot self-grant that acceptance. Structural context-surface changes remain **OPEN_HYPOTHESIS**, requiring a separate measured audit and separate authorization (Section 9). This ADR does not authorize Phase D or any product/runtime implementation.
+**DECISION (BORA_ACCEPTED, GOVERNING):** Bora explicitly accepted this ADR on 2026-09-11 ("I accept CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as governing policy. Phase D remains unauthorized until separately approved."). The policy principles in Sections 5-7 now govern Claude Code and Cursor session/context discipline going forward, as a quality-preserving usage-efficiency layer subordinate to the existing Authority Order in `AGENTS.md` and to every existing truth/evidence/review/approval rule. Structural context-surface changes remain **OPEN_HYPOTHESIS**, requiring a separate measured audit and separate authorization (Section 9). This ADR does not authorize Phase D or any product/runtime implementation.
 
-**STATUS:** `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / GOVERNANCE_ONLY / NOT_YET_GOVERNING / NO_IMPLEMENTATION_AUTHORIZED**. Phase D (`FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP`) remains **PROPOSED_NOT_AUTHORIZED**. `implementation_authorized` is `false`. The sole next allowed action is for Bora to review and accept or reject this policy milestone/checkpoint; no Phase D work may begin until Bora separately accepts this checkpoint and separately authorizes a next phase. Until that acceptance, this ADR does not govern anything.
+**STATUS:** `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING / NO_IMPLEMENTATION_AUTHORIZED**. Phase D (`FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP`) remains **PROPOSED_NOT_AUTHORIZED**. `implementation_authorized` is `false`. The sole next allowed action is for Bora to separately authorize a next phase; absent that authorization, no substantive next-phase work may begin.
 
 ## 12. Reference URLs at lock time
 
