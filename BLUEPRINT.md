@@ -4697,6 +4697,8 @@ A current first-party ATS state that explicitly says Bora **already applied** to
 
 Identity matching must be deterministic and role-specific: employer/system identity plus exact requisition/opportunity identifier controls when available. Title similarity, fuzzy company matching, or a recycled title alone must never suppress a genuinely different requisition. This rule never rewrites historical Employer Truth, Qualification Truth, Candidate Truth, Match Truth, package artifacts, or outcome history. It is a Bora-facing dedupe/pursuit rule, not a posting-freshness or actionability judgment.
 
+Canonical historical application state is recorded in `docs/application/BORA_APPLICATION_HISTORY_V1.json`. Every cold-start/live discovery operator must load that record before serious-role promotion and package generation, apply it only by the exact identity rule above, and update it only from authoritative Application Truth (for example Bora direct confirmation or an exact-role ATS submitted/already-applied state). Missing submission dates remain null rather than inferred.
+
 **139. BORA IMMIGRATION ROLE ANALYSIS TIGHTENING — BORA_IMMIGRATION_ROLE_ANALYSIS_TIGHTENING_V1 (LOCKED)**
 
 This section tightens §§24-27's existing immigration doctrine for serious-

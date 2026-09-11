@@ -1,0 +1,135 @@
+{
+  "record_id": "BORA_APPLICATION_HISTORY_V1",
+  "record_version": 1,
+  "updated_at": "2026-09-10",
+  "authority": "Application Truth supplied directly by Bora; use for exact-role dedupe and lifecycle continuity only.",
+  "identity_rule": "Exact employer/system identity + exact requisition/opportunity identifier. Never fuzzy-match titles.",
+  "entries": [
+    {
+      "employer": "The Brattle Group",
+      "requisition_id": "4720807005",
+      "title": "Research Analyst (Economics and Finance)",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Daley and Associates",
+      "requisition_id": "30180",
+      "title": "Investment Operations Analyst",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Harvard University / Harvard Medical School",
+      "requisition_id": "003692SR",
+      "title": "Part-Time Program Coordinator",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Harvard University / Harvard T.H. Chan School of Public Health",
+      "requisition_id": "003736SR",
+      "title": "Coordinator I (Program Coordinator)",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Harvard University / Harvard Medical School",
+      "requisition_id": "003741SR",
+      "title": "Program Coordinator",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Harvard University / Harvard Medical School",
+      "requisition_id": "003836SR",
+      "title": "Business Systems Analyst, Harvard Integrated Life Sciences",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Massachusetts Department of Transportation",
+      "requisition_id": "260005JH",
+      "title": "IT Data Analyst I",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Mass General Brigham",
+      "requisition_id": "RQ4076320",
+      "title": "Financial Coordinator",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Morgan Stanley",
+      "requisition_id": "JR041580",
+      "title": "Financial Analyst, Real Estate Investment Group",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Northeastern University",
+      "requisition_id": "R141882",
+      "title": "Cash Management Accountant",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Point32Health",
+      "requisition_id": "R9102",
+      "title": "Business Analyst",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Public Consulting Group",
+      "requisition_id": "JR102087",
+      "title": "Apprentice Business Analyst",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "Road Scholar",
+      "requisition_id": "COORD002072",
+      "title": "Coordinator, Program Operation - Central Programs",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    },
+    {
+      "employer": "The Chicago School",
+      "requisition_id": "R0013342",
+      "title": "Operations Analyst",
+      "application_status": "SUBMITTED",
+      "submitted_date": null,
+      "status_confirmed_at": "2026-09-10",
+      "evidence_basis": "BORA_DIRECT_CONFIRMATION"
+    }
+  ]
+}

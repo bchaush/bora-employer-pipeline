@@ -1,3 +1,4 @@
+* Added `BORA_APPLICATION_HISTORY_V1` as the canonical machine-readable Submitted Application Truth ledger for exact-role dedupe; seeded the 14 roles Bora directly confirmed as already submitted on 2026-09-10. Cold-start runs must load it before serious-role promotion. Also clarified first-wave discovery coverage honesty for LinkedIn Free and Brandeis Handshake: attempt when accessible, never claim inspection when access was unavailable.
 * Added `SUBMITTED_OPPORTUNITY_DEDUPE_V1` (Section 138.15): exact employer+requisition opportunities with historical Submitted Application Truth (including an authoritative first-party ?already applied? state) are suppressed from fresh Bora-facing discovery/package generation; exact identity is required, package-folder presence alone is insufficient, and in-progress packages continue rather than duplicate.
 # Bora Employer Pipeline OS — Change Log
 

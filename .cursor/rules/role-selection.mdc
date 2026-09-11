@@ -179,6 +179,8 @@ Do not convert, under any circumstance:
   per-role recency override) -- discovery-source preference never softens
   that cutoff.
 * Previously-submitted opportunity suppression (§138.15, `SUBMITTED_OPPORTUNITY_DEDUPE_V1`): before serious-role promotion/package generation, suppress any role whose exact employer + requisition/opportunity identity already has Submitted Application Truth. An exact-role first-party ATS message such as “already applied” is authoritative for this purpose. Persisted lifecycle states `SUBMITTED`, `INTERVIEWING`, `REJECTED`, `WITHDRAWN`, `OFFER`, or `CLOSED` are not fresh application targets; `PREPARING`/`READY_FOR_REVIEW` continue the existing workflow rather than create a second survivor. A package folder alone is not submission proof. Match exact role identity deterministically; never suppress merely by similar title/company text. Explicit Bora revisit requests may override the discovery suppression for that one role.
+* Canonical application-history ledger: load `docs/application/BORA_APPLICATION_HISTORY_V1.json` before serious-role promotion/package generation; exact employer/system + requisition identity only. Status is Application Truth, not posting freshness. Missing dates remain unknown.
+* Discovery coverage honesty: LinkedIn Free and Brandeis Handshake are first-wave surfaces when accessible; never claim either was checked if the current execution context could not actually inspect it. Continue through direct employer/ATS and the remaining source ladder instead.
 * Start horizon gate (§138.14): known intended start 0-30 days from the
   current operating date = TARGETED near-term window (actively target —
   Career OS should actively seek out and prioritize discovery/application
