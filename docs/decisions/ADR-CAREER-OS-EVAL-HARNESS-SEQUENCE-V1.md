@@ -1,7 +1,7 @@
 # ADR — Career OS Eval & Harness Sequence v1
 
-Status: **ACCEPTED ROADMAP / PHASE B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) COMPLETED_BY_OPERATOR AND BORA_ACCEPTED / PHASE C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) COMPLETED_BY_OPERATOR AND PENDING_BORA_ACCEPTANCE — READ_ONLY / NO IMPLEMENTATION OR LATER PHASE AUTHORIZED**
-Date: 2026-09-10 (Phase B acceptance and Phase C authorization recorded 2026-09-11; Phase C operator completion recorded 2026-09-11)
+Status: **ACCEPTED ROADMAP / PHASE B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) COMPLETED_BY_OPERATOR AND BORA_ACCEPTED / PHASE C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) COMPLETED_BY_OPERATOR AND BORA_ACCEPTED — READ_ONLY / GOVERNANCE-ONLY `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` POLICY MILESTONE COMPLETED_BY_OPERATOR AND PENDING_BORA_ACCEPTANCE / NO IMPLEMENTATION OR LATER PHASE AUTHORIZED**
+Date: 2026-09-10 (Phase B acceptance and Phase C authorization recorded 2026-09-11; Phase C operator completion and Bora acceptance recorded 2026-09-11; `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone authorized and operator-completed 2026-09-11)
 Owner: Bora + ChatGPT architecture/adjudication layer
 
 ## 1. Purpose
@@ -132,7 +132,7 @@ A fresh ChatGPT session must be able to resume without conversational memory. Th
 7. state the current recovered phase/status and exactly one next allowed action before beginning any work;
 8. use prior chat context only after canonical recovery and only when consistent with the repository.
 
-Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) is **COMPLETED_BY_OPERATOR** and **BORA_ACCEPTED** — see `CURRENT_EXECUTION_CHECKPOINT.json`. Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`), in **READ_ONLY** mode, is **COMPLETED_BY_OPERATOR** and **PENDING_BORA_ACCEPTANCE** — see `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`. Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**. A new chat must not jump directly to trace infrastructure, orchestration automation, a database, multi-agent implementation, or any phase beyond Phase C merely because Phase C's operator work is complete — Bora must separately accept the Phase C checkpoint and separately authorize a next phase before any later phase or implementation is authorized.
+Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) is **COMPLETED_BY_OPERATOR** and **BORA_ACCEPTED** — see `CURRENT_EXECUTION_CHECKPOINT.json`. Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`), in **READ_ONLY** mode, is **COMPLETED_BY_OPERATOR** and **BORA_ACCEPTED** — see `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`. The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone, authorized by Bora before Phase D, is **COMPLETED_BY_OPERATOR** and **PENDING_BORA_ACCEPTANCE** — see `docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md`. Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**. A new chat must not jump directly to trace infrastructure, orchestration automation, a database, multi-agent implementation, or Phase D merely because Phase C's or this policy milestone's operator work is complete — Bora must separately accept each checkpoint and separately authorize a next phase before any later phase or implementation is authorized.
 
 ## 7. Audit deliverables required before implementation
 
@@ -179,9 +179,9 @@ These references are anchors for the audit, not frozen third-party dependencies.
 
 **LOCKED SEQUENCE:** audit → real-trace/error inventory → failure taxonomy/evaluator map → eval-set architecture → trace/contract architecture → assurance architecture → bounded implementation → automation → optional agent/model specialization.
 
-**CURRENT STATUS:** Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`, read-only) is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** — see `CURRENT_EXECUTION_CHECKPOINT.json` for the machine-readable handoff and `docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md` for the operator audit report, both reflecting Bora's acceptance. Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`), in **READ_ONLY** mode, is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** — see `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`. Operator completion does not itself constitute Bora acceptance, and no implementation is authorized by it.
+**CURRENT STATUS:** Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`, read-only) is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** — see `CURRENT_EXECUTION_CHECKPOINT.json` for the machine-readable handoff and `docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md` for the operator audit report, both reflecting Bora's acceptance. Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`), in **READ_ONLY** mode, is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** — see `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`. Bora separately authorized the governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone before Phase D; that milestone is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** — see `docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md`. Operator completion does not itself constitute Bora acceptance, and no implementation is authorized by it.
 
-No phase beyond Phase C is pre-authorized. Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED** until Phase C's results are separately accepted by Bora and a next phase is separately authorized.
+The intervening governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone is not itself a roadmap phase and is not a violation of this sequence -- Bora explicitly authorized it as a governance step before Phase D. Phase D and every later roadmap phase (Phase D through Phase J) remain **PROPOSED_NOT_AUTHORIZED**, and no product/runtime implementation is authorized, until this policy milestone's results are separately accepted by Bora and a next phase is separately authorized.
 ## 11. Reference URLs at lock time
 
 - https://github.com/disler/fusion-harness

@@ -1,0 +1,69 @@
+{
+  "milestone_id": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Prepare quality-preserving Claude Code / Cursor context-and-usage discipline as a governance-only candidate policy ADR for Bora's acceptance, following Bora's explicit acceptance of the Phase C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) checkpoint and explicit authorization of this policy milestone before Phase D. Minimize irrelevant context, duplicated reasoning, and model work; never reduce evidence, validation depth, required intelligence, truth standards, independent review, or human approval boundaries. No product/runtime implementation.",
+  "baseline_sha": "ba6530498be3410e3524aacd1ff5fba0c815d8d0",
+  "allowed_paths": [
+    "docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md",
+    "milestone_contracts/governance/career-os-agent-context-and-usage-efficiency-v1.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md exists, labels every material claim SOURCE_DIRECT / CAREER_OS_ADAPTATION / OBSERVED_REPO_FACT / OPEN_HYPOTHESIS, and cites source URLs/dates",
+    "the ADR states the 17 candidate policy principles, the Cursor economy rule, and the Claude economy rule verbatim in substance as a policy that will govern only once Bora explicitly accepts it, and defers any context-surface structural refactor to a later measured audit as OPEN_HYPOTHESIS",
+    "the ADR records the OBSERVED_REPO_FACT baseline measurements (CLAUDE.md, AGENTS.md, .cursor/rules/* byte/line counts) without changing any of those files",
+    "AGENTS.md receives only a concise operational pointer to the new ADR, not a restatement of the policy",
+    "CURRENT_EXECUTION_CHECKPOINT.json records Phase C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) as BORA_ACCEPTED (accepted_at 2026-09-11) as prior_phase, and records CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as the current phase in COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / GOVERNANCE_ONLY state with implementation_authorized=false",
+    "docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md is updated to reflect BORA ACCEPTED status while remaining a historical operator finding that does not itself authorize Phase D or implementation",
+    "project_state.json, CURRENT_MILESTONE.md, and CURRENT_STATE.md are mutually consistent with the checkpoint: Phase C accepted, this policy milestone COMPLETED_BY_OPERATOR/PENDING_BORA_ACCEPTANCE, Phase D PROPOSED_NOT_AUTHORIZED, implementation_authorized=false",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md is updated only as needed so its Phase C status (now BORA_ACCEPTED) and Section 6 recovery protocol remain mutually consistent with the checkpoint, without authorizing Phase D",
+    "the three required tests fail closed on the new canonical state, including Phase C acceptance, this policy milestone's governance-only/pending-acceptance state, implementation_authorized=false, and the continued absence of Phase D authorization",
+    "no BLUEPRINT.md, CLAUDE.md, .cursor/rules/*, .cursorignore, or .claude/ settings/skills/subagents/hooks change exists in the diff",
+    "no src/, schemas/, claims/, evidence/, experiences/, resume/, or golden-tests/ change exists in the diff",
+    "no CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, database/UI, automation, new runtime agent, model routing, or LLM judge is introduced"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would modify BLUEPRINT.md, CLAUDE.md, .cursor/rules/*, .cursorignore, or .claude/ settings/skills/subagents/hooks",
+    "change would modify src/, schemas/, claims/, evidence/, experiences/, resume/, or golden-tests/ product/truth behavior",
+    "change would design or implement CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, a database/UI, orchestration automation, a new agent, model routing, or an LLM judge",
+    "change would authorize or imply authorization of Phase D or any later roadmap phase",
+    "change would assert an unsupported numerical savings claim or invent a vendor command/setting not present in the cited sources",
+    "change would let an operator self-accept its own work on Bora's behalf"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED",
+  "human_approval_requirements": "BORA_EXPLICITLY_ACCEPTED_THE_PHASE_C_CHECKPOINT_AND_EXPLICITLY_AUTHORIZED_THIS_GOVERNANCE_ONLY_CONTEXT_AND_USAGE_EFFICIENCY_POLICY_MILESTONE_BEFORE_PHASE_D_IN_THE_2026-09-11_OPERATING_SESSION; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}

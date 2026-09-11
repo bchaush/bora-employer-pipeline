@@ -21,6 +21,10 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-11 — Career OS Agent Context & Usage Efficiency v1 (GOVERNANCE-ONLY CANDIDATE POLICY, PENDING BORA ACCEPTANCE)
+
+Bora explicitly accepted the Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) checkpoint and explicitly authorized a governance-only policy milestone before Phase D. Drafted a candidate lock (pending Bora acceptance; not yet governing) of quality-preserving Claude Code / Cursor context-and-usage discipline at `docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md` (source-labeled SOURCE_DIRECT / CAREER_OS_ADAPTATION / OBSERVED_REPO_FACT / OPEN_HYPOTHESIS), including bounded-session discipline, smallest-sufficient context, deterministic-over-agent-reasoning gates, and the Cursor/Claude economy rules. No product/runtime implementation, `CAREER_OS_RUN_TRACE_V1`, or `CLAUDE.md`/`.cursor/rules/*`/`.cursorignore`/`.claude/` structural change is authorized; any future context-surface refactor is deferred as OPEN_HYPOTHESIS to a separately authorized, measured audit. Mechanical state and cold-start recovery pointers synchronized in `project_state.json`, `CURRENT_STATE.md`, `CURRENT_MILESTONE.md`, `AGENTS.md`, and `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`. Phase D remains PROPOSED_NOT_AUTHORIZED; this policy milestone itself is PENDING_BORA_ACCEPTANCE.
+
 ## 2026-09-10 — Career OS Eval & Harness Sequence v1 (ROADMAP LOCK)
 
 Locked an audit-first roadmap grounded in primary/public IndyDevDan, Hamel Husain, and Cole Medin materials; permanent ChatGPT→Claude→deterministic-checks→Cursor→CI→Bora role separation; and read-only `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` as the only authorized next phase. No automation implementation or later roadmap phase is pre-authorized. Mechanical state and cold-start recovery pointers were synchronized in `project_state.json`, `CURRENT_STATE.md`, `CURRENT_MILESTONE.md`, and `AGENTS.md`.
