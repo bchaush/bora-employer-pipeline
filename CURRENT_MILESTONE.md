@@ -9,29 +9,29 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - Agent Context & Usage Efficiency Policy Bora-Accepted (2026-09-11)
+## Current Checkpoint - Phase D (Failure Taxonomy & Evaluator Coverage Map) Bora-Authorized (2026-09-11)
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
 
-PRIOR PHASE (already Bora-accepted; recorded here only as context for the current milestone below -- these fields do NOT describe the current policy milestone):
-Prior phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` (Phase C, READ_ONLY)
-Prior-phase operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**
-Prior-phase human acceptance: **BORA_ACCEPTED**
+PRIOR MILESTONE (already Bora-accepted and GOVERNING; recorded here only as context for the current phase below -- these fields do NOT describe Phase D):
+Prior milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` (governance-only policy)
+Prior-milestone operator status: **COMPLETED_BY_OPERATOR**
+Prior-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**
+Prior-milestone governing status: **GOVERNING**
 
-CURRENT POLICY MILESTONE (distinct from the prior phase above; now governing):
-Current milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1`
-Current-milestone mode: **GOVERNANCE_ONLY**
-Current-milestone operator status: **COMPLETED_BY_OPERATOR**
-Current-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**
-Current-milestone governing status: **GOVERNING**
+CURRENT PHASE (distinct from the prior milestone above; newly authorized, not yet completed):
+Current phase: `CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`
+Current-phase mode: **READ_ONLY_DESIGN_ONLY**
+Current-phase authorization status: **BORA_AUTHORIZED**
+Current-phase selection status: **SELECTED**
+Current-phase operator status: **NOT_YET_COMPLETED**
 `implementation_authorized`: **false**
-ADR: `docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md`
-Bora explicitly stated: "I accept CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as governing policy. Phase D remains unauthorized until separately approved."
-Exact next allowed action: Bora may separately authorize a next phase (Phase D: `FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP`, currently **PROPOSED_NOT_AUTHORIZED**); absent that authorization, no substantive next-phase work may begin.
+Bora explicitly authorized `CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1` as the next phase in READ_ONLY / DESIGN_ONLY mode on 2026-09-11.
+Exact next allowed action: begin substantive Phase D read-only/design-only work (the failure taxonomy and evaluator-coverage map) under its own separately locked contract; no implementation. Phase E and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 
 ## Eval & Harness Audit - Roadmap Reference
 
-Prior-phase status (Phase C `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`): **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** (see the Checkpoint block above). The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone is a SEPARATE, CURRENT record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING**; Phase D and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
+The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone remains **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING** (see the Checkpoint block above). Phase D (`CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`) is a SEPARATE, CURRENT record: **BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY**; Phase E and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 

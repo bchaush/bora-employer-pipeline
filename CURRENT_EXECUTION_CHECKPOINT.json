@@ -1,23 +1,36 @@
 {
   "schema_version": "1.0",
-  "checkpoint_id": "CAREER_OS_CHECKPOINT_2026-09-11_AGENT_CONTEXT_USAGE_EFFICIENCY_POLICY",
+  "checkpoint_id": "CAREER_OS_CHECKPOINT_2026-09-11_PHASE_D_AUTHORIZATION",
   "recorded_at": "2026-09-11",
-  "canonical_basis_sha": "ba6530498be3410e3524aacd1ff5fba0c815d8d0",
-  "phase_id": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1",
-  "phase_mode": "GOVERNANCE_ONLY",
-  "operator_status": "COMPLETED_BY_OPERATOR",
-  "human_acceptance_status": "BORA_ACCEPTED",
-  "accepted_at": "2026-09-11",
+  "canonical_basis_sha": "4902f74a9282ba00f77ae2badf2b8e0139dbc7f1",
+  "phase_id": "CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1",
+  "phase_mode": "READ_ONLY_DESIGN_ONLY",
+  "authorization_status": "BORA_AUTHORIZED",
+  "selection_status": "SELECTED",
+  "operator_status": "NOT_YET_COMPLETED",
   "implementation_authorized": false,
   "prior_phase": {
+    "phase_id": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1",
+    "phase_mode": "GOVERNANCE_ONLY",
+    "operator_status": "COMPLETED_BY_OPERATOR",
+    "human_acceptance_status": "BORA_ACCEPTED",
+    "accepted_at": "2026-09-11"
+  },
+  "prior_prior_phase": {
     "phase_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
     "phase_mode": "READ_ONLY",
     "operator_status": "COMPLETED_BY_OPERATOR",
     "human_acceptance_status": "BORA_ACCEPTED",
     "accepted_at": "2026-09-11"
   },
-  "terminal_adjudication": "PHASE C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) BORA ACCEPTED - CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING - implementation_authorized remains false - PHASE D (FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP) PROPOSED_NOT_AUTHORIZED - no later roadmap phase authorized - IMPLEMENTATION NOT AUTHORIZED",
+  "terminal_adjudication": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) remains COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING - Bora explicitly authorized CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (PHASE D) as the next phase, in READ_ONLY / DESIGN_ONLY mode, on 2026-09-11 - PHASE D is now BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED - implementation_authorized remains false - PHASE E and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED - IMPLEMENTATION NOT AUTHORIZED",
   "completed_actions": [
+    "Recorded Bora's explicit 2026-09-11 authorization of CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) as the next phase, in READ_ONLY / DESIGN_ONLY mode, BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, with implementation_authorized remaining false",
+    "Synchronized project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md with this authorization-only transition",
+    "Added milestone_contracts/governance/career-os-phase-d-authorization-v1.json recording this bounded governance-sync contract",
+    "Preserved CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1's own BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING status unchanged as prior_phase, distinct from this new Phase D authorization event; performed no substantive Phase D taxonomy or evaluator-coverage-map work"
+  ],
+  "policy_milestone_completed_actions_reference": [
     "Drafted docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md as a candidate policy (pending Bora acceptance; not yet governing): quality-preserving Claude Code / Cursor context-and-usage discipline, with every material claim labeled SOURCE_DIRECT / CAREER_OS_ADAPTATION / OBSERVED_REPO_FACT / OPEN_HYPOTHESIS and cited to source URLs/dates",
     "Drafted the 17 candidate policy principles, the Cursor economy rule, and the Claude economy rule as CAREER_OS_ADAPTATION governance, subordinate to the existing Authority Order and every existing truth/evidence/review/approval rule, pending Bora acceptance",
     "Recorded OBSERVED_REPO_FACT baseline measurements (CLAUDE.md, AGENTS.md, and the seven .cursor/rules alwaysApply files' byte/line counts) as a future comparison point, without changing any of those files",
@@ -48,15 +61,16 @@
     "Recorded open-coding qualitative tags (current-role/actionability; package/artifact quality/spawn; controller/reviewer transport/evidence integrity; duplicate/application-lifecycle continuity; human-handoff/submission continuity) as Phase C tags only, not a Phase D taxonomy or evaluator map"
   ],
   "not_completed_or_not_authorized": [
+    "No substantive CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) taxonomy, severity ranking, or evaluator-coverage map work performed -- this checkpoint records authorization only",
     "No CAREER_OS_RUN_TRACE_V1 design or trace schema",
-    "No formal Phase D failure taxonomy, severity ranking, or evaluator-coverage map",
     "No trace infrastructure, database, dashboard, orchestration automation, new agent, model router, or LLM judge implemented",
     "No production Career OS behavior changed",
     "No structural change to CLAUDE.md, .cursor/rules/*, .cursorignore, or .claude/ settings/skills/subagents/hooks -- any such change remains OPEN_HYPOTHESIS pending a separately authorized measured context-surface audit",
+    "No BLUEPRINT.md substantive doctrine change; no src/, schemas/, claims/, evidence/, experiences/, resume/, or golden-tests/ change",
     "No numerical context/usage savings claim measured or asserted",
-    "No phase beyond Phase C (Phase D and later) is authorized by this checkpoint",
-    "No claim that raw run traces exist beyond what durable secondary records establish"
+    "No phase beyond Phase D (Phase E and later) is authorized by this checkpoint",
+    "implementation_authorized remains false"
   ],
-  "exact_next_allowed_action": "Bora explicitly accepted this policy milestone/checkpoint (CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1) and its ADR at docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md on 2026-09-11, stating explicitly that Phase D remains unauthorized until separately approved. This policy is now GOVERNING (governance-only; implementation_authorized remains false). Bora may separately authorize a next phase; absent that authorization, no Phase D work, taxonomy, evaluator design, trace architecture, or other substantive next-phase work may begin.",
-  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B, Phase C, and this governance-only policy milestone (2026-09-11) never implies that implementation is authorized or that Phase D or any later phase is authorized; that acceptance was recorded canonically by this checkpoint, not self-granted by the operator."
+  "exact_next_allowed_action": "Bora explicitly authorized CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) as the next phase in READ_ONLY / DESIGN_ONLY mode on 2026-09-11. Phase D is now BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED; implementation_authorized remains false. The sole next allowed action is to begin substantive Phase D read-only/design-only work (the failure taxonomy and evaluator-coverage map) under its own separately locked contract -- no implementation, trace infrastructure, database/UI, new agent, model routing, or LLM judge is authorized. Phase E and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED.",
+  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B, Phase C, and the governance-only agent context/usage-efficiency policy milestone, and Bora's authorization of Phase D, never implies that implementation is authorized or that Phase E or any later phase is authorized; that authorization was recorded canonically by this checkpoint, not self-granted by the operator."
 }

@@ -1,0 +1,67 @@
+{
+  "milestone_id": "CAREER_OS_PHASE_D_AUTHORIZATION_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Record Bora's explicit 2026-09-11 authorization of CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) as the next phase, in READ_ONLY / DESIGN_ONLY mode, as BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, with implementation_authorized remaining false and Phase E remaining PROPOSED_NOT_AUTHORIZED. This is a bounded authorization-transition sync only -- it does not perform, design, or begin any substantive Phase D taxonomy or evaluator-coverage-map work, and does not re-adjudicate the already-accepted CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 policy, which remains BORA_ACCEPTED / GOVERNING unchanged.",
+  "baseline_sha": "4902f74a9282ba00f77ae2badf2b8e0139dbc7f1",
+  "allowed_paths": [
+    "CHANGELOG.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "AGENTS.md",
+    "project_state.json",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "milestone_contracts/governance/career-os-phase-d-authorization-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/audits/**",
+    "docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md"
+  ],
+  "required_tests": [
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "CURRENT_EXECUTION_CHECKPOINT.json records phase_id=CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1, phase_mode=READ_ONLY_DESIGN_ONLY, authorization_status=BORA_AUTHORIZED, selection_status=SELECTED, operator_status=NOT_YET_COMPLETED, implementation_authorized=false, and preserves CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 as prior_phase in its own distinct BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING state",
+    "project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md are mutually consistent with the checkpoint: Phase D BORA_AUTHORIZED/SELECTED/NOT_YET_COMPLETED, implementation_authorized=false, Phase E PROPOSED_NOT_AUTHORIZED",
+    "CHANGELOG.md records this authorization transition as a distinct dated entry, separate from the prior CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 acceptance entry",
+    "the four required tests fail closed on this new canonical state",
+    "no BLUEPRINT.md, CLAUDE.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, or golden-tests/** change exists in the diff",
+    "no CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 substantive taxonomy, severity ranking, or evaluator-coverage-map content is authored",
+    "no CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, database/UI, automation, new runtime agent, model routing, or LLM judge is introduced",
+    "no authorization or implication of authorization of Phase E or any later roadmap phase",
+    "docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md is left unchanged; the already-accepted policy is not re-adjudicated"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would modify BLUEPRINT.md, CLAUDE.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, or golden-tests/**",
+    "change would author, design, or implement Phase D taxonomy/evaluator content, CAREER_OS_RUN_TRACE_V1, or any other runtime/product surface",
+    "change would authorize or imply authorization of Phase E or any later roadmap phase",
+    "change would represent this authorization as operator self-granted rather than a Bora human event",
+    "change would weaken or contradict CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1's existing BORA_ACCEPTED / GOVERNING status"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_AS_THE_NEXT_PHASE_IN_READ_ONLY_DESIGN_ONLY_MODE_ON_2026-09-11; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}

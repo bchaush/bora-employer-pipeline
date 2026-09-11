@@ -257,34 +257,36 @@ assert 'Quality/evidence/validation depth outrank quota conservation' not in AGE
 assert 'One bounded milestone per primary Claude/Cursor session' not in AGENTS
 
 # CURRENT_MILESTONE.md's live checkpoint block must explicitly separate the
-# PRIOR (already Bora-accepted, read-only Phase C) mode/operator/acceptance
-# fields from the CURRENT policy milestone's own fields -- no unscoped
-# BORA_ACCEPTED / READ_ONLY may appear as if it applies to the prior phase
-# rather than the current milestone, and the current milestone must read
-# GOVERNANCE_ONLY / COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) /
-# GOVERNING.
+# PRIOR (already Bora-accepted, GOVERNING policy milestone) mode/operator/
+# acceptance fields from the CURRENT Phase D authorization's own fields --
+# no unscoped BORA_ACCEPTED / GOVERNANCE_ONLY may appear as if it applies to
+# Phase D rather than to the prior policy milestone, and Phase D must read
+# READ_ONLY_DESIGN_ONLY / BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED.
 milestone_text = CURRENT_MILESTONE.read_text(encoding='utf-8')
-assert 'Prior-phase operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**' in milestone_text
-assert 'Prior-phase human acceptance: **BORA_ACCEPTED**' in milestone_text
-assert 'Current-milestone mode: **GOVERNANCE_ONLY**' in milestone_text
-assert 'Current-milestone operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Current-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
-assert 'Current-milestone governing status: **GOVERNING**' in milestone_text
+assert 'Prior-milestone operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
+assert 'Prior-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
+assert 'Prior-milestone governing status: **GOVERNING**' in milestone_text
+assert 'Current-phase mode: **READ_ONLY_DESIGN_ONLY**' in milestone_text
+assert 'Current-phase authorization status: **BORA_AUTHORIZED**' in milestone_text
+assert 'Current-phase selection status: **SELECTED**' in milestone_text
+assert 'Current-phase operator status: **NOT_YET_COMPLETED**' in milestone_text
 _checkpoint_block_end = milestone_text.index('## Eval & Harness Audit - Roadmap Reference')
 _checkpoint_block = milestone_text[:_checkpoint_block_end]
-assert 'Current milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1`\nCurrent-milestone mode: **GOVERNANCE_ONLY**' in _checkpoint_block, (
-    'the current policy milestone line must be immediately followed by its own scoped fields, not unscoped prior-phase fields'
+assert 'Current phase: `CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`\nCurrent-phase mode: **READ_ONLY_DESIGN_ONLY**' in _checkpoint_block, (
+    'the current Phase D line must be immediately followed by its own scoped fields, not unscoped prior-milestone fields'
 )
-assert 'Bora may separately authorize a next phase' in _checkpoint_block
+assert 'no implementation' in _checkpoint_block
 assert 'PROPOSED_NOT_AUTHORIZED' in _checkpoint_block
 
 # CURRENT_STATE.md must record this policy as Bora-accepted and governing
 # (a genuine human acceptance event, not operator self-acceptance), while
-# still stating implementation_authorized remains false and Phase D
-# remains unauthorized.
+# also recording Phase D as Bora-authorized (selected, not yet completed)
+# and implementation_authorized remaining false, with Phase E/later still
+# PROPOSED_NOT_AUTHORIZED.
 state_text = CURRENT_STATE.read_text(encoding='utf-8')
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in state_text
 assert 'not self-granted by the operator' in state_text
+assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED' in state_text
 assert '`implementation_authorized` remains `false`' in state_text
 assert 'PROPOSED_NOT_AUTHORIZED' in state_text
 
