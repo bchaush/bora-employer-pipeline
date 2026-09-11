@@ -1,3 +1,4 @@
+* Added `SUBMITTED_OPPORTUNITY_DEDUPE_V1` (Section 138.15): exact employer+requisition opportunities with historical Submitted Application Truth (including an authoritative first-party ?already applied? state) are suppressed from fresh Bora-facing discovery/package generation; exact identity is required, package-folder presence alone is insufficient, and in-progress packages continue rather than duplicate.
 # Bora Employer Pipeline OS — Change Log
 
 This file records material changes to the system.
