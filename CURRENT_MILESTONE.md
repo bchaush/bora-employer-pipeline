@@ -9,18 +9,18 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - Phase B Completed / Human Acceptance Pending
+## Current Checkpoint - Phase B Accepted / Phase C Authorized, Read-Only, Not Yet Completed
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
-Phase: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
+Prior phase: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**
-Human acceptance: **PENDING BORA ACCEPTANCE**
-Proposed next phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` - **PROPOSED_NOT_AUTHORIZED / READ-ONLY**
-Exact next allowed action: Bora reviews and accepts or rejects the completed Phase B audit checkpoint. No Phase C work or implementation is authorized by this record.
+Human acceptance: **BORA_ACCEPTED**
+Current phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` - **BORA_AUTHORIZED / SELECTED / READ_ONLY / NOT_YET_COMPLETED**
+Exact next allowed action: begin Phase C's read-only trace and failure corpus inventory work under the governing ADR. No implementation, and no phase beyond Phase C, is authorized by this record.
 
 ## Eval & Harness Audit - Roadmap Reference
 
-Status: **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** (see the Checkpoint block above; superseded from its prior SELECTED-at-time-of-selection status). Proposed next phase `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` remains **PROPOSED_NOT_AUTHORIZED** until Bora explicitly accepts this checkpoint and separately authorizes it.
+Status: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** (see the Checkpoint block above). Next phase `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` is **BORA_AUTHORIZED / SELECTED / READ_ONLY / NOT_YET_COMPLETED**; Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 
