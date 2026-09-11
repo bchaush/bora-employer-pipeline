@@ -26,6 +26,9 @@ BLUEPRINT.md is the strategic, product, reliability, implementation, and coding 
 - **Gemini**: optional non-coding strategic/directional second opinion only; not part of the coding execution or coding-review loop.
 - No runtime workflow may depend on multi-model agreement. Deterministic validators enforce invariants. Evidence wins over model opinion. Bora retains consequential approval.
 
+## Eval / Harness Roadmap Recovery
+Before any Career OS eval, harness, orchestration, or automation work, read `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`. While that ADR remains current, the only authorized next phase is the read-only `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`; do not jump directly to implementation. The locked execution roles are ChatGPT architect/adjudicator/initiator -> Claude Code bounded builder after explicit authorization -> deterministic checks -> Cursor independent adversarial review -> CI -> Bora final merge/release authority.
+
 ## Truth Rules
 Never invent or infer a factual claim merely to improve job fit. Unknown information must remain unknown.
 - Do NOT fabricate: work experience, technologies, metrics, employment dates, titles, immigration/OPT facts, employer details, sponsorship facts, or résumé claims.
