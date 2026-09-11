@@ -9,6 +9,16 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
+## Selected Next Phase — Eval & Harness Audit
+
+Status: **SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**
+Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
+Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
+
+Purpose: audit the tested Career OS operating baseline against primary/public reference frameworks from IndyDevDan, Hamel Husain, and Cole Medin; inventory real traces/failures, deterministic-vs-agent-vs-human boundaries, evaluator coverage, observability gaps, and assurance-runtime weaknesses before authorizing automation. The audit may recommend architecture, but may not implement trace infrastructure, a database/UI, new agents, model routing, LLM judges, or product automation.
+
+Fresh-session rule: independently verify live canonical `main`, recover repository doctrine, read the ADR above, state the current authorized phase, then begin read-only audit work. Prior chat context is secondary to canonical repository state.
+
 Status: CLOSED
 Closed task:
 BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1

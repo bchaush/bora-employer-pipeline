@@ -16,6 +16,12 @@ which found this file still declared Blueprint v3.8 while canonical
 outrank this prose. Before trusting anything below, verify it against
 those sources rather than this file alone.
 
+## Selected Next Phase (2026-09-10) — Eval & Harness Audit
+
+`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` is **SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**. The controlling sequence is `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`. This selection does not authorize trace infrastructure, a database/UI, orchestration automation, new agents, model/provider routing, LLM judges, or any later roadmap phase. Fresh sessions must recover live canonical `main`, `project_state.json`, `CURRENT_MILESTONE.md`, and the ADR before beginning this work.
+
+The audit is explicitly grounded in current primary/public materials from IndyDevDan, Hamel Husain, and Cole Medin, while requiring every proposed Career OS adoption to be justified by this repository's observed failures, consequences, or workload rather than external fashion. The locked execution model remains ChatGPT architecture/adjudication -> Claude Code bounded implementation only after authorization -> deterministic checks -> Cursor independent adversarial review -> CI -> Bora final merge/release authority.
+
 ## Catch-Up Entry (2026-09-07)
 
 Four milestones closed and merged to canonical `main` between this

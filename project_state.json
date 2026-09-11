@@ -3,7 +3,7 @@
   "latest_locked_section": 141,
   "latest_closed_milestone_id": "BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1",
   "latest_closed_milestone_pr": 17,
-  "current_phase": "OPERATE_WHILE_BUILDING (BLUEPRINT.md Section 133)",
-  "next_authorized_action": "No product implementation milestone is preselected on canonical main. Any next bounded implementation requires a new, explicitly authorized, branch-scoped milestone contract (BLUEPRINT.md Section 133 operate-first/build-when-earned doctrine).",
-  "semantic_state_updated_at": "2026-09-08"
+  "current_phase": "CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1 (SELECTED_READ_ONLY; NO_IMPLEMENTATION_AUTHORIZED)",
+  "next_authorized_action": "Run the read-only CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1 per docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md. No product automation, trace infrastructure, new agents, model routing, LLM judges, or later roadmap phase is authorized until the audit is completed and a separate bounded milestone is explicitly approved.",
+  "semantic_state_updated_at": "2026-09-10"
 }

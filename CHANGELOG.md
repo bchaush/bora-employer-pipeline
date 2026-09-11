@@ -21,6 +21,10 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 
 ---
 
+## 2026-09-10 — Career OS Eval & Harness Sequence v1 (ROADMAP LOCK)
+
+Locked an audit-first roadmap grounded in primary/public IndyDevDan, Hamel Husain, and Cole Medin materials; permanent ChatGPT→Claude→deterministic-checks→Cursor→CI→Bora role separation; and read-only `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` as the only authorized next phase. No automation implementation or later roadmap phase is pre-authorized. Mechanical state and cold-start recovery pointers were synchronized in `project_state.json`, `CURRENT_STATE.md`, `CURRENT_MILESTONE.md`, and `AGENTS.md`.
+
 ## 2026-09-10 — End-user application transition quorum (`END_USER_APPLICATION_TRANSITION_QUORUM_V1`, DOCTRINE LOCK)
 
 **Reason**
