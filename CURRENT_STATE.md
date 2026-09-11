@@ -16,9 +16,13 @@ which found this file still declared Blueprint v3.8 while canonical
 outrank this prose. Before trusting anything below, verify it against
 those sources rather than this file alone.
 
-## Selected Next Phase (2026-09-10) — Eval & Harness Audit
+## Current Execution Checkpoint (2026-09-10)
 
-`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` is **SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**. The controlling sequence is `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`. This selection does not authorize trace infrastructure, a database/UI, orchestration automation, new agents, model/provider routing, LLM judges, or any later roadmap phase. Fresh sessions must recover live canonical `main`, `project_state.json`, `CURRENT_MILESTONE.md`, and the ADR before beginning this work.
+`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` has been completed by the operator in READ-ONLY mode and is **PENDING BORA ACCEPTANCE**. `CURRENT_EXECUTION_CHECKPOINT.json` is the machine-readable fresh-chat handoff. Its proposed next phase, `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`, remains **PROPOSED_NOT_AUTHORIZED / READ-ONLY**. No Phase C work or implementation may begin until Bora explicitly accepts the Phase B checkpoint and authorizes the next phase.
+
+## Eval & Harness Audit Roadmap Reference (2026-09-10)
+
+`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** (see the Current Execution Checkpoint section above; superseded from its prior SELECTED-at-time-of-selection status). The controlling sequence is `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`. This completed-audit status does not authorize trace infrastructure, a database/UI, orchestration automation, new agents, model/provider routing, LLM judges, or any later roadmap phase. Fresh sessions recover in the single canonical order fixed by the ADR's Section 6 (New-chat recovery protocol) — this file does not restate a competing order.
 
 The audit is explicitly grounded in current primary/public materials from IndyDevDan, Hamel Husain, and Cole Medin, while requiring every proposed Career OS adoption to be justified by this repository's observed failures, consequences, or workload rather than external fashion. The locked execution model remains ChatGPT architecture/adjudication -> Claude Code bounded implementation only after authorization -> deterministic checks -> Cursor independent adversarial review -> CI -> Bora final merge/release authority.
 
