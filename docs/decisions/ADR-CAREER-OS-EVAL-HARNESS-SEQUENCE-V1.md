@@ -1,7 +1,7 @@
 # ADR — Career OS Eval & Harness Sequence v1
 
-Status: **ACCEPTED ROADMAP / PHASE B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) COMPLETED_BY_OPERATOR — PENDING_BORA_ACCEPTANCE / NO PHASE C OR LATER IMPLEMENTATION AUTHORIZED**
-Date: 2026-09-10
+Status: **ACCEPTED ROADMAP / PHASE B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) COMPLETED_BY_OPERATOR AND BORA_ACCEPTED / PHASE C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) BORA_AUTHORIZED — READ_ONLY / NOT_YET_COMPLETED / NO IMPLEMENTATION OR LATER PHASE AUTHORIZED**
+Date: 2026-09-10 (Phase B acceptance and Phase C authorization recorded 2026-09-11)
 Owner: Bora + ChatGPT architecture/adjudication layer
 
 ## 1. Purpose
@@ -132,7 +132,7 @@ A fresh ChatGPT session must be able to resume without conversational memory. Th
 7. state the current recovered phase/status and exactly one next allowed action before beginning any work;
 8. use prior chat context only after canonical recovery and only when consistent with the repository.
 
-Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) is **COMPLETED_BY_OPERATOR** and **PENDING_BORA_ACCEPTANCE** — see `CURRENT_EXECUTION_CHECKPOINT.json`. The proposed next phase, `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`, remains **PROPOSED_NOT_AUTHORIZED**. A new chat must not jump directly to trace infrastructure, orchestration automation, a database, multi-agent implementation, or Phase C merely because Phase B is operator-complete — Bora must explicitly accept the Phase B checkpoint and separately authorize the next phase first.
+Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) is **COMPLETED_BY_OPERATOR** and **BORA_ACCEPTED** — see `CURRENT_EXECUTION_CHECKPOINT.json`. Bora has explicitly authorized the next phase, `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` (Phase C), in **READ_ONLY** mode; it is **NOT_YET_COMPLETED**. Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**. A new chat must not jump directly to trace infrastructure, orchestration automation, a database, multi-agent implementation, or any phase beyond Phase C merely because Phase C is authorized — Phase C's own read-only work must actually be performed and separately accepted before any later phase or implementation is authorized.
 
 ## 7. Audit deliverables required before implementation
 
@@ -179,9 +179,9 @@ These references are anchors for the audit, not frozen third-party dependencies.
 
 **LOCKED SEQUENCE:** audit → real-trace/error inventory → failure taxonomy/evaluator map → eval-set architecture → trace/contract architecture → assurance architecture → bounded implementation → automation → optional agent/model specialization.
 
-**CURRENT STATUS:** Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`, read-only) is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** — see `CURRENT_EXECUTION_CHECKPOINT.json` for the machine-readable handoff and `docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md` for the operator audit report. Operator completion does not itself grant Bora acceptance.
+**CURRENT STATUS:** Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`, read-only) is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** — see `CURRENT_EXECUTION_CHECKPOINT.json` for the machine-readable handoff and `docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md` for the operator audit report, both reflecting Bora's acceptance. Bora has separately, explicitly authorized/selected Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) as the next phase, in **READ_ONLY** mode; Phase C is **NOT_YET_COMPLETED** and no implementation is authorized by this acceptance/authorization.
 
-No later phase, including Phase C, is pre-authorized. Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) is proposed and **PROPOSED_NOT_AUTHORIZED** until Bora explicitly accepts the Phase B checkpoint and separately authorizes it.
+No phase beyond Phase C is pre-authorized. Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED** until Phase C itself is actually performed and its own results are separately accepted and authorized.
 ## 11. Reference URLs at lock time
 
 - https://github.com/disler/fusion-harness

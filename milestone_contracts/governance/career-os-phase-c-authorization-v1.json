@@ -1,0 +1,55 @@
+{
+  "milestone_id": "CAREER_OS_PHASE_C_AUTHORIZATION_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Record Bora's explicit acceptance of the completed Phase B (CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1) checkpoint and Bora's explicit authorization/selection of Phase C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) as the next READ-ONLY phase, while preserving every existing prohibition. Continuity/governance bookkeeping only -- not Phase C substantive work and not product implementation.",
+  "baseline_sha": "615ac17029bc62cd6b8cd514b9c25ef972fadd6f",
+  "allowed_paths": [
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "AGENTS.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "milestone_contracts/governance/career-os-phase-c-authorization-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "BLUEPRINT.md"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "CURRENT_EXECUTION_CHECKPOINT.json becomes a Phase C START checkpoint whose canonical_basis_sha equals the verified baseline 615ac17029bc62cd6b8cd514b9c25ef972fadd6f",
+    "the checkpoint explicitly preserves that Phase B (CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1) was accepted by Bora, distinct from operator completion",
+    "the checkpoint states Phase C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) is authorized, read-only, and not yet completed",
+    "implementation_authorized remains false everywhere it is asserted",
+    "the checkpoint lists only what is actually complete at this transition point -- Bora's acceptance of Phase B and authorization/selection of Phase C -- and does not fabricate any Phase C substantive finding or corpus inventory",
+    "the checkpoint lists not-authorized work, including no CAREER_OS_RUN_TRACE_V1 design/implementation, no trace schema/infrastructure, no database/UI, no orchestration automation, no new agent, no model routing, no LLM judge, no product/runtime behavior change, and no phase beyond Phase C",
+    "the checkpoint states exactly one next allowed action: begin Phase C read-only trace/failure corpus inventory work under the governing ADR",
+    "project_state.json mechanically agrees: current_phase reflects Phase C authorized/read-only/not-completed/no-implementation, and next_authorized_action names Phase C read-only inventory as the sole authorized next action",
+    "CURRENT_STATE.md, CURRENT_MILESTONE.md, AGENTS.md, and the governing ADR are mutually consistent with the checkpoint and do not imply Phase D or implementation is authorized",
+    "docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md reflects Bora's acceptance of the Phase B checkpoint while remaining a historical audit report that does not itself authorize implementation",
+    "the single canonical recovery order fixed in the governing ADR Section 6 is preserved unchanged",
+    "the two focused governance tests fail closed on the new canonical state, including human acceptance, Phase C authorization/read-only state, implementation_authorized=false, recovery-order continuity, and the absence of any later-phase authorization"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would design or implement CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, a database/UI, orchestration automation, a new agent, model routing, an LLM judge, or any product/runtime behavior",
+    "change would authorize or imply authorization of Phase D or any later roadmap phase",
+    "change would fabricate a Phase C finding or corpus inventory before Phase C substantive work has actually started",
+    "change would let an operator self-accept its own work on Bora's behalf"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED",
+  "human_approval_requirements": "BORA_EXPLICITLY_ACCEPTED_THE_PHASE_B_CHECKPOINT_AND_AUTHORIZED_SELECTION_OF_CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_AS_THE_NEXT_READ_ONLY_PHASE_IN_THE_2026-09-11_OPERATING_SESSION; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}

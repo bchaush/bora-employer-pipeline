@@ -1,15 +1,25 @@
 {
   "schema_version": "1.0",
-  "checkpoint_id": "CAREER_OS_CHECKPOINT_2026-09-10_PHASE_B_AUDIT",
-  "recorded_at": "2026-09-10",
-  "canonical_basis_sha": "a36400ef26bd7d5712a386202d1fa036eafdea38",
-  "phase_id": "CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1",
+  "checkpoint_id": "CAREER_OS_CHECKPOINT_2026-09-11_PHASE_C_START",
+  "recorded_at": "2026-09-11",
+  "canonical_basis_sha": "615ac17029bc62cd6b8cd514b9c25ef972fadd6f",
+  "phase_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
   "phase_mode": "READ_ONLY",
-  "operator_status": "COMPLETED_BY_OPERATOR",
-  "human_acceptance_status": "PENDING_BORA_ACCEPTANCE",
+  "phase_status": "BORA_AUTHORIZED_NOT_YET_COMPLETED",
   "implementation_authorized": false,
-  "terminal_adjudication": "OPERATOR FINDING, PENDING BORA ACCEPTANCE, NOT ACCEPTED DOCTRINE - audit completed by operator; Phase C remains proposed and not authorized",
+  "prior_phase": {
+    "phase_id": "CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1",
+    "phase_mode": "READ_ONLY",
+    "operator_status": "COMPLETED_BY_OPERATOR",
+    "human_acceptance_status": "BORA_ACCEPTED",
+    "accepted_at": "2026-09-11"
+  },
+  "terminal_adjudication": "PHASE B (CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1) BORA ACCEPTED - PHASE C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) BORA AUTHORIZED / SELECTED / READ_ONLY / NOT YET COMPLETED - IMPLEMENTATION NOT AUTHORIZED",
   "completed_actions": [
+    "Bora reviewed and explicitly accepted the completed Phase B (CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1) checkpoint and its operator audit report",
+    "Bora explicitly authorized and selected CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1 as the next phase, in READ_ONLY mode"
+  ],
+  "phase_b_completed_actions_reference": [
     "Recovered live canonical main and governing eval/harness ADR",
     "Audited current engineering harness and job-operating workflow boundaries",
     "Inventoried real controller failures and derived a first-pass failure taxonomy",
@@ -19,16 +29,13 @@
     "Produced a ranked recommendation for the next read-only phase"
   ],
   "not_completed_or_not_authorized": [
+    "No Phase C substantive trace or failure corpus inventory work has been performed yet -- this checkpoint records authorization only",
+    "No CAREER_OS_RUN_TRACE_V1 design or implementation",
     "No trace schema or trace infrastructure implemented",
     "No database, dashboard, orchestration automation, new agent, model router, or LLM judge implemented",
-    "No Phase C work started",
-    "No production Career OS behavior changed"
+    "No production Career OS behavior changed",
+    "No phase beyond Phase C (Phase D and later) is authorized by this checkpoint"
   ],
-  "proposed_next_phase": {
-    "phase_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
-    "mode": "READ_ONLY",
-    "status": "PROPOSED_NOT_AUTHORIZED"
-  },
-  "exact_next_allowed_action": "Bora reviews and accepts or rejects the completed Phase B audit checkpoint; no Phase C work may begin until Bora explicitly authorizes it.",
-  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Operator completion never implies Bora acceptance or next-phase authorization."
+  "exact_next_allowed_action": "Begin Phase C (CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1) read-only trace and failure corpus inventory work under docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md. No Phase C work may begin from any other premise, and no later phase or implementation may begin until Phase C itself completes and is separately accepted and authorized.",
+  "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B and authorization of Phase C never imply that Phase C is complete, that implementation is authorized, or that any later phase is authorized."
 }
