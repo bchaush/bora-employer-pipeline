@@ -1,0 +1,56 @@
+{
+  "milestone_id": "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1",
+  "kind": "READ_ONLY_AUDIT",
+  "goal": "Render the already-completed READ_ONLY Phase C trace and failure corpus inventory into durable canonical governance/checkpoint documentation, separating OBSERVED / RECONSTRUCTED_FROM_DURABLE_EVIDENCE / MISSING / SYNTHETIC evidence, and update only the minimum canonical governance/state/checkpoint/test surfaces so fresh sessions recover Phase C as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY with implementation_authorized=false, Phase D PROPOSED_NOT_AUTHORIZED, and exactly one next allowed action (Bora reviews and accepts or rejects the Phase C checkpoint). No product implementation, no src/schema/database/dashboard/automation/agent/model-routing/LLM-judge work, and no design of CAREER_OS_RUN_TRACE_V1 or Phase D.",
+  "baseline_sha": "2ce84321e8095b622328c77ea348b8f1fe874f5c",
+  "allowed_paths": [
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "AGENTS.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md",
+    "docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "milestone_contracts/audit/career-os-trace-failure-corpus-inventory-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "BLUEPRINT.md",
+    "docs/application/BORA_APPLICATION_HISTORY_V1.json"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md exists and explicitly labels every case OBSERVED, RECONSTRUCTED_FROM_DURABLE_EVIDENCE, MISSING, or SYNTHETIC",
+    "the report does not claim raw traces/artifacts exist where only durable PR/commit/CI/changelog records survive, and explicitly records that .career-os/ run artifacts and local PDF/DOCX package artifacts are gitignored and therefore MISSING from repository history where not separately persisted",
+    "no synthetic case is presented as primary production evidence",
+    "the report cites the OBSERVED 14-entry BORA_DIRECT_CONFIRMATION corpus in docs/application/BORA_APPLICATION_HISTORY_V1.json without modifying that file",
+    "the report reconstructs, from durable secondary evidence only, the stale/dead/actionability cases (MGB RQ4055007, Fresenius R0266808, MGB RQ4075857, Point32Health R9102, MassDOT 260005JH), package/artifact-quality cases (Atominvest, Santander, DraftKings), and controller/reviewer integrity findings (F1-F9, provider stdout/stderr transport defect citing run 20260907T220348Z-3dacfcfd with historical runs 20260907T180932Z-656eae27 and 20260907T193310Z-f6a756d2), separately citing the reviewer stdin-transport closure (run 20260908T184816Z-d3a8a974), the resume gold-quality closure (run 20260909T040202Z-811bdf0a), and the package-gate closure (run 20260909T172902Z-7add4b47) as non-defect governed runs",
+    "open-coding buckets are recorded as Phase C qualitative tags only, not a formal Phase D taxonomy or evaluator map",
+    "CURRENT_EXECUTION_CHECKPOINT.json records phase_id=CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1, phase_mode=READ_ONLY, operator_status=COMPLETED_BY_OPERATOR, human_acceptance_status=PENDING_BORA_ACCEPTANCE, implementation_authorized=false, and preserves Phase B's BORA_ACCEPTED history unchanged under prior_phase",
+    "the checkpoint states exactly one next allowed action: Bora reviews and accepts or rejects the Phase C checkpoint",
+    "project_state.json, CURRENT_STATE.md, CURRENT_MILESTONE.md, AGENTS.md, and the governing ADR are mutually consistent with the checkpoint and do not imply Phase D or implementation is authorized",
+    "the single canonical recovery order fixed in the governing ADR Section 6 is preserved unchanged",
+    "the two focused governance tests fail closed on the new canonical state, including operator completion vs. Bora acceptance distinction, implementation_authorized=false, recovery-order continuity, and the absence of any later-phase authorization"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would design or implement CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, a database/UI, orchestration automation, a new agent, model routing, an LLM judge, or any product/runtime behavior",
+    "change would authorize or imply authorization of Phase D or any later roadmap phase",
+    "change would fabricate a raw trace, artifact, or synthetic case as primary production evidence",
+    "change would let an operator self-accept its own Phase C work on Bora's behalf"
+  ],
+  "review_requirements": "DETERMINISTIC_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BORA_EXPLICIT_REVIEW_AND_ACCEPTANCE_OR_REJECTION_OF_THE_PHASE_C_CHECKPOINT_REQUIRED_BEFORE_PHASE_D_OR_ANY_IMPLEMENTATION; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}

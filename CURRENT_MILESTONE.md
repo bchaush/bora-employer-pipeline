@@ -9,18 +9,19 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - Phase B Accepted / Phase C Authorized, Read-Only, Not Yet Completed
+## Current Checkpoint - Phase B Accepted / Phase C Completed by Operator, Pending Bora Acceptance
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
 Prior phase: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**
 Human acceptance: **BORA_ACCEPTED**
-Current phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` - **BORA_AUTHORIZED / SELECTED / READ_ONLY / NOT_YET_COMPLETED**
-Exact next allowed action: begin Phase C's read-only trace and failure corpus inventory work under the governing ADR. No implementation, and no phase beyond Phase C, is authorized by this record.
+Current phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` - **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY**
+Report: `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`
+Exact next allowed action: Bora reviews and accepts or rejects the Phase C checkpoint. No implementation, and no phase beyond Phase C, is authorized by this record.
 
 ## Eval & Harness Audit - Roadmap Reference
 
-Status: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** (see the Checkpoint block above). Next phase `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` is **BORA_AUTHORIZED / SELECTED / READ_ONLY / NOT_YET_COMPLETED**; Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**.
+Status: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED** (see the Checkpoint block above). Next phase `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY**; Phase D and every later phase remain **PROPOSED_NOT_AUTHORIZED**.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 
