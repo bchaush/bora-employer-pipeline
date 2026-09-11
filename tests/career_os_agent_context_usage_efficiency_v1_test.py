@@ -78,6 +78,31 @@ _BASELINE_FILE_COUNTS = {
     '.cursor/rules/testing.mdc': (4908, 184),
     '.cursor/rules/truth.mdc': (3599, 126),
 }
+def _ensure_baseline_commit_available(sha):
+    # CI checks out the PR merge ref with fetch-depth=1, so the historical
+    # baseline commit object may be absent from the shallow clone even though
+    # it is a real ancestor in the repo's full history. Fetch it directly
+    # before relying on `git show <sha>:<path>` / `git ls-tree <sha>`.
+    probe = subprocess.run(
+        ['git', 'cat-file', '-e', f'{sha}^{{commit}}'], cwd=ROOT, capture_output=True,
+    )
+    if probe.returncode == 0:
+        return
+    fetch = subprocess.run(
+        ['git', 'fetch', '--depth=1', 'origin', sha], cwd=ROOT, capture_output=True,
+    )
+    if fetch.returncode != 0:
+        subprocess.run(
+            ['git', 'fetch', '--unshallow', 'origin'], cwd=ROOT, capture_output=True,
+        )
+    probe = subprocess.run(
+        ['git', 'cat-file', '-e', f'{sha}^{{commit}}'], cwd=ROOT, capture_output=True,
+    )
+    assert probe.returncode == 0, f'baseline commit {sha} unavailable even after fetch attempts'
+
+
+_ensure_baseline_commit_available(BASELINE_SHA)
+
 for rel_path, (expected_bytes, expected_lines) in _BASELINE_FILE_COUNTS.items():
     blob = subprocess.run(
         ['git', 'show', f'{BASELINE_SHA}:{rel_path}'],
