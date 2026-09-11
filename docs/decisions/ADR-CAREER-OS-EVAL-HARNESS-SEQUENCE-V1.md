@@ -1,6 +1,6 @@
 # ADR — Career OS Eval & Harness Sequence v1
 
-Status: **ACCEPTED ROADMAP / READ-ONLY AUDIT SELECTED / NO IMPLEMENTATION AUTHORIZED**
+Status: **ACCEPTED ROADMAP / PHASE B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) COMPLETED_BY_OPERATOR — PENDING_BORA_ACCEPTANCE / NO PHASE C OR LATER IMPLEMENTATION AUTHORIZED**
 Date: 2026-09-10
 Owner: Bora + ChatGPT architecture/adjudication layer
 
@@ -16,7 +16,9 @@ This ADR locks the sequence and operating method only. It does **not** authorize
 
 The audit must explicitly use current primary/public materials from IndyDevDan, Hamel Husain, and Cole Medin as reference frameworks, while distinguishing their published guidance from Career OS-specific adaptation.
 
-No statement becomes Career OS doctrine merely because one of these practitioners recommends it. Each adoption still requires evidence that it fits Career OS's observed failure modes, consequences, or workload.### IndyDevDan reference frame
+No statement becomes Career OS doctrine merely because one of these practitioners recommends it. Each adoption still requires evidence that it fits Career OS's observed failure modes, consequences, or workload.
+
+### IndyDevDan reference frame
 
 Use his public harness/software-factory work for the principle that deterministic code should own sequencing, retries, acceptance, and phase boundaries; agents should operate inside bounded phases; structured/typed envelopes should cross seams; observable traces should make failures localizable; and objective checks should be code rather than model rediscovery.
 
@@ -32,7 +34,9 @@ Career OS adaptation: real Career OS runs and reproduced failures are the primar
 
 Use his public Agentic Engineering materials for the AI-layer concept, Plan → Implement → Validate separation, validation-depth layering, commandifying repeated workflows, reducing assumptions before implementation, context isolation/reset between phases, Git history as durable memory, and system evolution after every meaningful bug.
 
-Career OS adaptation: repeated operating instructions should become versioned workflows only after their contracts and evals are understood. Context must cross phases through durable artifacts rather than hidden conversational memory.## 3. Permanent role separation
+Career OS adaptation: repeated operating instructions should become versioned workflows only after their contracts and evals are understood. Context must cross phases through durable artifacts rather than hidden conversational memory.
+
+## 3. Permanent role separation
 
 **ChatGPT — architect / semantic adjudicator / initiator.** Recover canonical state, research primary sources, define the bounded problem, decide whether a milestone is earned, design the architecture/acceptance criteria, adjudicate findings, and sequence the work. ChatGPT must not treat its own prior chat output as canonical state.
 
@@ -54,7 +58,9 @@ Treat the current tested Career OS behavior as the candidate operating baseline.
 
 ### Phase B — `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` (READ-ONLY)
 
-Inventory the real system end to end against the three reference frameworks. Identify what is already deterministic, what is model-mediated, what is human-mediated, where state lives, what can mutate real-world state, what current tests/evals cover, and where observability/contract/assurance gaps actually exist.### Phase C — Real trace and failure inventory
+Inventory the real system end to end against the three reference frameworks. Identify what is already deterministic, what is model-mediated, what is human-mediated, where state lives, what can mutate real-world state, what current tests/evals cover, and where observability/contract/assurance gaps actually exist.
+
+### Phase C — `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` — Real trace and failure inventory
 
 Use genuine Career OS operating runs, package attempts, rejected/suppressed cases, and confirmed defects as the primary corpus. Preserve the full journey through human handoff where relevant. Bora/ChatGPT perform the first qualitative review and open coding before delegating clustering or summaries to an LLM.
 
@@ -74,7 +80,9 @@ Design a repeatable system-level eval set using confirmed pass/fail operating ca
 
 Only after the audit establishes the need, design `CAREER_OS_RUN_TRACE_V1` and phase contracts/typed envelopes. The trace should make canonical SHA, inputs, sources attempted, unavailable sources, state transitions, suppression reasons, model/tool provenance where relevant, human handoffs, artifact hashes, QA outcomes, and terminal state reconstructable without reading a chat transcript.
 
-Architecture first. No database, UI, or vendor is preselected.### Phase G — Assurance architecture
+Architecture first. No database, UI, or vendor is preselected.
+
+### Phase G — Assurance architecture
 
 Review the existing assurance runtime and split fast/slow checks only if evidence shows the current loop is too slow or unreliable for frequent use. Preserve one authoritative full-suite path. A faster tier must never silently become a weaker substitute for required full assurance.
 
@@ -109,18 +117,22 @@ Do not add multi-agent roles, model routers, provider abstractions, autonomous s
 - No generic agent framework adoption merely to appear agentic.
 - No self-modifying canonical governance without human-reviewed repository changes.
 - No replacing evidence provenance with model consensus.
-- No allowing a builder to modify the mechanism that independently grades its work unless the milestone explicitly authorizes that evaluator change and it receives separate review.## 6. New-chat recovery protocol
+- No allowing a builder to modify the mechanism that independently grades its work unless the milestone explicitly authorizes that evaluator change and it receives separate review.
 
-A fresh ChatGPT session must be able to resume without conversational memory. Before any consequential work it must:
+## 6. New-chat recovery protocol
+
+A fresh ChatGPT session must be able to resume without conversational memory. This is the single canonical recovery order — every other governance file (`AGENTS.md`, `CURRENT_MILESTONE.md`, `CURRENT_STATE.md`, `CURRENT_EXECUTION_CHECKPOINT.json`) must stay consistent with it rather than defining a competing order. Before any consequential work it must:
 
 1. independently fetch/verify live canonical `main`;
-2. read `AGENTS.md`, `BLUEPRINT.md`, `project_state.json`, and `CURRENT_MILESTONE.md`;
-3. read this ADR before beginning eval/harness work;
-4. verify live Git/GitHub state and whether a newer accepted ADR supersedes this one;
-5. state the current authorized phase and what is explicitly not authorized;
-6. use prior chat context only after canonical recovery and only when consistent with the repository.
+2. read `project_state.json` (the mechanically-checked phase/authority pointer);
+3. read `CURRENT_EXECUTION_CHECKPOINT.json` (the bounded progress-handoff detail for whatever phase `project_state.json` names — never a new strategic authority above `BLUEPRINT.md`/`project_state.json`);
+4. read `AGENTS.md` and `BLUEPRINT.md`;
+5. read this ADR and `CURRENT_MILESTONE.md`/`CURRENT_STATE.md` prose for historical context (informational only; verify against steps 2-3 rather than trusting prose alone);
+6. verify live Git/GitHub state and whether a newer accepted ADR supersedes this one;
+7. state the current recovered phase/status and exactly one next allowed action before beginning any work;
+8. use prior chat context only after canonical recovery and only when consistent with the repository.
 
-While this ADR remains current, the next authorized phase is **Phase B: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1` — READ-ONLY**. A new chat must not jump directly to trace infrastructure, orchestration automation, a database, or multi-agent implementation.
+Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`) is **COMPLETED_BY_OPERATOR** and **PENDING_BORA_ACCEPTANCE** — see `CURRENT_EXECUTION_CHECKPOINT.json`. The proposed next phase, `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`, remains **PROPOSED_NOT_AUTHORIZED**. A new chat must not jump directly to trace infrastructure, orchestration automation, a database, multi-agent implementation, or Phase C merely because Phase B is operator-complete — Bora must explicitly accept the Phase B checkpoint and separately authorize the next phase first.
 
 ## 7. Audit deliverables required before implementation
 
@@ -150,7 +162,9 @@ External references must be cited to primary/public material when reasonably ava
 - **OBSERVED-REPO-FACT** — established by direct inspection/test of Career OS;
 - **OPEN-HYPOTHESIS** — plausible but not yet proven and therefore not implementation authority.
 
-If a source cannot be verified or guidance conflicts across sources, preserve the uncertainty rather than harmonizing it silently.## 9. Reference materials reviewed for this lock
+If a source cannot be verified or guidance conflicts across sources, preserve the uncertainty rather than harmonizing it silently.
+
+## 9. Reference materials reviewed for this lock
 
 Primary/public reference starting points used for this roadmap:
 
@@ -165,12 +179,18 @@ These references are anchors for the audit, not frozen third-party dependencies.
 
 **LOCKED SEQUENCE:** audit → real-trace/error inventory → failure taxonomy/evaluator map → eval-set architecture → trace/contract architecture → assurance architecture → bounded implementation → automation → optional agent/model specialization.
 
-**CURRENT AUTHORITY:** Phase B only — `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`, read-only.
+**CURRENT STATUS:** Phase B (`CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`, read-only) is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** — see `CURRENT_EXECUTION_CHECKPOINT.json` for the machine-readable handoff and `docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md` for the operator audit report. Operator completion does not itself grant Bora acceptance.
 
-No later phase is pre-authorized.
-Reference URLs at lock time:
+No later phase, including Phase C, is pre-authorized. Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`) is proposed and **PROPOSED_NOT_AUTHORIZED** until Bora explicitly accepts the Phase B checkpoint and separately authorizes it.
+## 11. Reference URLs at lock time
 
 - https://github.com/disler/fusion-harness
 - https://github.com/disler/super-simple-software-factory
 - https://hamel.dev/blog/posts/evals-faq/
 - https://github.com/coleam00/ai-transformation-workshop
+
+## 12. Fresh-session checkpoint protocol
+
+`CURRENT_EXECUTION_CHECKPOINT.json` is the canonical machine-readable handoff for bounded phase progress within whatever phase `project_state.json`/`BLUEPRINT.md` currently authorize — it is subordinate to both and is never a new strategic authority. It exists to prevent fresh chats from re-running completed work or inferring authority from prose. A checkpoint must separate operator completion, Bora acceptance, and next-phase authorization; none implies either of the others. It must record exact completed actions, unresolved/not-authorized work, the proposed next phase if any, and exactly one next allowed action.
+
+Fresh sessions recover in the exact order fixed by "Section 6. New-chat recovery protocol" above — do not restate a different order here. When a meaningful bounded session changes canonical progress, continuity is not considered locked until the checkpoint and state pointers are updated consistently and merged to `main`. Git history preserves prior checkpoint versions, so the current checkpoint stays small rather than becoming a second narrative log.

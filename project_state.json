@@ -3,7 +3,7 @@
   "latest_locked_section": 141,
   "latest_closed_milestone_id": "BORA_ROLE_SELECTION_AND_PURSUIT_PRIORITY_STANDARD_V1",
   "latest_closed_milestone_pr": 17,
-  "current_phase": "CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1 (SELECTED_READ_ONLY; NO_IMPLEMENTATION_AUTHORIZED)",
-  "next_authorized_action": "Run the read-only CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1 per docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md. No product automation, trace infrastructure, new agents, model routing, LLM judges, or later roadmap phase is authorized until the audit is completed and a separate bounded milestone is explicitly approved.",
+  "current_phase": "CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1 (COMPLETED_BY_OPERATOR; PENDING_BORA_ACCEPTANCE; READ_ONLY; NO_IMPLEMENTATION_AUTHORIZED)",
+  "next_authorized_action": "Bora reviews and accepts or rejects CURRENT_EXECUTION_CHECKPOINT.json for the completed Phase B audit. CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1 status is PROPOSED_NOT_AUTHORIZED (READ_ONLY); no Phase C work or implementation may begin without explicit Bora authorization. No product automation, trace infrastructure, database/UI, new agents, model routing, or LLM judges are authorized.",
   "semantic_state_updated_at": "2026-09-10"
 }

@@ -9,15 +9,24 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Selected Next Phase — Eval & Harness Audit
+## Current Checkpoint - Phase B Completed / Human Acceptance Pending
 
-Status: **SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**
+Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
+Phase: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
+Operator status: **COMPLETED_BY_OPERATOR (READ-ONLY)**
+Human acceptance: **PENDING BORA ACCEPTANCE**
+Proposed next phase: `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` - **PROPOSED_NOT_AUTHORIZED / READ-ONLY**
+Exact next allowed action: Bora reviews and accepts or rejects the completed Phase B audit checkpoint. No Phase C work or implementation is authorized by this record.
+
+## Eval & Harness Audit - Roadmap Reference
+
+Status: **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE** (see the Checkpoint block above; superseded from its prior SELECTED-at-time-of-selection status). Proposed next phase `CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1` remains **PROPOSED_NOT_AUTHORIZED** until Bora explicitly accepts this checkpoint and separately authorizes it.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 
 Purpose: audit the tested Career OS operating baseline against primary/public reference frameworks from IndyDevDan, Hamel Husain, and Cole Medin; inventory real traces/failures, deterministic-vs-agent-vs-human boundaries, evaluator coverage, observability gaps, and assurance-runtime weaknesses before authorizing automation. The audit may recommend architecture, but may not implement trace infrastructure, a database/UI, new agents, model routing, LLM judges, or product automation.
 
-Fresh-session rule: independently verify live canonical `main`, recover repository doctrine, read the ADR above, state the current authorized phase, then begin read-only audit work. Prior chat context is secondary to canonical repository state.
+Fresh-session rule: recover in the single canonical order fixed by the ADR's Section 6 (New-chat recovery protocol) -- this file does not restate a competing order. Prior chat context is secondary to canonical repository state.
 
 Status: CLOSED
 Closed task:
@@ -440,7 +449,7 @@ reopened): "What We're Looking For" heading recognition
 (requirement_source_role.py's _REQUIREMENTS_HEADING_CUES); BS / B.S. / BA
 degree-abbreviation parsing; global NONE-vs-UNKNOWN remediation; general
 candidate years-of-experience computation; technology-qualified duration;
-immigration/work-authorization inference; résumé/package generation;
+immigration/work-authorization inference; rГ©sumГ©/package generation;
 pursuit-approval implementation. is_information_deficit() was deliberately
 left unmodified -- responsibility rows remain valid evidence that a JD
 contains substantive information; they simply cannot participate in
@@ -576,13 +585,13 @@ reproducible assurance baseline"; exactly five implementation files
 changed (.github/workflows/assurance-baseline.yml, requirements.in,
 requirements-lock.txt, scripts/verify_assurance_baseline.py,
 tests/p0_causal_invariants_v1_test.py); no business, production, schema,
-Claim, Evidence, Experience, résumé, fixture, or governance file was part
+Claim, Evidence, Experience, rГ©sumГ©, fixture, or governance file was part
 of the implementation commit; independently verified on GitHub by ChatGPT
 Work. Preceded by one narrow test-only correction (Cursor M-01: the
-original P0 §A only proved gated-leaf exclusion from hard_blockers/
+original P0 В§A only proved gated-leaf exclusion from hard_blockers/
 qualification_gaps/qualification_unknowns via a BLOCKED_BY_MATCHING_POLICY
 gate scenario, which exits decide_lane_and_decision() before its
-high_none-sensitive branch is reached; corrected by adding P0 §A2, an
+high_none-sensitive branch is reached; corrected by adding P0 В§A2, an
 UNRESOLVED-gate scenario plus an ungrouped control, isolating and proving
 the SEPARATE gated-exclusion inside decide_lane_and_decision()'s own
 mandatory/preferred list comprehensions) -- second Cursor review verdict
@@ -731,7 +740,7 @@ persistence, or code authorized): pursuit authorization is an
 opportunity-level human-authorization slice within the broader Blueprint
 Section 132 Pursuit truth layer, distinct from Employer truth, Candidate
 truth, Match truth, posting/actionability truth, Job.application_status,
-Job.network_action, ApplicationAttempt, Application Gate, résumé/package
+Job.network_action, ApplicationAttempt, Application Gate, rГ©sumГ©/package
 truth, submission authorization, and outcome truth; read-only/
 decision-support analysis (e.g. analyze_job re-analysis, exploratory
 application-route inspection) may occur before pursuit authorization when
@@ -755,7 +764,7 @@ architected, reviewed, and explicitly authorized before this boundary
 receives implementation.
 
 Expected first consumer under current product direction:
-résumé/package generation -- not locked as the only possible first
+rГ©sumГ©/package generation -- not locked as the only possible first
 consumer.
 
 This architecture record does not select, open, or imply a new active
@@ -893,7 +902,7 @@ Unchanged (verified byte-identical / zero diff):
 - src/requirement_normalize.py
 - all 15 golden fixtures
 - Atominvest and MIT LL real fixtures
-- Claims, Evidence, Experiences, résumé
+- Claims, Evidence, Experiences, rГ©sumГ©
 - immigration/work-authorization logic, posting-state logic
 - BLUEPRINT.md, AGENTS.md, CLAUDE.md
 
@@ -1117,7 +1126,7 @@ command), .github/workflows/assurance-baseline.yml (SHA-pinned Actions),
 and tests/p0_causal_invariants_v1_test.py (P0 integration invariants A-E,
 including the M-01-corrected A2 high_none-counting isolation case); one
 prior ADR-phase REQUIRES_CORRECTION (ambiguous verification-command phase
-structure) and one prior implementation-phase M-01 correction (P0 §A
+structure) and one prior implementation-phase M-01 correction (P0 В§A
 narrow gap), both corrected and re-reviewed SAFE_TO_COMMIT before
 proceeding. Hosted GitHub Actions run (id 33678696541, head SHA
 b05c39022f791e3b6ef3f605f535a66620cd7c2a, Ubuntu 24.04, Python 3.14.6)
@@ -1125,7 +1134,7 @@ independently verified: ALL PHASES PASSED (60/60 Phase 2, Application Gate
 9/9, Job Analysis Golden 15/15). REPRODUCIBILITY_UNVERIFIED closed for
 this exact canonical baseline/hosted environment only; BRANCH_PROTECTION_
 UNVERIFIED unchanged. No business/production/schema/Claim/Evidence/
-Experience/résumé semantics were touched at any stage. No new
+Experience/rГ©sumГ© semantics were touched at any stage. No new
 implementation milestone auto-selected.
 
 Historical anchors:

@@ -1,0 +1,53 @@
+{
+  "milestone_id": "CAREER_OS_SESSION_CHECKPOINT_AND_HANDOFF_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Create one machine-readable current execution checkpoint so fresh chats recover exact completed work, human acceptance status, unresolved/not-authorized work, and exactly one next allowed action without re-running completed phases or promoting proposed phases implicitly.",
+  "baseline_sha": "a36400ef26bd7d5712a386202d1fa036eafdea38",
+  "allowed_paths": [
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "AGENTS.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md",
+    "milestone_contracts/governance/career-os-session-checkpoint-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/",
+    "schemas/",
+    "resume/",
+    "evidence/",
+    "claims/",
+    "experiences/",
+    "golden-tests/",
+    "BLUEPRINT.md"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "fresh sessions are explicitly required to read CURRENT_EXECUTION_CHECKPOINT.json after verifying live canonical main and project_state.json and before phase work, per one single recovery order fixed in the governing ADR Section 6",
+    "checkpoint separates operator completion, Bora human acceptance, and next-phase authorization so none implies either of the others",
+    "checkpoint records exact completed actions, not-completed/not-authorized work, proposed next phase status, and exactly one next allowed action",
+    "current Phase B audit is recorded as operator COMPLETED_BY_OPERATOR in READ_ONLY mode but PENDING_BORA_ACCEPTANCE everywhere it is described (ADR, AGENTS, CURRENT_STATE, CURRENT_MILESTONE, checkpoint) -- no file may describe Phase B as merely SELECTED/to-be-run",
+    "CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1 is recorded only as PROPOSED_NOT_AUTHORIZED everywhere it is described",
+    "project_state, CURRENT_STATE, CURRENT_MILESTONE, AGENTS, and governing ADR remain mechanically consistent with the checkpoint, including a single consistent recovery/authority order",
+    "checkpoint is explicitly documented as a bounded progress-handoff record subordinate to BLUEPRINT.md/project_state.json, never a new strategic authority",
+    "terminal_adjudication is phrased as an operator finding pending Bora acceptance, not as accepted doctrine",
+    "a concise durable docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md exists, labeled OPERATOR AUDIT REPORT / PENDING BORA ACCEPTANCE, and contains only conclusions already present in CURRENT_EXECUTION_CHECKPOINT.json",
+    "no product behavior, trace infrastructure, database/UI, automation, new agent, model routing, LLM judge, or later roadmap phase is implemented or authorized",
+    "Git history remains the history mechanism; the checkpoint is current-state handoff rather than a second narrative log"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would authorize Phase C or any implementation without Bora's explicit approval",
+    "change would let an operator self-accept its own work",
+    "change would implement product/runtime/eval infrastructure rather than continuity governance"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_ADDING_A_DURABLE_CHAT_TO_CHAT_PROGRESS_CHECKPOINT_IN_THE_2026-09-10_OPERATING_CHAT; NO_SCOPE_EXPANSION"
+}
