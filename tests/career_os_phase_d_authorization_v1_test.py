@@ -1,5 +1,11 @@
 import json
+import re
 from pathlib import Path
+
+PHASE_F_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase F and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+    re.IGNORECASE,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / 'milestone_contracts' / 'governance' / 'career-os-phase-d-authorization-v1.json'
@@ -32,43 +38,49 @@ assert 'project_state.json' in contract['allowed_paths']
 assert 'docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md' in contract['forbidden_paths']
 assert POLICY_ADR_PATH.exists()
 
-# Live checkpoint must record the Phase D authorization transition exactly.
+# Live checkpoint must preserve the Phase D authorization/acceptance facts
+# exactly, now as prior_phase since Bora has since separately, explicitly
+# authorized Phase E as the live current phase.
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == BASELINE_SHA
-assert cp['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
-assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert cp['authorization_status'] == 'BORA_AUTHORIZED'
-assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-11'
 assert cp['implementation_authorized'] is False
-assert cp['prior_phase']['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
-assert cp['prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
+prior_phase = cp['prior_phase']
+assert prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
+assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_phase['accepted_at'] == '2026-09-11'
+assert cp['prior_prior_phase']['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
+assert cp['prior_prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
 
 # Phase D has since been legitimately completed by the operator AND
 # explicitly accepted by Bora (a later, separately-locked acceptance
-# contract governs that event). This authorization-only test must recognize
-# that live acceptance rather than assert its absence -- but the acceptance
-# must remain a genuine Bora human event, never self-granted by the
-# operator, and never an implementation authorization.
+# contract governs that event), and is now preserved as prior_phase since
+# Bora has separately, explicitly authorized Phase E as the next phase.
+# This authorization-only test must recognize that live progression rather
+# than assert Phase D's absence -- but the acceptance must remain a genuine
+# Bora human event, never self-granted by the operator, and never an
+# implementation authorization.
 completed = ' '.join(cp['completed_actions'])
-assert 'taxonomy' in completed.lower()
-assert 'evaluator-coverage map' in completed.lower()
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+phase_d_reference = ' '.join(cp['phase_d_completed_actions_reference'])
+assert 'taxonomy' in phase_d_reference.lower()
+assert 'evaluator-coverage map' in phase_d_reference.lower()
+assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['implementation_authorized'] is False
 
-# project_state.json must point at Phase D, now legitimately completed by
-# the operator and Bora-accepted, with no implementation authorized and
-# Phase E still proposed only.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1')
-assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-11)' in PROJECT_STATE['current_phase']
+# project_state.json must point at Phase E, the live current phase, while
+# preserving Phase D's completed/accepted status in the next_authorized_action
+# seam text, with no implementation authorized and Phase F still proposed only.
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1')
+assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'Phase E' in PROJECT_STATE['next_authorized_action']
-assert 'PROPOSED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
+assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
+    "project_state.next_authorized_action must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject"
+)
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: the prior policy milestone remains BORA_ACCEPTED/GOVERNING
@@ -100,7 +112,9 @@ for surface_name, surface_text in (
     assert 'implementation_authorized' in surface_text.lower() or 'implementation not authorized' in surface_text.lower() or 'no implementation' in surface_text.lower() or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text, (
         f'{surface_name} must state that implementation remains unauthorized'
     )
-    assert 'PROPOSED_NOT_AUTHORIZED' in surface_text, f'{surface_name} must state Phase E remains PROPOSED_NOT_AUTHORIZED'
+    assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
+        f'{surface_name} must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
+    )
 
 # CHANGELOG.md must record this transition as a distinct dated entry,
 # separate from the prior policy-acceptance entry.
