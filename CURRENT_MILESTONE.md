@@ -9,29 +9,36 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - Phase D (Failure Taxonomy & Evaluator Coverage Map) Bora Accepted (2026-09-11)
+## Current Checkpoint - Phase E (System Eval-Set Architecture) Bora Authorized (2026-09-12)
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
 
-PRIOR MILESTONE (already Bora-accepted and GOVERNING; recorded here only as context for the current phase below -- these fields do NOT describe Phase D):
+PRIOR PHASE (already Bora-accepted; recorded here only as context for the current phase below -- these fields do NOT describe Phase E):
+Prior phase: `CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1` (Phase D)
+Prior-phase mode: **READ_ONLY_DESIGN_ONLY**
+Prior-phase operator status: **COMPLETED_BY_OPERATOR**
+Prior-phase human acceptance: **BORA_ACCEPTED (2026-09-11)**
+
+PRIOR MILESTONE (already Bora-accepted and GOVERNING; recorded here only as context -- these fields do NOT describe Phase D or Phase E):
 Prior milestone: `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` (governance-only policy)
 Prior-milestone operator status: **COMPLETED_BY_OPERATOR**
 Prior-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**
 Prior-milestone governing status: **GOVERNING**
 
-CURRENT PHASE (distinct from the prior milestone above; substantive work operator-completed and now explicitly Bora-accepted):
-Current phase: `CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`
+CURRENT PHASE (distinct from the prior phase/milestone above; Bora-authorized, not yet operator-completed):
+Current phase: `CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1`
 Current-phase mode: **READ_ONLY_DESIGN_ONLY**
-Current-phase operator status: **COMPLETED_BY_OPERATOR**
-Current-phase human acceptance status: **BORA_ACCEPTED (2026-09-11)**
+Current-phase authorization status: **BORA_AUTHORIZED**
+Current-phase selection status: **SELECTED**
+Current-phase operator status: **NOT_YET_COMPLETED**
 `implementation_authorized`: **false**
-Report: `docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md`
-Bora explicitly accepted the already-merged Phase D checkpoint/report by stating: "I am satisfied."
-Exact next allowed action (the single open seam): Bora separately decides whether to authorize Phase E. Absent that separate, explicit authorization, no Phase E or implementation work may begin. Phase E and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
+Bora explicitly stated, on 2026-09-12: "I authorize Phase E - System Eval-Set Architecture - as the next bounded READ_ONLY / DESIGN_ONLY phase. No implementation is authorized."
+Phase E's own coupled state (the four fields above, read together): **BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY**.
+Exact next allowed action (the single open seam): begin substantive Phase E system-eval-set-architecture work under its own separately locked READ_ONLY / DESIGN_ONLY contract. No implementation. Phase F and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 
 ## Eval & Harness Audit - Roadmap Reference
 
-The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone remains **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING** (see the Checkpoint block above). Phase D (`CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`) is a SEPARATE, CURRENT record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY**; Phase E and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
+The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone remains **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING** (see the Checkpoint block above). Phase D (`CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`) is a SEPARATE, now-prior record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY**. Phase E (`CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1`) is the current record: **BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY**; Phase F and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 

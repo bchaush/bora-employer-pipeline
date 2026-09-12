@@ -149,25 +149,30 @@ EXPECTED_REQUIRED_TESTS = [
 ]
 assert contract['required_tests'] == EXPECTED_REQUIRED_TESTS
 
-# The checkpoint must now reflect substantive Phase D completion by the
-# operator, explicitly pending Bora acceptance -- never self-granted.
+# Phase D has since been superseded as the live current phase by Phase E
+# (separately, explicitly authorized by Bora); the checkpoint must now
+# preserve Phase D's substantive-completion/acceptance facts as prior_phase
+# -- never dropped, never self-granted -- distinct from Phase E's own
+# (not yet completed) live status.
 assert CHECKPOINT_PATH.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT_PATH.read_text(encoding='utf-8'))
-assert cp['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
-assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-11'
+prior_phase = cp['prior_phase']
+assert prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
+assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_phase['accepted_at'] == '2026-09-11'
 assert cp['implementation_authorized'] is False
-assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in ' '.join(cp['completed_actions'])
-assert 'BORA_ACCEPTED' in cp['exact_next_allowed_action']
-assert 'Phase E' in cp['exact_next_allowed_action']
+assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in ' '.join(
+    cp['phase_d_completed_actions_reference']
+)
 
-# project_state.json must reflect the same accepted state.
+# project_state.json must reflect Phase D's preserved acceptance lineage
+# (now cited from the Phase E next_authorized_action seam) even though
+# Phase E is the live current phase.
 project_state = json.loads(PROJECT_STATE_PATH.read_text(encoding='utf-8'))
-assert 'COMPLETED_BY_OPERATOR' in project_state['current_phase']
-assert 'BORA_ACCEPTED (2026-09-11)' in project_state['current_phase']
-assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in project_state['current_phase']
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in project_state['next_authorized_action']
+assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in project_state['next_authorized_action']
 
 # CHANGELOG.md must record the acceptance as a distinct dated entry while
 # preserving the prior operator-completion/pending-acceptance entry as

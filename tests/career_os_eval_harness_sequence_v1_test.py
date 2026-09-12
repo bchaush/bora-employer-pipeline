@@ -1,5 +1,11 @@
 import json
+import re
 from pathlib import Path
+
+PHASE_F_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase F and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+    re.IGNORECASE,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / 'docs' / 'decisions' / 'ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md'
@@ -18,7 +24,8 @@ for required in (
     'CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1',
     'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1',
     'GOVERNING',
-    'NO IMPLEMENTATION OR LATER PHASE AUTHORIZED',
+    'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY',
+    'PHASE F AND EVERY LATER ROADMAP PHASE REMAIN PROPOSED_NOT_AUTHORIZED',
     'IndyDevDan', 'Hamel Husain', 'Cole Medin',
     'ChatGPT', 'architect / semantic adjudicator / initiator',
     'Claude Code', 'bounded implementation builder',
@@ -78,6 +85,24 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ON
 assert 'NOT_YET_GOVERNING' not in text
 assert 'BORA_ACCEPTED (2026-09-11)' in text
 
+# Phase E is now BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED; the ADR
+# must positively state this transition, and Phase D must be described as
+# prior_phase, not merely still-current.
+assert 'Bora explicitly authorized Phase E' in text
+assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in text
+assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in text
+assert 'Phase D is now **PRIOR_PHASE**' in text or 'now recorded as **PRIOR_PHASE**' in text
+assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(text), (
+    'ADR must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
+)
+
+# Fail closed if a stale claim that Phase E remains unauthorized reappears.
+for stale in (
+    'Phase E and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**',
+    'Phase E and every later phase remain PROPOSED_NOT_AUTHORIZED',
+):
+    assert stale not in text, f'stale Phase-E-unauthorized wording reintroduced in ADR: {stale}'
+
 assert 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1' in AGENTS
 assert 'do not jump directly to implementation' in AGENTS
 assert 'COMPLETED_BY_OPERATOR and BORA_ACCEPTED' in AGENTS
@@ -99,7 +124,9 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in MILESTONE
 # preceding it in CURRENT_MILESTONE.md, so it cannot alone prove Phase D's
 # record.
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in MILESTONE
-assert 'PROPOSED_NOT_AUTHORIZED' in MILESTONE
+assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(MILESTONE), (
+    'CURRENT_MILESTONE.md must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
+)
 assert 'Status: **SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in MILESTONE
 assert str(ADR.relative_to(ROOT)).replace('\\', '/') in MILESTONE
 
@@ -113,13 +140,16 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in CURRENT_STATE
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in CURRENT_STATE
 assert '**SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in CURRENT_STATE
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1')
-assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-11)' in PROJECT_STATE['current_phase']
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1')
+assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'PROPOSED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
+assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
+    "project_state.next_authorized_action must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject"
+)
 assert 'No product automation' in PROJECT_STATE['next_authorized_action']
-assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-11'
+assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-12'
 
 AUDIT_REPORT = ROOT / 'docs' / 'audits' / 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md'
 assert AUDIT_REPORT.exists(), 'durable Phase B operator audit report missing'

@@ -1,0 +1,71 @@
+{
+  "milestone_id": "CAREER_OS_PHASE_E_AUTHORIZATION_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Record Bora's explicit 2026-09-12 authorization of CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (Phase E) as the next phase, in READ_ONLY / DESIGN_ONLY mode, as BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, with implementation_authorized remaining false and Phase F and every later roadmap phase remaining PROPOSED_NOT_AUTHORIZED. This is a bounded authorization-transition sync only -- it does not perform, design, or begin any substantive Phase E system-eval-set-architecture work, and does not re-adjudicate the already-accepted CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) report, which remains COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY, now recorded as prior_phase.",
+  "baseline_sha": "a2c1172d29dff262dec705a5a573e4b3a1e3a778",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "tests/career_os_phase_e_authorization_v1_test.py",
+    "milestone_contracts/governance/career-os-phase-e-authorization-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/audits/**",
+    "CAREER_OS_RUN_TRACE_V1_design_schema_infrastructure/**"
+  ],
+  "required_tests": [
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "tests/career_os_phase_e_authorization_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "CURRENT_EXECUTION_CHECKPOINT.json records phase_id=CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1, phase_mode=READ_ONLY_DESIGN_ONLY, authorization_status=BORA_AUTHORIZED, selection_status=SELECTED, operator_status=NOT_YET_COMPLETED, implementation_authorized=false, and preserves CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) as prior_phase in its own distinct COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY record",
+    "project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md are mutually consistent with the checkpoint: Phase E BORA_AUTHORIZED/SELECTED/NOT_YET_COMPLETED, implementation_authorized=false, Phase F and every later roadmap phase PROPOSED_NOT_AUTHORIZED",
+    "CHANGELOG.md records this authorization transition as a distinct dated entry, separate from the prior Phase D acceptance entry",
+    "the six required tests fail closed on this new canonical state",
+    "no BLUEPRINT.md, CLAUDE.md, GEMINI.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, golden-tests/**, fixtures/**, config/**, prompts/**, or docs/audits/** change exists in the diff",
+    "no CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 substantive eval-set schema, pass/fail case corpus, or end-to-end/step-level diagnostic-separation design is authored",
+    "no CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, database/UI, automation, new runtime agent, model routing, or LLM judge is introduced",
+    "no authorization or implication of authorization of Phase F or any later roadmap phase",
+    "Phase D's report substance, six failure families, severity vocabulary, evaluator vocabulary, evidence conclusions, methodology, and the accepted continuity repair remain unchanged"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would modify BLUEPRINT.md, CLAUDE.md, GEMINI.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, golden-tests/**, fixtures/**, config/**, prompts/**, or docs/audits/**",
+    "change would author, design, or implement Phase E eval-set-architecture content, CAREER_OS_RUN_TRACE_V1, or any other runtime/product surface",
+    "change would authorize or imply authorization of Phase F or any later roadmap phase",
+    "change would represent this authorization as operator self-granted rather than a Bora human event",
+    "change would weaken or contradict CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1's existing COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY status"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1_AS_THE_NEXT_PHASE_IN_READ_ONLY_DESIGN_ONLY_MODE_ON_2026-09-12; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}
