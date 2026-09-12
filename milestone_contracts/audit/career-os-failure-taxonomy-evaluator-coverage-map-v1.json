@@ -16,7 +16,8 @@
     "milestone_contracts/audit/career-os-failure-taxonomy-evaluator-coverage-map-v1.json",
     "tests/career_os_execution_checkpoint_v1_test.py",
     "tests/career_os_eval_harness_sequence_v1_test.py",
-    "tests/career_os_agent_context_usage_efficiency_v1_test.py"
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py"
   ],
   "forbidden_paths": [
     "BLUEPRINT.md",
@@ -40,7 +41,8 @@
     "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
     "tests/career_os_execution_checkpoint_v1_test.py",
     "tests/career_os_eval_harness_sequence_v1_test.py",
-    "tests/career_os_agent_context_usage_efficiency_v1_test.py"
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py"
   ],
   "acceptance_conditions": [
     "the taxonomy/evaluator-coverage-map report, when authored, labels every material claim OBSERVED, RECONSTRUCTED_FROM_DURABLE_EVIDENCE, EXPERIMENTAL_NON_CANONICAL, or MISSING, and does not upgrade any UNKNOWN or MISSING evidence state",

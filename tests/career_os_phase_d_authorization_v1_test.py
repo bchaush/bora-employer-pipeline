@@ -40,32 +40,39 @@ assert cp['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_
 assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'NOT_YET_COMPLETED'
+assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
 assert cp['implementation_authorized'] is False
 assert cp['prior_phase']['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
 assert cp['prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
 
-# No substantive Phase D taxonomy/evaluator-coverage-map content may be
-# fabricated by this bounded authorization-only sync.
+# Phase D has since been legitimately completed by the operator (a later,
+# separately-locked substantive contract governs that work). This
+# authorization-only test must recognize that live completion rather than
+# assert its absence -- but completion must still be PENDING_BORA_ACCEPTANCE,
+# never self-granted Bora acceptance, and never an implementation
+# authorization.
 completed = ' '.join(cp['completed_actions'])
-assert 'taxonomy' not in completed.lower() or 'no substantive' in completed.lower()
-assert 'severity ranking' not in completed
-assert 'evaluator-coverage map' not in completed or 'no substantive' in completed.lower()
+assert 'taxonomy' in completed.lower()
+assert 'evaluator-coverage map' in completed.lower()
+assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['implementation_authorized'] is False
 
-# project_state.json must point at Phase D, authorized but not completed,
-# with no implementation authorized and Phase E still proposed only.
+# project_state.json must point at Phase D, now legitimately completed by
+# the operator, with no implementation authorized and Phase E still
+# proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1')
-assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'SELECTED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'Phase E' in PROJECT_STATE['next_authorized_action']
 assert 'PROPOSED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: the prior policy milestone remains BORA_ACCEPTED/GOVERNING
-# and Phase D is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, with Phase E
-# and later still PROPOSED_NOT_AUTHORIZED.
+# and Phase D is COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE /
+# READ_ONLY_DESIGN_ONLY, with Phase E and later still PROPOSED_NOT_AUTHORIZED.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
     ('CURRENT_STATE.md', CURRENT_STATE),
@@ -75,8 +82,8 @@ for surface_name, surface_text in (
     assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in surface_text, (
         f'{surface_name} must preserve the prior policy milestone acceptance unchanged'
     )
-    assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED' in surface_text, (
-        f'{surface_name} must record Phase D as BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED'
+    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in surface_text, (
+        f'{surface_name} must record Phase D as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE'
     )
     assert 'implementation_authorized' in surface_text.lower() or 'implementation not authorized' in surface_text.lower() or 'no implementation' in surface_text.lower() or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text, (
         f'{surface_name} must state that implementation remains unauthorized'
@@ -87,7 +94,7 @@ for surface_name, surface_text in (
 # separate from the prior policy-acceptance entry.
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in CHANGELOG
 assert 'BORA_AUTHORIZED' in CHANGELOG
-assert 'authorized by Bora (READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED)' in CHANGELOG
+assert 'authorized by Bora (READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED' in CHANGELOG
 assert 'accepted by Bora (GOVERNANCE-ONLY, BORA ACCEPTED)' in CHANGELOG
 
 # The already-accepted policy ADR itself must be untouched by this sync --

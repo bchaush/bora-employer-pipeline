@@ -136,14 +136,16 @@ EXPECTED_ALLOWED = {
     'tests/career_os_execution_checkpoint_v1_test.py',
     'tests/career_os_eval_harness_sequence_v1_test.py',
     'tests/career_os_agent_context_usage_efficiency_v1_test.py',
+    'tests/career_os_phase_d_authorization_v1_test.py',
 }
-assert allowed == EXPECTED_ALLOWED, 'allowed_paths must stay bounded to report/docs plus checkpoint/state/changelog/tests/status-sync AGENTS.md/ADR and the three permitted governance-regression test files'
+assert allowed == EXPECTED_ALLOWED, 'allowed_paths must stay bounded to report/docs plus checkpoint/state/changelog/tests/status-sync AGENTS.md/ADR and the four permitted governance-regression test files'
 
 EXPECTED_REQUIRED_TESTS = [
     'tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py',
     'tests/career_os_execution_checkpoint_v1_test.py',
     'tests/career_os_eval_harness_sequence_v1_test.py',
     'tests/career_os_agent_context_usage_efficiency_v1_test.py',
+    'tests/career_os_phase_d_authorization_v1_test.py',
 ]
 assert contract['required_tests'] == EXPECTED_REQUIRED_TESTS
 
