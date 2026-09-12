@@ -1,8 +1,8 @@
 # Career OS Failure Taxonomy and Evaluator Coverage Map V1
 
-Status: **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY**
+Status: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY**
 `implementation_authorized`: **false**. Phase E and every later roadmap phase: **PROPOSED_NOT_AUTHORIZED**.
-Operator completion recorded here does **not** constitute Bora acceptance. See `CURRENT_EXECUTION_CHECKPOINT.json` for the live machine-readable handoff and the sole next allowed action.
+Bora explicitly accepted this checkpoint/report on 2026-09-11, stating: "I am satisfied." See `CURRENT_EXECUTION_CHECKPOINT.json` for the live machine-readable handoff.
 
 This report is a READ_ONLY / DESIGN_ONLY analytical rendering over already-adjudicated Phase B/C evidence (`docs/audits/CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md`, `docs/audits/CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1_REPORT.md`). It invents no new evidence, no evaluator code, no `CAREER_OS_RUN_TRACE_V1` design, no model router, no LLM judge, no database/UI, and no new runtime agent. It authorizes no implementation and no later roadmap phase.
 
@@ -212,4 +212,4 @@ Per the build-economy gate (`BLUEPRINT.md`) and this report's own read-only/desi
 
 ## 14. Disposition
 
-Phase D substantive read-only/design-only work is **COMPLETED_BY_OPERATOR**. It is **PENDING_BORA_ACCEPTANCE**. Operator completion of this report does not constitute Bora's acceptance of it. The sole next allowed action is Bora's explicit review and acceptance or rejection of the Phase D checkpoint; no Phase E or implementation work may begin without a separate, later Bora authorization.
+Phase D substantive read-only/design-only work is **COMPLETED_BY_OPERATOR** and is **BORA_ACCEPTED (2026-09-11)**: Bora explicitly accepted this checkpoint/report by stating "I am satisfied." This acceptance does not constitute Bora's acceptance of any Phase E or later roadmap phase; no Phase E or implementation work may begin without a separate, later Bora authorization.

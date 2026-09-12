@@ -41,29 +41,30 @@ assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['accepted_at'] == '2026-09-11'
 assert cp['implementation_authorized'] is False
 assert cp['prior_phase']['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
 assert cp['prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
 
-# Phase D has since been legitimately completed by the operator (a later,
-# separately-locked substantive contract governs that work). This
-# authorization-only test must recognize that live completion rather than
-# assert its absence -- but completion must still be PENDING_BORA_ACCEPTANCE,
-# never self-granted Bora acceptance, and never an implementation
-# authorization.
+# Phase D has since been legitimately completed by the operator AND
+# explicitly accepted by Bora (a later, separately-locked acceptance
+# contract governs that event). This authorization-only test must recognize
+# that live acceptance rather than assert its absence -- but the acceptance
+# must remain a genuine Bora human event, never self-granted by the
+# operator, and never an implementation authorization.
 completed = ' '.join(cp['completed_actions'])
 assert 'taxonomy' in completed.lower()
 assert 'evaluator-coverage map' in completed.lower()
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['implementation_authorized'] is False
 
 # project_state.json must point at Phase D, now legitimately completed by
-# the operator, with no implementation authorized and Phase E still
-# proposed only.
+# the operator and Bora-accepted, with no implementation authorized and
+# Phase E still proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-11)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'Phase E' in PROJECT_STATE['next_authorized_action']
@@ -71,7 +72,7 @@ assert 'PROPOSED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: the prior policy milestone remains BORA_ACCEPTED/GOVERNING
-# and Phase D is COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE /
+# and Phase D is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) /
 # READ_ONLY_DESIGN_ONLY, with Phase E and later still PROPOSED_NOT_AUTHORIZED.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
@@ -82,8 +83,19 @@ for surface_name, surface_text in (
     assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in surface_text, (
         f'{surface_name} must preserve the prior policy milestone acceptance unchanged'
     )
-    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in surface_text, (
-        f'{surface_name} must record Phase D as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE'
+    # Deliberately NOT a bare substring check: 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED
+    # (2026-09-11)' alone is a prefix of the prior policy milestone's own
+    # '... / GOVERNANCE_ONLY / GOVERNING' line above and would pass merely because
+    # that unrelated line exists. Require the READ_ONLY_DESIGN_ONLY-suffixed form,
+    # which only Phase D's own status line can satisfy, so this proves Phase D's
+    # own acceptance specifically, not merely that some accepted milestone exists.
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in surface_text, (
+        f'{surface_name} must record Phase D itself (not merely some other accepted '
+        f'milestone) as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY'
+    )
+    assert surface_text.count('COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)') >= 2, (
+        f'{surface_name} must record both the prior policy milestone acceptance and '
+        f'Phase D\'s own distinct acceptance as separate occurrences'
     )
     assert 'implementation_authorized' in surface_text.lower() or 'implementation not authorized' in surface_text.lower() or 'no implementation' in surface_text.lower() or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text, (
         f'{surface_name} must state that implementation remains unauthorized'

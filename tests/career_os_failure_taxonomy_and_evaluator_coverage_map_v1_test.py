@@ -156,29 +156,47 @@ cp = json.loads(CHECKPOINT_PATH.read_text(encoding='utf-8'))
 assert cp['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
 assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['accepted_at'] == '2026-09-11'
 assert cp['implementation_authorized'] is False
 assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in ' '.join(cp['completed_actions'])
-assert 'PENDING_BORA_ACCEPTANCE' in cp['exact_next_allowed_action']
+assert 'BORA_ACCEPTED' in cp['exact_next_allowed_action']
 assert 'Phase E' in cp['exact_next_allowed_action']
 
-# project_state.json must reflect the same completed/pending state.
+# project_state.json must reflect the same accepted state.
 project_state = json.loads(PROJECT_STATE_PATH.read_text(encoding='utf-8'))
 assert 'COMPLETED_BY_OPERATOR' in project_state['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in project_state['current_phase']
+assert 'BORA_ACCEPTED (2026-09-11)' in project_state['current_phase']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in project_state['current_phase']
 
-# CHANGELOG.md must record this as a distinct dated entry.
+# CHANGELOG.md must record the acceptance as a distinct dated entry while
+# preserving the prior operator-completion/pending-acceptance entry as
+# explicitly superseded history.
 changelog_text = CHANGELOG_PATH.read_text(encoding='utf-8')
 assert 'substantive read-only/design-only work completed by operator' in changelog_text
 assert 'PENDING BORA ACCEPTANCE' in changelog_text or 'PENDING_BORA_ACCEPTANCE' in changelog_text
+assert 'accepted by Bora (BORA ACCEPTED)' in changelog_text
+assert 'I am satisfied.' in changelog_text
 
 # AGENTS.md and the ADR: status/recovery-pointer sync only, no doctrine
-# change (spot-check the live status strings are synchronized).
+# change (spot-check the live status strings are synchronized). This must
+# prove Phase D's OWN status specifically -- the bare substring
+# 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' is also a prefix of
+# the prior GOVERNANCE_ONLY/GOVERNING policy milestone's own accepted line,
+# so a check against that bare substring alone would pass even if Phase D's
+# own status line were missing entirely.
 agents_text = AGENTS_PATH.read_text(encoding='utf-8')
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in agents_text
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in agents_text, (
+    "AGENTS.md must record Phase D itself, not merely some other accepted milestone, "
+    "as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY"
+)
+assert agents_text.count('COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)') >= 2
 adr_text = ADR_PATH.read_text(encoding='utf-8')
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in adr_text
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in adr_text, (
+    "the ADR must record Phase D itself, not merely some other accepted milestone, "
+    "as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY"
+)
+assert adr_text.count('COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)') >= 2
 
 # --- Phase D semantic-correction regression (fail-closed) ---
 # These three corrections were required against the original Phase D

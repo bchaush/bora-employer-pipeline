@@ -53,26 +53,30 @@ for stale in (
     'Phase C is **NOT_YET_COMPLETED**',
     'Bora has separately, explicitly authorized/selected Phase C',
     'Phase C (`CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1`), in **READ_ONLY** mode, is **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE**',
+    'Phase D substantive read-only/design-only work is now **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE**',
 ):
     assert stale not in text, f'stale contradictory wording reintroduced in ADR: {stale}'
 
 # Phase D's selection provenance (Bora explicitly authorized it) must be
-# preserved, and its substantive work is now operator-completed, pending
-# Bora's separate acceptance; Phase E and later must remain explicitly
-# PROPOSED_NOT_AUTHORIZED, fail-closed.
+# preserved, and its substantive work is now Bora-accepted; Phase E and
+# later must remain explicitly PROPOSED_NOT_AUTHORIZED, fail-closed.
 assert 'Bora explicitly authorized Phase D' in text
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in text
 assert 'READ_ONLY / DESIGN_ONLY' in text
 assert 'PROPOSED_NOT_AUTHORIZED' in text
 assert 'Phase D' in text
+# Phase D's own accepted state must be proven by the non-collidable,
+# phase-specific anchored block -- not by a bare COMPLETED_BY_OPERATOR /
+# BORA_ACCEPTED (2026-09-11) substring (which the GOVERNANCE_ONLY policy
+# milestone's own acceptance clause could otherwise satisfy) plus a
+# separate, unanchored READ_ONLY check elsewhere in the document.
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in text
 
 # The context/usage-efficiency policy milestone remains Bora-accepted and
-# GOVERNING; Phase D's own PENDING_BORA_ACCEPTANCE state must never be
-# conflated with -- or allowed to erase -- the policy's own GOVERNING
-# acceptance, and stale not-yet-governing wording must not reappear.
+# GOVERNING; Phase D's own acceptance must never be conflated with -- or
+# allowed to erase -- the policy's own GOVERNING acceptance, and stale
+# not-yet-governing wording must not reappear.
 assert 'NOT_YET_GOVERNING' not in text
 assert 'BORA_ACCEPTED (2026-09-11)' in text
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in text
 
 assert 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1' in AGENTS
 assert 'do not jump directly to implementation' in AGENTS
@@ -80,12 +84,21 @@ assert 'COMPLETED_BY_OPERATOR and BORA_ACCEPTED' in AGENTS
 assert 'CAREER_OS_TRACE_AND_FAILURE_CORPUS_INVENTORY_V1' in AGENTS
 assert 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1' in AGENTS
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in AGENTS
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in AGENTS
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in AGENTS
+# Phase D's own state in AGENTS.md must be proven by the non-collidable,
+# phase-specific anchored form, not by the bare substring above (which the
+# GOVERNANCE_ONLY policy milestone's own clause on the same line also contains).
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in AGENTS
 assert 'SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED' not in AGENTS
 
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED' in MILESTONE
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in MILESTONE
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in MILESTONE
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in MILESTONE
+# Phase D's own state must be anchored: the bare substring above is also a
+# strict prefix of the GOVERNANCE_ONLY/GOVERNING policy clause immediately
+# preceding it in CURRENT_MILESTONE.md, so it cannot alone prove Phase D's
+# record.
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in MILESTONE
 assert 'PROPOSED_NOT_AUTHORIZED' in MILESTONE
 assert 'Status: **SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in MILESTONE
 assert str(ADR.relative_to(ROOT)).replace('\\', '/') in MILESTONE
@@ -93,12 +106,16 @@ assert str(ADR.relative_to(ROOT)).replace('\\', '/') in MILESTONE
 assert 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1' in CURRENT_STATE
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED' in CURRENT_STATE
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in CURRENT_STATE
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in CURRENT_STATE
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in CURRENT_STATE
+# Phase D's own state in CURRENT_STATE.md must likewise be proven by the
+# non-collidable anchored form, since the bare substring above is also a
+# strict prefix of the GOVERNANCE_ONLY/GOVERNING policy clause on the same line.
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in CURRENT_STATE
 assert '**SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in CURRENT_STATE
 
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-11)' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'PROPOSED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
 assert 'No product automation' in PROJECT_STATE['next_authorized_action']

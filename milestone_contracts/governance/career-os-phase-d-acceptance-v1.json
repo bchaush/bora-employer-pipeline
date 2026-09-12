@@ -1,0 +1,68 @@
+{
+  "milestone_id": "CAREER_OS_PHASE_D_ACCEPTANCE_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Record Bora's explicit 2026-09-11 human acceptance of the already-merged CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) checkpoint/report ('I am satisfied.') as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY, with implementation_authorized remaining false and Phase E and every later roadmap phase remaining PROPOSED_NOT_AUTHORIZED. This is a bounded acceptance/state sync pass only -- not a re-adjudication of the Phase D taxonomy/evaluator-coverage-map content itself.",
+  "baseline_sha": "a50a575984b19db4a4a6ddfed4a8c03c90725612",
+  "allowed_paths": [
+    "CHANGELOG.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "AGENTS.md",
+    "project_state.json",
+    "docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "milestone_contracts/governance/career-os-phase-d-acceptance-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**"
+  ],
+  "required_tests": [
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "CURRENT_EXECUTION_CHECKPOINT.json records human_acceptance_status=BORA_ACCEPTED, accepted_at=2026-09-11, implementation_authorized=false, preserving prior_phase (the governance-only agent context/usage-efficiency policy milestone) as its own distinct BORA_ACCEPTED record",
+    "project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md, and docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md are mutually consistent with the checkpoint: Phase D COMPLETED_BY_OPERATOR/BORA_ACCEPTED(2026-09-11)/READ_ONLY_DESIGN_ONLY, implementation_authorized=false, Phase E and every later roadmap phase PROPOSED_NOT_AUTHORIZED",
+    "the Phase D report's substantive taxonomy/evidence/severity/coverage content is unchanged; only status/acceptance framing (the status header and the Disposition section) is edited",
+    "CHANGELOG.md adds a new, distinct, dated acceptance-sync entry while preserving the prior operator-completion/PENDING_BORA_ACCEPTANCE entry as an explicitly superseded historical record beneath it",
+    "the acceptance is recorded as a genuine Bora human event attributed to Bora's exact statement ('I am satisfied.'), never as an operator self-grant",
+    "the five required tests fail closed on this accepted state",
+    "no BLUEPRINT.md, CLAUDE.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, golden-tests/**, or fixtures/** change exists in the diff",
+    "no Phase E, implementation, trace infrastructure, or other runtime/product work is introduced or authorized"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would modify BLUEPRINT.md, CLAUDE.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, golden-tests/**, or fixtures/**",
+    "change would alter Phase D's six failure families, severity vocabulary, evaluator vocabulary, evidence/provenance conclusions, or practitioner methodology doctrine",
+    "change would author, design, or implement Phase E, CAREER_OS_RUN_TRACE_V1, or any other runtime/product surface",
+    "change would authorize or imply authorization of Phase E or any later roadmap phase",
+    "change would represent this acceptance as operator self-granted rather than a Bora human event",
+    "change would rewrite the historical PENDING_BORA_ACCEPTANCE CHANGELOG entry rather than preserve it as superseded history"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BORA_EXPLICITLY_ACCEPTED_THE_ALREADY_MERGED_CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_CHECKPOINT_REPORT_ON_2026-09-11_STATING_I_AM_SATISFIED; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED; NO_PHASE_E_AUTHORIZED"
+}
