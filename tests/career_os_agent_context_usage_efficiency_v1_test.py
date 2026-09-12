@@ -267,15 +267,23 @@ assert 'Prior-milestone operator status: **COMPLETED_BY_OPERATOR**' in milestone
 assert 'Prior-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
 assert 'Prior-milestone governing status: **GOVERNING**' in milestone_text
 assert 'Current-phase mode: **READ_ONLY_DESIGN_ONLY**' in milestone_text
-assert 'Current-phase authorization status: **BORA_AUTHORIZED**' in milestone_text
-assert 'Current-phase selection status: **SELECTED**' in milestone_text
-assert 'Current-phase operator status: **NOT_YET_COMPLETED**' in milestone_text
+assert 'Current-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
+assert 'Current-phase human acceptance status: **PENDING_BORA_ACCEPTANCE**' in milestone_text
 _checkpoint_block_end = milestone_text.index('## Eval & Harness Audit - Roadmap Reference')
 _checkpoint_block = milestone_text[:_checkpoint_block_end]
 assert 'Current phase: `CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`\nCurrent-phase mode: **READ_ONLY_DESIGN_ONLY**' in _checkpoint_block, (
     'the current Phase D line must be immediately followed by its own scoped fields, not unscoped prior-milestone fields'
 )
-assert 'no implementation' in _checkpoint_block
+assert '`implementation_authorized`: **false**' in _checkpoint_block, (
+    'the current Phase D checkpoint block must explicitly record implementation_authorized as false'
+)
+assert (
+    'no Phase E or implementation work may begin without a separate, later Bora authorization'
+    in _checkpoint_block
+), (
+    'the current Phase D checkpoint block must state that no Phase E or implementation work may '
+    'begin without separate later Bora authorization'
+)
 assert 'PROPOSED_NOT_AUTHORIZED' in _checkpoint_block
 
 # CURRENT_STATE.md must record this policy as Bora-accepted and governing
@@ -286,7 +294,7 @@ assert 'PROPOSED_NOT_AUTHORIZED' in _checkpoint_block
 state_text = CURRENT_STATE.read_text(encoding='utf-8')
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in state_text
 assert 'not self-granted by the operator' in state_text
-assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED' in state_text
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE' in state_text
 assert '`implementation_authorized` remains `false`' in state_text
 assert 'PROPOSED_NOT_AUTHORIZED' in state_text
 

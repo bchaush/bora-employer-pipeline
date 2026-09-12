@@ -1,0 +1,72 @@
+{
+  "milestone_id": "CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1",
+  "kind": "READ_ONLY_AUDIT",
+  "goal": "Author the Phase D failure taxonomy and evaluator-coverage map as a READ_ONLY / DESIGN_ONLY analytical report over already-existing Phase B/C evidence, and update only the minimum canonical checkpoint/state/changelog/test surfaces so fresh sessions can recover Phase D as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY with implementation_authorized remaining false and Phase E remaining PROPOSED_NOT_AUTHORIZED. This contract governs the substantive Phase D work itself; it does not perform, expand, or presuppose the content of that work. No product implementation, no evaluator code, no CAREER_OS_RUN_TRACE_V1 or trace infrastructure, no database/UI/automation, no new agent, no model routing, and no LLM judge is authorized by this contract.",
+  "baseline_sha": "7f46768fab51beb4f5c2e8576dedfce691a7ee12",
+  "allowed_paths": [
+    "docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md",
+    "AGENTS.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "milestone_contracts/audit/career-os-failure-taxonomy-evaluator-coverage-map-v1.json",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "config/**",
+    "prompts/**",
+    "fixtures/**"
+  ],
+  "required_tests": [
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "the taxonomy/evaluator-coverage-map report, when authored, labels every material claim OBSERVED, RECONSTRUCTED_FROM_DURABLE_EVIDENCE, EXPERIMENTAL_NON_CANONICAL, or MISSING, and does not upgrade any UNKNOWN or MISSING evidence state",
+    "any reference to the Antigravity benchmark #1 is labeled EXPERIMENTAL_NON_CANONICAL only and is never treated as authoritative or as granting any authority over taxonomy, severity, or evaluator design",
+    "the report may mention CAREER_OS_RUN_TRACE_V1 only as an explicitly out-of-scope/future architecture item or a known missing observability surface, and must not design, specify, schema, implement, or authorize CAREER_OS_RUN_TRACE_V1, any trace schema or trace infrastructure, evaluator code, a model router, an LLM judge, a database/UI surface, orchestration automation, or a new runtime agent",
+    "any change to AGENTS.md or docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md is limited strictly to live status/recovery pointer synchronization for Phase D completion; no locked role, roadmap sequence, policy principle, or substantive doctrine change to either file is authorized",
+    "the report does not claim or imply fallback-builder authority over any locked rule, and does not perform an experimental-run-receipts audit",
+    "the report does not perform or propose a context-surface refactor (CLAUDE.md/.cursor/.claude structural change) under Phase D",
+    "the report does not authorize, imply authorization of, or perform any Phase E or later roadmap phase work",
+    "CURRENT_EXECUTION_CHECKPOINT.json, project_state.json, CURRENT_STATE.md, and CURRENT_MILESTONE.md are updated only to record Phase D as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY, with implementation_authorized remaining false and Phase E remaining PROPOSED_NOT_AUTHORIZED",
+    "CHANGELOG.md records the Phase D substantive-work completion as a distinct dated entry",
+    "no existing locked rule, policy principle, or substantive roadmap doctrine (BLUEPRINT.md, CLAUDE.md, AGENTS.md, or any prior-accepted ADR) is changed",
+    "the dedicated regression test and the execution-checkpoint test fail closed on any violation of this contract"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would modify BLUEPRINT.md, CLAUDE.md, GEMINI.md, .cursor/**, .claude/**, src/**, schemas/**, claims/**, evidence/**, experiences/**, resume/**, golden-tests/**, config/**, prompts/**, or fixtures/**",
+    "change would modify AGENTS.md or docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md for any purpose other than live status/recovery pointer synchronization, or would change any locked role, roadmap sequence, policy principle, or substantive doctrine in either file",
+    "change would design, specify, schema, implement, or authorize CAREER_OS_RUN_TRACE_V1, trace schema/infrastructure, evaluator code, a model router, an LLM judge, a database/UI surface, orchestration automation, or a new runtime agent",
+    "change would treat Antigravity benchmark #1 (or any other EXPERIMENTAL_NON_CANONICAL source) as canonical or authority-granting",
+    "change would perform, propose, or presuppose a context-surface refactor",
+    "change would claim or imply fallback-builder authority over a locked rule",
+    "change would audit or report on experimental-run receipts",
+    "change would authorize or imply authorization of Phase E or any later roadmap phase",
+    "change would represent operator completion of Phase D as Bora acceptance"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BORA_EXPLICIT_REVIEW_AND_ACCEPTANCE_OR_REJECTION_OF_THE_PHASE_D_CHECKPOINT_REQUIRED_BEFORE_PHASE_E_OR_ANY_IMPLEMENTATION; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED"
+}
