@@ -1,0 +1,58 @@
+{
+  "milestone_id": "CAREER_OS_PHASE_D_RECOVERY_SUMMARY_CONTINUITY_REPAIR_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Close one confirmed recovery-summary inconsistency: CURRENT_EXECUTION_CHECKPOINT.json's completed_actions named 'jargon-leakage detection' as a possible future calibrated-LLM-judge surface, while the accepted Phase D report states enumerable banned/internal vocabulary (jargon-leakage) detection is deterministic-first and any potential calibrated LLM judge is limited to genuinely subjective residual style/naturalness/fidelity surfaces after objective lexical/structural checks and human calibration. Replace only that stale sentence with wording faithful to the accepted report; add a regression that fails closed if the stale claim returns.",
+  "baseline_sha": "9b170f205db4b9bd3b2f10b83ca93b7db3499d34",
+  "allowed_paths": [
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "CHANGELOG.md",
+    "milestone_contracts/governance/career-os-phase-d-continuity-repair-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "AGENTS.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/**",
+    "project_state.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "CURRENT_EXECUTION_CHECKPOINT.json's completed_actions no longer names jargon-leakage detection as a calibrated-LLM-judge candidate",
+    "the corrected sentence states enumerable banned/internal vocabulary (jargon-leakage) detection is deterministic-first, never an LLM-judge candidate",
+    "the corrected sentence states any potential calibrated LLM judge is a future candidate only for genuinely subjective residual surfaces (style/naturalness/fidelity) remaining after objective lexical/structural checks and human calibration",
+    "no LLM judge is designed, specified, or implemented; Phase E remains PROPOSED_NOT_AUTHORIZED; implementation_authorized remains false",
+    "every other completed_actions entry and every other checkpoint field is preserved verbatim",
+    "tests/career_os_execution_checkpoint_v1_test.py fails closed if the stale jargon-leakage/LLM-judge framing returns",
+    "CHANGELOG.md records this repair as a distinct dated entry",
+    "no path outside allowed_paths is touched"
+  ],
+  "stop_conditions": [
+    "change requires any path outside allowed_paths",
+    "change would alter Phase D's six failure families, severity vocabulary, evaluator vocabulary, evidence/provenance conclusions, or practitioner methodology doctrine",
+    "change would author, design, or implement an LLM judge, deterministic jargon evaluator, Phase E, or any other runtime/product surface",
+    "change would authorize or imply authorization of Phase E or any later roadmap phase",
+    "change would alter any completed_actions entry other than the one stale jargon-leakage/LLM-judge sentence",
+    "change would alter human_acceptance_status, accepted_at, operator_status, or implementation_authorized"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BOUNDED_WORDING_CONTINUITY_REPAIR_ONLY; NO_SCOPE_EXPANSION; NO_IMPLEMENTATION_AUTHORIZED; NO_PHASE_E_AUTHORIZED"
+}

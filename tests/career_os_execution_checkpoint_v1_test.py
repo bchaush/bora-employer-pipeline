@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,6 +72,85 @@ completed = ' '.join(cp['completed_actions'])
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in completed
 assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in completed
 assert 'I am satisfied' in completed
+
+# Continuity repair: completed_actions must state that enumerable
+# banned/internal vocabulary (jargon-leakage) detection is deterministic-
+# first, and that any potential calibrated LLM judge is limited to
+# genuinely subjective residual surfaces (style/naturalness/fidelity) left
+# over after objective lexical/structural checks and human calibration --
+# never positioned as a shortcut for the deterministic jargon check itself.
+# This must fail closed if the stale "jargon-leakage detection" framing
+# (naming jargon-leakage as an LLM-judge candidate) returns.
+#
+# The joined `completed` string is insufficient on its own: distinct
+# historical actions could each satisfy a different substring, letting the
+# assertions pass even if no single action states the corrected semantics
+# coherently. Identify the exact single completed_actions entry that
+# concerns jargon/internal-vocabulary detection and the calibrated LLM
+# judge, require there be exactly one such entry, and assert every
+# corrected-semantics substring against that same entry.
+# Fail-closed selector: detect the jargon/LLM-judge entry regardless of
+# spaced/hyphenated/dash-variant surface form (e.g. "LLM judge",
+# "LLM-judge", "calibrated-LLM-judge"), and regardless of case/whitespace,
+# so a stale entry cannot slip past this check merely by swapping a space
+# for a hyphen or another dash character.
+_DASH_CHARS = ''.join(chr(code_point) for code_point in (
+    0x002D,  # HYPHEN-MINUS
+    0x2010,  # HYPHEN
+    0x2011,  # NON-BREAKING HYPHEN
+    0x2012,  # FIGURE DASH
+    0x2013,  # EN DASH
+    0x2014,  # EM DASH
+    0x2015,  # HORIZONTAL BAR
+    0x2212,  # MINUS SIGN
+))
+
+
+def _normalize_for_jargon_judge_match(text):
+    normalized = text
+    for dash_char in _DASH_CHARS:
+        normalized = normalized.replace(dash_char, ' ')
+    normalized = re.sub(r'\s+', ' ', normalized).strip().lower()
+    return normalized
+
+
+jargon_judge_actions = [
+    action for action in cp['completed_actions']
+    if 'jargon' in _normalize_for_jargon_judge_match(action)
+    and 'llm judge' in _normalize_for_jargon_judge_match(action)
+]
+assert len(jargon_judge_actions) == 1, (
+    'expected exactly one completed_actions entry concerning jargon/internal '
+    f'vocabulary and the calibrated LLM judge, found {len(jargon_judge_actions)}'
+)
+jargon_judge_action = jargon_judge_actions[0]
+
+EXACT_JARGON_JUDGE_ACTION = (
+    "Named CAREER_OS_RUN_TRACE_V1 only as an out-of-scope/future missing "
+    "observability surface; recorded internal-jargon-leakage detection "
+    "against an enumerable banned-term/internal-vocabulary list as "
+    "deterministic-first, never an LLM-judge candidate; named a potential "
+    "calibrated LLM judge only as a future candidate for genuinely subjective "
+    "residual surfaces (package gold-family style/naturalness/fidelity) "
+    "remaining after objective lexical/structural checks and human "
+    "calibration; designed, specified, or implemented neither the LLM judge "
+    "nor any deterministic jargon evaluator"
+)
+assert jargon_judge_action == EXACT_JARGON_JUDGE_ACTION, (
+    'the identified jargon/LLM-judge completed_actions entry no longer '
+    'matches the exact corrected sentence'
+)
+
+assert 'deterministic-first' in jargon_judge_action
+assert 'never an LLM-judge candidate' in jargon_judge_action
+assert 'style/naturalness/fidelity' in jargon_judge_action
+assert 'after objective lexical/structural checks and human calibration' in jargon_judge_action
+
+# Stale-phrase negative assertion: fail closed if jargon-leakage detection
+# is ever renamed back into an LLM-judge candidate, on this entry or any
+# other completed_actions entry.
+assert 'gold-family style/naturalness/fidelity), jargon-leakage detection' not in completed
+assert 'fidelity, jargon-leakage detection' not in completed
 
 not_done = ' '.join(cp['not_completed_or_not_authorized'])
 assert 'BORA_ACCEPTED' in not_done
