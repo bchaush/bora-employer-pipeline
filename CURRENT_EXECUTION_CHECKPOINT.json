@@ -7,7 +7,8 @@
   "phase_mode": "READ_ONLY_DESIGN_ONLY",
   "authorization_status": "BORA_AUTHORIZED",
   "selection_status": "SELECTED",
-  "operator_status": "NOT_YET_COMPLETED",
+  "operator_status": "COMPLETED_BY_OPERATOR",
+  "human_acceptance_status": "PENDING_BORA_ACCEPTANCE",
   "implementation_authorized": false,
   "prior_phase": {
     "phase_id": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1",
@@ -23,12 +24,16 @@
     "human_acceptance_status": "BORA_ACCEPTED",
     "accepted_at": "2026-09-11"
   },
-  "terminal_adjudication": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) remains COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING - Bora explicitly authorized CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (PHASE D) as the next phase, in READ_ONLY / DESIGN_ONLY mode, on 2026-09-11 - PHASE D is now BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED - implementation_authorized remains false - PHASE E and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED - IMPLEMENTATION NOT AUTHORIZED",
+  "terminal_adjudication": "CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1 (governance-only policy milestone) remains COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING - CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (PHASE D) substantive read-only/design-only work is now COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY - operator completion is NOT Bora acceptance - implementation_authorized remains false - PHASE E and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED - IMPLEMENTATION NOT AUTHORIZED",
   "completed_actions": [
-    "Recorded Bora's explicit 2026-09-11 authorization of CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) as the next phase, in READ_ONLY / DESIGN_ONLY mode, BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, with implementation_authorized remaining false",
-    "Synchronized project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md with this authorization-only transition",
-    "Added milestone_contracts/governance/career-os-phase-d-authorization-v1.json recording this bounded governance-sync contract",
-    "Preserved CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1's own BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING status unchanged as prior_phase, distinct from this new Phase D authorization event; performed no substantive Phase D taxonomy or evaluator-coverage-map work"
+    "Rendered the substantive Phase D failure taxonomy and evaluator-coverage map into durable canonical documentation at docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md, over already-adjudicated Phase B/C evidence only, inventing no new evidence, evaluator code, trace infrastructure, model router, LLM judge, or new runtime agent",
+    "Recorded the six provisional failure families (LIVE_OPPORTUNITY_ACTIONABILITY_IDENTITY_ROUTE_FAILURE, PACKAGE_SPAWN_AND_CANDIDATE_ARTIFACT_QUALITY_FAILURE, CONTROLLER_REVIEWER_EVIDENCE_INTEGRITY_FAILURE, PROVIDER_SESSION_TRANSPORT_RECOVERABILITY_FAILURE, APPLICATION_LIFECYCLE_DUPLICATE_CONTINUITY_FAILURE, SEMANTIC_CONTRACT_ARCHITECTURE_FIDELITY_FAILURE), each with severity (consequence class only, never frequency), evidence/provenance labeling (OBSERVED / RECONSTRUCTED_FROM_DURABLE_EVIDENCE / EXPERIMENTAL_NON_CANONICAL / MISSING), current coverage type, evaluator owner/boundary, coverage gap, and end-to-end/handoff coverage status",
+    "Preserved the adjudicated distinction between posting_state_decision_wiring_v1_test.py (real production routing evaluator) and live_actionability_semantic_quorum_v1_test.py (doctrine-only, no runtime validator); recorded evaluate_resume_page_utilization() as a real deterministic validator without an observed rendered-geometry producer proving end-to-end export coverage; recorded resume_package_spawn_gate_v1_test.py as doctrine-record consistency, not runtime package-time validation; recorded that current evidence does NOT establish a consequential src/ runtime dedupe implementation for BORA_APPLICATION_HISTORY_V1 exact-opportunity suppression; recorded milestone_run_v1_test.py as strong genuine controller/state-machine regression coverage distinct from live production incidence monitoring",
+    "Recorded the Antigravity benchmark #1 case strictly as EXPERIMENTAL_NON_CANONICAL (FAILS_BOUNDED_BUILDER_QUALIFICATION_CASE_1 / IMPLEMENTATION_PLAUSIBLE_BUT_SEMANTICALLY_MISALIGNED), granting it zero builder authority, used only as the motivating instance for failure family 6",
+    "Recorded cross-cutting limitations separately from the six failure families: missing raw traces, no live incidence/frequency monitoring, no production failure-rate claim, the human submission-confirmation boundary, and durable experimental-run receipts as OPEN_HYPOTHESIS only (no receipts audit performed, no receipt infrastructure designed)",
+    "Named CAREER_OS_RUN_TRACE_V1 only as an out-of-scope/future missing observability surface; named a potential calibrated LLM judge only as a future candidate for genuinely subjective surfaces (package gold-family fidelity, jargon-leakage detection); designed, specified, or implemented neither",
+    "Synchronized project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, and docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md (live status/recovery-pointer synchronization only, no doctrine change) and updated the dedicated Phase D regression plus the three governance regressions to fail closed on this COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE state",
+    "Preserved CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1's own BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING status unchanged as prior_phase, distinct from this Phase D substantive-completion event"
   ],
   "policy_milestone_completed_actions_reference": [
     "Drafted docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md as a candidate policy (pending Bora acceptance; not yet governing): quality-preserving Claude Code / Cursor context-and-usage discipline, with every material claim labeled SOURCE_DIRECT / CAREER_OS_ADAPTATION / OBSERVED_REPO_FACT / OPEN_HYPOTHESIS and cited to source URLs/dates",
@@ -61,16 +66,17 @@
     "Recorded open-coding qualitative tags (current-role/actionability; package/artifact quality/spawn; controller/reviewer transport/evidence integrity; duplicate/application-lifecycle continuity; human-handoff/submission continuity) as Phase C tags only, not a Phase D taxonomy or evaluator map"
   ],
   "not_completed_or_not_authorized": [
-    "No substantive CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) taxonomy, severity ranking, or evaluator-coverage map work performed -- this checkpoint records authorization only",
+    "Phase D is COMPLETED_BY_OPERATOR but NOT yet Bora-accepted -- human_acceptance_status is PENDING_BORA_ACCEPTANCE, and operator completion is never self-granted Bora acceptance",
     "No CAREER_OS_RUN_TRACE_V1 design or trace schema",
-    "No trace infrastructure, database, dashboard, orchestration automation, new agent, model router, or LLM judge implemented",
+    "No trace infrastructure, database, dashboard, orchestration automation, new agent, model router, or LLM judge implemented -- the report names a potential calibrated LLM judge only as a future candidate, never designed or specified",
     "No production Career OS behavior changed",
     "No structural change to CLAUDE.md, .cursor/rules/*, .cursorignore, or .claude/ settings/skills/subagents/hooks -- any such change remains OPEN_HYPOTHESIS pending a separately authorized measured context-surface audit",
     "No BLUEPRINT.md substantive doctrine change; no src/, schemas/, claims/, evidence/, experiences/, resume/, or golden-tests/ change",
-    "No numerical context/usage savings claim measured or asserted",
+    "No numerical context/usage savings claim measured or asserted; no production failure-rate or incidence claim asserted anywhere in the Phase D report",
+    "No experimental-run-receipts audit performed; durable receipts recorded only as OPEN_HYPOTHESIS",
     "No phase beyond Phase D (Phase E and later) is authorized by this checkpoint",
     "implementation_authorized remains false"
   ],
-  "exact_next_allowed_action": "Bora explicitly authorized CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) as the next phase in READ_ONLY / DESIGN_ONLY mode on 2026-09-11. Phase D is now BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED; implementation_authorized remains false. The sole next allowed action is to begin substantive Phase D read-only/design-only work (the failure taxonomy and evaluator-coverage map) under its own separately locked contract -- no implementation, trace infrastructure, database/UI, new agent, model routing, or LLM judge is authorized. Phase E and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED.",
+  "exact_next_allowed_action": "CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) substantive read-only/design-only work is now COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY; implementation_authorized remains false. Operator completion is not Bora acceptance. The sole next allowed action is for Bora to explicitly review and accept or reject the Phase D checkpoint and report (docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md). No Phase E and no implementation, trace infrastructure, database/UI, new agent, model routing, or LLM judge is authorized until Bora separately authorizes it.",
   "continuity_rule": "Fresh sessions must read this checkpoint after verifying live canonical main and project_state.json, and before doing phase work, per the recovery order fixed in docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md Section 6. This checkpoint is a bounded progress-handoff record, subordinate to BLUEPRINT.md and project_state.json, and never a new strategic authority. Bora's acceptance of Phase B, Phase C, and the governance-only agent context/usage-efficiency policy milestone, and Bora's authorization of Phase D, never implies that implementation is authorized or that Phase E or any later phase is authorized; that authorization was recorded canonically by this checkpoint, not self-granted by the operator."
 }
