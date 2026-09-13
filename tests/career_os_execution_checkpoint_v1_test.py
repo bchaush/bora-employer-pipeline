@@ -35,12 +35,9 @@ assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['accepted_at'] == '2026-09-12'
 assert cp['implementation_authorized'] is False
-assert 'accepted_at' not in cp, (
-    'Phase E is not yet Bora-accepted, so the top-level checkpoint must not '
-    'carry an accepted_at for it'
-)
 
 # CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) must be
 # recorded distinctly as prior_phase, never conflated with Phase E's own
@@ -64,23 +61,22 @@ assert prior_prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allowed_action'].strip()
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in cp['exact_next_allowed_action']
 assert 'implementation_authorized remains false' in cp['exact_next_allowed_action']
-assert 'Bora reviews the substantive Phase E' in cp['exact_next_allowed_action']
+assert 'Bora separately decides whether to authorize Phase F' in cp['exact_next_allowed_action']
 assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(cp['exact_next_allowed_action']), (
     'exact_next_allowed_action must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 
-# Operator completion must never be read as itself constituting Bora's
-# eventual acceptance, and must never itself authorize Phase F.
+# Bora's Phase E acceptance must never be read as itself authorizing Phase F.
 assert 'does not itself authorize Phase F' in cp['exact_next_allowed_action']
-assert "does not itself constitute Bora's eventual acceptance" in cp['exact_next_allowed_action']
-assert 'No Phase F and no implementation' in cp['exact_next_allowed_action']
+assert 'I accept Phase E' in cp['exact_next_allowed_action']
+assert 'no Phase F and no implementation' in cp['exact_next_allowed_action']
 
 # terminal_adjudication must reflect the prior GOVERNING policy, Phase D's
 # preserved acceptance, AND Phase E's substantive operator completion, while
 # still stating implementation and Phase F are not authorized.
 assert 'GOVERNANCE_ONLY / GOVERNING' in cp['terminal_adjudication']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
 assert 'operator completion is explicitly not Bora acceptance' in cp['terminal_adjudication']
 assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
     'terminal_adjudication must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
@@ -194,13 +190,13 @@ assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(not_done), (
 assert 'No production Career OS behavior changed' in not_done
 assert 'CLAUDE.md' in not_done and '.cursor/rules' in not_done
 
-# Phase E's operator completion must be pinned as never self-granted, and
-# must be pinned as NOT itself constituting Bora's eventual acceptance --
-# each with its own exact wording. Phase D's preserved report substance
-# must also be explicitly reaffirmed unchanged.
+# Phase E's Bora acceptance must be pinned as a genuine recorded human
+# event, never self-granted, and must be pinned as NOT itself authorizing
+# Phase F -- each with its own exact wording. Phase D's preserved report
+# substance must also be explicitly reaffirmed unchanged.
 assert 'recorded human event' in not_done
 assert 'never self-granted by the operator' in not_done
-assert "does not itself constitute Bora's eventual acceptance" in not_done
+assert 'does not itself authorize Phase F' in not_done
 assert 'implementation_authorized remains false' in not_done
 assert "Phase D's report substance" in not_done
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in not_done
@@ -214,7 +210,7 @@ assert 'policy_milestone_completed_actions_reference' in cp
 assert 'phase_d_completed_actions_reference' in cp
 
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (COMPLETED_BY_OPERATOR')
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-12)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
@@ -230,7 +226,7 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in AGENTS
 # non-collidable anchored block, not by the bare substring above (a strict
 # prefix of the GOVERNANCE_ONLY policy milestone's own acceptance clause).
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in AGENTS
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in AGENTS
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in AGENTS
 
 # AGENTS.md must keep requiring project_state.json to be read before
 # CURRENT_EXECUTION_CHECKPOINT.json, and must not restate a competing

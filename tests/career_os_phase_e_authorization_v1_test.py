@@ -66,15 +66,9 @@ assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['accepted_at'] == '2026-09-12'
 assert cp['implementation_authorized'] is False
-
-# Phase E's own live checkpoint record must not yet carry an accepted_at --
-# that belongs only once Bora explicitly accepts, a separate future event.
-assert 'accepted_at' not in cp, (
-    'checkpoint top level must not carry an accepted_at for Phase E until '
-    'Bora explicitly accepts it'
-)
 
 # The checkpoint's own narrative fields must tie "Phase F" tightly to
 # PROPOSED_NOT_AUTHORIZED, not merely contain both words somewhere.
@@ -107,11 +101,11 @@ assert prior_prior_phase['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFIC
 assert prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 
 # project_state.json must point at Phase E, COMPLETED_BY_OPERATOR/
-# PENDING_BORA_ACCEPTANCE, with no implementation authorized and Phase F
+# BORA_ACCEPTED (2026-09-12), with no implementation authorized and Phase F
 # still proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-12)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
@@ -122,7 +116,7 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ON
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: Phase D remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
-# prior_phase, and Phase E is COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE
+# prior_phase, and Phase E is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12)
 # / READ_ONLY_DESIGN_ONLY, with Phase F and later still PROPOSED_NOT_AUTHORIZED.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
@@ -139,12 +133,12 @@ for surface_name, surface_text in (
     )
 
     # Phase E's own state must appear as one coupled invariant on every live
-    # surface -- COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE /
+    # surface -- COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) /
     # READ_ONLY_DESIGN_ONLY together, not as independently-true substrings
     # that could each be satisfied by unrelated sentences.
-    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in surface_text, (
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in surface_text, (
         f'{surface_name} must state Phase E\'s own coupled state as '
-        f'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
+        f'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY'
     )
 
     assert (
@@ -184,9 +178,9 @@ for surface_name, surface_text in (
     _end_idx = surface_text.index(_end_marker, _start_idx)
     _recovery_section = surface_text[_start_idx:_end_idx]
 
-    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
         f'{surface_name} recovery-governing section must itself couple Phase E\'s '
-        f'state as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY, '
+        f'state as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY, '
         f'not merely rely on an unrelated later section stating it'
     )
     assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(_recovery_section), (
