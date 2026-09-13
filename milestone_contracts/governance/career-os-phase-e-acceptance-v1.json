@@ -1,0 +1,67 @@
+{
+  "milestone_id": "CAREER_OS_PHASE_E_ACCEPTANCE_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Record Bora's explicit 2026-09-12 human acceptance of the already-merged CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (Phase E) report ('I accept Phase E — System Eval-Set Architecture — as completed. No Phase F or implementation is authorized by this acceptance.') as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY, with implementation_authorized remaining false and Phase F and every later roadmap phase remaining PROPOSED_NOT_AUTHORIZED. This is acceptance/state sync only, not Phase F authorization or Phase E substantive re-adjudication.",
+  "baseline_sha": "01266bd7db91a9085e3e4d86a12861e3d7c3603e",
+  "allowed_paths": [
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "project_state.json",
+    "docs/audits/CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1_REPORT.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "tests/career_os_system_eval_set_architecture_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "tests/career_os_phase_e_authorization_v1_test.py",
+    "milestone_contracts/governance/career-os-phase-e-acceptance-v1.json"
+  ],  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**"
+  ],
+  "required_tests": [
+    "tests/career_os_system_eval_set_architecture_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "tests/career_os_phase_e_authorization_v1_test.py"
+  ],  "acceptance_conditions": [
+    "CURRENT_EXECUTION_CHECKPOINT.json records human_acceptance_status=BORA_ACCEPTED, accepted_at=2026-09-12, implementation_authorized=false, preserving Phase D as its own distinct BORA_ACCEPTED prior_phase",
+    "project_state.json, CURRENT_MILESTONE.md, CURRENT_STATE.md, AGENTS.md, docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md, and docs/audits/CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1_REPORT.md are mutually consistent: Phase E COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY, implementation_authorized=false, Phase F and every later roadmap phase PROPOSED_NOT_AUTHORIZED",
+    "the Phase E report's substantive case corpus, taxonomy, provenance, executability, evaluator ownership, terminal-vs-step distinctions, and roadmap boundaries remain unchanged; only status/acceptance framing may change",
+    "CHANGELOG.md adds a distinct 2026-09-12 acceptance-sync entry while preserving earlier Phase E authorization/completion/PENDING_BORA_ACCEPTANCE entries as historical records",
+    "the acceptance is recorded as a genuine Bora human event attributed to Bora's exact acceptance statement, never as operator self-grant",
+    "the required tests fail closed on the accepted state and on Phase F remaining PROPOSED_NOT_AUTHORIZED",
+    "no forbidden-path change exists in the diff",
+    "no Phase F design, CAREER_OS_RUN_TRACE_V1 design, implementation, trace infrastructure, runtime/product work, new agent, model routing, or LLM judge work is introduced or authorized"
+  ],
+  "stop_conditions": [
+    "change requires a path outside allowed_paths",
+    "change alters Phase E substantive architecture rather than status/acceptance framing",
+    "change authorizes or implies authorization of Phase F or any later phase",
+    "change introduces implementation or runtime/product work",
+    "change represents acceptance as operator self-granted rather than a Bora human event",
+    "change rewrites historical PENDING_BORA_ACCEPTANCE entries instead of preserving them as history"
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BORA_EXPLICITLY_ACCEPTED_PHASE_E_ON_2026-09-12; NO_PHASE_F_AUTHORIZED; NO_IMPLEMENTATION_AUTHORIZED"
+}
