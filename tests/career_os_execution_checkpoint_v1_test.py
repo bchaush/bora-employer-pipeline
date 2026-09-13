@@ -18,22 +18,33 @@ assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
 
 assert cp['schema_version'] == '1.0'
+# Checkpoint lineage convention: Phase D's own checkpoint_id preserved its
+# "_AUTHORIZATION" suffix through operator completion and acceptance
+# (CAREER_OS_CHECKPOINT_2026-09-11_PHASE_D_AUTHORIZATION); Phase E's
+# checkpoint_id must follow the same established lineage convention rather
+# than drift to an ad hoc "_OPERATOR_COMPLETION" suffix.
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-12_PHASE_E_AUTHORIZATION', (
+    "checkpoint_id must preserve the established lineage convention "
+    "(CAREER_OS_CHECKPOINT_2026-09-12_PHASE_E_AUTHORIZATION), matching how "
+    "Phase D's own authorization checkpoint_id/basis survived through its "
+    "operator completion and acceptance"
+)
 assert cp['canonical_basis_sha'] == CANONICAL_BASELINE_SHA
 assert cp['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
 assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'NOT_YET_COMPLETED'
+assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
 assert cp['implementation_authorized'] is False
-assert 'human_acceptance_status' not in cp, (
-    'Phase E is not yet operator-completed, so the top-level checkpoint must not '
-    'carry a human_acceptance_status/accepted_at for it'
+assert 'accepted_at' not in cp, (
+    'Phase E is not yet Bora-accepted, so the top-level checkpoint must not '
+    'carry an accepted_at for it'
 )
 
 # CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) must be
 # recorded distinctly as prior_phase, never conflated with Phase E's own
-# (not yet completed) status -- operator completion, Bora acceptance, and
-# this new authorization must never collapse into one undifferentiated claim.
+# (operator-completed, not yet Bora-accepted) status.
 prior_phase = cp['prior_phase']
 assert prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
 assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
@@ -53,69 +64,82 @@ assert prior_prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allowed_action'].strip()
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in cp['exact_next_allowed_action']
 assert 'implementation_authorized remains false' in cp['exact_next_allowed_action']
-assert 'I authorize Phase E' in cp['exact_next_allowed_action']
+assert 'Bora reviews the substantive Phase E' in cp['exact_next_allowed_action']
 assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(cp['exact_next_allowed_action']), (
     'exact_next_allowed_action must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 
-# This authorization is a Bora human event, and it must never be read as
-# itself authorizing Phase F, or as itself constituting Phase E's eventual
-# operator completion/Bora acceptance.
+# Operator completion must never be read as itself constituting Bora's
+# eventual acceptance, and must never itself authorize Phase F.
 assert 'does not itself authorize Phase F' in cp['exact_next_allowed_action']
-assert 'does not itself constitute' in cp['exact_next_allowed_action']
-assert "Bora's separate, explicit authorization of Phase F" in cp['exact_next_allowed_action']
+assert "does not itself constitute Bora's eventual acceptance" in cp['exact_next_allowed_action']
 assert 'No Phase F and no implementation' in cp['exact_next_allowed_action']
 
 # terminal_adjudication must reflect the prior GOVERNING policy, Phase D's
-# preserved acceptance, AND Bora's explicit Phase E authorization event,
-# while still stating implementation and Phase F are not authorized.
+# preserved acceptance, AND Phase E's substantive operator completion, while
+# still stating implementation and Phase F are not authorized.
 assert 'GOVERNANCE_ONLY / GOVERNING' in cp['terminal_adjudication']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
-assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
+assert 'operator completion is explicitly not Bora acceptance' in cp['terminal_adjudication']
 assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
     'terminal_adjudication must couple Phase F to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 assert 'IMPLEMENTATION NOT AUTHORIZED' in cp['terminal_adjudication']
 
-# Must record the genuine Phase E authorization action, and must preserve
+# Must record the genuine Phase E substantive completion, and must preserve
 # the Phase D prior-phase transition action, without re-authoring Phase D's
 # own substantive report content.
 completed = ' '.join(cp['completed_actions'])
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in completed
-assert 'I authorize Phase E' in completed
+assert 'docs/audits/CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1_REPORT.md' in completed
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in completed
 assert 'prior_phase' in completed
 
-# Continuity repair: completed_actions must state that enumerable
-# banned/internal vocabulary (jargon-leakage) detection is deterministic-
-# first, and that any potential calibrated LLM judge is limited to
-# genuinely subjective residual surfaces (style/naturalness/fidelity) left
-# over after objective lexical/structural checks and human calibration --
-# never positioned as a shortcut for the deterministic jargon check itself.
-# This must fail closed if the stale "jargon-leakage detection" framing
-# (naming jargon-leakage as an LLM-judge candidate) returns.
-#
-# The joined `completed` string is insufficient on its own: distinct
-# historical actions could each satisfy a different substring, letting the
-# assertions pass even if no single action states the corrected semantics
-# coherently. Identify the exact single completed_actions entry that
-# concerns jargon/internal-vocabulary detection and the calibrated LLM
-# judge, require there be exactly one such entry, and assert every
-# corrected-semantics substring against that same entry.
-# Fail-closed selector: detect the jargon/LLM-judge entry regardless of
-# spaced/hyphenated/dash-variant surface form (e.g. "LLM judge",
-# "LLM-judge", "calibrated-LLM-judge"), and regardless of case/whitespace,
-# so a stale entry cannot slip past this check merely by swapping a space
-# for a hyphen or another dash character.
+# The Phase E completed_actions must state the case-row schema, executability
+# classes, and the terminal-vs-step-diagnostic separation this report defines.
+assert 'EXECUTABLE_NOW' in completed
+assert 'RECONSTRUCTION_BACKED_DESIGN_CASE' in completed
+assert 'BLOCKED_CANDIDATE' in completed
+assert 'TERMINAL_END_TO_END' in completed
+assert 'STEP_LEVEL_DIAGNOSTIC' in completed
+assert 'tests/career_os_system_eval_set_architecture_v1_test.py' in completed
+
+# FINAL hardened Phase E architecture facts must be reflected explicitly in
+# this recovery summary, never left implicit or allowed to regress to a
+# stale/looser prior draft's summary.
+EXPECTED_15_CASE_IDS = (
+    'F1-A', 'F1-B', 'F1-C', 'F1-D', 'F1-E',
+    'F2-A', 'F2-B', 'F2-C',
+    'F3-A', 'F4-A',
+    'F5-A', 'F5-B',
+    'REC-A',
+    'POS-A', 'POS-B',
+)
+for case_id in EXPECTED_15_CASE_IDS:
+    assert case_id in completed, f'checkpoint completed_actions must name admitted case {case_id}'
+assert 'exactly 15 case IDs' in completed, (
+    'checkpoint completed_actions must state the admitted corpus is exactly 15 case IDs'
+)
+for case_role in ('CONFIRMED_FAILURE_REGRESSION', 'IMPORTANT_WORKFLOW', 'POSITIVE_CONTINUITY_REFERENCE'):
+    assert case_role in completed, f'checkpoint completed_actions must name case role {case_role}'
+assert 'three-way case_role taxonomy' in completed
+assert 'deterministic PASS/FAIL pairing requirement' in completed
+assert 'Family 6' in completed and 'EXPERIMENTAL_NON_CANONICAL' in completed, (
+    'checkpoint completed_actions must record that Family 6 has no admitted case '
+    '(its only instance remains EXPERIMENTAL_NON_CANONICAL)'
+)
+assert 'Fresenius Medical Care R0266808 (F1-D)' in completed
+assert 'MGB RQ4055007 (F1-E)' in completed
+assert 'two separate, never-combined case identities' in completed
+assert 'Public Consulting Group JR102087' in completed
+assert 'never as a fabricated confirmed failure' in completed
+assert 'HUMAN_CONFIRMED_REFERENCE, never machine-executable' in completed
+
+# Continuity: Phase D's own corrected jargon/LLM-judge completed_actions
+# entry (fixed by an earlier continuity repair) must remain unchanged.
 _DASH_CHARS = ''.join(chr(code_point) for code_point in (
-    0x002D,  # HYPHEN-MINUS
-    0x2010,  # HYPHEN
-    0x2011,  # NON-BREAKING HYPHEN
-    0x2012,  # FIGURE DASH
-    0x2013,  # EN DASH
-    0x2014,  # EM DASH
-    0x2015,  # HORIZONTAL BAR
-    0x2212,  # MINUS SIGN
+    0x002D, 0x2010, 0x2011, 0x2012, 0x2013, 0x2014, 0x2015, 0x2212,
 ))
 
 
@@ -133,7 +157,7 @@ jargon_judge_actions = [
     and 'llm judge' in _normalize_for_jargon_judge_match(action)
 ]
 assert len(jargon_judge_actions) == 1, (
-    'expected exactly one completed_actions entry concerning jargon/internal '
+    'expected exactly one phase_d_completed_actions_reference entry concerning jargon/internal '
     f'vocabulary and the calibrated LLM judge, found {len(jargon_judge_actions)}'
 )
 jargon_judge_action = jargon_judge_actions[0]
@@ -150,21 +174,16 @@ EXACT_JARGON_JUDGE_ACTION = (
     "nor any deterministic jargon evaluator"
 )
 assert jargon_judge_action == EXACT_JARGON_JUDGE_ACTION, (
-    'the identified jargon/LLM-judge completed_actions entry no longer '
+    'the identified jargon/LLM-judge phase_d_completed_actions_reference entry no longer '
     'matches the exact corrected sentence'
 )
 
-assert 'deterministic-first' in jargon_judge_action
-assert 'never an LLM-judge candidate' in jargon_judge_action
-assert 'style/naturalness/fidelity' in jargon_judge_action
-assert 'after objective lexical/structural checks and human calibration' in jargon_judge_action
-
-# Stale-phrase negative assertion: fail closed if jargon-leakage detection
-# is ever renamed back into an LLM-judge candidate, anywhere in the
-# preserved Phase D reference lineage.
-phase_d_reference_joined = ' '.join(cp['phase_d_completed_actions_reference'])
-assert 'gold-family style/naturalness/fidelity), jargon-leakage detection' not in phase_d_reference_joined
-assert 'fidelity, jargon-leakage detection' not in phase_d_reference_joined
+# Report itself must reuse the same deterministic-first / genuinely-subjective
+# framing for its own sole LLM-judge candidate (DraftKings gold-family style
+# fidelity), never repositioning jargon-lexicon detection as an LLM-judge
+# candidate.
+assert 'deterministic-first' in completed
+assert 'POTENTIAL_CALIBRATED_LLM_JUDGE candidate to DraftKings' in completed
 
 not_done = ' '.join(cp['not_completed_or_not_authorized'])
 assert 'CAREER_OS_RUN_TRACE_V1' in not_done
@@ -175,14 +194,13 @@ assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(not_done), (
 assert 'No production Career OS behavior changed' in not_done
 assert 'CLAUDE.md' in not_done and '.cursor/rules' in not_done
 
-# Phase E's authorization must be pinned as a genuine Bora human event, never
-# an operator self-grant, and must be pinned as NOT itself performing
-# substantive Phase E work -- each with its own exact wording so these
-# invariants cannot silently regress into a vaguer, weaker claim. Phase D's
-# preserved report substance must also be explicitly reaffirmed unchanged.
+# Phase E's operator completion must be pinned as never self-granted, and
+# must be pinned as NOT itself constituting Bora's eventual acceptance --
+# each with its own exact wording. Phase D's preserved report substance
+# must also be explicitly reaffirmed unchanged.
 assert 'recorded human event' in not_done
 assert 'never self-granted by the operator' in not_done
-assert "does not itself perform, design, or begin any substantive Phase E" in not_done
+assert "does not itself constitute Bora's eventual acceptance" in not_done
 assert 'implementation_authorized remains false' in not_done
 assert "Phase D's report substance" in not_done
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in not_done
@@ -195,9 +213,8 @@ assert 'phase_c_completed_actions_reference' in cp
 assert 'policy_milestone_completed_actions_reference' in cp
 assert 'phase_d_completed_actions_reference' in cp
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (BORA_AUTHORIZED')
-assert 'SELECTED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (COMPLETED_BY_OPERATOR')
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
@@ -213,6 +230,7 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in AGENTS
 # non-collidable anchored block, not by the bare substring above (a strict
 # prefix of the GOVERNANCE_ONLY policy milestone's own acceptance clause).
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in AGENTS
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in AGENTS
 
 # AGENTS.md must keep requiring project_state.json to be read before
 # CURRENT_EXECUTION_CHECKPOINT.json, and must not restate a competing

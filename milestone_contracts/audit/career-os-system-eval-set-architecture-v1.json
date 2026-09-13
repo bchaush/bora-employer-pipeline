@@ -1,0 +1,73 @@
+{
+  "milestone_id": "CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1",
+  "kind": "READ_ONLY_AUDIT",
+  "baseline_sha": "d2127314172f8d0b3b5f7a91c68cb00b3d242c1a",
+  "goal": "Design a repeatable Career OS system-level eval-set architecture from confirmed pass/fail operating cases, separating end-to-end terminal-state correctness from step-level diagnostics, without implementing evaluators or Phase F trace/contract architecture.",
+  "allowed_paths": [
+    "docs/audits/CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1_REPORT.md",
+    "milestone_contracts/audit/career-os-system-eval-set-architecture-v1.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md",
+    "tests/career_os_system_eval_set_architecture_v1_test.py",
+    "tests/career_os_agent_context_usage_efficiency_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "tests/career_os_phase_e_authorization_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**"
+  ],
+  "acceptance_conditions": [
+    "Report defines a repeatable eval-set architecture grounded only in confirmed durable evidence; no invented traces, fixtures, pass/fail outcomes, or incidence claims.",
+    "Report separates end-to-end terminal-state correctness from step-level diagnostics and explains that a system case can fail terminally even when some step diagnostics pass.",
+    "Every proposed case row records provenance quality, operating case identity, expected terminal outcome, diagnostic layer, evaluator type/owner, current executability, and blocking evidence gaps where applicable.",
+    "Cases with missing raw traces or missing package artifacts are not falsely presented as executable end-to-end fixtures; they are explicitly classified as reconstruction-backed design cases or blocked candidates.",
+    "Objective lexical/structural/identity/state-transition rules remain deterministic-first; no LLM judge is specified for enumerable banned/internal vocabulary or other objective facts.",
+    "Any potential calibrated LLM-judge role is limited to genuinely subjective residual style/naturalness/fidelity after objective checks and human calibration, and remains future/non-implemented.",
+    "The architecture includes representative negative and positive operating cases where source material is sufficient, including live-actionability/dead-route, recency suppression, application lifecycle/duplicate continuity, controller/provider integrity, package-quality/gold-family, and clean successful/handoff cases.",
+    "The report distinguishes CI regression evals from live production monitoring/incidence and makes no production failure-rate claim.",
+    "No CAREER_OS_RUN_TRACE_V1 schema, trace contract, typed envelope, trace infrastructure, database/UI, orchestration automation, new agent, model routing, LLM-judge implementation, or product/runtime behavior is designed or implemented.",
+    "Phase E completes as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY with implementation_authorized=false; Phase F and all later phases remain PROPOSED_NOT_AUTHORIZED.",
+    "Cursor independent adversarial review is required on the frozen exact diff before commit/push/PR; Cursor may not repair its own findings."
+  ],
+  "required_tests": [
+    "python tests/career_os_system_eval_set_architecture_v1_test.py",
+    "python tests/career_os_eval_harness_sequence_v1_test.py",
+    "python tests/career_os_execution_checkpoint_v1_test.py",
+    "python tests/career_os_phase_e_authorization_v1_test.py",
+    "python tests/career_os_failure_taxonomy_and_evaluator_coverage_map_v1_test.py",
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Stop if substantive Phase F trace/contract architecture would be required to complete the report.",
+    "Stop if a proposed eval case requires inventing unavailable raw evidence or reconstructing facts beyond durable records.",
+    "Stop if any implementation or runtime mutation would be required.",
+    "Stop at Bora human acceptance gate after a reviewed/merged Phase E completion transition; do not authorize Phase F implicitly."
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_BEFORE_COMMIT; DETERMINISTIC_STATE_AND_FOCUSED_TESTS_REQUIRED; NO_COMMIT_PUSH_PR_OR_MERGE_AUTHORIZED_BY_THIS_CONTRACT_ALONE",
+  "human_approval_requirements": "BORA_EXPLICIT_REVIEW_AND_ACCEPTANCE_OR_CORRECTION_OF_THE_PHASE_E_CHECKPOINT_REQUIRED_BEFORE_PHASE_F_OR_ANY_IMPLEMENTATION; NO_IMPLEMENTATION_AUTHORIZED_BY_THIS_CONTRACT; NO_PHASE_F_AUTHORIZATION_IMPLIED"
+}
