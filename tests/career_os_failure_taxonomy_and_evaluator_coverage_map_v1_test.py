@@ -149,27 +149,27 @@ EXPECTED_REQUIRED_TESTS = [
 ]
 assert contract['required_tests'] == EXPECTED_REQUIRED_TESTS
 
-# Phase D has since been superseded as the live current phase by Phase E
-# (separately, explicitly authorized by Bora); the checkpoint must now
-# preserve Phase D's substantive-completion/acceptance facts as prior_phase
-# -- never dropped, never self-granted -- distinct from Phase E's own
-# (not yet completed) live status.
+# Phase D has since been superseded as the live current phase, first by
+# Phase E and now by Phase F (each separately, explicitly authorized by
+# Bora); the checkpoint must now preserve Phase D's substantive-completion/
+# acceptance facts as prior_prior_phase -- never dropped, never self-granted
+# -- distinct from Phase F's own (not yet completed) live status.
 assert CHECKPOINT_PATH.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT_PATH.read_text(encoding='utf-8'))
-prior_phase = cp['prior_phase']
-assert prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
-assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_phase['accepted_at'] == '2026-09-11'
+prior_prior_phase = cp['prior_prior_phase']
+assert prior_prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
+assert prior_prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_prior_phase['accepted_at'] == '2026-09-11'
 assert cp['implementation_authorized'] is False
 assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in ' '.join(
     cp['phase_d_completed_actions_reference']
 )
 
 # project_state.json must reflect Phase D's preserved acceptance lineage
-# (now cited from the Phase E next_authorized_action seam) even though
-# Phase E is the live current phase.
+# (now cited from the Phase F next_authorized_action seam) even though
+# Phase F is the live current phase.
 project_state = json.loads(PROJECT_STATE_PATH.read_text(encoding='utf-8'))
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in project_state['next_authorized_action']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in project_state['next_authorized_action']

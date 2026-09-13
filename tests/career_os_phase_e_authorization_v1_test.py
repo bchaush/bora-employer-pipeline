@@ -2,14 +2,14 @@ import json
 import re
 from pathlib import Path
 
-# Requires the exact subject-coupled phrase "Phase F and every later roadmap
+# Requires the exact subject-coupled phrase "Phase G and every later roadmap
 # phase remain PROPOSED_NOT_AUTHORIZED" as one contiguous subject, so this can
 # never be satisfied by two unrelated, independently true substrings (e.g. a
-# bare "Phase F" mention somewhere and an unrelated PROPOSED_NOT_AUTHORIZED
+# bare "Phase G" mention somewhere and an unrelated PROPOSED_NOT_AUTHORIZED
 # elsewhere). Markdown bold is allowed around PROPOSED_NOT_AUTHORIZED only
 # where the surface actually renders it that way.
-PHASE_F_PROPOSED_NOT_AUTHORIZED = re.compile(
-    r'Phase F and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+PHASE_G_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase G and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
 
@@ -49,75 +49,59 @@ assert 'project_state.json' in contract['allowed_paths']
 assert PHASE_D_REPORT_PATH.exists()
 assert PHASE_E_REPORT_PATH.exists(), 'substantive Phase E report missing'
 
-# Live checkpoint must record both the original Phase E authorization event
-# AND its subsequent substantive operator-completion transition.
+# Live checkpoint must preserve both the original Phase E authorization event
+# AND its subsequent substantive operator-completion/acceptance transition,
+# now recorded as prior_phase since Bora has since separately, explicitly
+# authorized Phase F as the live current phase.
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-# Checkpoint lineage convention: preserved exactly through operator completion,
-# matching the historical precedent of Phase D's own authorization checkpoint
-# ID/basis surviving through its own completion/acceptance.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-12_PHASE_E_AUTHORIZATION', (
-    'checkpoint_id must preserve the established lineage convention through '
-    'Phase E operator completion, matching Phase D historical precedent'
-)
-assert cp['canonical_basis_sha'] == BASELINE_SHA
-assert cp['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
-assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert cp['authorization_status'] == 'BORA_AUTHORIZED'
-assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-12'
 assert cp['implementation_authorized'] is False
-
-# The checkpoint's own narrative fields must tie "Phase F" tightly to
-# PROPOSED_NOT_AUTHORIZED, not merely contain both words somewhere.
-assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
-    'checkpoint terminal_adjudication must couple Phase F to PROPOSED_NOT_AUTHORIZED'
-)
-_not_done_joined = ' '.join(cp['not_completed_or_not_authorized'])
-assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(_not_done_joined), (
-    'checkpoint not_completed_or_not_authorized must couple Phase F to PROPOSED_NOT_AUTHORIZED'
-)
-
-# The checkpoint's own continuity_rule must itself couple Phase F to
-# PROPOSED_NOT_AUTHORIZED as one subject -- a fresh session reading only
-# continuity_rule must not be able to infer Phase F/later authorization.
-assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(cp['continuity_rule']), (
-    'checkpoint continuity_rule must couple Phase F to PROPOSED_NOT_AUTHORIZED'
-)
-
-# Phase D must be preserved distinctly as prior_phase, never conflated with
-# Phase E's own (operator-completed, not yet Bora-accepted) status.
 prior_phase = cp['prior_phase']
-assert prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_phase['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
 assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
 assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_phase['accepted_at'] == '2026-09-11'
+assert prior_phase['accepted_at'] == '2026-09-12'
 
+# Phase D must be preserved distinctly as prior_prior_phase, never conflated
+# with Phase E's own preserved status.
 prior_prior_phase = cp['prior_prior_phase']
-assert prior_prior_phase['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
+assert prior_prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_prior_phase['accepted_at'] == '2026-09-11'
 
-# project_state.json must point at Phase E, COMPLETED_BY_OPERATOR/
-# BORA_ACCEPTED (2026-09-12), with no implementation authorized and Phase F
-# still proposed only.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1')
-assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-12)' in PROJECT_STATE['current_phase']
+prior_prior_prior_phase = cp['prior_prior_prior_phase']
+assert prior_prior_prior_phase['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
+assert prior_prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+
+# Phase E's full operator-completion/acceptance lifecycle narrative is
+# preserved as historical reference now that Phase F is current.
+assert 'phase_e_completed_actions_reference' in cp
+phase_e_reference = ' '.join(cp['phase_e_completed_actions_reference'])
+assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in phase_e_reference
+assert 'exactly 15 case IDs' in phase_e_reference
+
+# project_state.json must point at Phase F, the live current phase, while
+# Phase E's completed/accepted status is preserved in the
+# next_authorized_action seam text, with no implementation authorized and
+# Phase G still proposed only.
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1')
+assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    'project_state.next_authorized_action must couple Phase F to PROPOSED_NOT_AUTHORIZED'
+assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
+assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
+    'project_state.next_authorized_action must couple Phase G to PROPOSED_NOT_AUTHORIZED'
 )
-assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
-assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: Phase D remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
-# prior_phase, and Phase E is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12)
-# / READ_ONLY_DESIGN_ONLY, with Phase F and later still PROPOSED_NOT_AUTHORIZED.
+# prior_prior_phase, Phase E remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
+# prior_phase, and Phase F is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED,
+# with Phase G and later still PROPOSED_NOT_AUTHORIZED.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
     ('CURRENT_STATE.md', CURRENT_STATE),
@@ -126,7 +110,7 @@ for surface_name, surface_text in (
 ):
     assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in surface_text, (
         f'{surface_name} must preserve Phase D itself as COMPLETED_BY_OPERATOR / '
-        f'BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY, now prior_phase'
+        f'BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY, now prior_prior_phase'
     )
     assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase E (CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1)'
@@ -148,44 +132,10 @@ for surface_name, surface_text in (
         or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text
     ), f'{surface_name} must state that implementation remains unauthorized'
 
-    # Phase F (and every later roadmap phase) must be coupled to
+    # Phase G (and every later roadmap phase) must be coupled to
     # PROPOSED_NOT_AUTHORIZED, not proven by two unrelated substrings.
-    assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
-        f'{surface_name} must couple Phase F to PROPOSED_NOT_AUTHORIZED'
-    )
-
-# A whole-document search is not enough: it can pass merely because some
-# unrelated later section (e.g. a "Decision"/"Roadmap Reference" summary)
-# happens to state the coupled quartet or the Phase F guard, while the
-# actual live recovery-governing section a fresh session reads first stays
-# vacuous. Anchor each surface's own recovery-governing section and require
-# both invariants inside that exact section, not merely somewhere in the
-# document.
-_RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint', '## Eval & Harness Audit - Roadmap Reference'),
-    'CURRENT_STATE.md': ('## Current Execution Checkpoint', '## Eval & Harness Audit Roadmap Reference'),
-    'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
-    'ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md': ('## 6. New-chat recovery protocol', '## 7.'),
-}
-for surface_name, surface_text in (
-    ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
-    ('CURRENT_STATE.md', CURRENT_STATE),
-    ('AGENTS.md', AGENTS),
-    ('ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md', ADR),
-):
-    _start_marker, _end_marker = _RECOVERY_SECTION_BOUNDS[surface_name]
-    _start_idx = surface_text.index(_start_marker)
-    _end_idx = surface_text.index(_end_marker, _start_idx)
-    _recovery_section = surface_text[_start_idx:_end_idx]
-
-    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
-        f'{surface_name} recovery-governing section must itself couple Phase E\'s '
-        f'state as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY, '
-        f'not merely rely on an unrelated later section stating it'
-    )
-    assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(_recovery_section), (
-        f'{surface_name} recovery-governing section must itself couple Phase F to '
-        f'PROPOSED_NOT_AUTHORIZED, not merely rely on an unrelated later section stating it'
+    assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
+        f'{surface_name} must couple Phase G to PROPOSED_NOT_AUTHORIZED'
     )
 
 # FINAL hardened Phase E architecture facts (15 admitted case IDs, the
@@ -193,6 +143,10 @@ for surface_name, surface_text in (
 # the two live recovery-governing surfaces this milestone is authorized to
 # maintain (CURRENT_MILESTONE.md, AGENTS.md), so a fresh session cannot read
 # a stale looser summary.
+_RECOVERY_SECTION_BOUNDS = {
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint', '## Eval & Harness Audit - Roadmap Reference'),
+    'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
+}
 for surface_name in ('CURRENT_MILESTONE.md', 'AGENTS.md'):
     _start_marker, _end_marker = _RECOVERY_SECTION_BOUNDS[surface_name]
     surface_text = CURRENT_MILESTONE if surface_name == 'CURRENT_MILESTONE.md' else AGENTS
