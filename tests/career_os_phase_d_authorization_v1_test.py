@@ -71,11 +71,18 @@ assert cp['implementation_authorized'] is False
 # project_state.json must point at Phase E, the live current phase, while
 # preserving Phase D's completed/accepted status in the next_authorized_action
 # seam text, with no implementation authorized and Phase F still proposed only.
+# Phase E's substantive work has since been operator-completed (a later,
+# distinct event from its original BORA_AUTHORIZED/SELECTED authorization),
+# so current_phase now reads COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE,
+# never the stale pre-completion NOT_YET_COMPLETED wording.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1')
-assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'NOT_YET_COMPLETED' not in PROJECT_STATE['current_phase'], (
+    'stale pre-completion NOT_YET_COMPLETED wording reintroduced for Phase E current_phase'
+)
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert PHASE_F_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
@@ -122,6 +129,24 @@ assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in CHANGELOG
 assert 'BORA_AUTHORIZED' in CHANGELOG
 assert 'authorized by Bora (READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED' in CHANGELOG
 assert 'accepted by Bora (GOVERNANCE-ONLY, BORA ACCEPTED)' in CHANGELOG
+
+# The checkpoint's own Phase E completed_actions narrative must never combine
+# the two distinct Family 1 stale-role identities (Fresenius Medical Care
+# R0266808 and MGB RQ4055007) into one slashed row -- each is a separate,
+# distinctly-evidenced case identity (F1-D and F1-E respectively) per the
+# Phase E report's own explicit split.
+assert 'MGB RQ4055007/Fresenius R0266808' not in completed, (
+    'stale combined MGB RQ4055007/Fresenius R0266808 identity reintroduced in checkpoint completed_actions'
+)
+assert 'Fresenius Medical Care R0266808' in completed
+assert 'MGB RQ4055007' in completed
+
+# The checkpoint must name all four hardened executability classes,
+# including HUMAN_CONFIRMED_REFERENCE, never a stale three-class summary.
+assert 'HUMAN_CONFIRMED_REFERENCE' in completed
+assert 'three executability classes' not in completed, (
+    'stale three-executability-class summary reintroduced in checkpoint completed_actions'
+)
 
 # The already-accepted policy ADR itself must be untouched by this sync --
 # still governing, without a Phase D re-adjudication inside it.
