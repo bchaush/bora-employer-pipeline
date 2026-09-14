@@ -157,7 +157,7 @@ report_text = REPORT_PATH.read_text(encoding='utf-8')
 # ---------------------------------------------------------------------------
 # Status banner and epistemic discipline.
 # ---------------------------------------------------------------------------
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in report_text
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in report_text
 assert 'implementation_authorized' in report_text
 assert 'PROPOSED_NOT_AUTHORIZED' in report_text
 for label in ('OBSERVED', 'RECONSTRUCTED_FROM_DURABLE_EVIDENCE', 'MISSING'):
