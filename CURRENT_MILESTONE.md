@@ -9,7 +9,7 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - Phase F (Trace/Contract Architecture) Bora Authorized (2026-09-13)
+## Current Checkpoint - Phase F (Trace/Contract Architecture) Completed by Operator (2026-09-13)
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`
 
@@ -32,21 +32,20 @@ Prior-milestone operator status: **COMPLETED_BY_OPERATOR**
 Prior-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**
 Prior-milestone governing status: **GOVERNING**
 
-CURRENT PHASE (distinct from the prior phase/prior-prior phase/milestone above; a recorded authorization event only -- no substantive work has yet begun):
+CURRENT PHASE (distinct from the prior phase/prior-prior phase/milestone above; substantive read-only/design-only work is now completed by the operator, pending Bora's acceptance):
 Current phase: `CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1`
 Current-phase mode: **READ_ONLY_DESIGN_ONLY**
-Current-phase authorization status: **BORA_AUTHORIZED**
-Current-phase selection status: **SELECTED**
-Current-phase operator status: **NOT_YET_COMPLETED**
+Current-phase operator status: **COMPLETED_BY_OPERATOR**
+Current-phase human acceptance: **PENDING_BORA_ACCEPTANCE**
 `implementation_authorized`: **false**
 Bora explicitly stated, on 2026-09-13: "I authorize Phase F - Trace/Contract Architecture - as the next bounded READ_ONLY / DESIGN_ONLY phase. No implementation is authorized."
-This authorization-transition sync does not perform, design, or begin substantive Phase F trace/contract architecture work (no `CAREER_OS_RUN_TRACE_V1` schema, field design, typed-envelope design, trace contract, phase contract, or storage architecture) and does not re-adjudicate the accepted Phase E system eval-set architecture.
-Phase F's own coupled state (read together): **BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY**.
-Exact next allowed action (the single open seam): begin substantive Phase F read-only/design-only work under its own separately locked contract -- no implementation. Phase G and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
+The substantive Phase F trace/contract architecture report is rendered at `docs/audits/CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1_REPORT.md`: `CAREER_OS_RUN_TRACE_V1` defined conceptually only (no schema file, no implementation), the three-way terminal_state / first_point_of_divergence / first_causal_failure_point distinction (terminal_state = the outcome the run actually reached; first_point_of_divergence = the earliest identifiable divergence from correctness in the run's own trajectory, including one a later gate catches and recovers from; first_causal_failure_point = the divergence point -- that same earliest divergence, or a distinct, later one -- after which no later gate in the run's own trajectory recovered, making the incorrect terminal_state unavoidable, and equals first_point_of_divergence only when no earlier recovered divergence exists in that run; a run can contain an earlier recovered divergence A followed by a distinct, later, unrecovered divergence B, yielding first_point_of_divergence = A and first_causal_failure_point = B at two different points in the same run; a run can also have a recovered first_point_of_divergence = A whose actual causal defect lived in a distinct, later, uninstrumented boundary with no identifiable point B, in which case first_point_of_divergence = A is preserved unchanged (never wiped or reattributed) and first_causal_failure_point is separately recorded as CAUSE_UNKNOWN / UNINSTRUMENTED_BOUNDARY rather than a fabricated point B, distinct from the fully-uninstrumented case where both fields carry that same symmetric CAUSE_UNKNOWN / UNINSTRUMENTED_BOUNDARY label; a correct terminal_state with no divergence records first_point_of_divergence as NOT_APPLICABLE / NO_DIVERGENCE, and any correct terminal_state -- including one preserving a recovered first_point_of_divergence = A unchanged -- records first_causal_failure_point as NOT_APPLICABLE / NO_TERMINAL_FAILURE, never CAUSE_UNKNOWN / UNINSTRUMENTED_BOUNDARY, which remains reserved exclusively for an incorrect terminal_state with a real but uninstrumented divergence or causal failure), the human-handoff architecture, the bounded phase/typed-envelope contract, the append-only-facts-vs-derived-summaries distinction, and artifact-hash/model-provenance discipline -- grounded only in already-adjudicated Phase C/D/E evidence, with no re-adjudication of the accepted Phase E system eval-set architecture or Phase D failure taxonomy.
+Phase F's own coupled state (read together): **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY**.
+Exact next allowed action (the single open seam): Bora's explicit review and acceptance or correction of this checkpoint/report. Operator completion does not itself authorize Phase G. Phase G and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 
 ## Eval & Harness Audit - Roadmap Reference
 
-The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone remains **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING** (see the Checkpoint block above). Phase D (`CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`) is a SEPARATE, now-prior-prior record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY**. Phase E (`CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1`) is a SEPARATE, now-prior record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY**. Phase F (`CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1`) is the current record: **BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY**; Phase G and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
+The governance-only `CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1` policy milestone remains **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING** (see the Checkpoint block above). Phase D (`CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1`) is a SEPARATE, now-prior-prior record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY**. Phase E (`CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1`) is a SEPARATE, now-prior record: **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY**. Phase F (`CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1`) is the current record: **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY**; Phase G and every later roadmap phase remain **PROPOSED_NOT_AUTHORIZED**.
 Task: `CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1`
 Canonical sequence: `docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md`
 
