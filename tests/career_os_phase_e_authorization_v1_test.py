@@ -85,10 +85,13 @@ assert 'exactly 15 case IDs' in phase_e_reference
 # project_state.json must point at Phase F, the live current phase, while
 # Phase E's completed/accepted status is preserved in the
 # next_authorized_action seam text, with no implementation authorized and
-# Phase G still proposed only.
+# Phase G still proposed only. Phase F has since been substantively
+# completed by the operator (still pending Bora's acceptance), so
+# current_phase now reads COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE,
+# never the stale BORA_AUTHORIZED/NOT_YET_COMPLETED authorization-only wording.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1')
-assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
@@ -100,8 +103,9 @@ assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_act
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: Phase D remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
 # prior_prior_phase, Phase E remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
-# prior_phase, and Phase F is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED,
-# with Phase G and later still PROPOSED_NOT_AUTHORIZED.
+# prior_phase, and Phase F is now COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE
+# / READ_ONLY_DESIGN_ONLY (still awaiting Bora's acceptance/correction), with
+# Phase G and later still PROPOSED_NOT_AUTHORIZED.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
     ('CURRENT_STATE.md', CURRENT_STATE),
