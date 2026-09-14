@@ -86,12 +86,12 @@ assert 'exactly 15 case IDs' in phase_e_reference
 # Phase E's completed/accepted status is preserved in the
 # next_authorized_action seam text, with no implementation authorized and
 # Phase G still proposed only. Phase F has since been substantively
-# completed by the operator (still pending Bora's acceptance), so
-# current_phase now reads COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE,
+# completed by the operator and explicitly accepted by Bora on 2026-09-14, so
+# current_phase now records COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14),
 # never the stale BORA_AUTHORIZED/NOT_YET_COMPLETED authorization-only wording.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
@@ -103,9 +103,9 @@ assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_act
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: Phase D remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
 # prior_prior_phase, Phase E remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
-# prior_phase, and Phase F is now COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE
-# / READ_ONLY_DESIGN_ONLY (still awaiting Bora's acceptance/correction), with
-# Phase G and later still PROPOSED_NOT_AUTHORIZED.
+# prior_phase, and Phase F is now COMPLETED_BY_OPERATOR / BORA_ACCEPTED
+# (2026-09-14) / READ_ONLY_DESIGN_ONLY, with Phase G and later still
+# PROPOSED_NOT_AUTHORIZED.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
     ('CURRENT_STATE.md', CURRENT_STATE),
@@ -136,6 +136,10 @@ for surface_name, surface_text in (
         or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text
     ), f'{surface_name} must state that implementation remains unauthorized'
 
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in surface_text, (
+        f'{surface_name} must preserve Phase F as BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY'
+    )
+
     # Phase G (and every later roadmap phase) must be coupled to
     # PROPOSED_NOT_AUTHORIZED, not proven by two unrelated substrings.
     assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
@@ -148,7 +152,7 @@ for surface_name, surface_text in (
 # maintain (CURRENT_MILESTONE.md, AGENTS.md), so a fresh session cannot read
 # a stale looser summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase F (Trace/Contract Architecture) Accepted by Bora (2026-09-14)', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
 }
 for surface_name in ('CURRENT_MILESTONE.md', 'AGENTS.md'):

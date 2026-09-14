@@ -74,13 +74,13 @@ assert cp['implementation_authorized'] is False
 # project_state.json must point at Phase F, the live current phase, while
 # preserving Phase D's completed/accepted status in the next_authorized_action
 # seam text, with no implementation authorized and Phase G still proposed only.
-# Phase F has since been operator-completed and is now awaiting Bora's
-# explicit review/acceptance -- so current_phase now reads
-# COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY,
-# never the stale BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED wording.
+# Phase F has since been operator-completed and explicitly accepted by Bora
+# on 2026-09-14, so current_phase now reads COMPLETED_BY_OPERATOR /
+# BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY, never the stale
+# BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED wording.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
