@@ -3,8 +3,8 @@ import re
 import subprocess
 from pathlib import Path
 
-PHASE_G_PROPOSED_NOT_AUTHORIZED = re.compile(
-    r'Phase G and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
 
@@ -263,54 +263,54 @@ assert 'One bounded milestone per primary Claude/Cursor session' not in AGENTS
 
 # CURRENT_MILESTONE.md's live checkpoint block must explicitly separate the
 # PRIOR MILESTONE (already Bora-accepted, GOVERNING policy milestone),
-# PRIOR-PRIOR PHASE (Phase D, already Bora-accepted), and PRIOR PHASE
-# (Phase E, already Bora-accepted) fields from the CURRENT Phase F fields --
-# no unscoped BORA_ACCEPTED / GOVERNANCE_ONLY may appear as if it applies to
-# Phase F rather than to the prior policy milestone. Phase F's own
-# authorization is a distinct, later event from Phase E's own
-# COMPLETED_BY_OPERATOR/BORA_ACCEPTED (2026-09-12) acceptance, and Phase F's
-# authorization is never itself an authorization of Phase G.
+# PRIOR-PRIOR-PRIOR PHASE (Phase D, already Bora-accepted), PRIOR-PRIOR PHASE
+# (Phase E, already Bora-accepted), and PRIOR PHASE (Phase F, already
+# Bora-accepted) fields from the CURRENT Phase G fields -- no unscoped
+# BORA_ACCEPTED / GOVERNANCE_ONLY may appear as if it applies to Phase G
+# rather than to the prior policy milestone. Phase G's own authorization is a
+# distinct, later event from Phase F's own COMPLETED_BY_OPERATOR/BORA_ACCEPTED
+# (2026-09-14) acceptance, and Phase G's authorization is never itself an
+# authorization of Phase H.
 milestone_text = CURRENT_MILESTONE.read_text(encoding='utf-8')
 assert 'Prior-milestone operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
 assert 'Prior-milestone human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
 assert 'Prior-milestone governing status: **GOVERNING**' in milestone_text
 assert 'Prior-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Prior-phase human acceptance: **BORA_ACCEPTED (2026-09-12)**' in milestone_text
+assert 'Prior-phase human acceptance: **BORA_ACCEPTED (2026-09-14)**' in milestone_text
 assert 'Prior-prior-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
+assert 'Prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-12)**' in milestone_text
+assert 'Prior-prior-prior-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
+assert 'Prior-prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
 assert 'Current-phase mode: **READ_ONLY_DESIGN_ONLY**' in milestone_text
-assert 'Current-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Current-phase human acceptance: **BORA_ACCEPTED (2026-09-14)**' in milestone_text
+assert 'Current-phase authorization status: **BORA_AUTHORIZED**' in milestone_text
+assert 'Current-phase operator status: **NOT_YET_COMPLETED**' in milestone_text
 _checkpoint_block_end = milestone_text.index('## Eval & Harness Audit - Roadmap Reference')
 _checkpoint_block = milestone_text[:_checkpoint_block_end]
-assert 'Current phase: `CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1`\nCurrent-phase mode: **READ_ONLY_DESIGN_ONLY**' in _checkpoint_block, (
-    'the current Phase F line must be immediately followed by its own scoped fields, not unscoped prior fields'
+assert 'Current phase: `CAREER_OS_ASSURANCE_ARCHITECTURE_V1`\nCurrent-phase mode: **READ_ONLY_DESIGN_ONLY**' in _checkpoint_block, (
+    'the current Phase G line must be immediately followed by its own scoped fields, not unscoped prior fields'
 )
 assert '`implementation_authorized`: **false**' in _checkpoint_block, (
-    'the current Phase F checkpoint block must explicitly record implementation_authorized as false'
+    'the current Phase G checkpoint block must explicitly record implementation_authorized as false'
 )
 assert (
-    "Bora separately choosing and explicitly authorizing a next phase or another bounded governance action" in _checkpoint_block
+    "begin substantive Phase G Assurance Architecture design under its own separately locked design contract" in _checkpoint_block
 ), (
-    'the current Phase F checkpoint block must identify the single next allowed seam as '
-    "Bora separately choosing and explicitly authorizing a next phase or bounded governance action, not a stale "
-    'acceptance-or-correction or begin-substantive-Phase-F-work seam'
+    'the current Phase G checkpoint block must identify the single next allowed seam as '
+    "beginning substantive Phase G Assurance Architecture design, not a stale acceptance-or-correction seam"
 )
 # Fail closed if the stale pre-completion wording -- true only before Phase F's
 # substantive operator work was completed -- reappears.
 for stale in (
-    'Current-phase operator status: **NOT_YET_COMPLETED**',
-    'Current-phase authorization status: **BORA_AUTHORIZED**',
-    'Current-phase selection status: **SELECTED**',
     'Current-phase human acceptance: **BORA_ACCEPTED (2026-09-12)**',
     'begin substantive Phase E system-eval-set-architecture work',
     'begin substantive Phase F read-only/design-only work',
     'Bora reviews and either accepts or requests correction of the Phase E report',
     "Bora separately decides whether to authorize Phase F",
+    "Bora separately decides whether to authorize Phase G",
 ):
-    assert stale not in _checkpoint_block, f'stale Phase-F checkpoint wording reintroduced: {stale}'
-assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(_checkpoint_block), (
-    'CURRENT_MILESTONE.md checkpoint block must couple Phase G to PROPOSED_NOT_AUTHORIZED as one subject'
+    assert stale not in _checkpoint_block, f'stale Phase-F/Phase-G checkpoint wording reintroduced: {stale}'
+assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(_checkpoint_block), (
+    'CURRENT_MILESTONE.md checkpoint block must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 
 # The checkpoint block's own executability-class summary must name all four
@@ -330,26 +330,25 @@ assert (
 # (a genuine human acceptance event, not operator self-acceptance), while
 # also recording Phase D as Bora-accepted (COMPLETED_BY_OPERATOR / BORA_ACCEPTED),
 # Phase E's substantive work as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12),
-# and Phase F's substantive read-only/design-only work as now
-# COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14), with the single next seam
-# being Bora separately choosing and explicitly authorizing a next phase or
-# bounded governance action; implementation_authorized remains false and
-# Phase G/later remain PROPOSED_NOT_AUTHORIZED.
+# Phase F's substantive read-only/design-only work as
+# COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14), and Phase G as freshly
+# BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, with the single next seam
+# being to begin substantive Phase G Assurance Architecture design;
+# implementation_authorized remains false and Phase H/later remain
+# PROPOSED_NOT_AUTHORIZED.
 state_text = CURRENT_STATE.read_text(encoding='utf-8')
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / GOVERNANCE_ONLY / GOVERNING' in state_text
 assert 'never self-granted by the operator' in state_text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in state_text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in state_text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in state_text
+assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in state_text
 assert 'Bora must separately choose and explicitly authorize' in state_text
 assert '`implementation_authorized` remains `false`' in state_text
-assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(state_text), (
-    'CURRENT_STATE.md must couple Phase G to PROPOSED_NOT_AUTHORIZED as one subject'
+assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(state_text), (
+    'CURRENT_STATE.md must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 assert 'READ_ONLY_DESIGN_ONLY' in state_text
-# Fail closed if the stale pre-completion wording -- true only before Phase F's
-# substantive operator work was completed -- reappears.
-assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' not in state_text
 # Phase D's own accepted state must be proven by the single non-collidable
 # anchored block, not by the bare COMPLETED_BY_OPERATOR / BORA_ACCEPTED
 # (2026-09-11) substring above (a strict prefix of the GOVERNANCE_ONLY/

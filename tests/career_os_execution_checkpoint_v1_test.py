@@ -2,8 +2,8 @@ import json
 import re
 from pathlib import Path
 
-PHASE_G_PROPOSED_NOT_AUTHORIZED = re.compile(
-    r'Phase G and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
 
@@ -12,87 +12,94 @@ CHECKPOINT = ROOT / 'CURRENT_EXECUTION_CHECKPOINT.json'
 PROJECT_STATE = json.loads((ROOT / 'project_state.json').read_text(encoding='utf-8'))
 AGENTS = (ROOT / 'AGENTS.md').read_text(encoding='utf-8')
 
-CANONICAL_BASELINE_SHA = '256edcc01f6860f6614a8e0d8e409f5900765082'
+CANONICAL_BASELINE_SHA = 'e199623c73b08e986beb32437e65f40a5b63b435'
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
 
 assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
-# Phase F's checkpoint_id must now reflect Bora's explicit 2026-09-14
-# acceptance event, after the earlier authorization and operator completion.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-14_PHASE_F_ACCEPTANCE', (
-    "checkpoint_id must reflect Phase F's Bora-acceptance event "
-    "(CAREER_OS_CHECKPOINT_2026-09-14_PHASE_F_ACCEPTANCE)"
+# Phase G's checkpoint_id must now reflect Bora's explicit 2026-09-14
+# authorization event, after Phase F's operator completion and acceptance.
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_AUTHORIZATION', (
+    "checkpoint_id must reflect Phase G's Bora-authorization event "
+    "(CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_AUTHORIZATION)"
 )
 assert cp['canonical_basis_sha'] == CANONICAL_BASELINE_SHA
-assert cp['phase_id'] == 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1'
+assert cp['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
 assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-14'
+assert cp['operator_status'] == 'NOT_YET_COMPLETED'
 assert cp['implementation_authorized'] is False
 
-# CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (Phase E) must be recorded
-# distinctly as prior_phase, never conflated with Phase F's own completed and
-# BORA_ACCEPTED (2026-09-14) status.
+# CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1 (Phase F) must be recorded
+# distinctly as prior_phase, never conflated with Phase G's own freshly
+# authorized status.
 prior_phase = cp['prior_phase']
-assert prior_phase['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
+assert prior_phase['phase_id'] == 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1'
 assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
 assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_phase['accepted_at'] == '2026-09-12'
+assert prior_phase['accepted_at'] == '2026-09-14'
 
 prior_prior_phase = cp['prior_prior_phase']
-assert prior_prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_prior_phase['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
 assert prior_prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert prior_prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
 assert prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_prior_phase['accepted_at'] == '2026-09-11'
+assert prior_prior_phase['accepted_at'] == '2026-09-12'
 
 prior_prior_prior_phase = cp['prior_prior_prior_phase']
-assert prior_prior_prior_phase['phase_id'] == 'CAREER_OS_AGENT_CONTEXT_AND_USAGE_EFFICIENCY_V1'
-assert prior_prior_prior_phase['phase_mode'] == 'GOVERNANCE_ONLY'
+assert prior_prior_prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
+assert prior_prior_prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert prior_prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_prior_prior_phase['accepted_at'] == '2026-09-11'
 
 assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allowed_action'].strip()
-assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in cp['exact_next_allowed_action']
+assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in cp['exact_next_allowed_action']
 assert 'implementation_authorized remains false' in cp['exact_next_allowed_action']
-assert "Bora separately choosing and explicitly authorizing a next phase or another bounded governance action" in cp['exact_next_allowed_action']
-assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(cp['exact_next_allowed_action']), (
-    'exact_next_allowed_action must couple Phase G to PROPOSED_NOT_AUTHORIZED as one subject'
+assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(cp['exact_next_allowed_action']), (
+    'exact_next_allowed_action must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
 )
-assert 'decides whether to authorize Phase G' not in cp['exact_next_allowed_action']
-assert 'runtime implementation of the trace/contract architecture may begin until' not in cp['exact_next_allowed_action']
-assert 'Phase G alone does not authorize implementation' in cp['exact_next_allowed_action'] or 'authorization of Phase G alone does not authorize implementation' in cp['exact_next_allowed_action']
+assert 'Authorizing Phase G alone does not authorize implementation' in cp['exact_next_allowed_action']
 assert 'Phase H' in cp['exact_next_allowed_action']
 
 # terminal_adjudication must reflect the prior GOVERNING policy, Phase D's
-# preserved acceptance, Phase E's preserved acceptance, AND Phase F's explicit
-# 2026-09-14 human acceptance, while still stating implementation and Phase G
-# are not authorized.
+# preserved acceptance, Phase E's preserved acceptance, Phase F's explicit
+# 2026-09-14 human acceptance, AND Phase G's fresh 2026-09-14 authorization,
+# while still stating implementation and Phase H are not authorized.
 assert 'GOVERNANCE_ONLY / GOVERNING' in cp['terminal_adjudication']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in cp['terminal_adjudication']
 assert 'I explicitly accept Phase F brother' in cp['terminal_adjudication']
-assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
-    'terminal_adjudication must couple Phase G to PROPOSED_NOT_AUTHORIZED as one subject'
+assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in cp['terminal_adjudication']
+assert 'once we are proper to standard' in cp['terminal_adjudication']
+assert 'done G lets keep going brother' in cp['terminal_adjudication']
+assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
+    'terminal_adjudication must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 assert 'IMPLEMENTATION NOT AUTHORIZED' in cp['terminal_adjudication']
 
-# Must record the genuine Phase F authorization transition, and must
-# preserve the Phase E prior-phase transition action, without re-authoring
-# Phase E's own substantive report content.
+# Must record the genuine Phase F substantive narrative (preserved, appended
+# to rather than overwritten) AND the new Phase G authorization transition.
 completed = ' '.join(cp['completed_actions'])
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in completed
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in completed
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in completed
+assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in completed
 assert 'prior_phase' in completed
 assert 'prior_prior_phase' in completed
+assert 'prior_prior_prior_phase' in completed
+assert 'Phase D, recorded here as prior_prior_phase' not in completed
+assert 'Phase E, recorded here as prior_phase' not in completed
+assert 'Moved CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1 (Phase F) into prior_phase' in completed
+assert 'moved CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 (Phase E) into prior_prior_phase' in completed
+assert 'moved CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 (Phase D) into prior_prior_prior_phase' in completed
 assert 'CAREER_OS_RUN_TRACE_V1' in completed
+assert 'once we are proper to standard' in completed
+assert 'done G lets keep going brother' in completed
 
 # Phase E's full lifecycle narrative (case corpus, executability classes,
 # terminal-vs-step separation) must be preserved as historical reference,
@@ -177,24 +184,27 @@ assert 'POTENTIAL_CALIBRATED_LLM_JUDGE candidate to DraftKings' in phase_e_refer
 not_done = ' '.join(cp['not_completed_or_not_authorized'])
 assert 'CAREER_OS_RUN_TRACE_V1' in not_done
 assert 'trace infrastructure' in not_done
-assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(not_done), (
-    'not_completed_or_not_authorized must couple Phase G to PROPOSED_NOT_AUTHORIZED as one subject'
+assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(not_done), (
+    'not_completed_or_not_authorized must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 assert 'No production Career OS behavior changed' in not_done
 assert 'CLAUDE.md' in not_done and '.cursor/rules' in not_done
 
-# Phase F's Bora authorization must be pinned as a genuine recorded human
-# event, never self-granted, and must be pinned as NOT itself constituting
-# substantive completion or authorization of Phase G -- each with its own
-# exact wording. Phase E's and Phase D's preserved report substance must
-# also be explicitly reaffirmed unchanged.
+# Phase F's and Phase G's Bora authorization/acceptance events must be pinned
+# as genuine recorded human events, never self-granted, and must be pinned as
+# NOT itself constituting substantive completion or authorization of the next
+# phase -- each with its own exact wording. Phase F's, Phase E's, and Phase
+# D's preserved report substance must also be explicitly reaffirmed unchanged.
 assert 'recorded human event' in not_done
 assert 'never self-granted by the operator' in not_done
 assert 'implementation_authorized remains false' in not_done
+assert "Phase F's report substance" in not_done
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in not_done
 assert "Phase E's report substance" in not_done
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in not_done
 assert "Phase D's report substance" in not_done
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in not_done
+assert 'Authorizing Phase G alone does not authorize implementation' in not_done
 
 # Phase B, Phase C, the agent context/usage-efficiency policy milestone's,
 # Phase D's, and Phase E's completed-action lineage must all survive as
@@ -208,25 +218,26 @@ assert 'phase_e_completed_actions_reference' in cp
 # Phase F's own original authorization-era completed_actions (true only
 # before Phase F was operator-completed) must survive as a distinct
 # machine-readable historical reference array, analogous to the earlier
-# phase_d/phase_e_completed_actions_reference lineage, rather than being
-# silently lost when the live completed_actions array was overwritten with
-# Phase F's substantive operator-completion content.
+# phase_d/phase_e_completed_actions_reference lineage.
 assert 'phase_f_authorization_completed_actions_reference' in cp
 phase_f_authorization_reference = ' '.join(cp['phase_f_authorization_completed_actions_reference'])
 assert 'I authorize Phase F - Trace/Contract Architecture' in phase_f_authorization_reference
 assert 'NOT_YET_COMPLETED' in phase_f_authorization_reference
 assert 'career-os-phase-f-authorization-v1.json' in phase_f_authorization_reference
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1 (COMPLETED_BY_OPERATOR')
-assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1 (BORA_AUTHORIZED')
+assert 'SELECTED' in PROJECT_STATE['current_phase']
+assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
-assert PHASE_G_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    "project_state.next_authorized_action must couple Phase G to PROPOSED_NOT_AUTHORIZED as one subject"
+assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
+    "project_state.next_authorized_action must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject"
 )
 assert 'CURRENT_EXECUTION_CHECKPOINT.json' in AGENTS
 assert 'BORA_ACCEPTED (2026-09-11)' in AGENTS
@@ -238,6 +249,8 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in AGENTS
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in AGENTS
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in AGENTS
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in AGENTS
+assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in AGENTS
+assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in AGENTS
 
 # AGENTS.md must keep requiring project_state.json to be read before
 # CURRENT_EXECUTION_CHECKPOINT.json, and must not restate a competing
