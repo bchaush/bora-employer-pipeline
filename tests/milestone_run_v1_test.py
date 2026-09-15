@@ -111,16 +111,15 @@ POLICY = {
 }
 
 
-def _base_repo(root: Path) -> str:
-    """A committed main branch with the minimal scaffolding
-    milestone_run.py needs: prompts/, an assurance stub, a passing test
-    stub. Returns the baseline commit SHA."""
+_BASE_TEMPLATE_TMP = None
+_BASE_TEMPLATE_ROOT = None
+_BASE_TEMPLATE_ORIGIN = None
+_BASE_TEMPLATE_SHA = None
+
+
+def _build_base_repo(root: Path) -> str:
+    """Build the canonical disposable real-Git baseline once."""
     _init_repo(root)
-    # Mirror the real repository's own .gitignore protection for
-    # .career-os/ -- without this, `git add -A` (used throughout this
-    # fixture) would accidentally commit runtime run-state files, which
-    # then vanish across branch checkouts in a way that has nothing to
-    # do with the controller itself.
     _write(root, ".gitignore", ".career-os/\n")
     _write(root, "prompts/milestone_builder_v1.md", (ROOT / "prompts" / "milestone_builder_v1.md").read_text(encoding="utf-8"))
     _write(root, "prompts/milestone_reviewer_v1.md", (ROOT / "prompts" / "milestone_reviewer_v1.md").read_text(encoding="utf-8"))
@@ -129,6 +128,32 @@ def _base_repo(root: Path) -> str:
     sha = _commit(root, "initial")
     _sync_fake_origin_main(root)
     return sha
+
+
+def _prepared_baseline() -> tuple[Path, Path, str]:
+    global _BASE_TEMPLATE_TMP, _BASE_TEMPLATE_ROOT, _BASE_TEMPLATE_ORIGIN, _BASE_TEMPLATE_SHA
+    if _BASE_TEMPLATE_ROOT is None:
+        _BASE_TEMPLATE_TMP = tempfile.TemporaryDirectory(prefix="milestone_run_baseline_template_")
+        _BASE_TEMPLATE_ROOT = Path(_BASE_TEMPLATE_TMP.name) / "repo"
+        _BASE_TEMPLATE_SHA = _build_base_repo(_BASE_TEMPLATE_ROOT)
+        _BASE_TEMPLATE_ORIGIN = _BASE_TEMPLATE_ROOT.parent / f"{_BASE_TEMPLATE_ROOT.name}-origin.git"
+    return _BASE_TEMPLATE_ROOT, _BASE_TEMPLATE_ORIGIN, _BASE_TEMPLATE_SHA
+
+
+def _clone_prepared_baseline(root: Path) -> str:
+    template_root, template_origin, baseline_sha = _prepared_baseline()
+    scenario_origin = root.parent / f"{root.name}-origin.git"
+    shutil.copytree(template_root, root)
+    shutil.copytree(template_origin, scenario_origin)
+    _git(["remote", "set-url", "origin", str(scenario_origin)], root)
+    return baseline_sha
+
+
+def _base_repo(root: Path) -> str:
+    """Return the immutable SHA of the already-prepared scenario baseline."""
+    assert (root / ".git").is_dir(), "_with_tmp_repo must preload the real-Git baseline"
+    assert _BASE_TEMPLATE_SHA is not None, "prepared baseline SHA must exist before scenario execution"
+    return _BASE_TEMPLATE_SHA
 
 
 def _contract(branch: str, baseline_sha: str, **overrides) -> dict:
@@ -178,13 +203,40 @@ def _make_feature_branch(root: Path, branch: str) -> None:
 def _with_tmp_repo(fn) -> None:
     tmp_dir = tempfile.mkdtemp(prefix="milestone_run_test_")
     try:
-        # `root` is nested one level inside tmp_dir so the sibling bare
-        # "-origin.git" directory _init_repo creates (at root.parent /
-        # f"{root.name}-origin.git") lands inside tmp_dir too, and is
-        # cleaned up by the same shutil.rmtree below.
-        fn(Path(tmp_dir) / "repo")
+        root = Path(tmp_dir) / "repo"
+        _clone_prepared_baseline(root)
+        fn(root)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _test_prepared_baseline_fixture_isolation() -> None:
+    tmp_a = tempfile.mkdtemp(prefix="milestone_run_isolation_a_")
+    tmp_b = tempfile.mkdtemp(prefix="milestone_run_isolation_b_")
+    try:
+        root_a = Path(tmp_a) / "repo"
+        root_b = Path(tmp_b) / "repo"
+        baseline_a = _clone_prepared_baseline(root_a)
+        baseline_b = _clone_prepared_baseline(root_b)
+        assert_true(baseline_a == baseline_b, "prepared fixture clones must start from the same baseline SHA")
+        _write(root_a, "isolation-marker.txt", "a-only\n")
+        mutated_a = _commit(root_a, "mutate only clone a")
+        _sync_fake_origin_main(root_a)
+        assert_true(_git(["rev-parse", "HEAD"], root_b).stdout.strip() == baseline_b, "clone B worktree HEAD must remain unchanged")
+        origin_a = root_a.parent / f"{root_a.name}-origin.git"
+        origin_b = root_b.parent / f"{root_b.name}-origin.git"
+        remote_a = _git(["--git-dir", str(origin_a), "rev-parse", "main"], root_a).stdout.strip()
+        remote_b = _git(["--git-dir", str(origin_b), "rev-parse", "main"], root_b).stdout.strip()
+        assert_true(remote_a == mutated_a, "clone A bare origin must receive clone A push")
+        assert_true(remote_b == baseline_b, "clone B bare origin main must remain unchanged by clone A push")
+        assert_true(not (root_b / "isolation-marker.txt").exists(), "clone B worktree bytes must remain isolated")
+    finally:
+        shutil.rmtree(tmp_a, ignore_errors=True)
+        shutil.rmtree(tmp_b, ignore_errors=True)
+
+
+_test_prepared_baseline_fixture_isolation()
+print("PASS fixture isolation: cloned worktree and bare-origin state are scenario-local.")
 
 
 # ----------------------------------------------------------------------
