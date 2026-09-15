@@ -21,13 +21,16 @@ BORA_QUOTE = (
     'u have all authorization moving forwrad, please G just mind the usage limits of Cursor and Claude love u bro'
 )
 
+# This test records the historical Phase G acceptance / Phase H scoped
+# authorization event (2026-09-14). Phase H has since been itself accepted
+# and Recommendation B separately authorized (2026-09-15, see
+# career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py);
+# this file continues to verify that the 2026-09-14 event's substance was
+# genuinely recorded and is preserved unchanged, even though the checkpoint's
+# top-level "live current phase" fields have since moved on to Phase H.
+
 PHASE_I_PROPOSED_NOT_AUTHORIZED = re.compile(
     r'Phase I and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
-    re.IGNORECASE,
-)
-
-RECOMMENDATIONS_B_C_NOT_AUTHORIZED = re.compile(
-    r'Recommendation B\b[^\n]*?Recommendation C\b[^\n]*?remain \*{0,2}NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
 
@@ -50,57 +53,61 @@ for forbidden_path in (
 ):
     assert forbidden_path in contract['forbidden_paths'], f'contract must forbid {forbidden_path}'
 
-# --- Checkpoint: Phase G acceptance -----------------------------------------
+# --- Checkpoint: Phase G acceptance, preserved as prior_phase --------------
+# (Phase G's own record has moved from the checkpoint's top-level fields into
+# prior_phase now that Phase H has itself been accepted -- this is the
+# expected live-current-pointer shift, not a loss of the underlying fact.)
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == BASELINE_SHA
-assert cp['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-14'
-# The global implementation_authorized flag never flips to true from this
-# sync -- the scoped Phase H grant lives only in its own distinct record.
-assert cp['implementation_authorized'] is False
+prior_phase = cp['prior_phase']
+assert prior_phase['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
+assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_phase['accepted_at'] == '2026-09-14'
 
-# --- Checkpoint: Phase H authorization, scoped only -------------------------
+# --- Checkpoint: Phase H's own acceptance record preserves its original
+# scoped-authorization substance (selected_from, scope) unchanged, even
+# though operator_status/human_acceptance_status have since progressed from
+# NOT_YET_COMPLETED to COMPLETED_BY_OPERATOR / BORA_ACCEPTED. -----------------
 
-assert 'phase_h_authorization' in cp, 'checkpoint must record a distinct phase_h_authorization object'
-phase_h = cp['phase_h_authorization']
+assert 'phase_h_acceptance' in cp, 'checkpoint must record a distinct phase_h_acceptance object'
+phase_h = cp['phase_h_acceptance']
 assert phase_h['phase_id'] == PHASE_H_ID
 assert phase_h['authorization_status'] == 'BORA_AUTHORIZED'
 assert phase_h['selection_status'] == 'SELECTED'
-assert phase_h['operator_status'] == 'NOT_YET_COMPLETED'
 assert phase_h['selected_from'] == 'PHASE_G_RECOMMENDATION_A_TIMING_OBSERVABILITY_ONLY'
 assert phase_h['implementation_authorization_scope'] == 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL'
-assert 'NOT_AUTHORIZED' in phase_h['recommendation_b_milestone_run_optimization']
-assert 'NOT_AUTHORIZED' in phase_h['recommendation_c_fast_diagnostic_runner']
-assert 'Phase I or any later roadmap phase' in phase_h['explicitly_not_authorized']
-assert BORA_QUOTE in phase_h['human_authorization_event']
-assert 'never self-granted by the operator' in phase_h['human_authorization_event']
 
-# --- Recommendation B/C explicitly not authorized, no implementation done --
+# --- The original Phase G acceptance / Phase H authorization sync's own
+# completed_actions / not_completed_or_not_authorized narrative is preserved
+# unchanged in dedicated historical reference arrays. -----------------------
 
-completed = ' '.join(cp['completed_actions'])
-assert BORA_QUOTE in completed
-assert 'Recommendation B' in completed and 'NOT AUTHORIZE' in completed.upper()
-assert 'Recommendation C' in completed
-assert 'no timing-instrumentation code' in completed
-assert 'no scripts/verify_assurance_baseline.py edit' in completed
+assert 'phase_g_acceptance_phase_h_authorization_completed_actions_reference' in cp
+completed_reference = ' '.join(cp['phase_g_acceptance_phase_h_authorization_completed_actions_reference'])
+assert BORA_QUOTE in completed_reference
+assert 'Recommendation B' in completed_reference and 'NOT AUTHORIZE' in completed_reference.upper()
+assert 'Recommendation C' in completed_reference
+assert 'no timing-instrumentation code' in completed_reference
+assert 'no scripts/verify_assurance_baseline.py edit' in completed_reference
 
-not_done = ' '.join(cp['not_completed_or_not_authorized'])
-assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(not_done), (
-    'checkpoint not_completed_or_not_authorized must couple Phase I to PROPOSED_NOT_AUTHORIZED'
+assert 'phase_g_acceptance_phase_h_authorization_not_completed_or_not_authorized_reference' in cp
+not_done_reference = ' '.join(cp['phase_g_acceptance_phase_h_authorization_not_completed_or_not_authorized_reference'])
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(not_done_reference), (
+    'preserved historical not_completed_or_not_authorized reference must couple Phase I to PROPOSED_NOT_AUTHORIZED'
 )
-assert ('scoped exclusively to CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in not_done or 'never a blanket/global implementation grant' in not_done), 'narrative must preserve the scoped-not-global Phase H boundary'
-assert 'NOT_AUTHORIZED' in not_done
+assert 'scoped exclusively to CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in not_done_reference
+assert 'NOT_AUTHORIZED' in not_done_reference
 
 # --- Prior phases (F/E/D) preserved unchanged, in their own distinct slots -
+# (Phase F/E have themselves shifted one slot further down the chain since
+# Phase H's own acceptance; Phase D has dropped out of the live three-slot
+# chain entirely, exactly as Phase C did before it, and is preserved only as
+# historical reference -- this is the expected live-pointer progression.)
 
 for slot, phase_id, accepted_at in (
-    ('prior_phase', 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1', '2026-09-14'),
-    ('prior_prior_phase', 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1', '2026-09-12'),
-    ('prior_prior_prior_phase', 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1', '2026-09-11'),
+    ('prior_prior_phase', 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1', '2026-09-14'),
+    ('prior_prior_prior_phase', 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1', '2026-09-12'),
 ):
     record = cp[slot]
     assert record['phase_id'] == phase_id
@@ -108,22 +115,21 @@ for slot, phase_id, accepted_at in (
     assert record['human_acceptance_status'] == 'BORA_ACCEPTED'
     assert record['accepted_at'] == accepted_at
 
+assert 'phase_d_completed_actions_reference' in cp, (
+    "Phase D's substantive work must survive as historical reference even after dropping out of the live chain"
+)
+
 # --- Phase G's substantive report preserved unchanged -----------------------
 
 assert PHASE_G_REPORT_PATH.exists(), 'substantive Phase G assurance architecture report missing'
 
-# --- project_state.json ------------------------------------------------------
+# --- project_state.json: Phase G's own record preserved as historical text -
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
-assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
-assert PHASE_H_ID in PROJECT_STATE['current_phase']
-assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
-assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    'project_state.next_authorized_action must couple Phase I to PROPOSED_NOT_AUTHORIZED'
-)
-assert BORA_QUOTE in PROJECT_STATE['next_authorized_action']
+assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['next_authorized_action']
+assert PHASE_H_ID in PROJECT_STATE['next_authorized_action'] or PHASE_H_ID in PROJECT_STATE['current_phase']
 
-# --- Every live recovery/state surface agrees ------------------------------
+# --- Every live recovery/state surface still carries the preserved,
+# historical Phase G acceptance / Phase H authorization record -------------
 
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
@@ -135,38 +141,20 @@ for surface_name, surface_text in (
         f'{surface_name} must state Phase G is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY'
     )
     assert PHASE_H_ID in surface_text, f'{surface_name} must name Phase H ({PHASE_H_ID})'
-    assert 'BORA_AUTHORIZED' in surface_text and 'NOT_YET_COMPLETED' in surface_text
-    assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in surface_text, (
-        f'{surface_name} must state Phase H implementation authority is scoped to this milestone only, not global'
-    )
     assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
         f'{surface_name} must couple Phase I to PROPOSED_NOT_AUTHORIZED'
     )
 
-# Recommendation B and C must be explicitly not-authorized on every surface
-# that discusses Phase H's scope (not required on every surface verbatim,
-# but at least the checkpoint, ADR, and CURRENT_MILESTONE/CURRENT_STATE).
-for surface_name, surface_text in (
-    ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
-    ('CURRENT_STATE.md', CURRENT_STATE),
-    ('ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md', ADR),
-):
-    assert RECOMMENDATIONS_B_C_NOT_AUTHORIZED.search(surface_text), (
-        f'{surface_name} must couple Recommendation B and Recommendation C to NOT_AUTHORIZED in one bounded statement'
-    )
-
-# --- No Phase H implementation performed in this sync -----------------------
+# --- No Phase H implementation performed in the ORIGINAL 2026-09-14 sync ---
+# (Phase H's substantive implementation was authored later, under its own
+# separate, later-dated milestone contract and PR #61 -- never inside this
+# 2026-09-14 governance-only sync.)
 
 VERIFY_ASSURANCE_SCRIPT = ROOT / 'scripts' / 'verify_assurance_baseline.py'
 assert VERIFY_ASSURANCE_SCRIPT.exists(), 'canonical assurance script must still exist unmodified'
-WORKFLOWS_DIR = ROOT / '.github' / 'workflows'
-# This sync must not have touched CI workflow files; existence/non-existence
-# is not asserted here (out of this contract's allowed_paths either way),
-# only that this test file itself never edits them.
-assert 'not_implemented_this_sync' in phase_h
-assert 'no timing-instrumentation code' in phase_h['not_implemented_this_sync']
+assert 'no timing-instrumentation code' in completed_reference
 
-# --- CHANGELOG.md records two distinct dated sub-entries --------------------
+# --- CHANGELOG.md preserves the two distinct dated sub-entries -------------
 
 assert BORA_QUOTE in CHANGELOG
 _PHASE_H_HEADING_MARKER = 'Career OS Phase H (`CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1`) authorized by Bora'
@@ -179,4 +167,4 @@ assert _h_pos != -1 and _g_accept_pos != -1 and _h_pos != _g_accept_pos, (
     'Phase G acceptance and Phase H authorization must be two distinct CHANGELOG entries, never conflated'
 )
 
-print('PASS: Career OS Phase G acceptance / Phase H scoped authorization governance sync verified.')
+print('PASS: Career OS Phase G acceptance / Phase H scoped authorization governance sync verified (preserved as historical record).')

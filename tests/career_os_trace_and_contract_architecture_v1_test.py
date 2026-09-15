@@ -535,7 +535,7 @@ assert 'Cursor' in report_text and 'may not repair its own findings' in report_t
 CHECKPOINT_PATH = ROOT / 'CURRENT_EXECUTION_CHECKPOINT.json'
 assert CHECKPOINT_PATH.exists(), 'CURRENT_EXECUTION_CHECKPOINT.json missing'
 checkpoint = json.loads(CHECKPOINT_PATH.read_text(encoding='utf-8'))
-completed_actions_text = '\n'.join(checkpoint['completed_actions'])
+completed_actions_text = '\n'.join(checkpoint['phase_g_acceptance_phase_h_authorization_completed_actions_reference'])
 
 STALE_PHRASES = (
     'reused unchanged from Phase C/D/E',
