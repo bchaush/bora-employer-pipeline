@@ -53,13 +53,16 @@ assert PHASE_F_REPORT_PATH.exists(), 'substantive Phase F report missing'
 # Phase F/E/D each in their own distinct, shifted-down slot.
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_AUTHORIZATION'
-assert cp['canonical_basis_sha'] == BASELINE_SHA
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_OPERATOR_COMPLETION', (
+    "checkpoint_id must reflect Phase G's own substantive operator-completion event"
+)
+assert cp['canonical_basis_sha'] == 'bb8ae10fa71adb663117a65d8c6176e23de29b42'
 assert cp['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
 assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'NOT_YET_COMPLETED'
+assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
 assert cp['implementation_authorized'] is False
 
 prior_phase = cp['prior_phase']
@@ -120,27 +123,27 @@ assert 'CAREER_OS_RUN_TRACE_V1' in completed
 assert 'first_causal_failure_point' in completed
 assert 'human-handoff' in completed.lower()
 
-# project_state.json must point at Phase G as freshly authorized, with Phase F
-# preserved as prior_phase and Phase H/later still proposed only.
+# project_state.json must point at Phase G as now operator-completed, with
+# Phase F preserved as prior_phase and Phase H/later still proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
-assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'SELECTED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert BORA_QUOTE_CONDITIONAL in PROJECT_STATE['next_authorized_action']
 assert BORA_QUOTE_CONFIRMATION in PROJECT_STATE['next_authorized_action']
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
     'project_state.next_authorized_action must couple Phase H to PROPOSED_NOT_AUTHORIZED'
 )
-assert 'Authorizing Phase G alone does not authorize implementation' in PROJECT_STATE['next_authorized_action']
+assert 'does not authorize implementation' in PROJECT_STATE['next_authorized_action'].lower()
 
-# Every live recovery/state surface must agree: Phase G is BORA_AUTHORIZED /
-# SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY, Phase F remains
+# Every live recovery/state surface must agree: Phase G is COMPLETED_BY_OPERATOR /
+# PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY, Phase F remains
 # BORA_ACCEPTED (2026-09-14) as prior_phase, and Phase H/later remain
-# PROPOSED_NOT_AUTHORIZED; authorizing Phase G alone never authorizes
+# PROPOSED_NOT_AUTHORIZED; Phase G operator completion never authorizes
 # implementation.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
@@ -151,9 +154,9 @@ for surface_name, surface_text in (
     assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase G (CAREER_OS_ASSURANCE_ARCHITECTURE_V1)'
     )
-    assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in surface_text, (
+    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in surface_text, (
         f'{surface_name} must state Phase G\'s own coupled state as '
-        f'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY'
+        f'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
     )
     assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase F (CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1)'
@@ -178,8 +181,14 @@ for surface_name, surface_text in (
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in CHANGELOG
 assert BORA_QUOTE_CONDITIONAL in CHANGELOG
 assert BORA_QUOTE_CONFIRMATION in CHANGELOG
-assert '## 2026-09-14 — Career OS Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) authorized by Bora (READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED)' in CHANGELOG
-_PHASE_G_HEADING = '## 2026-09-14 — Career OS Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) authorized by Bora (READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED)'
+assert (
+    '## 2026-09-14 — Career OS Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) authorized by Bora '
+    '(READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED — historical, superseded by the operator-completion entry above)'
+) in CHANGELOG
+_PHASE_G_HEADING = (
+    '## 2026-09-14 — Career OS Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) authorized by Bora '
+    '(READ_ONLY / DESIGN_ONLY, BORA_AUTHORIZED — historical, superseded by the operator-completion entry above)'
+)
 _g_start = CHANGELOG.index(_PHASE_G_HEADING)
 _g_next = CHANGELOG.find('\n## ', _g_start + len(_PHASE_G_HEADING))
 _g_block = CHANGELOG[_g_start:_g_next if _g_next != -1 else len(CHANGELOG)]
@@ -203,5 +212,14 @@ for family in (
 phase_e_report_text = PHASE_E_REPORT_PATH.read_text(encoding='utf-8')
 for case_id in ('F1-A', 'F1-D', 'F1-E', 'F2-A', 'F3-A', 'F4-A', 'F5-A', 'REC-A', 'POS-A', 'POS-B'):
     assert case_id in phase_e_report_text, f'Phase E report must still name admitted case {case_id}'
+
+# Phase G's own substantive design deliverable (a separate, later, dedicated
+# artifact from this authorization-only governance sync) must now exist and
+# record the operator-completed state.
+PHASE_G_REPORT_PATH = ROOT / 'docs' / 'audits' / 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1_REPORT.md'
+PHASE_G_DESIGN_CONTRACT_PATH = ROOT / 'milestone_contracts' / 'design' / 'career-os-phase-g-assurance-architecture-v1.json'
+assert PHASE_G_REPORT_PATH.exists(), 'substantive Phase G assurance architecture report missing'
+assert PHASE_G_DESIGN_CONTRACT_PATH.exists(), 'Phase G design milestone contract missing'
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in completed
 
 print('PASS: Career OS Phase G authorization governance sync verified.')
