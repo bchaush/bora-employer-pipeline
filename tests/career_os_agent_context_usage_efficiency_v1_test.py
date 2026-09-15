@@ -7,6 +7,10 @@ PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
     r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
+PHASE_I_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase I and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+    re.IGNORECASE,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / 'docs' / 'decisions' / 'ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md'
@@ -284,21 +288,18 @@ assert 'Prior-prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-11)**
 assert 'Current-phase mode: **READ_ONLY_DESIGN_ONLY**' in milestone_text
 assert 'Current-phase authorization status: **BORA_AUTHORIZED**' in milestone_text
 assert 'Current-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Current-phase human acceptance status: **PENDING_BORA_ACCEPTANCE**' in milestone_text
+assert 'Current-phase human acceptance status: **BORA_ACCEPTED (2026-09-14)**' in milestone_text
 _checkpoint_block_end = milestone_text.index('## Eval & Harness Audit - Roadmap Reference')
 _checkpoint_block = milestone_text[:_checkpoint_block_end]
 assert 'Current phase: `CAREER_OS_ASSURANCE_ARCHITECTURE_V1`\nCurrent-phase mode: **READ_ONLY_DESIGN_ONLY**' in _checkpoint_block, (
     'the current Phase G line must be immediately followed by its own scoped fields, not unscoped prior fields'
 )
-assert '`implementation_authorized`: **false**' in _checkpoint_block, (
+assert '`implementation_authorized` (global/blanket flag): **false**' in _checkpoint_block, (
     'the current Phase G checkpoint block must explicitly record implementation_authorized as false'
 )
-assert (
-    "Bora's explicit acceptance or correction of this Phase G design" in _checkpoint_block
-), (
-    'the current Phase G checkpoint block must identify the single next allowed seam as '
-    "Bora acceptance or correction of the completed Phase G Assurance Architecture design"
-)
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _checkpoint_block
+assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _checkpoint_block
+assert 'a separately authored, bounded Phase H builder pass' in _checkpoint_block
 # Fail closed if the stale pre-completion wording -- true only before Phase F's
 # substantive operator work was completed -- reappears.
 for stale in (
@@ -310,8 +311,8 @@ for stale in (
     "Bora separately decides whether to authorize Phase G",
 ):
     assert stale not in _checkpoint_block, f'stale Phase-F/Phase-G checkpoint wording reintroduced: {stale}'
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(_checkpoint_block), (
-    'CURRENT_MILESTONE.md checkpoint block must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_checkpoint_block), (
+    'CURRENT_MILESTONE.md checkpoint block must couple Phase I/later to PROPOSED_NOT_AUTHORIZED'
 )
 
 # The checkpoint block's own executability-class summary must name all four
@@ -344,11 +345,13 @@ assert 'done G lets keep going brother we got this beautiful work we are doing h
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in state_text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in state_text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in state_text
-assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in state_text
-assert 'Bora must separately choose and explicitly authorize' in state_text
-assert '`implementation_authorized` remains `false`' in state_text
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(state_text), (
-    'CURRENT_STATE.md must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in state_text
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(state_text), 'CURRENT_STATE.md must keep Phase I and later closed pending future Bora authorization'
+assert '`implementation_authorized` (the global/blanket flag) remains `false`' in state_text
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in state_text
+assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in state_text
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(state_text), (
+    'CURRENT_STATE.md must couple Phase I/later to PROPOSED_NOT_AUTHORIZED as one subject'
 )
 assert 'READ_ONLY_DESIGN_ONLY' in state_text
 # Phase D's own accepted state must be proven by the single non-collidable

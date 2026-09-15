@@ -6,6 +6,11 @@ PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
     r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
+PHASE_I_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase I and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+    re.IGNORECASE,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / 'milestone_contracts' / 'governance' / 'career-os-phase-f-authorization-v1.json'
@@ -89,18 +94,16 @@ assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
 assert cp['implementation_authorized'] is False
 
-# The checkpoint's own narrative fields must tie "Phase H" tightly to
-# PROPOSED_NOT_AUTHORIZED, not merely contain both words somewhere.
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
-    'checkpoint terminal_adjudication must couple Phase H to PROPOSED_NOT_AUTHORIZED'
-)
-_not_done_joined = ' '.join(cp['not_completed_or_not_authorized'])
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(_not_done_joined), (
-    'checkpoint not_completed_or_not_authorized must couple Phase H to PROPOSED_NOT_AUTHORIZED'
-)
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(cp['continuity_rule']), (
-    'checkpoint continuity_rule must couple Phase H to PROPOSED_NOT_AUTHORIZED'
-)
+# The checkpoint's live narrative fields must preserve the scoped Phase H grant
+# and keep Phase I/later closed, without rewriting Phase F's historical contract.
+for _field_name, _field_text in (
+    ('terminal_adjudication', cp['terminal_adjudication']),
+    ('not_completed_or_not_authorized', ' '.join(cp['not_completed_or_not_authorized'])),
+    ('continuity_rule', cp['continuity_rule']),
+):
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _field_text, f'{_field_name} must name scoped Phase H'
+    assert ('SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _field_text or 'scoped exclusively' in _field_text.lower() or 'one named, scoped milestone' in _field_text.lower()), f'{_field_name} must preserve scoped-not-global authority'
+    assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_field_text), f'{_field_name} must keep Phase I and later closed'
 
 # Phase F must be preserved distinctly as prior_phase, Phase E as
 # prior_prior_phase, and Phase D as prior_prior_prior_phase -- never
@@ -161,10 +164,15 @@ for _entry in cp['completed_actions']:
     for _term in _NEGATION_REQUIRED_TERMS:
         _idx = _entry_lower.find(_term)
         while _idx != -1:
-            _preceding = _entry_lower[max(0, _idx - 12):_idx]
-            assert 'no ' in _preceding, (
+            # Require negation in the same punctuation-bounded clause. This
+            # accepts explicit shared-negation lists such as "no src/schema/DB/UI/.../LLM-judge work"
+            # while still rejecting a positive claim in a later/adversative clause.
+            _clause_start = max(_entry_lower.rfind(_d, 0, _idx) for _d in ('.', ';', ':'))
+            _preceding = _entry_lower[_clause_start + 1:_idx]
+            _last_no = _preceding.rfind('no ')
+            assert _last_no != -1 and ' but ' not in _preceding[_last_no:] and ' however ' not in _preceding[_last_no:], (
                 f'checkpoint completed_actions entry names forbidden term {_term!r} without '
-                f'its own preceding negation ("no ..."): {_entry!r}'
+                f'a same-clause governing negation: {_entry!r}'
             )
             _idx = _entry_lower.find(_term, _idx + 1)
 
@@ -174,41 +182,38 @@ for _entry in cp['completed_actions']:
 # and Phase H still proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
-assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    'project_state.next_authorized_action must couple Phase H to PROPOSED_NOT_AUTHORIZED'
-)
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
+assert 'IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['next_authorized_action']
+assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['next_authorized_action']
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action'])
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
-assert 'once we are proper to standard' in PROJECT_STATE['next_authorized_action'].lower()
-assert 'done g lets keep going brother' in PROJECT_STATE['next_authorized_action'].lower()
-# Live recovery doctrine must keep Phase G authorization separate from implementation authority.
-for _surface_name, _surface_text in (('ADR', ADR), ('AGENTS', AGENTS)):
-    assert 'Phase H' in _surface_text, f'{_surface_name} must preserve the Phase H implementation boundary'
-    assert 'authorizing Phase G alone does not authorize implementation' in _surface_text or 'Authorizing Phase G alone does not authorize implementation' in _surface_text, f'{_surface_name} must state that Phase G authorization alone never authorizes implementation'
-    assert 'until a next phase is separately authorized by Bora' not in _surface_text, f'{_surface_name} must not make next-phase authorization the implementation unlock'
-    assert 'before it or any implementation is authorized' not in _surface_text, f'{_surface_name} must not couple generic next-phase authorization to implementation authority'
-    assert 'no implementation is authorized until then' not in _surface_text, f'{_surface_name} must not use ambiguous next-phase-as-implementation-gate wording'
-
-# Phase G authorization must remain independent from implementation authority on every live recovery/state surface.
-_phase_h_surfaces = (
+assert 'beautiful work g once u cehck everything being up to standart' in PROJECT_STATE['next_authorized_action'].lower()
+assert 'mind the usage limits of cursor and claude' in PROJECT_STATE['next_authorized_action'].lower()
+# Live recovery surfaces must now preserve the narrow Phase H grant and keep later work closed.
+_live_phase_h_surfaces = (
     ('project_state.next_authorized_action', PROJECT_STATE['next_authorized_action']),
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
     ('CURRENT_STATE.md', CURRENT_STATE),
     ('ADR', ADR),
     ('AGENTS', AGENTS),
-    ('Phase F report', PHASE_F_REPORT_PATH.read_text(encoding='utf-8')),
 )
-for _surface_name, _surface_text in _phase_h_surfaces:
-    _surface_lower = _surface_text.lower()
-    assert 'phase h' in _surface_lower, f'{_surface_name} must preserve the independent Phase H implementation boundary'
-    assert ('authorizing phase g alone does not authorize implementation' in _surface_lower or 'operator completion of phase g alone does not authorize implementation' in _surface_lower), f'{_surface_name} must state that neither Phase G authorization nor operator completion authorizes implementation'
+for _surface_name, _surface_text in _live_phase_h_surfaces:
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _surface_text, f'{_surface_name} must name scoped Phase H'
+    assert ('SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _surface_text or 'one named, scoped milestone' in _surface_text.lower()), f'{_surface_name} must preserve scoped-not-global Phase H authority'
+    assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_surface_text), f'{_surface_name} must keep Phase I and later closed'
+
+# The historical Phase F report must remain historical; it must not be rewritten to today's Phase H state.
+_phase_f_report_text = PHASE_F_REPORT_PATH.read_text(encoding='utf-8')
+assert 'authorizing Phase G alone does not authorize implementation' in _phase_f_report_text or 'Authorizing Phase G alone does not authorize implementation' in _phase_f_report_text
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' not in _phase_f_report_text
 assert 'no phase g or implementation work may begin' not in PROJECT_STATE['next_authorized_action'].lower(), 'project_state must not couple Phase G authorization to implementation permission'
 assert 'authorizing Phase G alone does not authorize implementation' in _acceptance_conditions
 assert 'Phase H bounded implementation milestone' in _acceptance_conditions
@@ -246,9 +251,8 @@ for surface_name, surface_text in (
     assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase G (CAREER_OS_ASSURANCE_ARCHITECTURE_V1)'
     )
-    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in surface_text, (
-        f'{surface_name} must state Phase G\'s own coupled state as '
-        f'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in surface_text, (
+        f'{surface_name} must state Phase G\'s own accepted coupled state'
     )
     assert (
         'implementation_authorized' in surface_text.lower()
@@ -256,8 +260,14 @@ for surface_name, surface_text in (
         or 'no implementation' in surface_text.lower()
         or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text
     ), f'{surface_name} must state that implementation remains unauthorized'
-    assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
-        f'{surface_name} must couple Phase H to PROPOSED_NOT_AUTHORIZED'
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in surface_text, (
+        f'{surface_name} must name the scoped Phase H timing-observability milestone'
+    )
+    assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in surface_text, (
+        f'{surface_name} must preserve the scoped-not-global Phase H authority'
+    )
+    assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
+        f'{surface_name} must keep Phase I and later closed as one coupled subject'
     )
 
 # FINAL hardened Phase F completion facts (Phase F's own coupled prior_phase state,
@@ -269,7 +279,7 @@ for surface_name, surface_text in (
 # file -- so a fresh session reading only the recovery section cannot land
 # on a stale or unrelated summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) Completed by Operator (2026-09-14, PENDING BORA ACCEPTANCE)', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) BORA ACCEPTED (2026-09-14); Phase H (Assurance Timing Observability) BORA AUTHORIZED, SCOPED', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
     'CURRENT_STATE.md': ('## Current Execution Checkpoint (2026-09-14)', '## Eval & Harness Audit Roadmap Reference (2026-09-14)'),
     'ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md': ('## 6. New-chat recovery protocol', '## 7. Audit deliverables required before implementation'),
@@ -305,11 +315,17 @@ for surface_name in (
     assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in _recovery_section, (
         f'{surface_name} recovery-governing section must name Phase G (CAREER_OS_ASSURANCE_ARCHITECTURE_V1)'
     )
-    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
-        f'{surface_name} recovery-governing section must state Phase G as the live authorized current phase'
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
+        f'{surface_name} recovery-governing section must state Phase G as accepted'
     )
-    assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(_recovery_section), (
-        f'{surface_name} recovery-governing section must couple Phase H to PROPOSED_NOT_AUTHORIZED'
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _recovery_section, (
+        f'{surface_name} recovery-governing section must name scoped Phase H'
+    )
+    assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _recovery_section, (
+        f'{surface_name} recovery-governing section must preserve scoped Phase H authority'
+    )
+    assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_recovery_section), (
+        f'{surface_name} recovery-governing section must keep Phase I and later closed'
     )
 
 # CHANGELOG.md must preserve authorization and operator-completion history and

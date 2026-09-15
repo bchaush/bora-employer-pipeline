@@ -11,6 +11,11 @@ PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
     r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
+PHASE_I_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase I and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+    re.IGNORECASE,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / 'milestone_contracts' / 'governance' / 'career-os-phase-e-authorization-v1.json'
@@ -90,14 +95,14 @@ assert 'exactly 15 case IDs' in phase_e_reference
 # Phase H still proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
-assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
+assert 'IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    'project_state.next_authorized_action must couple Phase H to PROPOSED_NOT_AUTHORIZED'
-)
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['next_authorized_action']
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action'])
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: Phase D remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
@@ -142,15 +147,20 @@ for surface_name, surface_text in (
     assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase G (CAREER_OS_ASSURANCE_ARCHITECTURE_V1)'
     )
-    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in surface_text, (
-        f'{surface_name} must state Phase G\'s own coupled state as '
-        f'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in surface_text, (
+        f'{surface_name} must state Phase G\'s own accepted coupled state'
     )
 
     # Phase H (and every later roadmap phase) must be coupled to
     # PROPOSED_NOT_AUTHORIZED, not proven by two unrelated substrings.
-    assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
-        f'{surface_name} must couple Phase H to PROPOSED_NOT_AUTHORIZED'
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in surface_text, (
+        f'{surface_name} must name the scoped Phase H timing-observability milestone'
+    )
+    assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in surface_text, (
+        f'{surface_name} must preserve the scoped-not-global Phase H authority'
+    )
+    assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
+        f'{surface_name} must keep Phase I and later closed as one coupled subject'
     )
 
 # FINAL hardened Phase E architecture facts (15 admitted case IDs, the
@@ -159,7 +169,7 @@ for surface_name, surface_text in (
 # maintain (CURRENT_MILESTONE.md, AGENTS.md), so a fresh session cannot read
 # a stale looser summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) Completed by Operator (2026-09-14, PENDING BORA ACCEPTANCE)', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) BORA ACCEPTED (2026-09-14); Phase H (Assurance Timing Observability) BORA AUTHORIZED, SCOPED', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
 }
 for surface_name in ('CURRENT_MILESTONE.md', 'AGENTS.md'):

@@ -6,6 +6,11 @@ PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
     r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
 )
+PHASE_I_PROPOSED_NOT_AUTHORIZED = re.compile(
+    r'Phase I and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
+    re.IGNORECASE,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / 'milestone_contracts' / 'governance' / 'career-os-phase-d-authorization-v1.json'
@@ -80,14 +85,14 @@ assert cp['implementation_authorized'] is False
 # reads COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
-assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
+assert 'IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
-assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    "project_state.next_authorized_action must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject"
-)
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['next_authorized_action']
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action'])
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
 # must all agree: the prior policy milestone remains BORA_ACCEPTED/GOVERNING
@@ -119,8 +124,14 @@ for surface_name, surface_text in (
     assert 'implementation_authorized' in surface_text.lower() or 'implementation not authorized' in surface_text.lower() or 'no implementation' in surface_text.lower() or 'NO_IMPLEMENTATION_AUTHORIZED' in surface_text, (
         f'{surface_name} must state that implementation remains unauthorized'
     )
-    assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
-        f'{surface_name} must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in surface_text, (
+        f'{surface_name} must name the scoped Phase H timing-observability milestone'
+    )
+    assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in surface_text, (
+        f'{surface_name} must preserve the scoped-not-global Phase H authority'
+    )
+    assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(surface_text), (
+        f'{surface_name} must keep Phase I and later closed as one coupled subject'
     )
 
 # CHANGELOG.md must record this transition as a distinct dated entry,
