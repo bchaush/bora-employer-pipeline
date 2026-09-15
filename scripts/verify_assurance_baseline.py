@@ -74,6 +74,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,6 +100,20 @@ MANDATORY_PHASE_2_ANCHORS: tuple[str, ...] = (
     "requirement_schema_smoke_test.py",
     "resume_schema_smoke_test.py",
 )
+
+
+# Diagnostic-only timing record grammar (Phase G Recommendation A). These
+# lines never affect pass/fail, discovery, ordering, anchors, golden
+# execution, or promotion authority -- they exist purely to expose
+# per-phase and per-Phase-2-test wall-clock duration for later human/
+# tooling inspection. seconds is a monotonic high-resolution duration
+# (time.perf_counter) formatted with 6 decimal places, always >= 0.
+def _emit_phase_timing(phase: int, seconds: float) -> None:
+    print(f"PHASE_TIMING phase={phase} seconds={seconds:.6f}")
+
+
+def _emit_test_timing(test_name: str, seconds: float) -> None:
+    print(f"TEST_TIMING test={test_name} seconds={seconds:.6f}")
 
 
 def _run(cmd: list[str], *, label: str) -> tuple[bool, str]:
@@ -172,10 +187,12 @@ def phase_2_tests() -> bool:
 
     failures: list[tuple[str, str]] = []
     for test_path in discovered:
+        test_start = time.perf_counter()
         ok, output = _run(
             [sys.executable, "-B", str(test_path)],
             label=test_path.name,
         )
+        _emit_test_timing(test_path.name, time.perf_counter() - test_start)
         if ok:
             print(f"PASS {test_path.name}")
         else:
@@ -212,14 +229,21 @@ def phase_3_job_analysis_golden() -> bool:
     return True
 
 
+def _run_phase_with_timing(phase: int, phase_fn) -> bool:
+    start = time.perf_counter()
+    ok = phase_fn()
+    _emit_phase_timing(phase, time.perf_counter() - start)
+    return ok
+
+
 def main() -> int:
-    if not phase_0_state_validation():
+    if not _run_phase_with_timing(0, phase_0_state_validation):
         return 1
-    if not phase_1_compile():
+    if not _run_phase_with_timing(1, phase_1_compile):
         return 1
-    if not phase_2_tests():
+    if not _run_phase_with_timing(2, phase_2_tests):
         return 1
-    if not phase_3_job_analysis_golden():
+    if not _run_phase_with_timing(3, phase_3_job_analysis_golden):
         return 1
     print("\nALL PHASES PASSED: canonical assurance baseline verified.")
     return 0
