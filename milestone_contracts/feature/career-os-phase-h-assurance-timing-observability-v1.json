@@ -1,0 +1,52 @@
+{
+  "milestone_id": "CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Implement Phase G Recommendation A only: add standardized, purely diagnostic per-phase and Phase-2 per-test timing observability to the existing canonical scripts/verify_assurance_baseline.py path. Preserve all existing assurance pass/fail semantics, discovery, ordering, mandatory coverage anchors, golden coverage, hosted CI command, promotion authority, short-circuit behavior, and the exact canonical terminal success string. This milestone does not authorize optimization, a separate fast runner, parallelism, sharding, caching/skipping, framework migration, slow-test exclusion, trace infrastructure, or Phase I work.",
+  "baseline_sha": "9611823c790f5fa3556ab1eda10b95bc0a541531",
+  "allowed_paths": [
+    "scripts/verify_assurance_baseline.py",
+    "tests/career_os_assurance_timing_observability_v1_test.py",
+    "milestone_contracts/feature/career-os-phase-h-assurance-timing-observability-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md", "AGENTS.md", "CLAUDE.md", "GEMINI.md",
+    "project_state.json", "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md", "CURRENT_MILESTONE.md", "CHANGELOG.md",
+    ".cursor/**", ".claude/**", ".github/**", "schemas/**",
+    "src/**", "claims/**", "evidence/**", "experiences/**",
+    "resume/**", "golden-tests/**", "fixtures/**", "docs/**"
+  ],  "required_tests": [
+    "tests/career_os_assurance_timing_observability_v1_test.py",
+    "tests/career_os_assurance_architecture_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "Use Python standard-library monotonic timing via time.perf_counter or an equivalent monotonic high-resolution clock; no external dependency or platform-specific shell timing.",
+    "Each invoked canonical phase 0, 1, 2, and 3 emits exactly one standardized diagnostic phase-duration record using a stable machine-readable text grammar with a non-negative duration in seconds.",
+    "Each Phase 2 test that is actually executed emits exactly one standardized diagnostic per-test duration record naming the test filename and a non-negative duration in seconds, including failed tests.",
+    "Phase timing is emitted for an invoked phase even when that phase returns failure; later phases still do not execute after the first failed phase.",
+    "Timing output is diagnostic only and never participates in pass/fail, test discovery, ordering, mandatory-anchor validation, golden-case semantics, promotion authority, or success determination.",
+    "The exact terminal success string ALL PHASES PASSED: canonical assurance baseline verified. remains byte-for-byte unchanged and is emitted only when all four canonical phases succeed.",
+    "Phase 2 discovery remains tests/*_test.py in deterministic lexicographic filename order; all nine mandatory Phase 2 anchors remain unchanged.",
+    "Phase 3 continues to invoke golden-tests/run_job_analysis_golden_set.py through the existing canonical path with unchanged success/failure semantics.",
+    "No wall-clock threshold, performance SLA, optimization decision, or reliability inference is added; tests use deterministic/fake timing rather than asserting machine-dependent runtimes.",
+    "No path outside allowed_paths changes and no hosted workflow command changes.",
+    "python tests/career_os_assurance_timing_observability_v1_test.py passes.",
+    "python tests/career_os_assurance_architecture_v1_test.py passes.",
+    "python tests/career_os_state_v1_test.py passes.",
+    "python scripts/verify_milestone_state.py passes.",
+    "python scripts/verify_assurance_baseline.py passes.",
+    "git diff --check passes.",
+    "Independent Cursor adversarial review of immutable frozen bytes returns SAFE before promotion."
+  ],  "stop_conditions": [
+    "origin/main or canonical merge reality differs from baseline_sha before substantive builder work begins",
+    "implementation requires any path outside allowed_paths",
+    "timing requires changing test discovery, ordering, mandatory coverage anchors, golden execution, CI command, promotion authority, or terminal success semantics",
+    "implementation introduces optimization, parallelism, sharding, cache skipping, framework migration, slow-test exclusion, a second assurance runner, or any Phase I surface",
+    "a governance, schema, Truth-layer, job, resume, application, provider, controller, trace, database/UI, agent, routing, or LLM-judge change is required",
+    "deterministic tests cannot prove timing output remains diagnostic-only and failure short-circuit behavior is unchanged",
+    "Cursor produces a materially ambiguous or disputed finding that cannot be resolved deterministically"
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_CURSOR_ADVERSARIAL_REVIEW_OF_IMMUTABLE_BYTES; Cursor is reviewer-only and must not edit the candidate. Any mutation after SAFE invalidates the review and requires a new freeze/review.",
+  "human_approval_requirements": "BORA_FINAL_MERGE_REQUIRED; commit/push/PR are allowed only after focused validation, full canonical Assurance, semantic adjudication, immutable freeze, Cursor SAFE, and exact post-review byte equality. NO_AUTO_MERGE."
+}
