@@ -12,25 +12,24 @@ CHECKPOINT = ROOT / 'CURRENT_EXECUTION_CHECKPOINT.json'
 PROJECT_STATE = json.loads((ROOT / 'project_state.json').read_text(encoding='utf-8'))
 AGENTS = (ROOT / 'AGENTS.md').read_text(encoding='utf-8')
 
-CANONICAL_BASELINE_SHA = 'e199623c73b08e986beb32437e65f40a5b63b435'
-
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
 
 assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
-# Phase G's checkpoint_id must now reflect Bora's explicit 2026-09-14
-# authorization event, after Phase F's operator completion and acceptance.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_AUTHORIZATION', (
-    "checkpoint_id must reflect Phase G's Bora-authorization event "
-    "(CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_AUTHORIZATION)"
+# Phase G's checkpoint_id must now reflect its own substantive 2026-09-14
+# operator-completion event, after Bora's earlier authorization of Phase G.
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_OPERATOR_COMPLETION', (
+    "checkpoint_id must reflect Phase G's own operator-completion event "
+    "(CAREER_OS_CHECKPOINT_2026-09-14_PHASE_G_OPERATOR_COMPLETION)"
 )
-assert cp['canonical_basis_sha'] == CANONICAL_BASELINE_SHA
+assert cp['canonical_basis_sha'] == 'bb8ae10fa71adb663117a65d8c6176e23de29b42'
 assert cp['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
 assert cp['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'NOT_YET_COMPLETED'
+assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
 assert cp['implementation_authorized'] is False
 
 # CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1 (Phase F) must be recorded
@@ -225,9 +224,8 @@ assert 'I authorize Phase F - Trace/Contract Architecture' in phase_f_authorizat
 assert 'NOT_YET_COMPLETED' in phase_f_authorization_reference
 assert 'career-os-phase-f-authorization-v1.json' in phase_f_authorization_reference
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1 (BORA_AUTHORIZED')
-assert 'SELECTED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1 (COMPLETED_BY_OPERATOR')
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
@@ -250,7 +248,7 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ON
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in AGENTS
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in AGENTS
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in AGENTS
-assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in AGENTS
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in AGENTS
 
 # AGENTS.md must keep requiring project_state.json to be read before
 # CURRENT_EXECUTION_CHECKPOINT.json, and must not restate a competing

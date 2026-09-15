@@ -106,13 +106,13 @@ assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in text
 assert 'I authorize Phase F' in text
 
-# Phase G is now BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED, the live
+# Phase G is now COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE, the live
 # current phase; the ADR must positively state Bora's explicit authorization
-# (built from Bora's two exact statements) and couple Phase H to
-# PROPOSED_NOT_AUTHORIZED.
+# (built from Bora's two exact statements), Phase G's own substantive
+# operator completion, and couple Phase H to PROPOSED_NOT_AUTHORIZED.
 assert 'Bora explicitly authorized Phase G' in text or 'Bora has since, separately and explicitly, authorized Phase G' in text
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in text
-assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in text
+assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in text
 assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(text), (
     'ADR must couple Phase H to PROPOSED_NOT_AUTHORIZED as one subject'
 )
@@ -196,8 +196,8 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ON
 assert '**SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in CURRENT_STATE
 
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
-assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
@@ -221,21 +221,21 @@ assert (
 ), 'stale three-class executability summary (omitting HUMAN_CONFIRMED_REFERENCE) reintroduced'
 
 # AGENTS.md's own Agent Context & Usage Efficiency section must describe
-# Phase G as the current, freshly-authorized phase, and Phase F as
-# Bora-accepted prior_phase, never as the stale current-phase wording that
-# was only true before this authorization transition.
+# Phase G as the current, now operator-completed phase, and Phase F as
+# Bora-accepted prior_phase, never as the stale authorized-but-not-yet-
+# completed wording that was only true before this operator completion.
 assert (
     'Phase F (`CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1`) is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY'
     in AGENTS
 ), 'AGENTS.md must describe Phase F as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY'
 assert (
-    'Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY'
+    'Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) is COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
     in AGENTS
-), 'AGENTS.md must describe Phase G as BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY'
+), 'AGENTS.md must describe Phase G as COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
 assert (
-    'Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) is COMPLETED_BY_OPERATOR'
+    'Phase G (`CAREER_OS_ASSURANCE_ARCHITECTURE_V1`) is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED'
     not in AGENTS
-), 'stale premature Phase G completion wording must not appear in AGENTS.md'
+), 'stale not-yet-completed Phase G wording must not appear in AGENTS.md'
 
 AUDIT_REPORT = ROOT / 'docs' / 'audits' / 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md'
 assert AUDIT_REPORT.exists(), 'durable Phase B operator audit report missing'

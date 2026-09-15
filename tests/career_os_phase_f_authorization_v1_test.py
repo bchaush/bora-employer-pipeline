@@ -168,13 +168,13 @@ for _entry in cp['completed_actions']:
             )
             _idx = _entry_lower.find(_term, _idx + 1)
 
-# project_state.json must now point at Phase G as freshly authorized, while
+# project_state.json must now point at Phase G as operator-completed / pending Bora acceptance, while
 # preserving Phase F as operator-completed and BORA_ACCEPTED (2026-09-14) in
 # the next_authorized_action seam text, with no implementation authorized
 # and Phase H still proposed only.
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
-assert 'BORA_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'NOT_YET_COMPLETED' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
 assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
 assert 'NO_IMPLEMENTATION_AUTHORIZED' in PROJECT_STATE['current_phase']
 assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
@@ -208,7 +208,7 @@ _phase_h_surfaces = (
 for _surface_name, _surface_text in _phase_h_surfaces:
     _surface_lower = _surface_text.lower()
     assert 'phase h' in _surface_lower, f'{_surface_name} must preserve the independent Phase H implementation boundary'
-    assert 'authorizing phase g alone does not authorize implementation' in _surface_lower, f'{_surface_name} must state that Phase G authorization alone never authorizes implementation'
+    assert ('authorizing phase g alone does not authorize implementation' in _surface_lower or 'operator completion of phase g alone does not authorize implementation' in _surface_lower), f'{_surface_name} must state that neither Phase G authorization nor operator completion authorizes implementation'
 assert 'no phase g or implementation work may begin' not in PROJECT_STATE['next_authorized_action'].lower(), 'project_state must not couple Phase G authorization to implementation permission'
 assert 'authorizing Phase G alone does not authorize implementation' in _acceptance_conditions
 assert 'Phase H bounded implementation milestone' in _acceptance_conditions
@@ -246,9 +246,9 @@ for surface_name, surface_text in (
     assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase G (CAREER_OS_ASSURANCE_ARCHITECTURE_V1)'
     )
-    assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in surface_text, (
+    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in surface_text, (
         f'{surface_name} must state Phase G\'s own coupled state as '
-        f'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY'
+        f'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY'
     )
     assert (
         'implementation_authorized' in surface_text.lower()
@@ -269,7 +269,7 @@ for surface_name, surface_text in (
 # file -- so a fresh session reading only the recovery section cannot land
 # on a stale or unrelated summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) Authorized by Bora (2026-09-14)', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) Completed by Operator (2026-09-14, PENDING BORA ACCEPTANCE)', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
     'CURRENT_STATE.md': ('## Current Execution Checkpoint (2026-09-14)', '## Eval & Harness Audit Roadmap Reference (2026-09-14)'),
     'ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md': ('## 6. New-chat recovery protocol', '## 7. Audit deliverables required before implementation'),
@@ -305,7 +305,7 @@ for surface_name in (
     assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in _recovery_section, (
         f'{surface_name} recovery-governing section must name Phase G (CAREER_OS_ASSURANCE_ARCHITECTURE_V1)'
     )
-    assert 'BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
+    assert 'COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY' in _recovery_section, (
         f'{surface_name} recovery-governing section must state Phase G as the live authorized current phase'
     )
     assert PHASE_H_PROPOSED_NOT_AUTHORIZED.search(_recovery_section), (
