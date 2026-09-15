@@ -1,5 +1,3 @@
-* Added `BORA_APPLICATION_HISTORY_V1` as the canonical machine-readable Submitted Application Truth ledger for exact-role dedupe; seeded the 14 roles Bora directly confirmed as already submitted on 2026-09-10. Cold-start runs must load it before serious-role promotion. Also clarified first-wave discovery coverage honesty for LinkedIn Free and Brandeis Handshake: attempt when accessible, never claim inspection when access was unavailable.
-* Added `SUBMITTED_OPPORTUNITY_DEDUPE_V1` (Section 138.15): exact employer+requisition opportunities with historical Submitted Application Truth (including an authoritative first-party ?already applied? state) are suppressed from fresh Bora-facing discovery/package generation; exact identity is required, package-folder presence alone is insufficient, and in-progress packages continue rather than duplicate.
 # Bora Employer Pipeline OS — Change Log
 
 This file records material changes to the system.
@@ -20,6 +18,19 @@ Do not use this file for every typo or formatting edit. Record changes that affe
 * production behavior.
 
 ---
+
+## Pre-existing canonical continuity notes
+
+* Added `BORA_APPLICATION_HISTORY_V1` as the canonical machine-readable Submitted Application Truth ledger for exact-role dedupe; seeded the 14 roles Bora directly confirmed as already submitted on 2026-09-10. Cold-start runs must load it before serious-role promotion. Also clarified first-wave discovery coverage honesty for LinkedIn Free and Brandeis Handshake: attempt when accessible, never claim inspection when access was unavailable.
+* Added `SUBMITTED_OPPORTUNITY_DEDUPE_V1` (Section 138.15): exact employer+requisition opportunities with historical Submitted Application Truth (including an authoritative first-party "already applied" state) are suppressed from fresh Bora-facing discovery/package generation; exact identity is required, package-folder presence alone is insufficient, and in-progress packages continue rather than duplicate.
+
+## 2026-09-15 — Career OS Recommendation B operator completion (pending Bora acceptance)
+
+- Independently verified PR #63 merged at canonical main `0120bcde46a10f1ee7d5ec33e17f5fca7b8fc310` with reviewed head `d328350a232b9051b34fc302d100ed52bb5964c6`, exact tree equality `49445e42fc9e1545c99cfe3b441c94037badc82c`, and hosted post-merge Assurance run `35018521277` = `SUCCESS`.
+- `CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1` is now `COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE`; operator completion is explicitly not Bora acceptance.
+- Reviewed immutable candidate remained Cursor `SAFE` with zero findings; local full Assurance passed (`93/93` Phase 2, `15/15` golden, exit `0`). Coverage was preserved (76→77 test functions; 54→55 PASS labels; no prior functions/labels removed) and fixture-isolation coverage was added.
+- Local median moved from about `312.284s` to `285.150s` (~`8.69%`); profiling establishes the stop line: remaining dominant cost is real controller + real Git behavior, not avoidable fixture construction.
+- Recommendation C remains `NOT_AUTHORIZED`; Phase I+ remain `PROPOSED_NOT_AUTHORIZED`; global `implementation_authorized=false`. After genuine Bora acceptance, BLUEPRINT.md §133 `OPERATE FIRST / BUILD SECOND` remains the default.
 
 ## 2026-09-15 — Career OS Recommendation B (`CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1`) authorized by Bora, scoped to this milestone only (BORA_AUTHORIZED, NOT GLOBAL)
 

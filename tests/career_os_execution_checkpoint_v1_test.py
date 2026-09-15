@@ -25,17 +25,14 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-15_PHASE_H_ACCEPTANCE_RECOMMENDATION_B_AUTHORIZATION', (
-    "checkpoint_id must reflect Phase H's acceptance and Recommendation B's scoped authorization "
-    "(CAREER_OS_CHECKPOINT_2026-09-15_PHASE_H_ACCEPTANCE_RECOMMENDATION_B_AUTHORIZATION)"
-)
-assert cp['canonical_basis_sha'] == '52227f2d2ac913768bc558619f38d507358ebbaa'
-assert cp['phase_id'] == 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-15_RECOMMENDATION_B_OPERATOR_COMPLETION'
+assert cp['canonical_basis_sha'] == '0120bcde46a10f1ee7d5ec33e17f5fca7b8fc310'
+assert cp['phase_id'] == 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1'
 assert cp['authorization_status'] == 'BORA_AUTHORIZED'
 assert cp['selection_status'] == 'SELECTED'
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-15'
+assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['accepted_at'] is None
 assert cp['implementation_authorized'] is False
 
 phase_h = cp['phase_h_acceptance']
@@ -52,6 +49,10 @@ assert rec_b['milestone_id'] == 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATIO
 assert rec_b['authorization_status'] == 'BORA_AUTHORIZED'
 assert rec_b['selection_status'] == 'SELECTED'
 assert rec_b['operator_status'] == 'NOT_YET_COMPLETED'
+comp = cp['recommendation_b_completion']
+assert comp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert comp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert comp['canonical_merge_verification'].find('PR #63') != -1
 assert rec_b['implementation_authorization_scope'] == 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL'
 assert rec_b['selected_from'] == 'PHASE_G_RECOMMENDATION_B_ONLY'
 timing = rec_b['timing_evidence_threshold']
@@ -110,7 +111,7 @@ assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(cp['terminal_adjudication']), (
 # Must record the genuine Phase F/G substantive narrative (preserved, appended
 # to rather than overwritten) AND the new Phase H acceptance / Recommendation B
 # authorization transition.
-completed = ' '.join(cp['completed_actions'])
+completed = ' '.join(cp['phase_h_acceptance_recommendation_b_authorization_completed_actions_reference'])
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in completed
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in completed
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in completed
@@ -208,9 +209,9 @@ not_done = ' '.join(cp['not_completed_or_not_authorized'])
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(not_done), (
     'not_completed_or_not_authorized must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject'
 )
-assert 'the top-level implementation_authorized flag remains false' in not_done or 'implementation_authorized flag remains false' in not_done
+assert cp['implementation_authorized'] is False
 assert 'Recommendation C' in not_done and 'NOT_AUTHORIZED' in not_done
-assert 'no optimization implementation' in not_done.lower() or 'no optimization code' in not_done.lower()
+assert 'No additional Recommendation-B optimization is authorized' in not_done
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in not_done
 
 # Phase B, Phase C, the agent context/usage-efficiency policy milestone's,
@@ -241,9 +242,11 @@ assert 'beautiful work G once u cehck everything being up to standart' in phase_
 assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
 assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
-assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
+assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
+assert 'PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['next_authorized_action']
+assert 'Bora final human review/acceptance' in PROJECT_STATE['next_authorized_action']
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
     "project_state.next_authorized_action must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject"
 )

@@ -95,7 +95,7 @@ assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
 assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
-assert 'IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
+assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['next_authorized_action']
@@ -165,7 +165,7 @@ for surface_name, surface_text in (
 # maintain (CURRENT_MILESTONE.md, AGENTS.md), so a fresh session cannot read
 # a stale looser summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase H (Assurance Timing Observability) BORA ACCEPTED (2026-09-15); Recommendation B (Milestone Run V1 Targeted Optimization) BORA AUTHORIZED, SCOPED', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; PENDING BORA ACCEPTANCE', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
 }
 for surface_name in ('CURRENT_MILESTONE.md', 'AGENTS.md'):
