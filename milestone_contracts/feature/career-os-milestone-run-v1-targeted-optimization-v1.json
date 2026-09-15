@@ -1,0 +1,65 @@
+{
+  "milestone_id": "CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Implement Phase G Recommendation B only: reduce avoidable execution cost in tests/milestone_run_v1_test.py by reusing an immutable process-local prepared baseline fixture while preserving every existing adversarial scenario, real disposable Git behavior, real local bare-origin fetch/push semantics, provider fakes, causal invariants, and Assurance coverage. The optimization must not change src/milestone_run.py or any product/runtime behavior. Faster but weaker is failure.",
+  "baseline_sha": "0d4a0885e024eceb6467fc890eca164f97dbadc5",
+  "allowed_paths": [
+    "tests/milestone_run_v1_test.py",
+    "milestone_contracts/feature/career-os-milestone-run-v1-targeted-optimization-v1.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md",
+    ".cursor/**",
+    ".claude/**",
+    ".github/**",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "docs/**"
+  ],
+  "required_tests": [
+    "tests/milestone_run_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_state_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "Every pre-existing adversarial scenario in tests/milestone_run_v1_test.py still executes; no scenario is deleted, skipped, xfailed, short-circuited, or converted from real Git to a mock.",
+    "The reusable baseline fixture is created from the same .gitignore, builder/reviewer prompts, assurance stub, fake test, initial commit, user config, and real local bare origin as the canonical pre-optimization helper.",
+    "Each scenario still receives its own disposable worktree and its own disposable bare origin; no mutable Git refs, run state, working-tree bytes, locks, or remote state are shared across scenarios.",
+    "Each cloned scenario's origin URL is rebound to that scenario's own bare origin before controller execution.",
+    "Real git fetch/push behavior remains exercised. Provider builder/reviewer/test/assurance adapters remain faked exactly as before.",
+    "A dedicated isolation regression proves mutation/push in one cloned fixture cannot alter another fixture's local or remote main state.",
+    "No src/milestone_run.py, controller, provider, Assurance-runner, workflow, governance, Truth-layer, resume, application, or product/runtime path changes.",
+    "No parallelism, test skipping, scenario merging, framework migration, cache-based omission, or Recommendation C fast runner is introduced.",
+    "Standalone milestone_run_v1_test.py still passes completely and all existing PASS assertions remain represented.",
+    "A post-change local timing observation demonstrates a clear material reduction versus the recent canonical ~299-318 second local observations; timing remains diagnostic and never controls correctness/pass-fail.",
+    "python scripts/verify_milestone_state.py passes.",
+    "python scripts/verify_assurance_baseline.py passes.",
+    "git diff --check passes.",
+    "Independent Cursor adversarial review of immutable frozen bytes returns SAFE before promotion."
+  ],
+  "stop_conditions": [
+    "canonical origin/main differs from baseline_sha before substantive mutation begins",
+    "optimization requires changing src/milestone_run.py, scripts/verify_assurance_baseline.py, workflows, or any path outside allowed_paths",
+    "any pre-existing adversarial scenario or semantic assertion must be removed, weakened, skipped, or made synthetic to obtain speed",
+    "fixture copies cannot prove isolated local and remote Git state",
+    "post-change standalone runtime does not materially improve on the same local environment despite the mutation",
+    "full canonical Assurance or any required regression fails"
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_CURSOR_ADVERSARIAL_REVIEW_OF_IMMUTABLE_BYTES; Cursor is reviewer-only and must not edit the candidate. Any mutation after SAFE invalidates the review and requires a new freeze/review.",
+  "human_approval_requirements": "BORA_FINAL_REVIEW_REQUIRED"
+}
