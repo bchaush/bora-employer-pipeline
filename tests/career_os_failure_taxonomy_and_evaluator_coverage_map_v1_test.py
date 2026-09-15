@@ -157,16 +157,14 @@ assert contract['required_tests'] == EXPECTED_REQUIRED_TESTS
 # completed) live status.
 assert CHECKPOINT_PATH.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT_PATH.read_text(encoding='utf-8'))
-prior_prior_phase = cp['prior_prior_prior_phase']
-assert prior_prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
-assert prior_prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert prior_prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_prior_phase['accepted_at'] == '2026-09-11'
+assert cp['prior_phase']['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
+assert cp['prior_prior_phase']['phase_id'] == 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1'
+assert cp['prior_prior_prior_phase']['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
 assert cp['implementation_authorized'] is False
-assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in ' '.join(
-    cp['phase_d_completed_actions_reference']
-)
+phase_d_reference = ' '.join(cp['phase_d_completed_actions_reference'])
+assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in phase_d_reference
+assert 'BORA_ACCEPTED' in phase_d_reference and 'accepted_at=2026-09-11' in phase_d_reference
+assert 'docs/audits/CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1_REPORT.md' in phase_d_reference
 
 # project_state.json must reflect Phase D's preserved acceptance lineage
 # (now cited from the Phase F next_authorized_action seam) even though

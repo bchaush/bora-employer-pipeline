@@ -44,29 +44,28 @@ assert 'docs/decisions/ADR-CAREER-OS-AGENT-CONTEXT-USAGE-EFFICIENCY-V1.md' in co
 assert POLICY_ADR_PATH.exists()
 
 # Live checkpoint must preserve the Phase D authorization/acceptance facts
-# exactly, now as prior_prior_prior_phase since Bora has since separately,
-# explicitly authorized Phase E, then Phase F, and now Phase G as the live
-# current phase.
+# exactly. Phase D has since dropped out of the live three-slot prior_phase
+# chain (as Phase C did before it) now that Bora has separately, explicitly
+# authorized Phase E, Phase F, Phase G, and now accepted Phase H as the live
+# current phase -- Phase D's substance survives only as historical reference.
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
 assert cp['implementation_authorized'] is False
-prior_phase = cp['prior_prior_prior_phase']
-assert prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
-assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_phase['accepted_at'] == '2026-09-11'
-assert cp['prior_prior_phase']['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
+assert cp['prior_prior_prior_phase']['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
+assert cp['prior_prior_prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['prior_prior_prior_phase']['accepted_at'] == '2026-09-12'
+assert cp['prior_prior_phase']['phase_id'] == 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1'
 assert cp['prior_prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['prior_prior_phase']['accepted_at'] == '2026-09-12'
-assert cp['prior_phase']['phase_id'] == 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1'
+assert cp['prior_prior_phase']['accepted_at'] == '2026-09-14'
+assert cp['prior_phase']['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
 assert cp['prior_phase']['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['prior_phase']['accepted_at'] == '2026-09-14'
 
 # Phase D has since been legitimately completed by the operator AND
 # explicitly accepted by Bora (a later, separately-locked acceptance
-# contract governs that event), and is now preserved as prior_prior_prior_phase
-# because Phase E, Phase F, and now Phase G have since advanced the live recovery slots.
+# contract governs that event), and is now preserved only as historical
+# reference because Phase E, Phase F, Phase G, and now Phase H have since
+# advanced the live recovery slots past the three-slot chain's capacity.
 # This authorization-only test must recognize that live progression rather
 # than assert Phase D's absence -- but the acceptance must remain a genuine
 # Bora human event, never self-granted by the operator, and never an
@@ -75,19 +74,16 @@ completed = ' '.join(cp['completed_actions'])
 phase_d_reference = ' '.join(cp['phase_d_completed_actions_reference'])
 assert 'taxonomy' in phase_d_reference.lower()
 assert 'evaluator-coverage map' in phase_d_reference.lower()
-assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['implementation_authorized'] is False
 
-# project_state.json must point at Phase G, the live current phase, while
+# project_state.json must point at Phase H, the live current phase, while
 # preserving Phase D's completed/accepted status in the next_authorized_action
-# seam text, with no implementation authorized and Phase H still proposed only.
-# Phase G has since been freshly authorized by Bora, so current_phase now
-# reads COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE / READ_ONLY_DESIGN_ONLY.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
+# seam text, with no implementation authorized.
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
-assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
-assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
+assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
 assert 'IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']

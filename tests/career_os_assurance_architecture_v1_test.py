@@ -73,7 +73,7 @@ assert REPORT_PATH.exists(), 'substantive Phase G assurance architecture report 
 report_text = REPORT_PATH.read_text(encoding='utf-8')
 report_lower = report_text.lower()
 checkpoint = json.loads(CHECKPOINT_PATH.read_text(encoding='utf-8'))
-checkpoint_not_done = ' '.join(checkpoint['not_completed_or_not_authorized'])
+checkpoint_not_done = ' '.join(checkpoint['phase_g_acceptance_phase_h_authorization_not_completed_or_not_authorized_reference'])
 
 # ---------------------------------------------------------------------------
 # Status banner and epistemic discipline.

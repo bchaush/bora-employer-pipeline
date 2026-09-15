@@ -282,24 +282,25 @@ assert 'Prior-milestone governing status: **GOVERNING**' in milestone_text
 assert 'Prior-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
 assert 'Prior-phase human acceptance: **BORA_ACCEPTED (2026-09-14)**' in milestone_text
 assert 'Prior-prior-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-12)**' in milestone_text
+assert 'Prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-14)**' in milestone_text
 assert 'Prior-prior-prior-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Prior-prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-11)**' in milestone_text
-assert 'Current-phase mode: **READ_ONLY_DESIGN_ONLY**' in milestone_text
+assert 'Prior-prior-prior-phase human acceptance: **BORA_ACCEPTED (2026-09-12)**' in milestone_text
+assert 'Current-phase mode: **BOUNDED_IMPLEMENTATION**' in milestone_text
 assert 'Current-phase authorization status: **BORA_AUTHORIZED**' in milestone_text
 assert 'Current-phase operator status: **COMPLETED_BY_OPERATOR**' in milestone_text
-assert 'Current-phase human acceptance status: **BORA_ACCEPTED (2026-09-14)**' in milestone_text
+assert 'Current-phase human acceptance status: **BORA_ACCEPTED (2026-09-15)**' in milestone_text
 _checkpoint_block_end = milestone_text.index('## Eval & Harness Audit - Roadmap Reference')
 _checkpoint_block = milestone_text[:_checkpoint_block_end]
-assert 'Current phase: `CAREER_OS_ASSURANCE_ARCHITECTURE_V1`\nCurrent-phase mode: **READ_ONLY_DESIGN_ONLY**' in _checkpoint_block, (
-    'the current Phase G line must be immediately followed by its own scoped fields, not unscoped prior fields'
+assert 'Current phase: `CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1` (Phase H)\nCurrent-phase mode: **BOUNDED_IMPLEMENTATION**' in _checkpoint_block, (
+    'the current Phase H line must be immediately followed by its own scoped fields, not unscoped prior fields'
 )
 assert '`implementation_authorized` (global/blanket flag): **false**' in _checkpoint_block, (
-    'the current Phase G checkpoint block must explicitly record implementation_authorized as false'
+    'the current Phase H checkpoint block must explicitly record implementation_authorized as false'
 )
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _checkpoint_block
+assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in _checkpoint_block
 assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _checkpoint_block
-assert 'a separately authored, bounded Phase H builder pass' in _checkpoint_block
+assert 'a separately authored, bounded Phase H Recommendation B builder pass' in _checkpoint_block
 # Fail closed if the stale pre-completion wording -- true only before Phase F's
 # substantive operator work was completed -- reappears.
 for stale in (

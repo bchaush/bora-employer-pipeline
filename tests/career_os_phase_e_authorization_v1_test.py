@@ -7,10 +7,7 @@ from pathlib import Path
 # never be satisfied by two unrelated, independently true substrings. Markdown
 # bold is allowed around PROPOSED_NOT_AUTHORIZED only where the surface actually
 # renders it that way.
-PHASE_H_PROPOSED_NOT_AUTHORIZED = re.compile(
-    r'Phase H and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
-    re.IGNORECASE,
-)
+PHASE_D_HISTORICAL_REFERENCE = re.compile(r'(?:Phase D|CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1).{0,700}(?:historical reference|historical-reference|dropped out of the live)', re.IGNORECASE | re.DOTALL)
 PHASE_I_PROPOSED_NOT_AUTHORIZED = re.compile(
     r'Phase I and every later roadmap phase remain \*{0,2}PROPOSED_NOT_AUTHORIZED\*{0,2}',
     re.IGNORECASE,
@@ -55,49 +52,49 @@ assert PHASE_E_REPORT_PATH.exists(), 'substantive Phase E report missing'
 
 # Live checkpoint must preserve both the original Phase E authorization event
 # AND its subsequent substantive operator-completion/acceptance transition,
-# now recorded as prior_prior_phase since Bora has since separately,
-# explicitly authorized Phase F and now Phase G as the live current phase.
+# now recorded as prior_prior_prior_phase since Bora has since separately,
+# explicitly authorized Phase F, Phase G, and now accepted Phase H as the
+# live current phase.
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
 assert cp['implementation_authorized'] is False
-prior_phase = cp['prior_prior_phase']
+prior_phase = cp['prior_prior_prior_phase']
 assert prior_phase['phase_id'] == 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1'
 assert prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert prior_phase['operator_status'] == 'COMPLETED_BY_OPERATOR'
 assert prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert prior_phase['accepted_at'] == '2026-09-12'
 
-# Phase D must be preserved distinctly as prior_prior_prior_phase, never
-# conflated with Phase E's own preserved status.
-prior_prior_phase = cp['prior_prior_prior_phase']
-assert prior_prior_phase['phase_id'] == 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1'
-assert prior_prior_phase['phase_mode'] == 'READ_ONLY_DESIGN_ONLY'
-assert prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert prior_prior_phase['accepted_at'] == '2026-09-11'
+# Phase D has since dropped out of the live three-slot chain entirely (as
+# Phase C did before it); its substance survives only as historical
+# reference, never conflated with Phase E's own preserved status.
+assert 'phase_d_completed_actions_reference' in cp
 
-# Phase F must be preserved distinctly as prior_phase, the most recently
-# accepted phase before Phase G's fresh authorization.
-prior_f_phase = cp['prior_phase']
+# Phase F must be preserved distinctly as prior_prior_phase, and Phase G as
+# prior_phase, the most recently accepted phases before Phase H's acceptance.
+prior_f_phase = cp['prior_prior_phase']
 assert prior_f_phase['phase_id'] == 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1'
 assert prior_f_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert prior_f_phase['accepted_at'] == '2026-09-14'
+prior_g_phase = cp['prior_phase']
+assert prior_g_phase['phase_id'] == 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1'
+assert prior_g_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert prior_g_phase['accepted_at'] == '2026-09-14'
 
 # Phase E's full operator-completion/acceptance lifecycle narrative is
-# preserved as historical reference now that Phase G is current and Phase F is prior_phase.
+# preserved as historical reference now that Phase H is current.
 assert 'phase_e_completed_actions_reference' in cp
 phase_e_reference = ' '.join(cp['phase_e_completed_actions_reference'])
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in phase_e_reference
 assert 'exactly 15 case IDs' in phase_e_reference
 
-# project_state.json must point at Phase G, the live current phase, while
+# project_state.json must point at Phase H, the live current phase, while
 # Phase E's completed/accepted status is preserved in the
-# next_authorized_action seam text, with no implementation authorized and
-# Phase H still proposed only.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
+# next_authorized_action seam text, with no implementation authorized.
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
-assert 'READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['current_phase']
-assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
+assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
 assert 'IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
@@ -105,20 +102,19 @@ assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['next_auth
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action'])
 
 # CURRENT_MILESTONE.md / CURRENT_STATE.md / AGENTS.md / the eval-harness ADR
-# must all agree: Phase D remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY as
-# prior_prior_prior_phase, Phase E remains BORA_ACCEPTED/READ_ONLY_DESIGN_ONLY
-# as prior_prior_phase, Phase F remains COMPLETED_BY_OPERATOR / BORA_ACCEPTED
-# (2026-09-14) / READ_ONLY_DESIGN_ONLY as prior_phase, and Phase G is now the
-# live current phase, with Phase H and later still PROPOSED_NOT_AUTHORIZED.
+# must all agree on the post-Phase-H live hierarchy: Phase D is historical
+# reference outside the live three-slot chain; Phase E is prior_prior_prior_phase;
+# Phase F is prior_prior_phase; Phase G is prior_phase; Phase H is accepted;
+# Recommendation B is the current scoped authorization; Phase I+ remain closed.
 for surface_name, surface_text in (
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
     ('CURRENT_STATE.md', CURRENT_STATE),
     ('AGENTS.md', AGENTS),
     ('ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md', ADR),
 ):
-    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in surface_text, (
-        f'{surface_name} must preserve Phase D itself as COMPLETED_BY_OPERATOR / '
-        f'BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY, now prior_prior_prior_phase'
+    assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in surface_text
+    assert PHASE_D_HISTORICAL_REFERENCE.search(surface_text), (
+        f'{surface_name} must map Phase D to historical reference outside the live three-slot chain'
     )
     assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in surface_text, (
         f'{surface_name} must name Phase E (CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1)'
@@ -151,8 +147,8 @@ for surface_name, surface_text in (
         f'{surface_name} must state Phase G\'s own accepted coupled state'
     )
 
-    # Phase H (and every later roadmap phase) must be coupled to
-    # PROPOSED_NOT_AUTHORIZED, not proven by two unrelated substrings.
+    # Phase H is accepted; the current scoped grant is Recommendation B, while
+    # Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED.
     assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in surface_text, (
         f'{surface_name} must name the scoped Phase H timing-observability milestone'
     )
@@ -169,7 +165,7 @@ for surface_name, surface_text in (
 # maintain (CURRENT_MILESTONE.md, AGENTS.md), so a fresh session cannot read
 # a stale looser summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase G (Assurance Architecture) BORA ACCEPTED (2026-09-14); Phase H (Assurance Timing Observability) BORA AUTHORIZED, SCOPED', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Phase H (Assurance Timing Observability) BORA ACCEPTED (2026-09-15); Recommendation B (Milestone Run V1 Targeted Optimization) BORA AUTHORIZED, SCOPED', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
 }
 for surface_name in ('CURRENT_MILESTONE.md', 'AGENTS.md'):

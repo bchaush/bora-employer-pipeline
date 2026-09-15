@@ -92,35 +92,33 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ON
 assert 'NOT_YET_GOVERNING' not in text
 assert 'BORA_ACCEPTED (2026-09-11)' in text
 
-# Phase E's substantive work is COMPLETED_BY_OPERATOR / BORA_ACCEPTED
-# (2026-09-12); after Phase G authorization the recovery slots are
-# D=prior_prior_prior_phase, E=prior_prior_phase, F=prior_phase.
+# The live recovery stack has advanced through Phase H acceptance: Phase D is
+# historical reference only; Phase E=prior_prior_prior_phase;
+# Phase F=prior_prior_phase; Phase G=prior_phase.
 assert 'Bora explicitly authorized Phase E' in text
 assert 'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1' in text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in text
-assert 'Phase D is now **PRIOR_PRIOR_PRIOR_PHASE**' in text
-assert 'Phase E is now **PRIOR_PRIOR_PHASE**' in text
-assert 'Phase E is now **PRIOR_PHASE**' not in text
+assert ('Phase D is now **HISTORICAL_REFERENCE**' in text or 'Phase D substantive work remains COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY, now dropped out of the live three-slot chain' in text)
+assert 'Phase E is now **PRIOR_PRIOR_PRIOR_PHASE**' in text
 assert 'I accept Phase E' in text
 
-# Phase F is now COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14), now
-# recorded as prior_phase; the ADR must positively state Bora's explicit
-# authorization, subsequent operator completion, and explicit human
-# acceptance.
+# Phase F remains accepted and is now prior_prior_phase.
 assert 'Bora explicitly authorized Phase F' in text
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in text
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in text
 assert 'I authorize Phase F' in text
+assert 'Phase F (`CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1`) is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY, now prior_prior_phase' in text
 
-# Phase G is now COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14); the ADR
-# must positively state Bora's explicit authorization (built from Bora's two
-# exact statements), Phase G's Bora acceptance, Phase H's scoped
-# authorization, and couple Phase I to PROPOSED_NOT_AUTHORIZED.
+# Phase G remains accepted and is now prior_phase. Phase H is accepted, while
+# Recommendation B is the current scoped authorization. Recommendation C and
+# Phase I/later remain closed.
 assert 'Bora explicitly authorized Phase G' in text or 'Bora has since, separately and explicitly, authorized Phase G' in text
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in text
-assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in text
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in text
+assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-15) / BOUNDED_IMPLEMENTATION' in text
+assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in text
 assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in text or 'IMPLEMENTATION AUTHORITY SCOPED TO THIS MILESTONE ONLY' in text
+assert 'Recommendation C remains NOT_AUTHORIZED' in text or 'RECOMMENDATION C' in text
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(text), (
     'ADR must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject'
 )
@@ -215,10 +213,10 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in CURRENT_STATE
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in CURRENT_STATE
 assert '**SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in CURRENT_STATE
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_ARCHITECTURE_V1')
+assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-14)' in PROJECT_STATE['current_phase']
-assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
+assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
 assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['current_phase']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
@@ -227,7 +225,7 @@ assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_act
     "project_state.next_authorized_action must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject"
 )
 assert 'No product automation' in PROJECT_STATE['next_authorized_action']
-assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-14'
+assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-15'
 
 # project_state.json's own executability-class summary must name all four
 # hardened classes, including HUMAN_CONFIRMED_REFERENCE (the human
@@ -258,9 +256,13 @@ assert (
     not in AGENTS
 ), 'stale pre-acceptance Phase G PENDING wording must not appear in AGENTS.md'
 assert (
-    'Phase H (`CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1`) is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED'
+    'Phase H (`CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1`) is COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-15) / BOUNDED_IMPLEMENTATION'
     in AGENTS
-), 'AGENTS.md must describe Phase H as BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED'
+), 'AGENTS.md must describe Phase H as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-15) / BOUNDED_IMPLEMENTATION'
+assert (
+    'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1` (Phase H Recommendation B) is BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED'
+    in AGENTS
+), 'AGENTS.md must describe Recommendation B as BORA_AUTHORIZED / SELECTED / NOT_YET_COMPLETED'
 
 AUDIT_REPORT = ROOT / 'docs' / 'audits' / 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md'
 assert AUDIT_REPORT.exists(), 'durable Phase B operator audit report missing'
@@ -330,22 +332,23 @@ assert 'does not constitute acceptance of any later phase' not in phase_c_text o
 print('PASS: Career OS eval/harness roadmap and cold-start recovery lock verified.')
 
 
-# Post-Phase-G recovery slot fail-closed checks.
+# Post-Phase-H recovery slot fail-closed checks.
 section6 = text.split('## 6. New-chat recovery protocol', 1)[1].split('## 7. Audit deliverables required before implementation', 1)[0]
-assert section6.count('Phase D is now **PRIOR_PRIOR_PRIOR_PHASE**') == 1
-assert section6.count('Phase E is now **PRIOR_PRIOR_PHASE**') == 1
-assert section6.count('now recorded as **PRIOR_PHASE**') == 1
-assert 'Phase D is now **PRIOR_PRIOR_PHASE**' not in section6
-assert 'Phase E is now **PRIOR_PHASE**' not in section6
+assert section6.count('Phase D is now **HISTORICAL_REFERENCE** outside the live three-slot prior-phase chain.') == 1
+assert section6.count('Phase E is now **PRIOR_PRIOR_PRIOR_PHASE**') == 1
+assert section6.count('now recorded as **PRIOR_PRIOR_PHASE**') == 1
+assert 'Phase D is now **PRIOR_PRIOR_PRIOR_PHASE**' not in section6
+assert 'Phase E is now **PRIOR_PRIOR_PHASE**' not in section6
 
 agents_recovery = AGENTS.split('## Eval / Harness Roadmap Recovery', 1)[1].split('## Agent Context & Usage Efficiency', 1)[0]
-assert agents_recovery.count('now recorded as prior_prior_prior_phase') == 1
-assert agents_recovery.count('Phase E is now recorded as prior_prior_phase.') == 1
-assert agents_recovery.count('now recorded as prior_phase') == 1
-assert 'Phase E is now recorded as prior_phase.' not in agents_recovery
+assert 'now historical reference only outside the live three-slot prior-phase chain' in agents_recovery
+assert agents_recovery.count('Phase E is now recorded as prior_prior_prior_phase.') == 1
+assert agents_recovery.count('Phase F is now COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY, now recorded as prior_prior_phase.') == 1
+assert 'Phase G moves to **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY**' in agents_recovery
 
 checkpoint_data = json.loads((ROOT / 'CURRENT_EXECUTION_CHECKPOINT.json').read_text(encoding='utf-8'))
 checkpoint_ta = checkpoint_data['terminal_adjudication']
-assert re.search(r'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 \(PHASE D\).*?recorded as prior_prior_prior_phase', checkpoint_ta)
-assert re.search(r'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 \(PHASE E\).*?recorded as prior_prior_phase', checkpoint_ta)
-assert re.search(r'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1 \(PHASE F\).*?recorded as prior_phase', checkpoint_ta)
+assert re.search(r'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1 \(Phase D\).*?historical reference outside the live three-slot prior-phase chain', checkpoint_ta)
+assert re.search(r'CAREER_OS_SYSTEM_EVAL_SET_ARCHITECTURE_V1 \(Phase E\).*?recorded as prior_prior_prior_phase', checkpoint_ta)
+assert re.search(r'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1 \(PHASE F\).*?recorded as prior_prior_phase', checkpoint_ta)
+assert re.search(r'CAREER_OS_ASSURANCE_ARCHITECTURE_V1 \(Phase G\).*?prior_phase', checkpoint_ta, re.I)
