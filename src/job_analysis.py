@@ -39,6 +39,10 @@ from qualification_gate import (
     validate_gate_requirement_references,
     validate_gate_source_traceability,
 )
+from related_experience_duration import (
+    evaluate_related_experience_duration_requirement,
+    is_related_experience_duration_requirement,
+)
 from requirement_match import infer_requirement_capabilities, match_requirements
 from requirement_normalize import normalize_structured_requirements
 from requirement_source_role import (
@@ -469,6 +473,7 @@ def analyze_job(
     # experience_range.py are not modified.
     generic_range_requirements: list[dict[str, Any]] = []
     domain_qualified_duration_requirements: list[dict[str, Any]] = []
+    related_experience_duration_requirements: list[dict[str, Any]] = []
     remaining_requirements: list[dict[str, Any]] = []
     for requirement in requirements:
         inferred_caps = infer_requirement_capabilities(requirement)
@@ -480,6 +485,10 @@ def analyze_job(
             requirement, inferred_capabilities=inferred_caps
         ):
             domain_qualified_duration_requirements.append(requirement)
+        elif is_related_experience_duration_requirement(
+            requirement, inferred_capabilities=inferred_caps
+        ):
+            related_experience_duration_requirements.append(requirement)
         else:
             remaining_requirements.append(requirement)
 
@@ -505,6 +514,12 @@ def analyze_job(
         )
         for index, requirement in enumerate(domain_qualified_duration_requirements)
     ]
+    related_experience_duration_matches = [
+        evaluate_related_experience_duration_requirement(
+            job_id=job_id, requirement=requirement, match_index=index
+        )
+        for index, requirement in enumerate(related_experience_duration_requirements)
+    ]
 
     # Restore normalized-Requirement order (partitioning above splits the
     # single ordered `requirements` list in two): downstream consumers key
@@ -516,6 +531,7 @@ def analyze_job(
         for m in match_result["matches"]
         + experience_range_matches
         + domain_qualified_duration_matches
+        + related_experience_duration_matches
     }
     matches = [
         combined_matches_by_req[requirement["requirement_id"]]
