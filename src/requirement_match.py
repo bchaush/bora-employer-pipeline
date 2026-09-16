@@ -328,10 +328,12 @@ _REQ_CAPABILITY_PATTERNS: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
         ),
         frozenset({"us_regulatory_reporting"}),
     ),
-    (
-        re.compile(r"\bsalesforce\b|\bsfdc\b", re.I),
-        frozenset({"salesforce_administration"}),
-    ),
+    # NAMED_PLATFORM_LEARNING_READINESS_V1: Salesforce/SFDC is handled outside
+    # this table (see _SALESFORCE_MENTION / _has_salesforce_capability below)
+    # so that explicit willingness/interest/desire-to-learn language about
+    # Salesforce never infers a present-capability requirement, while genuine
+    # current-capability language ("Salesforce administration required") is
+    # unaffected.
     (
         re.compile(r"\bworkday\b|\bservicenow\b|\bsnow\b|\bsap\b", re.I),
         frozenset({"enterprise_platform_specialization"}),
@@ -888,12 +890,284 @@ def _requirement_blob(requirement: Mapping[str, Any]) -> str:
     return _norm(" ".join(parts))
 
 
+def _requirement_textual_blob(requirement: Mapping[str, Any]) -> str:
+    """Employer free-text surfaces only -- excludes structured `technology`
+    metadata. NAMED_PLATFORM_LEARNING_READINESS_V1 repair: a trailing
+    structured `technology=['Salesforce']` entry must never re-manufacture a
+    present-capability requirement out of text that is only "willingness to
+    learn Salesforce" -- so Salesforce polarity is judged from this blob
+    first, with the technology list consulted only as a legacy fallback (see
+    _has_salesforce_capability) when no textual Salesforce/SFDC mention
+    exists at all.
+    """
+    parts = [
+        str(requirement.get("text") or ""),
+        str(requirement.get("source_text") or ""),
+        str(requirement.get("domain") or ""),
+        str(requirement.get("category") or ""),
+    ]
+    return _norm(" ".join(parts))
+
+
+_SALESFORCE_MENTION = re.compile(r"\bsalesforce\b|\bsfdc\b")
+
+# NAMED_PLATFORM_LEARNING_READINESS_V1: explicit employer willingness/
+# readiness-to-learn language. Deliberately narrow and literal (no broad
+# semantic parsing) -- only recognizes "to learn"/"in learning" governed by
+# willingness, interest, desire, eagerness, or readiness.
+_SALESFORCE_LEARNING_INTENT = re.compile(
+    r"\b(?:willingness|desire|interest|eagerness|readiness)\s+to\s+learn\b|"
+    r"\bwilling(?:ness)?\s+to\s+learn\b|"
+    r"\binterest(?:ed)?\s+in\s+learning\b|"
+    r"\beager(?:ness)?\s+to\s+learn\b|"
+    r"\bread(?:y|iness)\s+to\s+learn\b"
+)
+
+# NAMED_PLATFORM_LEARNING_READINESS_V1 F1 repair: a narrow, literal
+# present-capability phrase that directly governs a Salesforce/SFDC mention
+# ("Salesforce proficiency required", "hands-on Salesforce experience
+# required", "experience with Salesforce required") outranks unrelated
+# learning/readiness language earlier in the same sentence ("Willingness to
+# learn Asana, and Salesforce proficiency required" is a genuine present
+# requirement, not a learning statement, even though "willingness to learn"
+# appears earlier in the sentence). Deliberately limited to the "at minimum"
+# forms plus administration, not a general capability parser.
+_SALESFORCE_PRESENT_CAPABILITY_LOCAL = re.compile(
+    r"(?:hands-on\s+)?(?:salesforce|sfdc)\s+"
+    r"(?:administration|proficiency|experience)\s+(?:is\s+)?required\b|"
+    r"\bexperience\s+(?:with|in)\s+(?:salesforce|sfdc)\s+(?:is\s+)?required\b",
+    re.I,
+)
+
+# NAMED_PLATFORM_LEARNING_READINESS_V1 micro-repair: explicit employer
+# negated/non-required current-possession language about Salesforce/SFDC
+# ("No Salesforce experience required", "Salesforce experience is not
+# required", "Prior Salesforce experience not required"). An explicit
+# statement that Salesforce experience is NOT required is never a
+# present-capability requirement. Matched as a literal span (rather than a
+# preceding-window check like _SALESFORCE_LEARNING_INTENT) because the
+# negation cue ("required"/"not required") trails the mention here instead
+# of preceding it.
+_SALESFORCE_NEGATED_REQUIREMENT = re.compile(
+    r"\bno\s+(?:prior\s+)?(?:salesforce|sfdc)\s+experience\s+(?:is\s+)?required\b|"
+    r"\b(?:prior\s+)?(?:salesforce|sfdc)\s+experience\s+is\s+not\s+required\b|"
+    r"\b(?:prior\s+)?(?:salesforce|sfdc)\s+experience\s+not\s+required\b",
+    re.I,
+)
+
+# NAMED_PLATFORM_LEARNING_READINESS_V1 F3 repair: the structured
+# `technology` fallback (used only when the employer's free text has no
+# textual Salesforce/SFDC mention at all) must fire only when that free text
+# is neutral with respect to CRM/platform capability. A negated/non-required
+# statement about CRM experience specifically ("No CRM experience required",
+# "CRM experience is not required") is not neutral even though it never
+# names Salesforce/SFDC explicitly, because CRM is the generic category
+# Salesforce (a CRM platform) falls under.
+#
+# NAMED_PLATFORM_LEARNING_READINESS_V1 STRUCTURED_FALLBACK_OVERBROAD_
+# NEGATION_CORRECTION_V1: an earlier version of this guard, `_GENERIC_NOT_
+# REQUIRED`, matched ANY "no ... required" / "not required" span anywhere in
+# the free text regardless of subject -- so unrelated negated requirements
+# with no platform/CRM relevance at all ("No travel required", "No
+# relocation required") also withheld the legacy tech-only fallback, even
+# though the negation has nothing to do with platform capability. The fix
+# narrows the guard to require the negation to actually govern CRM/customer-
+# relationship-management experience specifically (mirroring
+# _SALESFORCE_NEGATED_REQUIREMENT's literal-span shape for the named
+# platform), rather than firing on any "no"/"not required" text in the
+# requirement regardless of subject.
+#
+# NAMED_PLATFORM_LEARNING_READINESS_V1 CRM_PLATFORM_HALF_CONTRACT_FIX_V1:
+# the frozen contract requires this guard to withhold the structured
+# fallback for platform-experience non-required language too ("No platform
+# experience required", "Platform experience is not required", "Prior
+# platform experience not required"), not just CRM. The literal "platform"
+# alternative is added alongside CRM/customer-relationship-management,
+# using the same literal-span shape -- still no generic "no ... required"
+# regex.
+# NAMED_PLATFORM_LEARNING_READINESS_V1 CRM_PLATFORM_COORDINATION_REPAIR_V1:
+# the family above only recognized a single CRM/platform name directly
+# followed by "experience ... required" -- it missed the bounded coordinated
+# category grammar employers actually use ("No CRM or platform experience
+# required", "No CRM/platform experience required", "No CRM and platform
+# experience required", "Prior CRM or platform experience not required").
+# Mirroring _SALESFORCE_NEGATED_REQUIREMENT's disjunct-group shape, an
+# optional bounded "/"/"or"/"and"-joined second name from the same CRM/
+# platform family is permitted between the first name and "experience"; this
+# is additive (single-name forms simply skip the optional group) and stays
+# CRM/platform-specific -- it does not become a generic "no ... required"
+# match on unrelated subjects like travel or relocation.
+_CRM_OR_PLATFORM_NOT_REQUIRED = re.compile(
+    r"\bno\s+(?:prior\s+)?(?:crm|customer\s+relationship\s+management|"
+    r"platform)(?:\s*(?:/|or|and)\s*(?:crm|customer\s+relationship\s+"
+    r"management|platform))?\s+experience\s+(?:is\s+)?required\b|"
+    r"\b(?:prior\s+)?(?:crm|customer\s+relationship\s+management|platform)"
+    r"(?:\s*(?:/|or|and)\s*(?:crm|customer\s+relationship\s+management|"
+    r"platform))?\s+experience\s+is\s+not\s+required\b|"
+    r"\b(?:prior\s+)?(?:crm|customer\s+relationship\s+management|platform)"
+    r"(?:\s*(?:/|or|and)\s*(?:crm|customer\s+relationship\s+management|"
+    r"platform))?\s+experience\s+not\s+required\b",
+    re.I,
+)
+
+# NAMED_PLATFORM_LEARNING_READINESS_V1 DISJUNCTIVE_NEGATION_REPAIR_V1: the
+# negated-requirement literal spans above only recognized a single
+# Salesforce/SFDC name directly followed by "experience ... required" --
+# they missed the disjunctive/slash synonym-pair grammar employers actually
+# use ("No Salesforce or SFDC experience required", "No Salesforce/SFDC
+# experience required"). The optional disjunct group below permits exactly
+# one bounded "/"- or "or"-joined second synonym name between the first
+# platform name and "experience"; it is additive (fully backward compatible
+# with the single-name forms, which simply skip the optional group) and
+# does not touch polarity elsewhere -- negated is still negated only when
+# "required"/"not required" literally governs the mention(s).
+#
+# NAMED_PLATFORM_LEARNING_READINESS_V1 NAND_CONJUNCTION_NEGATION_REPAIR_V1:
+# the disjunct group above only recognized "/" and "or" joining the two
+# synonym names, so natural `and` coordination ("No Salesforce and SFDC
+# experience required", "Prior Salesforce and SFDC experience not
+# required") fell through to a bare positive. `and` is added to the same
+# bounded connector alternation, alongside (not instead of) "/" and "or".
+_SALESFORCE_NEGATED_REQUIREMENT = re.compile(
+    r"\bno\s+(?:prior\s+)?(?:salesforce|sfdc)"
+    r"(?:\s*(?:/|or|and)\s*(?:salesforce|sfdc))?"
+    r"\s+experience\s+(?:is\s+)?required\b|"
+    r"\b(?:prior\s+)?(?:salesforce|sfdc)"
+    r"(?:\s*(?:/|or|and)\s*(?:salesforce|sfdc))?"
+    r"\s+experience\s+is\s+not\s+required\b|"
+    r"\b(?:prior\s+)?(?:salesforce|sfdc)"
+    r"(?:\s*(?:/|or|and)\s*(?:salesforce|sfdc))?"
+    r"\s+experience\s+not\s+required\b",
+    re.I,
+)
+
+# NAMED_PLATFORM_LEARNING_READINESS_V1 SYNONYM_COMENTION_INTENT_REPAIR_V1:
+# a narrow, literal set of keywords that mark a Salesforce/SFDC mention as
+# governed by its OWN new clause (present-capability, negation, or a fresh
+# requirement) rather than being a bare coordinated repeat of the
+# immediately preceding Salesforce/SFDC mention in the same list (e.g. the
+# "SFDC" in "Willingness to learn Salesforce and SFDC", or in "...
+# Salesforce, Asana, and SFDC"). Used only to decide whether a second (or
+# later) mention should inherit the preceding mention's already-resolved
+# suppression instead of defaulting to a bare positive -- see
+# _has_salesforce_capability.
+#
+# NAMED_PLATFORM_LEARNING_READINESS_V1 COMENTION_KEYWORD_ADJACENCY_REPAIR_V1:
+# the original version matched the governing keyword ANYWHERE in the
+# mention-scoped window, so an unrelated governing word that actually
+# governs a DIFFERENT item earlier in the window ("Willingness to learn
+# Salesforce and experience with Asana and SFDC" -- "experience" governs
+# Asana, not the later SFDC mention) was wrongly treated as freshly
+# governing the later Salesforce/SFDC mention. The keyword must instead sit
+# at the END of the window (optionally followed by one bounded connector
+# word), i.e. immediately adjacent to the mention it is being credited with
+# governing, not merely present somewhere earlier in the coordinated list.
+_SF_GOVERNING_KEYWORD = re.compile(
+    r"\b(?:required|experience|administration|proficiency|hands[- ]?on)\b"
+    r"(?:\s+(?:with|in|of|to|for)\b)?\s*$",
+    re.I,
+)
+
+
+def _has_salesforce_capability(blob: str) -> bool:
+    """True if blob contains a genuine present-capability Salesforce/SFDC
+    requirement, not merely willingness/interest/desire-to-learn language.
+
+    NAMED_PLATFORM_LEARNING_READINESS_V1 repair (mention-scoped, not
+    clause-scoped): each Salesforce/SFDC mention is checked only against the
+    text between the END of the PRECEDING Salesforce/SFDC mention (or the
+    nearest preceding '.'/';', or the start of the blob) and the mention
+    itself. Whole-clause scoping previously let learning language governing
+    an EARLIER mention in the same sentence also suppress a LATER,
+    independent mention in that same sentence ("Willingness to learn
+    Salesforce and experience with Salesforce required" -- the second
+    "Salesforce" is governed by "experience with", not by "willingness to
+    learn", but clause-scoping saw "willingness to learn" in the text
+    preceding both mentions and suppressed both). Mention-scoping fixes this
+    while still correctly reaching back across an intervening named platform
+    ("Willingness to learn Asana and Salesforce" -- only one mention, so its
+    scoped window is unchanged and still reaches "to learn").
+    """
+    negated_spans = [
+        (m.start(), m.end()) for m in _SALESFORCE_NEGATED_REQUIREMENT.finditer(blob)
+    ]
+    present_capability_spans = [
+        (m.start(), m.end())
+        for m in _SALESFORCE_PRESENT_CAPABILITY_LOCAL.finditer(blob)
+    ]
+
+    prev_mention_end = 0
+    for mention_index, match in enumerate(_SALESFORCE_MENTION.finditer(blob)):
+        window_start = max(
+            prev_mention_end,
+            blob.rfind(".", 0, match.start()) + 1,
+            blob.rfind(";", 0, match.start()) + 1,
+        )
+        window = blob[window_start : match.start()]
+        prev_mention_end = match.end()
+        is_negated = any(
+            start <= match.start() < end for start, end in negated_spans
+        )
+        governed_by_present_capability = any(
+            start <= match.start() < end for start, end in present_capability_spans
+        )
+        if governed_by_present_capability and not is_negated:
+            return True
+        if is_negated:
+            continue
+        if _SALESFORCE_LEARNING_INTENT.search(window):
+            continue
+        # SYNONYM_COMENTION_INTENT_REPAIR_V1: a later mention (SFDC after
+        # Salesforce, or vice versa) whose intervening text is a bare
+        # coordination -- "and"/"or"/","/another named item, but no new
+        # governing keyword ("required"/"experience"/"administration"/
+        # "proficiency"/"hands-on") -- is a synonym repeat of the SAME
+        # requirement, not an independent mention. Every earlier mention
+        # reaching this point in the loop already resolved to suppressed
+        # (negated or learning-intent), since a present-capability
+        # resolution returns True immediately above; inherit that
+        # suppression instead of defaulting to a bare positive. This fixes
+        # "Willingness to learn Salesforce and SFDC" (and "...or SFDC",
+        # "Salesforce, Asana, and SFDC") without weakening the genuine
+        # second-mention positive control ("Willingness to learn Salesforce
+        # and experience with Salesforce required"), which is still caught
+        # by the present-capability check above before this is reached.
+        if mention_index > 0 and not _SF_GOVERNING_KEYWORD.search(window):
+            continue
+        return True
+    return False
+
+
 def infer_requirement_capabilities(requirement: Mapping[str, Any]) -> frozenset[str]:
     blob = _requirement_blob(requirement)
     caps: set[str] = set()
     for pattern, tags in _REQ_CAPABILITY_PATTERNS:
         if pattern.search(blob):
             caps.update(tags)
+
+    # NAMED_PLATFORM_LEARNING_READINESS_V1 repair: judge Salesforce/SFDC
+    # polarity from the employer's free text first. Structured `technology`
+    # metadata is consulted only as a legacy fallback when no textual
+    # Salesforce/SFDC mention exists at all -- otherwise a trailing
+    # `technology=['Salesforce']` entry (duplicated into _requirement_blob)
+    # would re-manufacture a present-capability requirement out of text that
+    # is only "willingness to learn Salesforce".
+    textual_blob = _requirement_textual_blob(requirement)
+    if _SALESFORCE_MENTION.search(textual_blob):
+        if _has_salesforce_capability(textual_blob):
+            caps.add("salesforce_administration")
+    else:
+        tech = requirement.get("technology")
+        text_is_neutral = not _SALESFORCE_LEARNING_INTENT.search(
+            textual_blob
+        ) and not _CRM_OR_PLATFORM_NOT_REQUIRED.search(textual_blob)
+        if (
+            text_is_neutral
+            and isinstance(tech, list)
+            and any(_SALESFORCE_MENTION.search(_norm(str(item))) for item in tech)
+        ):
+            caps.add("salesforce_administration")
+
     return frozenset(caps)
 
 
