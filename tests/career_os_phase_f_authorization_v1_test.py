@@ -95,12 +95,16 @@ assert cp['implementation_authorized'] is False
 # Phase F's historical contract.
 for _field_name, _field_text in (
     ('terminal_adjudication', cp['terminal_adjudication']),
-    ('not_completed_or_not_authorized', ' '.join(cp['not_completed_or_not_authorized'])),
     ('continuity_rule', cp['continuity_rule']),
 ):
-    assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in _field_text, f'{_field_name} must name scoped Recommendation B'
-    assert ('SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _field_text or 'scoped exclusively' in _field_text.lower() or 'one named, scoped milestone' in _field_text.lower() or 'scoped strictly' in _field_text.lower() or 'never a blanket/global implementation grant' in _field_text.lower()), f'{_field_name} must preserve scoped-not-global authority'
+    assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in _field_text, f'{_field_name} must preserve Recommendation B history'
+    assert ('SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _field_text or 'scoped exclusively' in _field_text.lower() or 'one named, scoped milestone' in _field_text.lower() or 'scoped strictly' in _field_text.lower() or 'never a blanket/global implementation grant' in _field_text.lower()), f'{_field_name} must preserve historical scoped-not-global authority'
     assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_field_text), f'{_field_name} must keep Phase I and later closed'
+_not_done = ' '.join(cp['not_completed_or_not_authorized'])
+assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' not in _not_done
+assert 'Recommendation C' in _not_done and 'NOT_AUTHORIZED' in _not_done
+assert 'No new engineering milestone is selected or authorized' in _not_done
+assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_not_done)
 
 # Phase F must be preserved distinctly as prior_prior_phase and Phase E as
 # prior_prior_prior_phase, since Phase H's own acceptance has since shifted
@@ -186,7 +190,8 @@ assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
 assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['next_authorized_action']
-assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['next_authorized_action']
+assert 'OPERATE FIRST / BUILD SECOND' in PROJECT_STATE['next_authorized_action']
+assert 'No new engineering milestone is selected or authorized' in PROJECT_STATE['next_authorized_action']
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action'])
 assert 'CAREER_OS_TRACE_AND_CONTRACT_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
@@ -196,7 +201,7 @@ assert 'CAREER_OS_FAILURE_TAXONOMY_AND_EVALUATOR_COVERAGE_MAP_V1' in PROJECT_STA
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'done brother carry the same discipline and manner' in PROJECT_STATE['next_authorized_action'].lower()
 assert 'love u' in PROJECT_STATE['next_authorized_action'].lower()
-# Live recovery surfaces must now preserve the narrow Phase H grant and keep later work closed.
+# Live recovery surfaces must preserve accepted Phase H context while keeping later engineering closed.
 _live_phase_h_surfaces = (
     ('project_state.next_authorized_action', PROJECT_STATE['next_authorized_action']),
     ('CURRENT_MILESTONE.md', CURRENT_MILESTONE),
@@ -205,9 +210,10 @@ _live_phase_h_surfaces = (
     ('AGENTS', AGENTS),
 )
 for _surface_name, _surface_text in _live_phase_h_surfaces:
-    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _surface_text, f'{_surface_name} must name scoped Phase H'
-    assert ('SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _surface_text or 'one named, scoped milestone' in _surface_text.lower()), f'{_surface_name} must preserve scoped-not-global Phase H authority'
+    assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _surface_text, f'{_surface_name} must preserve Phase H context'
+    assert 'BORA_ACCEPTED (2026-09-15)' in _surface_text, f'{_surface_name} must preserve accepted Phase H context'
     assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(_surface_text), f'{_surface_name} must keep Phase I and later closed'
+assert 'No new engineering milestone is selected or authorized' in PROJECT_STATE['next_authorized_action']
 
 # The historical Phase F report must remain historical; it must not be rewritten to today's Phase H state.
 _phase_f_report_text = PHASE_F_REPORT_PATH.read_text(encoding='utf-8')
@@ -269,7 +275,7 @@ for surface_name, surface_text in (
     )
 
 # FINAL hardened recovery facts (Phase F=prior_prior_phase, Phase E=prior_prior_prior_phase,
-# Phase G=prior_phase, Phase H accepted, Recommendation B current scoped authorization,
+# Phase G=prior_phase, Phase H accepted, Recommendation B accepted with prior scoped authority exhausted,
 # and Phase D historical reference) must appear inside the live recovery-governing sections this
 # milestone is authorized to maintain (CURRENT_MILESTONE.md, AGENTS.md,
 # CURRENT_STATE.md's Current Execution Checkpoint section, and the ADR's
@@ -277,7 +283,7 @@ for surface_name, surface_text in (
 # file -- so a fresh session reading only the recovery section cannot land
 # on a stale or unrelated summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; PENDING BORA ACCEPTANCE', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; BORA ACCEPTED (2026-09-15)', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
     'CURRENT_STATE.md': ('## Current Execution Checkpoint (2026-09-15)', '## Eval & Harness Audit Roadmap Reference (2026-09-15)'),
     'ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md': ('## 6. New-chat recovery protocol', '## 7. Audit deliverables required before implementation'),

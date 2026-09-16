@@ -165,7 +165,7 @@ for surface_name, surface_text in (
 # maintain (CURRENT_MILESTONE.md, AGENTS.md), so a fresh session cannot read
 # a stale looser summary.
 _RECOVERY_SECTION_BOUNDS = {
-    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; PENDING BORA ACCEPTANCE', '## Eval & Harness Audit - Roadmap Reference'),
+    'CURRENT_MILESTONE.md': ('## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; BORA ACCEPTED (2026-09-15)', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
 }
 for surface_name in ('CURRENT_MILESTONE.md', 'AGENTS.md'):

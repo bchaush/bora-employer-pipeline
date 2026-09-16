@@ -1,5 +1,14 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-15 — Career OS Recommendation B human acceptance
+
+- Bora explicitly stated: "I explicitly accept `CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1` as completed. I approve the Recommendation-B result and authorize the system to record my acceptance."
+- Recorded `CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1` as **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-15)** after PR #64 merged the completion-governance sync to canonical main `e521c7972a345f48379304b3df0e9598bc6326b2` and hosted post-merge Assurance run `35033992088` succeeded.
+- Preserved the prior `PENDING_BORA_ACCEPTANCE` completion state as historical evidence; the original scoped Recommendation-B implementation authority remains exhausted.
+- Recommendation C remains **NOT_AUTHORIZED**; Phase I+ remain **PROPOSED_NOT_AUTHORIZED**; global `implementation_authorized=false`; no successor engineering milestone is selected or authorized.
+- **OPERATE FIRST / BUILD SECOND** is now the live default for Career OS Personal v1.
+
+
 This file records material changes to the system.
 
 Do not use this file for every typo or formatting edit. Record changes that affect:

@@ -60,12 +60,12 @@ for forbidden_path in (
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == '0120bcde46a10f1ee7d5ec33e17f5fca7b8fc310'
+assert cp['canonical_basis_sha'] == 'e521c7972a345f48379304b3df0e9598bc6326b2'
 assert BASELINE_SHA in cp['phase_h_acceptance']['canonical_merge_verification']
 assert cp['phase_id'] == REC_B_ID
 assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
-assert cp['accepted_at'] is None
+assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['accepted_at'] == '2026-09-15'
 assert cp['implementation_authorized'] is False
 
 # --- Checkpoint: Phase H acceptance, distinct fact 1 ------------------------
@@ -92,7 +92,7 @@ assert rec_b['selection_status'] == 'SELECTED'
 assert rec_b['operator_status'] == 'NOT_YET_COMPLETED'
 assert rec_b['record_semantics'] == 'HISTORICAL_AUTHORIZATION_SNAPSHOT_SUPERSEDED_BY_RECOMMENDATION_B_COMPLETION'
 assert cp['recommendation_b_completion']['operator_status'] == 'COMPLETED_BY_OPERATOR'
-assert cp['recommendation_b_completion']['human_acceptance_status'] == 'PENDING_BORA_ACCEPTANCE'
+assert cp['recommendation_b_completion']['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert rec_b['selected_from'] == 'PHASE_G_RECOMMENDATION_B_ONLY'
 assert rec_b['implementation_authorization_scope'] == 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL'
 assert 'semantic equivalence to full assurance required to be proven via dedicated regressions' in rec_b['scope_description']
@@ -150,7 +150,8 @@ assert 'phase_d_completed_actions_reference' in cp, (
 not_done = ' '.join(cp['not_completed_or_not_authorized'])
 assert 'Recommendation C' in not_done and 'NOT_AUTHORIZED' in not_done
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(not_done)
-assert REC_B_ID in not_done
+assert REC_B_ID not in not_done
+assert cp['recommendation_b_acceptance']['human_acceptance_status'] == 'BORA_ACCEPTED'
 
 completed = ' '.join(cp['phase_h_acceptance_recommendation_b_authorization_completed_actions_reference'])
 assert BORA_QUOTE in completed
@@ -167,7 +168,7 @@ assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert REC_B_ID in PROJECT_STATE['current_phase']
 assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert BORA_QUOTE in PROJECT_STATE['next_authorized_action']
-assert 'COMPLETED_BY_OPERATOR; PENDING_BORA_ACCEPTANCE' in PROJECT_STATE['current_phase']
+assert 'COMPLETED_BY_OPERATOR; BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action'])
 
 # --- Every live recovery/state surface agrees -------------------------------
@@ -183,7 +184,7 @@ for surface_name, surface_text in (
     )
     assert REC_B_ID in surface_text, f'{surface_name} must name Recommendation B ({REC_B_ID})'
     assert 'BORA_AUTHORIZED' in surface_text
-    assert 'COMPLETED_BY_OPERATOR' in surface_text and 'PENDING_BORA_ACCEPTANCE' in surface_text
+    assert 'COMPLETED_BY_OPERATOR' in surface_text and 'BORA_ACCEPTED (2026-09-15)' in surface_text
     assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in surface_text, (
         f'{surface_name} must state Recommendation B implementation authority is scoped to this milestone only, not global'
     )

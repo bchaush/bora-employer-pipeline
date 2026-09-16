@@ -119,6 +119,10 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-15) / BOUNDED_IMPLEMENTAT
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in text
 assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in text or 'IMPLEMENTATION AUTHORITY SCOPED TO THIS MILESTONE ONLY' in text
 assert 'Recommendation C remains NOT_AUTHORIZED' in text or 'RECOMMENDATION C' in text
+sec10 = text[text.index('## 10. Decision'):text.index('## 11. Reference URLs at lock time')]
+assert '`CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1` (Phase H Recommendation B) is now **COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE**' not in sec10
+assert 'Recommendation B acceptance update (2026-09-15)' in sec10 and 'OPERATE FIRST / BUILD SECOND' in sec10
+
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(text), (
     'ADR must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject'
 )
@@ -175,7 +179,7 @@ assert _seen_phase_f_quartet, 'ADR must preserve a Phase F-anchored accepted qua
 assert _seen_phase_g_quartet, 'ADR must preserve a distinct Phase G-anchored accepted quartet'
 
 assert 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1' in AGENTS
-assert 'do not jump directly to trace infrastructure' in AGENTS
+assert 'No successor engineering milestone is selected or authorized' in AGENTS
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in AGENTS
 assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in AGENTS
 assert 'COMPLETED_BY_OPERATOR and BORA_ACCEPTED' in AGENTS
@@ -261,8 +265,8 @@ assert (
 ), 'AGENTS.md must describe Phase H as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-15) / BOUNDED_IMPLEMENTATION'
 assert (
     'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1` (Phase H Recommendation B) is COMPLETED_BY_OPERATOR / PENDING_BORA_ACCEPTANCE'
-    in AGENTS
-), 'AGENTS.md must describe Recommendation B as operator-completed and pending Bora acceptance'
+    not in AGENTS
+), 'stale live Recommendation-B pending wording must not appear in AGENTS.md'
 
 AUDIT_REPORT = ROOT / 'docs' / 'audits' / 'CAREER_OS_EVAL_AND_HARNESS_AUDIT_V1_REPORT.md'
 assert AUDIT_REPORT.exists(), 'durable Phase B operator audit report missing'

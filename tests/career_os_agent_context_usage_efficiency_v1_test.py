@@ -300,8 +300,8 @@ assert '`implementation_authorized` (global/blanket flag): **false**' in _checkp
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in _checkpoint_block
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in _checkpoint_block
 assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in _checkpoint_block
-assert 'Bora final human review/acceptance of the exact Recommendation B implementation' in _checkpoint_block
-assert 'PENDING_BORA_ACCEPTANCE' in _checkpoint_block
+assert 'OPERATE FIRST / BUILD SECOND' in _checkpoint_block
+assert 'BORA_ACCEPTED (2026-09-15)' in _checkpoint_block
 # Fail closed if the stale pre-completion wording -- true only before Phase F's
 # substantive operator work was completed -- reappears.
 for stale in (
