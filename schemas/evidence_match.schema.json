@@ -60,6 +60,7 @@
         "EXPERIENCE_RANGE_EVALUATOR",
         "DOMAIN_QUALIFIED_DURATION_EVALUATOR",
         "RELATED_EXPERIENCE_DURATION_EVALUATOR",
+        "EDUCATION_FLOOR_EVALUATOR",
         null
       ],
       "description": "ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1: additive, stable, machine-readable identification of which deterministic evaluation path produced this result -- Match truth, never Employer truth. A closed V1 enumeration of currently-real paths only, not a general ontology. Human-readable `explanation` text must never control consequential (qualification-gate) logic; this field is the only machine-readable signal consumers may use for that purpose. Null/absent for match records not produced by one of the enumerated paths (e.g. synthetic/test-constructed records) -- consumers must treat a missing/unrecognized value as UNRESOLVED, never as an authoritative negative."

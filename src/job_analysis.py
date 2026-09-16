@@ -21,6 +21,10 @@ from domain_qualified_duration import (
     evaluate_domain_qualified_duration_requirement,
     is_domain_qualified_duration_requirement,
 )
+from education_floor import (
+    evaluate_education_floor_requirement,
+    is_education_floor_requirement,
+)
 from evidence_repository import validate_evidence_repository
 from experience_range import (
     evaluate_generic_experience_range,
@@ -474,10 +478,26 @@ def analyze_job(
     generic_range_requirements: list[dict[str, Any]] = []
     domain_qualified_duration_requirements: list[dict[str, Any]] = []
     related_experience_duration_requirements: list[dict[str, Any]] = []
+    education_floor_requirements: list[dict[str, Any]] = []
     remaining_requirements: list[dict[str, Any]] = []
     for requirement in requirements:
         inferred_caps = infer_requirement_capabilities(requirement)
-        if is_generic_experience_range_requirement(
+        # EDUCATION_FLOOR_SEMANTICS_V1: routed first among the narrow
+        # evaluators since a plain education-floor requirement (e.g.
+        # "Bachelor's degree required") always produces a non-empty
+        # {"bachelors_degree_credential"} inferred-capability tag from the
+        # existing capability matcher -- unlike the other narrow evaluators
+        # below, which require inferred_capabilities to be empty. Order
+        # relative to those other evaluators does not otherwise matter:
+        # their own text grammars are mutually exclusive with education-
+        # floor grammars.
+        if is_education_floor_requirement(
+            requirement,
+            inferred_capabilities=inferred_caps,
+            gated=requirement["requirement_id"] in gated_requirement_ids,
+        ):
+            education_floor_requirements.append(requirement)
+        elif is_generic_experience_range_requirement(
             requirement, inferred_capabilities=inferred_caps
         ):
             generic_range_requirements.append(requirement)
@@ -520,6 +540,15 @@ def analyze_job(
         )
         for index, requirement in enumerate(related_experience_duration_requirements)
     ]
+    education_floor_matches = [
+        evaluate_education_floor_requirement(
+            job_id=job_id,
+            requirement=requirement,
+            match_index=index,
+            evidence_index=evidence_index,
+        )
+        for index, requirement in enumerate(education_floor_requirements)
+    ]
 
     # Restore normalized-Requirement order (partitioning above splits the
     # single ordered `requirements` list in two): downstream consumers key
@@ -532,6 +561,7 @@ def analyze_job(
         + experience_range_matches
         + domain_qualified_duration_matches
         + related_experience_duration_matches
+        + education_floor_matches
     }
     matches = [
         combined_matches_by_req[requirement["requirement_id"]]
