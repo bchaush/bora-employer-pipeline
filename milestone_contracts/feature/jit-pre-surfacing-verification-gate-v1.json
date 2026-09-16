@@ -1,0 +1,67 @@
+{
+  "milestone_id": "JIT_PRE_SURFACING_VERIFICATION_GATE_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Close the demonstrated provenance gap that lets caller-supplied VERIFIED_LIVE + VERIFIED_DIRECT preserve serious pursuit without a current-run evidence record proving exact first-party identity, actionability, recency provenance, and conflict resolution.",
+  "baseline_sha": "e602bad8d1df7894d38a492d92d9f45d1cddca2a",
+  "allowed_paths": [
+    "src/jit_pre_surfacing_verification.py",
+    "src/job_analysis.py",
+    "tests/jit_pre_surfacing_verification_gate_v1_test.py",
+    "tests/posting_state_decision_wiring_v1_test.py",
+    "tests/job_analysis_test.py",
+    "milestone_contracts/feature/jit-pre-surfacing-verification-gate-v1.json",
+    "CHANGELOG.md",
+    "tests/application_gate_golden_test.py",
+    "tests/domain_qualified_experience_duration_unknown_v1_test.py",
+    "tests/recruiter_threshold_alignment_v1_test.py",
+    "tests/source_semantic_role_qualification_view_v1_test.py",
+    "golden-tests/run_job_analysis_golden_set.py"
+  ],
+  "forbidden_paths": [
+    "schemas/",
+    "src/job_decision.py",
+    "src/application_gate.py",
+    "src/requirement_match.py",
+    "src/qualification_gate.py",
+    "resume/",
+    "claims/",
+    "evidence/",
+    "experiences/",
+    "golden-tests/job_analysis/",
+    ".github/",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md"
+  ],
+  "required_tests": [
+    "tests/jit_pre_surfacing_verification_gate_v1_test.py",
+    "tests/posting_state_decision_wiring_v1_test.py",
+    "tests/job_analysis_test.py",
+    "tests/live_actionability_semantic_quorum_v1_test.py",
+    "tests/end_user_application_transition_quorum_v1_test.py",
+    "tests/application_gate_golden_test.py",
+    "tests/domain_qualified_experience_duration_unknown_v1_test.py",
+    "tests/recruiter_threshold_alignment_v1_test.py",
+    "tests/source_semantic_role_qualification_view_v1_test.py",
+    "golden-tests/run_job_analysis_golden_set.py"
+  ],
+  "acceptance_conditions": [
+    "pre-fix production reproduction proves VERIFIED_LIVE + VERIFIED_DIRECT can preserve APPLY with no coupled verification packet",
+    "favorable posting-state strings alone no longer preserve APPLY-like routing",
+    "a current-run first-party verification envelope with exact official_url/company/role identity, substantive role content, actionable application route, recency provenance, and no unresolved material conflict may preserve APPLY-like routing",
+    "third-party-only, dead/error, identity-mismatch, stale-run, unresolved-conflict, or missing-verification shapes fail closed to WATCH with explicit diagnostic reason codes",
+    "authoritative employer recency may resolve weaker discovery/search recency conflict without fabricating an absolute date",
+    "qualification requirements, evidence matches, gaps, unknowns, hard blockers, and REJECT outcomes remain unchanged",
+    "no crawler, browser automation, ATS-specific adapter, new truth enum, schema redesign, or crowding-as-Employer-Truth implementation is introduced"
+  ],
+  "stop_conditions": [
+    "the causal defect cannot be reproduced on production code",
+    "the repair requires browser/network automation inside the deterministic engine",
+    "the repair requires a new persisted Job truth axis or broad schema redesign",
+    "the repair changes qualification matching or application/legal gate semantics",
+    "the repair requires employer-specific hardcoding"
+  ],
+  "review_requirements": "FOCUSED_RED_BEFORE_BUILD; FULL_CANONICAL_ASSURANCE_AFTER_MUTATION; IMMUTABLE_CURSOR_ADVERSARIAL_REVIEW_BEFORE_COMMIT",
+  "human_approval_requirements": "BORA_EXPLICITLY_DIRECTED_THIS_REPEATED_LIVE-OPERATION_RELIABILITY_DEFECT_TO_BE_FIXED_IF_MECHANICALLY_REPRODUCED_ON_2026-09-15; AUTHORIZATION_IS_BOUNDED_TO_THIS_HARD_CORRECTION_ONLY; NO_RECOMMENDATION_C; NO_PHASE_I; NO_SCOPE_EXPANSION"
+}

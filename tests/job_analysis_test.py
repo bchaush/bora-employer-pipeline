@@ -46,6 +46,49 @@ def _stamp_source_roles(requirements: list[dict]) -> list[dict]:
     return requirements
 
 
+# JIT_PRE_SURFACING_VERIFICATION_GATE_V1 test-continuity helper: several
+# fixtures in this suite deliberately set role_status=VERIFIED_LIVE +
+# source_verification_status=VERIFIED_DIRECT to exercise qualification/
+# role-family actionability routing, not posting-freshness/current-run
+# verification (see each fixture's own comment for that intent). That intent
+# now requires a coupled current-run first-party verification envelope (see
+# tests/jit_pre_surfacing_verification_gate_v1_test.py's immutable
+# regression matrix), or the otherwise-APPLY-like decision downgrades to
+# WATCH. This helper supplies a always-valid envelope so those fixtures keep
+# exercising qualification/family routing exactly as before -- it does not
+# change any qualification expectation.
+_CONTINUITY_VERIFICATION_OPERATION_RUN_ID = "RUN_JOB_ANALYSIS_TEST_CONTINUITY_CURRENT"
+_CONTINUITY_VERIFICATION_OBSERVED_AT = "2026-09-15T12:00:00-04:00"
+_CONTINUITY_VERIFICATION_DATE_LAST_VERIFIED = "2026-09-15"
+
+
+def _with_valid_pre_surfacing_verification(job_input: dict, *, official_url: str) -> dict:
+    job_input = dict(job_input)
+    job_input["official_url"] = official_url
+    job_input["operation_run_id"] = _CONTINUITY_VERIFICATION_OPERATION_RUN_ID
+    job_input["date_last_verified"] = _CONTINUITY_VERIFICATION_DATE_LAST_VERIFIED
+    job_input["pre_surfacing_verification"] = {
+        "verification_kind": "JIT_PRE_SURFACING_VERIFICATION_V1",
+        "operation_run_id": _CONTINUITY_VERIFICATION_OPERATION_RUN_ID,
+        "observed_at": _CONTINUITY_VERIFICATION_OBSERVED_AT,
+        "source_kind": "FIRST_PARTY_DIRECT",
+        "exact_url": official_url,
+        "observed_company": job_input["company"],
+        "observed_role": job_input["role"],
+        "substantive_role_content_present": True,
+        "application_route_status": "ACTIONABLE",
+        "recency_observation": {
+            "state": "AUTHORITATIVE_LIVE_RELATIVE_AGE",
+            "source_kind": "FIRST_PARTY_DIRECT",
+            "observed_at": _CONTINUITY_VERIFICATION_OBSERVED_AT,
+            "posted_age_days": 1,
+        },
+        "material_conflicts": [],
+        "resolved_conflicts": [],
+    }
+    return job_input
+
+
 def assert_true(condition: bool, message: str) -> None:
     if not condition:
         print(f"FAIL: {message}")
@@ -61,24 +104,30 @@ def load_bsa_fixture() -> dict:
     extraction = json.loads(
         (FIXTURE_DIR / "structured_extraction.json").read_text(encoding="utf-8")
     )
-    return {
-        "company": "Northbridge Civic Ops (Synthetic Fixture)",
-        "role": "Business Systems Analyst",
-        "jd_text": jd_text,
-        "fixture_key": "FIXTURE_BSA_001",
-        "structured_extraction": extraction,
-        # POSTING_STATE_DECISION_WIRING_V1: explicitly synthetic fixture
-        # ("Synthetic Fixture" in its own company name); this suite tests
-        # qualification/actionability, not posting-freshness verification.
-        # VERIFIED_LIVE is the correct explicit fixture state for that
-        # intent (Bounded Correction Section 3). PRE_SURFACING_FIRST_
-        # PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired with
-        # source_verification_status=VERIFIED_DIRECT so this same intent
-        # still preserves APPLY-like routing under the new dual-axis
-        # gate (Blueprint §135).
-        "role_status": "VERIFIED_LIVE",
-        "source_verification_status": "VERIFIED_DIRECT",
-    }
+    return _with_valid_pre_surfacing_verification(
+        {
+            "company": "Northbridge Civic Ops (Synthetic Fixture)",
+            "role": "Business Systems Analyst",
+            "jd_text": jd_text,
+            "fixture_key": "FIXTURE_BSA_001",
+            "structured_extraction": extraction,
+            # POSTING_STATE_DECISION_WIRING_V1: explicitly synthetic fixture
+            # ("Synthetic Fixture" in its own company name); this suite tests
+            # qualification/actionability, not posting-freshness verification.
+            # VERIFIED_LIVE is the correct explicit fixture state for that
+            # intent (Bounded Correction Section 3). PRE_SURFACING_FIRST_
+            # PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired with
+            # source_verification_status=VERIFIED_DIRECT so this same intent
+            # still preserves APPLY-like routing under the new dual-axis
+            # gate (Blueprint §135). JIT_PRE_SURFACING_VERIFICATION_GATE_V1:
+            # that same intent now also requires the coupled current-run
+            # envelope supplied by _with_valid_pre_surfacing_verification
+            # below, or the fixture would incorrectly downgrade to WATCH.
+            "role_status": "VERIFIED_LIVE",
+            "source_verification_status": "VERIFIED_DIRECT",
+        },
+        official_url="https://careers.example.test/jobs/FIXTURE_BSA_001",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1160,39 +1209,46 @@ for family, title in [
     ("Business Systems", "Business Systems Analyst"),
     ("Implementation", "Implementation Analyst"),
 ]:
-    app_job = {
-        "company": f"Family Co {family}",
-        "role": title,
-        "jd_text": f"{title} supporting internal applications.",
-        "fixture_key": f"UNIT_FAMILY_{family.replace(' ', '_').upper()}",
-        # POSTING_STATE_DECISION_WIRING_V1: synthetic unit fixture testing
-        # role-family qualification/actionability, not posting freshness.
-        # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
-        # with VERIFIED_DIRECT for the same reason (Blueprint §135).
-        "role_status": "VERIFIED_LIVE",
-        "source_verification_status": "VERIFIED_DIRECT",
-        "structured_extraction": {
-            "role_family": family,
-            "seniority": "EARLY_CAREER",
-            "requirements": [
-                {
-                    "requirement_id": rid,
-                    "job_id": "PLACEHOLDER",
-                    "text": text,
-                    "category": "CORE",
-                    "importance": "MANDATORY",
-                    "seniority_implication": None,
-                    "technology": ["CSV"] if "CSV" in text else [],
-                    "experience_level": None,
-                    "domain": family,
-                    "relevance": "HIGH",
-                    "source_text": text,
-                    "source_location": "Required",
-                }
-                for rid, text in app_core
-            ],
+    fixture_key = f"UNIT_FAMILY_{family.replace(' ', '_').upper()}"
+    app_job = _with_valid_pre_surfacing_verification(
+        {
+            "company": f"Family Co {family}",
+            "role": title,
+            "jd_text": f"{title} supporting internal applications.",
+            "fixture_key": fixture_key,
+            # POSTING_STATE_DECISION_WIRING_V1: synthetic unit fixture testing
+            # role-family qualification/actionability, not posting freshness.
+            # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
+            # with VERIFIED_DIRECT for the same reason (Blueprint §135).
+            # JIT_PRE_SURFACING_VERIFICATION_GATE_V1: that same intent now
+            # also requires the coupled current-run envelope supplied by
+            # _with_valid_pre_surfacing_verification below.
+            "role_status": "VERIFIED_LIVE",
+            "source_verification_status": "VERIFIED_DIRECT",
+            "structured_extraction": {
+                "role_family": family,
+                "seniority": "EARLY_CAREER",
+                "requirements": [
+                    {
+                        "requirement_id": rid,
+                        "job_id": "PLACEHOLDER",
+                        "text": text,
+                        "category": "CORE",
+                        "importance": "MANDATORY",
+                        "seniority_implication": None,
+                        "technology": ["CSV"] if "CSV" in text else [],
+                        "experience_level": None,
+                        "domain": family,
+                        "relevance": "HIGH",
+                        "source_text": text,
+                        "source_location": "Required",
+                    }
+                    for rid, text in app_core
+                ],
+            },
         },
-    }
+        official_url=f"https://careers.example.test/jobs/{fixture_key}",
+    )
     _stamp_source_roles(app_job["structured_extraction"]["requirements"])
     app_result = analyze_job(
         app_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
@@ -1275,39 +1331,45 @@ for text in n1_neg:
 print("PASS N1b: residual precision guards remain non-positive.")
 
 # N-2: Business Applications Analyst positive; SWE application titles reject
-ba_job = {
-    "company": "Apps Analyst Co",
-    "role": "Business Applications Analyst",
-    "jd_text": "Business Applications Analyst supporting internal apps.",
-    "fixture_key": "UNIT_BUSINESS_APPLICATIONS_ANALYST",
-    # POSTING_STATE_DECISION_WIRING_V1: synthetic unit fixture testing
-    # role-family qualification/actionability, not posting freshness.
-    # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
-    # with VERIFIED_DIRECT for the same reason (Blueprint §135).
-    "role_status": "VERIFIED_LIVE",
-    "source_verification_status": "VERIFIED_DIRECT",
-    "structured_extraction": {
-        "role_family": "Business Applications Analyst",
-        "seniority": "EARLY_CAREER",
-        "requirements": [
-            {
-                "requirement_id": rid,
-                "job_id": "PLACEHOLDER",
-                "text": text,
-                "category": "CORE",
-                "importance": "MANDATORY",
-                "seniority_implication": None,
-                "technology": ["CSV"] if "CSV" in text else [],
-                "experience_level": None,
-                "domain": "Application Analyst",
-                "relevance": "HIGH",
-                "source_text": text,
-                "source_location": "Required",
-            }
-            for rid, text in app_core
-        ],
+ba_job = _with_valid_pre_surfacing_verification(
+    {
+        "company": "Apps Analyst Co",
+        "role": "Business Applications Analyst",
+        "jd_text": "Business Applications Analyst supporting internal apps.",
+        "fixture_key": "UNIT_BUSINESS_APPLICATIONS_ANALYST",
+        # POSTING_STATE_DECISION_WIRING_V1: synthetic unit fixture testing
+        # role-family qualification/actionability, not posting freshness.
+        # PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1: paired
+        # with VERIFIED_DIRECT for the same reason (Blueprint §135).
+        # JIT_PRE_SURFACING_VERIFICATION_GATE_V1: that same intent now also
+        # requires the coupled current-run envelope supplied by
+        # _with_valid_pre_surfacing_verification below.
+        "role_status": "VERIFIED_LIVE",
+        "source_verification_status": "VERIFIED_DIRECT",
+        "structured_extraction": {
+            "role_family": "Business Applications Analyst",
+            "seniority": "EARLY_CAREER",
+            "requirements": [
+                {
+                    "requirement_id": rid,
+                    "job_id": "PLACEHOLDER",
+                    "text": text,
+                    "category": "CORE",
+                    "importance": "MANDATORY",
+                    "seniority_implication": None,
+                    "technology": ["CSV"] if "CSV" in text else [],
+                    "experience_level": None,
+                    "domain": "Application Analyst",
+                    "relevance": "HIGH",
+                    "source_text": text,
+                    "source_location": "Required",
+                }
+                for rid, text in app_core
+            ],
+        },
     },
-}
+    official_url="https://careers.example.test/jobs/UNIT_BUSINESS_APPLICATIONS_ANALYST",
+)
 _stamp_source_roles(ba_job["structured_extraction"]["requirements"])
 ba_result = analyze_job(ba_job, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX)
 assert_true(ba_result["valid"] is True, ba_result["errors"])
@@ -1459,25 +1521,31 @@ for text in p2_neg:
     assert_true(m["result"] == "NONE", f"generic {text!r} -> {m}")
 print("PASS P2c: generic process/workflow words remain non-positive.")
 
-p2_fixture = {
-    "company": "Process Studio",
-    "role": "Business Process Analyst",
-    "jd_text": (ROOT / "golden-tests/job_analysis/GT_PROCESS_MAP_P2/jd.txt").read_text(
-        encoding="utf-8"
-    ),
-    "fixture_key": "GT_PROCESS_MAP_P2",
-    # POSTING_STATE_DECISION_WIRING_V1: mirrors the synthetic Golden fixture
-    # of the same id, testing qualification/actionability, not posting
-    # freshness. PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1:
-    # paired with VERIFIED_DIRECT for the same reason (Blueprint §135).
-    "role_status": "VERIFIED_LIVE",
-    "source_verification_status": "VERIFIED_DIRECT",
-    "structured_extraction": json.loads(
-        (
-            ROOT / "golden-tests/job_analysis/GT_PROCESS_MAP_P2/structured_extraction.json"
-        ).read_text(encoding="utf-8")
-    ),
-}
+p2_fixture = _with_valid_pre_surfacing_verification(
+    {
+        "company": "Process Studio",
+        "role": "Business Process Analyst",
+        "jd_text": (ROOT / "golden-tests/job_analysis/GT_PROCESS_MAP_P2/jd.txt").read_text(
+            encoding="utf-8"
+        ),
+        "fixture_key": "GT_PROCESS_MAP_P2",
+        # POSTING_STATE_DECISION_WIRING_V1: mirrors the synthetic Golden fixture
+        # of the same id, testing qualification/actionability, not posting
+        # freshness. PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1:
+        # paired with VERIFIED_DIRECT for the same reason (Blueprint §135).
+        # JIT_PRE_SURFACING_VERIFICATION_GATE_V1: that same intent now also
+        # requires the coupled current-run envelope supplied by
+        # _with_valid_pre_surfacing_verification below.
+        "role_status": "VERIFIED_LIVE",
+        "source_verification_status": "VERIFIED_DIRECT",
+        "structured_extraction": json.loads(
+            (
+                ROOT / "golden-tests/job_analysis/GT_PROCESS_MAP_P2/structured_extraction.json"
+            ).read_text(encoding="utf-8")
+        ),
+    },
+    official_url="https://careers.example.test/jobs/GT_PROCESS_MAP_P2",
+)
 p2_result = analyze_job(
     p2_fixture, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX
 )
