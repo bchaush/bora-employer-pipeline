@@ -48,13 +48,21 @@ A requirement is routed here ONLY when ALL four conditions hold:
      "experience" somewhere, and not the bare presence of a populated
      `domain` field alone.
 
-V1 recognizes ONLY a minimum-bound "N years of experience in <domain>"
-family (word-plus-parenthetical-digit, e.g. "Three (3) years...", and bare
-digit, e.g. "5 years..." or "5+ years..."), the exact shapes evidenced in
-the real fixture corpus. It does NOT recognize a range or maximum-bound
-domain-qualified grammar (not evidenced) and does NOT accept "with" in
-place of "in" (not evidenced in the real corpus; broadening beyond what is
-evidenced is explicitly out of scope for this milestone).
+V1 recognizes a minimum-bound "N years of experience in <domain>" family
+(word-plus-parenthetical-digit, e.g. "Three (3) years...", and bare digit,
+e.g. "5 years..." or "5+ years...") and a numeric-RANGE "N-M years of
+experience in <domain>" family (plain hyphen or en dash, e.g. "0-2 years
+of experience in IT, telecommunications, ..." -- the real, live Global
+Partners Network Operations Service Analyst posting, R0031886), the exact
+shapes evidenced in the real fixture/posting corpus. An inverted range
+("3-1 years...") is malformed text, not a range whose bounds this module
+may silently swap or "correct" -- refusing to recognize it (returning
+None) is the truth-preserving choice, mirroring experience_range.py's own
+identical rule for its domain-free range grammar. It does NOT recognize a
+maximum-bound domain-qualified grammar (not evidenced) and does NOT
+accept "with" in place of "in" (not evidenced in the real corpus;
+broadening beyond what is evidenced is explicitly out of scope for this
+milestone).
 
 V1 ALWAYS returns UNKNOWN for a recognized domain-qualified duration
 requirement -- never NONE (no fabricated disproof of the domain
@@ -109,16 +117,24 @@ _DIGIT_MINIMUM = re.compile(
     r"^\s*(\d+)\+?\s*years?\s+of\s+experience\s+in\s+.+$",
     re.IGNORECASE,
 )
+# "0-2 years of experience in IT, telecommunications, network operations,
+# ..." / "0–2 years of experience in ..." -- plain-hyphen or en-dash
+# numeric range, the real, live Global Partners Network Operations Service
+# Analyst posting (R0031886) shape.
+_DIGIT_RANGE = re.compile(
+    r"^\s*(\d+)\s*[-–]\s*(\d+)\s*years?\s+of\s+experience\s+in\s+.+$",
+    re.IGNORECASE,
+)
 
 
 def parse_domain_qualified_duration(text: str) -> dict[str, Any] | None:
     """Parse a "N years of experience in <domain>" phrase.
 
-    Returns an internal-only structure ``{lower_bound, grammar}`` when the
-    text is an exact match for one of V1's narrowly supported shapes, or
-    ``None`` otherwise. ``None`` means "not a recognized domain-qualified
-    duration shape" -- callers must never guess a bound for unrecognized
-    text.
+    Returns an internal-only structure ``{lower_bound, grammar}`` (a range
+    match also carries ``upper_bound``) when the text is an exact match for
+    one of V1's narrowly supported shapes, or ``None`` otherwise. ``None``
+    means "not a recognized domain-qualified duration shape" -- callers
+    must never guess a bound for unrecognized text.
     """
     if not isinstance(text, str):
         return None
@@ -127,6 +143,21 @@ def parse_domain_qualified_duration(text: str) -> dict[str, Any] | None:
     match = _WORD_PAREN_DIGIT_MINIMUM.match(candidate)
     if match:
         return {"lower_bound": int(match.group(1)), "grammar": "WORD_PAREN_DIGIT_MINIMUM"}
+
+    match = _DIGIT_RANGE.match(candidate)
+    if match:
+        lower, upper = int(match.group(1)), int(match.group(2))
+        # An inverted range ("3-1 years...") is malformed text, not a range
+        # whose bounds this module may silently swap or "correct" --
+        # refusing to recognize it (returning None) is the truth-preserving
+        # choice (mirrors experience_range.py's identical rule).
+        if lower > upper:
+            return None
+        return {
+            "lower_bound": lower,
+            "upper_bound": upper,
+            "grammar": "DIGIT_RANGE",
+        }
 
     match = _DIGIT_MINIMUM.match(candidate)
     if match:
