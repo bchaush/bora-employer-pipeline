@@ -409,4 +409,113 @@ assert_true(match_bsa_010["result"] == "STRONG", "BSA REQ_BSA_010 must remain ST
 print("PASS H: Atominvest, MIT LL, and BSA (synthetic) are byte-for-byte unaffected -- no domain-qualified-duration row exists in any of them.")
 
 
+# ======================================================================
+# I. DOMAIN_QUALIFIED_EXPERIENCE_DURATION_RANGE_V2 -- real, live Global
+# Partners Network Operations Service Analyst posting (R0031886):
+# "0-2 years of experience in IT, telecommunications, network operations,
+# technical support, vendor coordination, or a related field; relevant
+# internship, academic, military, or equivalent experience is welcome."
+# The corrected causal finding is that this row carries real domain
+# metadata (not domain=None) and empty inferred capabilities, so it must
+# route to this module's evaluator and resolve honest UNKNOWN -- not the
+# fabricated NONE / NO_CAPABILITY_COVERAGE the unextended minimum-only
+# grammar produced.
+# ======================================================================
+GP_TEXT = (
+    "0-2 years of experience in IT, telecommunications, network operations, "
+    "technical support, vendor coordination, or a related field; relevant "
+    "internship, academic, military, or equivalent experience is welcome"
+)
+GP_DOMAIN = "IT / Telecommunications / Network Operations / Technical Support / Vendor Coordination"
+
+gp_parsed = parse_domain_qualified_duration(GP_TEXT)
+assert_true(gp_parsed is not None, "Global Partners 0-2 domain-qualified range must parse")
+assert_true(gp_parsed["lower_bound"] == 0, f"Global Partners lower_bound must be 0, got {gp_parsed}")
+assert_true(gp_parsed["upper_bound"] == 2, f"Global Partners upper_bound must be 2, got {gp_parsed}")
+assert_true(gp_parsed["grammar"] == "DIGIT_RANGE", f"Global Partners grammar must be DIGIT_RANGE, got {gp_parsed}")
+
+gp_row = _row("REQ_GP_EXP", GP_TEXT, domain=GP_DOMAIN)
+gp_caps = infer_requirement_capabilities(gp_row)
+assert_true(not gp_caps, f"Global Partners row must still infer no capabilities, got {gp_caps}")
+assert_true(
+    is_domain_qualified_duration_requirement(gp_row, inferred_capabilities=gp_caps),
+    "Global Partners domain-qualified 0-2 range row must route to the new evaluator",
+)
+gp_match = evaluate_domain_qualified_duration_requirement(job_id="JOB_GP", requirement=gp_row, match_index=0)
+assert_true(gp_match["result"] == "UNKNOWN", f"Global Partners row must resolve UNKNOWN, got {gp_match['result']}")
+print("PASS I1: Global Partners 0-2 domain-qualified range parses, routes, and resolves UNKNOWN.")
+
+# I2. En-dash equivalent.
+gp_endash_row = _row("REQ_GP_EXP_ENDASH", GP_TEXT.replace("0-2", "0–2"), domain=GP_DOMAIN)
+gp_endash_caps = infer_requirement_capabilities(gp_endash_row)
+assert_true(
+    is_domain_qualified_duration_requirement(gp_endash_row, inferred_capabilities=gp_endash_caps),
+    "en-dash '0–2 years of experience in ...' must route identically to the hyphen form",
+)
+print("PASS I2: en-dash range variant routes identically to the hyphen form.")
+
+# I3. Bounded 1-2 / 0-1 grammar-family controls parse but establish no
+# candidate satisfaction (result is always UNKNOWN, never SUPPORTED).
+for bounded_text, lo, hi in (
+    ("1-2 years of experience in network operations", 1, 2),
+    ("0-1 years of experience in network operations", 0, 1),
+):
+    bounded_row = _row("REQ_GP_BOUNDED", bounded_text, domain="Network Operations")
+    bounded_caps = infer_requirement_capabilities(bounded_row)
+    assert_true(
+        is_domain_qualified_duration_requirement(bounded_row, inferred_capabilities=bounded_caps),
+        f"{bounded_text!r} must route to the new evaluator",
+    )
+    bounded_match = evaluate_domain_qualified_duration_requirement(job_id="JOB_GP", requirement=bounded_row, match_index=0)
+    assert_true(bounded_match["result"] == "UNKNOWN", f"{bounded_text!r} must resolve UNKNOWN, got {bounded_match['result']}")
+    bounded_parsed = parse_domain_qualified_duration(bounded_text)
+    assert_true(bounded_parsed["lower_bound"] == lo and bounded_parsed["upper_bound"] == hi, f"{bounded_text!r} bounds must be ({lo},{hi}), got {bounded_parsed}")
+print("PASS I3: bounded 1-2/0-1 grammar-family controls parse and route but establish no candidate satisfaction.")
+
+# I4. Negative controls -- must all stay OUT of the new evaluator.
+negative_controls = [
+    ("REQ_GP_NEG_SERVICENOW", "0-2 years of experience with ServiceNow", "ServiceNow", ["ServiceNow"]),
+    ("REQ_GP_NEG_UAT", "3 years of UAT experience", "Testing", []),
+    ("REQ_GP_NEG_NODURATION", "Experience in network operations required", "Network Operations", []),
+    ("REQ_GP_NEG_INVERTED", "3-1 years of experience in network operations", "Network Operations", []),
+]
+for req_id, text, domain, technology in negative_controls:
+    row = _row(req_id, text, domain=domain, technology=technology)
+    caps = infer_requirement_capabilities(row)
+    assert_true(
+        not is_domain_qualified_duration_requirement(row, inferred_capabilities=caps),
+        f"{text!r} must stay OUT of the new evaluator",
+    )
+assert_true(parse_domain_qualified_duration("3-1 years of experience in network operations") is None, "inverted range must not parse")
+print("PASS I4: ServiceNow/UAT/no-duration/inverted-range negative controls stay out of the new evaluator.")
+
+# I5. Same 0-2 domain-shaped text with domain=None stays outside (condition
+# 1 -- non-empty structured domain -- still governs; domain=None must never
+# force routing).
+gp_no_domain_row = _row("REQ_GP_NEG_NODOMAIN", GP_TEXT, domain=None)
+gp_no_domain_caps = infer_requirement_capabilities(gp_no_domain_row)
+assert_true(
+    not is_domain_qualified_duration_requirement(gp_no_domain_row, inferred_capabilities=gp_no_domain_caps),
+    "the same 0-2 domain-shaped text with domain=None must stay OUT of the new evaluator",
+)
+print("PASS I5: same 0-2 domain-shaped text with domain=None stays out of the new evaluator.")
+
+# I6. Existing generic domain-free "0-2 years of work experience" remains
+# owned by experience_range.py, unaffected by this range grammar addition.
+generic_control = _row("REQ_GP_GENERIC_CONTROL", "0-2 years of work experience", domain=None)
+generic_control_caps = infer_requirement_capabilities(generic_control)
+assert_true(
+    not is_domain_qualified_duration_requirement(generic_control, inferred_capabilities=generic_control_caps),
+    "generic domain-free '0-2 years of work experience' must remain outside this module",
+)
+from experience_range import is_generic_experience_range_requirement  # noqa: E402
+assert_true(
+    is_generic_experience_range_requirement(generic_control, inferred_capabilities=generic_control_caps),
+    "generic domain-free '0-2 years of work experience' must remain owned by experience_range.py",
+)
+print("PASS I6: existing generic experience-range parser control unaffected.")
+
+print("PASS I: DOMAIN_QUALIFIED_EXPERIENCE_DURATION_RANGE_V2 acceptance matrix confirmed.")
+
+
 print("ALL domain_qualified_experience_duration_unknown_v1_test CHECKS PASSED")
