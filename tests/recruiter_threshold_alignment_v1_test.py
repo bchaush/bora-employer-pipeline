@@ -108,6 +108,37 @@ def _threshold_row(
     }
 
 
+
+
+def _attach_current_verification(job_input: dict, fixture_tag: str) -> dict:
+    run_id = f"RUN_JIT_CONTINUITY_{fixture_tag}"
+    url = f"https://careers.example.test/jobs/{fixture_tag}"
+    observed_at = "2026-09-15T12:00:00-04:00"
+    job_input["operation_run_id"] = run_id
+    job_input["official_url"] = url
+    job_input["date_last_verified"] = "2026-09-15"
+    job_input["pre_surfacing_verification"] = {
+        "verification_kind": "JIT_PRE_SURFACING_VERIFICATION_V1",
+        "operation_run_id": run_id,
+        "observed_at": observed_at,
+        "source_kind": "FIRST_PARTY_DIRECT",
+        "exact_url": url,
+        "observed_company": job_input["company"],
+        "observed_role": job_input["role"],
+        "substantive_role_content_present": True,
+        "application_route_status": "ACTIONABLE",
+        "recency_observation": {
+            "state": "AUTHORITATIVE_ABSOLUTE_DATE",
+            "source_kind": "FIRST_PARTY_DIRECT",
+            "observed_at": observed_at,
+            "posted_date": "2026-09-14",
+        },
+        "material_conflicts": [],
+        "resolved_conflicts": [],
+    }
+    return job_input
+
+
 def _bsa_job_input(extra_requirement: dict | None, *, qualification_gates: list | None = None) -> dict:
     """Real, approved-evidence-backed BSA fixture (proven PRIORITY_APPLY,
     distinct_high_claims=4) with exactly one optional injected requirement
@@ -120,7 +151,7 @@ def _bsa_job_input(extra_requirement: dict | None, *, qualification_gates: list 
     jd_text = BSA_JD_TEXT
     if extra_requirement is not None:
         jd_text = jd_text + "\n" + str(extra_requirement.get("text") or "")
-    return {
+    job_input = {
         "company": "Bose Professional (Synthetic Regression Fixture)",
         "role": "IT Business Analyst",
         "jd_text": jd_text,
@@ -129,6 +160,7 @@ def _bsa_job_input(extra_requirement: dict | None, *, qualification_gates: list 
         "role_status": "VERIFIED_LIVE",
         "source_verification_status": "VERIFIED_DIRECT",
     }
+    return _attach_current_verification(job_input, "BSA_THRESHOLD")
 
 
 def _analyze(job_input: dict) -> dict:
@@ -297,6 +329,7 @@ job_input_mixed = {
     "role_status": "VERIFIED_LIVE",
     "source_verification_status": "VERIFIED_DIRECT",
 }
+_attach_current_verification(job_input_mixed, "BSA_THRESHOLD_MIXED")
 result_mixed = _analyze(job_input_mixed)
 assert_true(
     result_mixed["analysis"]["decision"] == "WATCH",

@@ -142,15 +142,70 @@ def _with_posting_state(base: dict, **posting_fields) -> dict:
     return job_input
 
 
+# JIT_PRE_SURFACING_VERIFICATION_GATE_V1 (Blueprint §135, hard correction):
+# VERIFIED_LIVE + VERIFIED_DIRECT alone no longer preserve APPLY-like routing
+# (see tests/jit_pre_surfacing_verification_gate_v1_test.py) -- an
+# apply_pre_surfacing_verification_gate() call was wired in strictly after
+# apply_posting_state_routing() and now additionally requires a valid,
+# current-run job_input['pre_surfacing_verification'] envelope whenever both
+# axes are exactly VERIFIED_LIVE/VERIFIED_DIRECT. The two genuine positive
+# controls below (Section A, Section E's restated dual-axis case) are
+# migrated to supply that envelope, alongside the matching
+# operation_run_id/official_url identity facts it is checked against. Every
+# other assertion in this file exercises a combination that already fails
+# closed upstream in apply_posting_state_routing() (a bad/missing axis), so
+# it never reaches the envelope gate and needs no envelope.
+_POSTING_STATE_TEST_OPERATION_RUN_ID = "RUN_POSTING_STATE_WIRING_TEST_CURRENT"
+_POSTING_STATE_TEST_OFFICIAL_URL = "https://careers.example.test/jobs/POSTING-STATE-WIRING-TEST"
+_POSTING_STATE_TEST_OBSERVED_AT = "2026-09-15T12:00:00-04:00"
+_POSTING_STATE_TEST_DATE_LAST_VERIFIED = "2026-09-15"
+
+
+def _valid_pre_surfacing_verification_envelope(job_input: dict) -> dict:
+    return {
+        "verification_kind": "JIT_PRE_SURFACING_VERIFICATION_V1",
+        "operation_run_id": _POSTING_STATE_TEST_OPERATION_RUN_ID,
+        "observed_at": _POSTING_STATE_TEST_OBSERVED_AT,
+        "source_kind": "FIRST_PARTY_DIRECT",
+        "exact_url": _POSTING_STATE_TEST_OFFICIAL_URL,
+        "observed_company": job_input["company"],
+        "observed_role": job_input["role"],
+        "substantive_role_content_present": True,
+        "application_route_status": "ACTIONABLE",
+        "recency_observation": {
+            "state": "AUTHORITATIVE_LIVE_RELATIVE_AGE",
+            "source_kind": "FIRST_PARTY_DIRECT",
+            "observed_at": _POSTING_STATE_TEST_OBSERVED_AT,
+            "posted_age_days": 1,
+        },
+        "material_conflicts": [],
+        "resolved_conflicts": [],
+    }
+
+
+def _with_valid_pre_surfacing_verification(base: dict, **posting_fields) -> dict:
+    job_input = _with_posting_state(
+        base,
+        operation_run_id=_POSTING_STATE_TEST_OPERATION_RUN_ID,
+        official_url=_POSTING_STATE_TEST_OFFICIAL_URL,
+        date_last_verified=_POSTING_STATE_TEST_DATE_LAST_VERIFIED,
+        **posting_fields,
+    )
+    job_input["pre_surfacing_verification"] = _valid_pre_surfacing_verification_envelope(job_input)
+    return job_input
+
+
 # ======================================================================
 # A. GENUINE POSITIVE CONTROL (PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_
-#    ENFORCEMENT_V1) -- VERIFIED_LIVE + VERIFIED_DIRECT together preserve
-#    existing APPLY-like routing exactly. This is the ONLY combination
-#    that does. Computed first so later sections can assert
-#    byte-equivalent qualification structures against it.
+#    ENFORCEMENT_V1) -- VERIFIED_LIVE + VERIFIED_DIRECT together, WITH a
+#    valid current-run JIT_PRE_SURFACING_VERIFICATION_V1 envelope
+#    (JIT_PRE_SURFACING_VERIFICATION_GATE_V1), preserve existing APPLY-like
+#    routing exactly. This is the ONLY combination that does. Computed
+#    first so later sections can assert byte-equivalent qualification
+#    structures against it.
 # ======================================================================
 result_live = _analyze(
-    _with_posting_state(
+    _with_valid_pre_surfacing_verification(
         QUALIFYING_BASE,
         role_status="VERIFIED_LIVE",
         source_verification_status="VERIFIED_DIRECT",
@@ -465,14 +520,15 @@ print("PASS I: malformed role_status values (int, list, invalid string, bool) ne
 
 # ======================================================================
 # E (restated for PRE_SURFACING_FIRST_PARTY_ACTIONABILITY_ENFORCEMENT_V1).
-#    Only VERIFIED_LIVE + VERIFIED_DIRECT together preserve APPLY.
-#    role_status=VERIFIED_LIVE alone (source_verification_status absent)
-#    NO LONGER preserves APPLY -- this line is deliberately updated from
-#    the pre-dual-axis assertion; see Section A2/B above for the full
+#    Only VERIFIED_LIVE + VERIFIED_DIRECT together, WITH a valid current-run
+#    verification envelope (JIT_PRE_SURFACING_VERIFICATION_GATE_V1), preserve
+#    APPLY. role_status=VERIFIED_LIVE alone (source_verification_status
+#    absent) NO LONGER preserves APPLY -- this line is deliberately updated
+#    from the pre-dual-axis assertion; see Section A2/B above for the full
 #    migration rationale.
 # ======================================================================
 r_dual = _analyze(
-    _with_posting_state(
+    _with_valid_pre_surfacing_verification(
         QUALIFYING_BASE, role_status="VERIFIED_LIVE", source_verification_status="VERIFIED_DIRECT"
     )
 )

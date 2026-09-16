@@ -64,11 +64,40 @@ EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = cl_result["index"]
 
 
+def _attach_current_verification(job_input: dict, fixture_tag: str) -> dict:
+    run_id = f"RUN_JIT_CONTINUITY_{fixture_tag}"
+    url = f"https://careers.example.test/jobs/{fixture_tag}"
+    observed_at = "2026-09-15T12:00:00-04:00"
+    job_input["operation_run_id"] = run_id
+    job_input["official_url"] = url
+    job_input["date_last_verified"] = "2026-09-15"
+    job_input["pre_surfacing_verification"] = {
+        "verification_kind": "JIT_PRE_SURFACING_VERIFICATION_V1",
+        "operation_run_id": run_id,
+        "observed_at": observed_at,
+        "source_kind": "FIRST_PARTY_DIRECT",
+        "exact_url": url,
+        "observed_company": job_input["company"],
+        "observed_role": job_input["role"],
+        "substantive_role_content_present": True,
+        "application_route_status": "ACTIONABLE",
+        "recency_observation": {
+            "state": "AUTHORITATIVE_ABSOLUTE_DATE",
+            "source_kind": "FIRST_PARTY_DIRECT",
+            "observed_at": observed_at,
+            "posted_date": "2026-09-14",
+        },
+        "material_conflicts": [],
+        "resolved_conflicts": [],
+    }
+    return job_input
+
+
 def load_job_input(fixture_id: str) -> dict:
     fixture_dir = GOLDEN_JOB_ANALYSIS / fixture_id
     extraction = json.loads((fixture_dir / "structured_extraction.json").read_text(encoding="utf-8"))
     jd_text = (fixture_dir / "jd.txt").read_text(encoding="utf-8")
-    return {
+    job_input = {
         "company": f"Synthetic Golden Co ({fixture_id})",
         "role": extraction.get("_role_title") or fixture_id,
         "jd_text": jd_text,
@@ -88,6 +117,7 @@ def load_job_input(fixture_id: str) -> dict:
         "role_status": "VERIFIED_LIVE",
         "source_verification_status": "VERIFIED_DIRECT",
     }
+    return _attach_current_verification(job_input, fixture_id)
 
 
 def run_analysis(fixture_id: str) -> dict:

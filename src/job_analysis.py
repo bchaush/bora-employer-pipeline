@@ -26,6 +26,7 @@ from experience_range import (
     evaluate_generic_experience_range,
     is_generic_experience_range_requirement,
 )
+from jit_pre_surfacing_verification import apply_pre_surfacing_verification_gate
 from job_decision import (
     apply_posting_state_routing,
     apply_recruiter_threshold_guard,
@@ -630,6 +631,33 @@ def analyze_job(
         role_status=role_status,
         source_verification_status=source_verification_status,
     )
+
+    # JIT_PRE_SURFACING_VERIFICATION_GATE_V1 (Blueprint §135, hard
+    # correction): a further, independent, downgrade-only layer, strictly
+    # AFTER apply_posting_state_routing() so the two compose (either may
+    # downgrade; neither can undo the other's downgrade). September 15
+    # Personal-v1 operating runs proved role_status=="VERIFIED_LIVE" AND
+    # source_verification_status=="VERIFIED_DIRECT" alone -- with no coupled
+    # current-run verification evidence -- preserved APPLY. This gate is
+    # only reachable once both posting-state axes have already cleared
+    # apply_posting_state_routing(); every other axis combination was
+    # already downgraded to WATCH upstream and is left untouched here. When
+    # reached, it additionally requires a valid, current-run
+    # job_input['pre_surfacing_verification'] envelope proving exact
+    # official_url/company/role identity, first-party direct sourcing,
+    # substantive role content, an actionable application route, known
+    # current-run recency provenance, and no unresolved material conflict --
+    # or the decision downgrades to WATCH with explicit diagnostic reason
+    # codes (see src/jit_pre_surfacing_verification.py). Never touches
+    # requirements/evidence_matches/gaps/unknowns/hard_blockers, never
+    # upgrades a decision, and never introduces REJECT.
+    decision = apply_pre_surfacing_verification_gate(
+        base_result=decision,
+        job_input=job_input,
+        role_status=role_status,
+        source_verification_status=source_verification_status,
+    )
+    warnings.extend(decision.get("warnings") or [])
 
     # BORA_RECRUITER_THRESHOLD_ALIGNMENT_V1: a further, independent,
     # downgrade-only pursuit/surfacing-economics layer. Runs after posting-
