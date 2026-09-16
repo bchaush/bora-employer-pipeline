@@ -128,7 +128,8 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ON
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
     'project_state.next_authorized_action must couple Phase I to PROPOSED_NOT_AUTHORIZED'
 )
-assert 'SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL' in PROJECT_STATE['next_authorized_action']
+assert 'OPERATE FIRST / BUILD SECOND' in PROJECT_STATE['next_authorized_action']
+assert 'No new engineering milestone is selected or authorized' in PROJECT_STATE['next_authorized_action']
 
 # Every live recovery/state surface must agree: Phase G is COMPLETED_BY_OPERATOR /
 # BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY, Phase F remains BORA_ACCEPTED
