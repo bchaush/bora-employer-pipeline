@@ -1,0 +1,61 @@
+{
+  "milestone_id": "CAREER_OS_SUPERVISED_PRODUCTION_V1_CONTRACT",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "Lock the read-only production gap audit and the minimum supervised-production architecture contract without implementing runtime product behavior.",
+  "baseline_sha": "d16c4473d3fb1505a95c5a95c90c766a0a4afd5c",
+  "allowed_paths": [
+    "docs/audits/SUPERVISED_PRODUCTION_V1_GAP_AUDIT.md",
+    "docs/SUPERVISED_PRODUCTION_V1.md",
+    "milestone_contracts/docs/career-os-supervised-production-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "project_state.json",
+    "CHANGELOG.md",
+    "src/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    ".cursor/**",
+    ".claude/**"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The audit classifies current production capabilities into REUSE, ADAPT, MISSING, and DO NOT BUILD from live canonical repository evidence.",
+    "The contract preserves canonical Blueprint v3.13 authority and does not reintroduce stale v3.0 facts such as unverified STEM/CIP status.",
+    "The contract freezes the existing truth engine against hypothetical semantic churn and requires real consequential production failures before mutation.",
+    "The contract keeps external discovery, Gmail, Google Sheets, Google Drive, Vercel, Claude, and other providers as replaceable adapters around the owned truth core.",
+    "The first implementation seam is limited to Gmail alert ingestion -> normalization -> exact-role dedupe -> JOBS Sheet persistence + LOG records.",
+    "No runtime code, schema, test, Golden set, Candidate Truth, Employer Truth, Match Truth, package behavior, submission behavior, Vercel deployment, or external provider integration is implemented by this milestone.",
+    "PURSUE and SUBMIT remain distinct human-controlled boundaries; system recommendation never constitutes human pursuit authorization.",
+    "The branch ends as a doctrine-only candidate requiring independent architecture review and Bora acceptance before any Slice 1 implementation authorization.",
+    "After Bora acceptance and merge, a separate bounded governance-sync milestone must refresh canonical continuity/checkpoint pointers before Slice 1 implementation may be authorized.",
+    "Doctrine acceptance never authorizes Slice 1 implementation; Slice 1 requires the post-merge continuity sync plus a separate allowed-paths mutation contract and Bora explicit authorization.",
+    "Slice 1 consumes the canonical untrusted `DiscoveryLead` boundary concept and exact employer/system + requisition/opportunity identity rule; it does not invent a parallel lead model or fuzzy exact-role identity."
+  ],
+  "stop_conditions": [
+    "Stop if completing this contract requires any runtime/product implementation or any path outside allowed_paths.",
+    "Stop if the contract would weaken canonical truth/provenance, Golden tests, Assurance, human submission control, or provider replaceability.",
+    "Stop if a provider-specific convenience is being promoted into canonical truth architecture rather than retained as an adapter.",
+    "Stop at doctrine acceptance/rejection; Slice 1 implementation requires a separate bounded mutation contract."
+  ],
+  "review_requirements": "CURSOR_INDEPENDENT_ADVERSARIAL_REVIEW_REQUIRED_ON_FROZEN_EXACT_DIFF_BEFORE_COMMIT_OR_PUSH; DETERMINISTIC_MILESTONE_STATE_AND_FULL_ASSURANCE_REQUIRED; NO_RUNTIME_IMPLEMENTATION_AUTHORIZED",
+  "human_approval_requirements": "BORA_EXPLICITLY_AUTHORIZED_THE_SUPERVISED_PRODUCTION_DIRECTION_AND_REQUESTED_READ_ONLY_AUDIT_THEN_FROZEN_CONTRACT_ON_2026-09-16; BORA_ACCEPTANCE_OR_CORRECTION_REQUIRED_BEFORE_SLICE_1_IMPLEMENTATION"
+}
