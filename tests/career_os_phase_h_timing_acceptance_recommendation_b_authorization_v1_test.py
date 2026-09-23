@@ -60,13 +60,15 @@ for forbidden_path in (
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == 'e521c7972a345f48379304b3df0e9598bc6326b2'
+assert cp['canonical_basis_sha'] == '01602bf6ba4329b37d8b0365a77f53f953dce597'
 assert BASELINE_SHA in cp['phase_h_acceptance']['canonical_merge_verification']
-assert cp['phase_id'] == REC_B_ID
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
+assert cp['operator_status'] == 'CONTINUITY_SYNC_COMPLETED_BY_OPERATOR'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-15'
+assert cp['accepted_at'] == '2026-09-16'
 assert cp['implementation_authorized'] is False
+assert cp['phase_h_acceptance']['phase_id'] == PHASE_H_ID
+assert cp['recommendation_b_completion']['milestone_id'] == REC_B_ID
 
 # --- Checkpoint: Phase H acceptance, distinct fact 1 ------------------------
 
@@ -163,7 +165,8 @@ for milestone_seconds, phase2_seconds in TIMING_EVIDENCE.values():
 
 # --- project_state.json -----------------------------------------------------
 
-assert PROJECT_STATE['current_phase'].startswith(PHASE_H_ID)
+assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
+assert PHASE_H_ID in PROJECT_STATE['current_phase']
 assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert REC_B_ID in PROJECT_STATE['current_phase']
 assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']

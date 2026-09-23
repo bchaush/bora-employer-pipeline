@@ -9,6 +9,16 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
+## Current Checkpoint - SUPERVISED_PRODUCTION_V1 (Accepted; continuity sync)
+
+Canonical contract merge: `01602bf6ba4329b37d8b0365a77f53f953dce597` (PR #71). Reviewed head: `5cb49e0eba7b86773e20738f3e250252c389b3fd`. Reviewed/merge tree: `3ddcd3cecb54ad9a3bc053dff59833ebc90e5cfb`.
+
+Active doctrine: `docs/SUPERVISED_PRODUCTION_V1.md`.
+
+Next candidate seam: `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` — **SELECTED_NOT_AUTHORIZED**. `implementation_authorized=false`. Exact next allowed action is to author/freeze/validate/review a bounded Slice 1 mutation contract and obtain Bora's separate explicit authorization. Do not implement Gmail or Google Sheets before that authorization.
+
+The one-task Cursor-review exception applied only to the exact doctrine candidate fingerprint `bc073a55b8b14aab954f19a0d220e5eb9184f09607761bf35866b6883590a253`; it does not weaken future review requirements.
+
 ## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; BORA ACCEPTED (2026-09-15)
 
 Checkpoint: `CURRENT_EXECUTION_CHECKPOINT.json`

@@ -1,0 +1,71 @@
+{
+  "milestone_id": "SUPERVISED_PRODUCTION_V1_CONTINUITY_SYNC",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Synchronize canonical recovery pointers after PR #71 so fresh sessions recover SUPERVISED_PRODUCTION_V1 as active doctrine and Slice 1 as selected-but-not-authorized, without implementing Slice 1.",
+  "baseline_sha": "01602bf6ba4329b37d8b0365a77f53f953dce597",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "milestone_contracts/governance/career-os-supervised-production-v1-continuity-sync.json",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_phase_d_authorization_v1_test.py",
+    "tests/career_os_phase_e_authorization_v1_test.py",
+    "tests/career_os_phase_f_authorization_v1_test.py",
+    "tests/career_os_phase_g_authorization_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/**",
+    ".github/**"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "project_state.json and CURRENT_EXECUTION_CHECKPOINT.json identify SUPERVISED_PRODUCTION_V1 as active",
+    "docs/SUPERVISED_PRODUCTION_V1.md is named as required production context without changing canonical recovery order",
+    "Slice 1 is SELECTED_NOT_AUTHORIZED and implementation_authorized remains false",
+    "PR #71 merge/head/tree/fingerprint and one-task Cursor exception are recorded exactly",
+    "historical accepted milestone evidence remains preserved",
+    "no runtime or schema implementation occurs",
+    "Any historical authorization/acceptance regression test modified by this sync preserves or strengthens its prior semantic guardrails; no oracle is weakened merely to accommodate new continuity pointers."
+  ],
+  "stop_conditions": [
+    "any Slice 1 runtime implementation is required",
+    "any Match Truth or Candidate Truth mutation is required",
+    "any path outside allowed_paths must change",
+    "continuity sync would imply Slice 1 authorization",
+    "global implementation_authorized would become true",
+    "Stop if adapting a historical regression test would delete or weaken an accepted semantic, authorization, recovery-order, or fail-closed invariant instead of relocating or equivalently strengthening it."
+  ],
+  "review_requirements": "CONSEQUENTIAL_GOVERNANCE_DIFF_REQUIRES_CURSOR_ADVERSARIAL_REVIEW_BEFORE_COMMIT_PUSH_UNLESS_BORA_EXPLICITLY_WAIVES_THIS_SPECIFIC_SYNC; DETERMINISTIC_STATE_AND_FULL_ASSURANCE_REQUIRED",
+  "human_approval_requirements": "BORA_AUTHORIZED_CONTINUITY_SYNC_ONLY; SLICE_1_IMPLEMENTATION_REQUIRES_SEPARATE_EXPLICIT_BORA_AUTHORIZATION"
+}

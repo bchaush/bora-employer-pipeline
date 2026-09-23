@@ -8,12 +8,13 @@ RID="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 cp=json.loads((ROOT/"CURRENT_EXECUTION_CHECKPOINT.json").read_text(encoding="utf-8"))
 ps=json.loads((ROOT/"project_state.json").read_text(encoding="utf-8"))
 contract=json.loads((ROOT/"milestone_contracts/governance/career-os-recommendation-b-completion-v1.json").read_text(encoding="utf-8"))
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-15_RECOMMENDATION_B_ACCEPTED"
-assert cp["canonical_basis_sha"]=="e521c7972a345f48379304b3df0e9598bc6326b2"
-assert cp["phase_id"]==RID
-assert cp["operator_status"]=="COMPLETED_BY_OPERATOR"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-16_SUPERVISED_PRODUCTION_V1_CONTINUITY_SYNC"
+assert cp["canonical_basis_sha"]=="01602bf6ba4329b37d8b0365a77f53f953dce597"
+assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
+assert cp["operator_status"]=="CONTINUITY_SYNC_COMPLETED_BY_OPERATOR"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED"
-assert cp["accepted_at"]=="2026-09-15"
+assert cp["accepted_at"]=="2026-09-16"
+assert cp["recommendation_b_completion"]["milestone_id"]==RID
 assert cp["implementation_authorized"] is False
 assert cp["recommendation_b_authorization"]["operator_status"]=="NOT_YET_COMPLETED"  # historical authorization fact remains immutable
 comp=cp["recommendation_b_completion"]
@@ -59,9 +60,12 @@ assert "has since completed" in cp["recommendation_b_authorization"]["not_implem
 assert "recommendation_b_authorization object unchanged" not in " ".join(cp["completed_actions"])
 assert "superseded historical snapshot" in " ".join(cp["completed_actions"])
 action=ps["next_authorized_action"]
-assert not action.rstrip().endswith((", and", " and", ",", "-"))
-assert action.rstrip().endswith("No product automation, trace infrastructure, database/UI, new agents, model routing, LLM judges, Recommendation C, Phase I, or successor engineering milestone is authorized by this completion sync.")
-assert "No product automation, trace infrastructure" in action
+current_action=action.split(" HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:",1)[0]
+assert not current_action.rstrip().endswith((", and", " and", ",", "-"))
+assert current_action.rstrip().endswith("Global implementation_authorized remains false.")
+assert "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET" in current_action
+assert "NOT_AUTHORIZED" in current_action
+assert "No product automation, trace infrastructure, database/UI, new agents, model routing, LLM judges, Recommendation C, Phase I, or successor implementation milestone is authorized by this continuity sync." in current_action
 assert "first_point_of_divergence = A and first_causal_failure_point = B at two different points in the same run" in action
 assert changelog.startswith("# Bora Employer Pipeline OS")
 assert changelog.index("# Bora Employer Pipeline OS") < changelog.index("Career OS Recommendation B operator completion")

@@ -90,7 +90,8 @@ assert 'exactly 15 case IDs' in phase_e_reference
 # project_state.json must point at Phase H, the live current phase, while
 # Phase E's completed/accepted status is preserved in the
 # next_authorized_action seam text, with no implementation authorized.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
+assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
 assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
