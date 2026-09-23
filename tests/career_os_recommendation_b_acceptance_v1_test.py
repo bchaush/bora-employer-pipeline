@@ -7,11 +7,12 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-15_RECOMMENDATION_B_ACCEPTED"
-assert cp["canonical_basis_sha"]=="e521c7972a345f48379304b3df0e9598bc6326b2"
-assert cp["phase_id"]=="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
-assert cp["operator_status"]=="COMPLETED_BY_OPERATOR"
-assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-15"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-16_SUPERVISED_PRODUCTION_V1_CONTINUITY_SYNC"
+assert cp["canonical_basis_sha"]=="01602bf6ba4329b37d8b0365a77f53f953dce597"
+assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
+assert cp["operator_status"]=="CONTINUITY_SYNC_COMPLETED_BY_OPERATOR"
+assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-16"
+assert cp["recommendation_b_completion"]["milestone_id"]=="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 assert cp["implementation_authorized"] is False
 assert cp["recommendation_b_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 acc=cp["recommendation_b_acceptance"]

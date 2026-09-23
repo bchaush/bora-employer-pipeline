@@ -1,5 +1,13 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-16 — SUPERVISED_PRODUCTION_V1 continuity sync
+
+- Verified PR #71 merged the accepted doctrine-only contract at canonical `01602bf6ba4329b37d8b0365a77f53f953dce597`; reviewed head is `5cb49e0eba7b86773e20738f3e250252c389b3fd`; reviewed/merge tree is `3ddcd3cecb54ad9a3bc053dff59833ebc90e5cfb`.
+- Activated `SUPERVISED_PRODUCTION_V1` as the current production doctrine and added its contract as required production context under the existing canonical recovery order.
+- Selected `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` as the next candidate seam and marked it **SELECTED_NOT_AUTHORIZED**; global `implementation_authorized=false`.
+- Exact next allowed action is to author/freeze/validate/review a bounded Slice 1 mutation contract and obtain Bora's separate explicit authorization. No Slice 1 implementation is included in this sync.
+
+
 ## 2026-09-15 — JIT_PRE_SURFACING_VERIFICATION_GATE_V1 (Blueprint §135 hard correction)
 
 - Closed a proven live-operation reliability defect: production `analyze_job()` returned `APPLY` for `role_status=VERIFIED_LIVE` + `source_verification_status=VERIFIED_DIRECT` with `date_last_verified=None` and no coupled current-run verification evidence at all — the two favorable posting-state strings alone were sufficient to preserve serious pursuit.

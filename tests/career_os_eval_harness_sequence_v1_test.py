@@ -19,6 +19,7 @@ AGENTS = (ROOT / 'AGENTS.md').read_text(encoding='utf-8')
 MILESTONE = (ROOT / 'CURRENT_MILESTONE.md').read_text(encoding='utf-8')
 CURRENT_STATE = (ROOT / 'CURRENT_STATE.md').read_text(encoding='utf-8')
 PROJECT_STATE = json.loads((ROOT / 'project_state.json').read_text(encoding='utf-8'))
+EXECUTION_CHECKPOINT = json.loads((ROOT / 'CURRENT_EXECUTION_CHECKPOINT.json').read_text(encoding='utf-8'))
 
 assert ADR.exists(), 'canonical eval/harness sequence ADR missing'
 text = ADR.read_text(encoding='utf-8')
@@ -217,31 +218,40 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11)' in CURRENT_STATE
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in CURRENT_STATE
 assert '**SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in CURRENT_STATE
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
-assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
-assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
+assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
+assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['current_phase']
+assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
+assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['next_authorized_action']
+assert 'NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
+assert 'Do not begin Gmail/Sheets implementation' in PROJECT_STATE['next_authorized_action']
 assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    "project_state.next_authorized_action must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject"
+    'project_state.next_authorized_action must keep Phase I and later coupled to PROPOSED_NOT_AUTHORIZED'
 )
-assert 'No product automation' in PROJECT_STATE['next_authorized_action']
-assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-15'
-
-# project_state.json's own executability-class summary must name all four
-# hardened classes, including HUMAN_CONFIRMED_REFERENCE (the human
-# submission-handoff class) -- a stale three-class summary must not reappear.
+assert 'No product automation, trace infrastructure, database/UI, new agents, model routing, LLM judges, Recommendation C, Phase I, or successor implementation milestone is authorized by this continuity sync.' in PROJECT_STATE['next_authorized_action']
 assert (
     'EXECUTABLE_NOW / RECONSTRUCTION_BACKED_DESIGN_CASE / BLOCKED_CANDIDATE / HUMAN_CONFIRMED_REFERENCE'
     in PROJECT_STATE['next_authorized_action']
-), 'project_state.next_authorized_action must summarize all four executability classes, including HUMAN_CONFIRMED_REFERENCE'
+), 'project_state.next_authorized_action must preserve all four accepted executability classes'
 assert (
     'EXECUTABLE_NOW / RECONSTRUCTION_BACKED_DESIGN_CASE / BLOCKED_CANDIDATE executability'
     not in PROJECT_STATE['next_authorized_action']
-), 'stale three-class executability summary (omitting HUMAN_CONFIRMED_REFERENCE) reintroduced'
+), 'stale three-class executability summary must not reappear'
+assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-16'
+
+# Historical Phase B-H / Recommendation-B detail remains in the durable
+# checkpoint lineage; project_state preserves binding semantic invariants while
+# current routing stays separate from historical authority.
+assert 'phase_h_acceptance' in EXECUTION_CHECKPOINT
+assert 'recommendation_b_completion' in EXECUTION_CHECKPOINT
+assert EXECUTION_CHECKPOINT['phase_h_acceptance']['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert EXECUTION_CHECKPOINT['recommendation_b_completion']['human_acceptance_status'] == 'BORA_ACCEPTED'
 
 # AGENTS.md's own Agent Context & Usage Efficiency section must describe
 # Phase G as Bora-accepted, Phase F as Bora-accepted prior_phase, and Phase H

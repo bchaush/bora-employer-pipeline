@@ -25,14 +25,14 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-15_RECOMMENDATION_B_ACCEPTED'
-assert cp['canonical_basis_sha'] == 'e521c7972a345f48379304b3df0e9598bc6326b2'
-assert cp['phase_id'] == 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1'
-assert cp['authorization_status'] == 'BORA_AUTHORIZED'
-assert cp['selection_status'] == 'SELECTED'
-assert cp['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-16_SUPERVISED_PRODUCTION_V1_CONTINUITY_SYNC'
+assert cp['canonical_basis_sha'] == '01602bf6ba4329b37d8b0365a77f53f953dce597'
+assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
+assert cp['authorization_status'] == 'BORA_ACCEPTED'
+assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
+assert cp['operator_status'] == 'CONTINUITY_SYNC_COMPLETED_BY_OPERATOR'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-15'
+assert cp['accepted_at'] == '2026-09-16'
 assert cp['implementation_authorized'] is False
 
 phase_h = cp['phase_h_acceptance']
@@ -239,17 +239,26 @@ assert 'phase_g_acceptance_phase_h_authorization_completed_actions_reference' in
 phase_g_acceptance_reference = ' '.join(cp['phase_g_acceptance_phase_h_authorization_completed_actions_reference'])
 assert 'beautiful work G once u cehck everything being up to standart' in phase_g_acceptance_reference
 
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
-assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
+assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
-assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
+assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['current_phase']
+assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['next_authorized_action']
+assert 'NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
+assert 'Do not begin Gmail/Sheets implementation' in PROJECT_STATE['next_authorized_action']
+current_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[0]
+assert 'Recommendation C remains NOT_AUTHORIZED' in current_action
+assert 'Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED' in current_action
+assert 'No product automation, trace infrastructure, database/UI, new agents, model routing, LLM judges, Recommendation C, Phase I, or successor implementation milestone is authorized by this continuity sync.' in current_action
+assert 'OPERATE FIRST / BUILD SECOND' not in current_action
+assert 'No new engineering milestone is selected or authorized' not in current_action
+historical_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[1]
+assert 'OPERATE FIRST / BUILD SECOND' in historical_action
+assert 'No new engineering milestone is selected or authorized' in historical_action
 assert 'CAREER_OS_ASSURANCE_ARCHITECTURE_V1' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
-assert 'OPERATE FIRST / BUILD SECOND' in PROJECT_STATE['next_authorized_action']
-assert 'No new engineering milestone is selected or authorized' in PROJECT_STATE['next_authorized_action']
-assert PHASE_I_PROPOSED_NOT_AUTHORIZED.search(PROJECT_STATE['next_authorized_action']), (
-    "project_state.next_authorized_action must couple Phase I to PROPOSED_NOT_AUTHORIZED as one subject"
-)
+assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert 'CURRENT_EXECUTION_CHECKPOINT.json' in AGENTS
 assert 'BORA_ACCEPTED (2026-09-11)' in AGENTS
 assert 'GOVERNING' in AGENTS

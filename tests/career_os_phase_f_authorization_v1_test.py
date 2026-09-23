@@ -183,7 +183,8 @@ for _entry in cp['completed_actions']:
 # preserving Phase F as operator-completed and BORA_ACCEPTED (2026-09-14) in
 # the next_authorized_action seam text, with no implementation authorized
 # and Phase H still proposed only.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
+assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
 assert 'COMPLETED_BY_OPERATOR' in PROJECT_STATE['current_phase']
 assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
@@ -285,7 +286,7 @@ for surface_name, surface_text in (
 _RECOVERY_SECTION_BOUNDS = {
     'CURRENT_MILESTONE.md': ('## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; BORA ACCEPTED (2026-09-15)', '## Eval & Harness Audit - Roadmap Reference'),
     'AGENTS.md': ('## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
-    'CURRENT_STATE.md': ('## Current Execution Checkpoint (2026-09-15)', '## Eval & Harness Audit Roadmap Reference (2026-09-15)'),
+    'CURRENT_STATE.md': ('## Historical Execution Checkpoint (2026-09-15)', '## Eval & Harness Audit Roadmap Reference (2026-09-15)'),
     'ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md': ('## 6. New-chat recovery protocol', '## 7. Audit deliverables required before implementation'),
 }
 _RECOVERY_SURFACE_TEXT = {
@@ -370,7 +371,7 @@ print('PASS: Career OS Phase F Bora-acceptance governance sync verified.')
 # Post-Phase-H dependent recovery-slot checks.
 for _surface_name, _surface_text, _start_marker, _end_marker in (
     ('AGENTS.md', AGENTS, '## Eval / Harness Roadmap Recovery', '## Agent Context & Usage Efficiency'),
-    ('CURRENT_STATE.md', CURRENT_STATE, '## Current Execution Checkpoint (2026-09-15)', '## Eval & Harness Audit Roadmap Reference (2026-09-15)'),
+    ('CURRENT_STATE.md', CURRENT_STATE, '## Historical Execution Checkpoint (2026-09-15)', '## Eval & Harness Audit Roadmap Reference (2026-09-15)'),
     ('ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md', ADR, '## 6. New-chat recovery protocol', '## 7. Audit deliverables required before implementation'),
 ):
     _section = _surface_text.split(_start_marker, 1)[1].split(_end_marker, 1)[0].lower()

@@ -118,7 +118,8 @@ assert 'human-handoff' in full_checkpoint_text.lower()
 # project_state.json must now point at Phase H as Bora-accepted, with
 # Recommendation B BORA_AUTHORIZED (scoped) and Phase I/later still proposed
 # only; Phase G's own accepted quartet is preserved in the next_authorized_action seam text.
-assert PROJECT_STATE['current_phase'].startswith('CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1')
+assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
+assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
 assert 'BORA_ACCEPTED (2026-09-15)' in PROJECT_STATE['current_phase']
 assert 'BOUNDED_IMPLEMENTATION' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
