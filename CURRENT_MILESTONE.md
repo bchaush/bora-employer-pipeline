@@ -9,15 +9,15 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - SUPERVISED_PRODUCTION_V1 (Accepted; continuity sync)
-
-Canonical contract merge: `01602bf6ba4329b37d8b0365a77f53f953dce597` (PR #71). Reviewed head: `5cb49e0eba7b86773e20738f3e250252c389b3fd`. Reviewed/merge tree: `3ddcd3cecb54ad9a3bc053dff59833ebc90e5cfb`.
+## Current Checkpoint - SUPERVISED_PRODUCTION_V1 (Slice 1 completed; post-merge continuity sync)
 
 Active doctrine: `docs/SUPERVISED_PRODUCTION_V1.md`.
 
-Next candidate seam: `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` — **SELECTED_NOT_AUTHORIZED**. `implementation_authorized=false`. Exact next allowed action is to author/freeze/validate/review a bounded Slice 1 mutation contract and obtain Bora's separate explicit authorization. Do not implement Gmail or Google Sheets before that authorization.
+Slice 1 `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-23)**. PR #73 merged reviewed head `18883e12dc307d22b2928a3c3ece4da3d7bb8fd8` into canonical main `c236ac03c3afe3c8f6bfb7c53f72b663374df468`. The reviewed staged-diff fingerprint was `1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6`; local canonical Assurance passed 102/102, Golden passed 15/15, GitHub Assurance run #151 succeeded, and final independent exact-byte review was SAFE.
 
-The one-task Cursor-review exception applied only to the exact doctrine candidate fingerprint `bc073a55b8b14aab954f19a0d220e5eb9184f09607761bf35866b6883590a253`; it does not weaken future review requirements.
+Next candidate seam: `SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET` — **SELECTED_NOT_AUTHORIZED**. Scope follows `docs/SUPERVISED_PRODUCTION_V1.md` Section 9 item 1: attach existing cheap gates + Employer Truth + Match Truth and write outcomes back to Sheet. `implementation_authorized=false`. Exact next allowed action is governance only: author/freeze/validate/review a bounded Slice 2 mutation contract and obtain Bora's separate explicit runtime authorization. Do not implement Slice 2 before that authorization.
+
+The prior one-task Cursor-review exception applied only to the exact doctrine candidate fingerprint `bc073a55b8b14aab954f19a0d220e5eb9184f09607761bf35866b6883590a253`; it does not weaken current or future review requirements.
 
 ## Current Checkpoint - Recommendation B (Milestone Run V1 Targeted Optimization) COMPLETED BY OPERATOR; BORA ACCEPTED (2026-09-15)
 

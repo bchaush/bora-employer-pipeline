@@ -25,15 +25,26 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-16_SUPERVISED_PRODUCTION_V1_CONTINUITY_SYNC'
-assert cp['canonical_basis_sha'] == '01602bf6ba4329b37d8b0365a77f53f953dce597'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-23_SUPERVISED_PRODUCTION_V1_SLICE_1_COMPLETION_SYNC'
+assert cp['canonical_basis_sha'] == 'c236ac03c3afe3c8f6bfb7c53f72b663374df468'
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
 assert cp['authorization_status'] == 'BORA_ACCEPTED'
 assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
-assert cp['operator_status'] == 'CONTINUITY_SYNC_COMPLETED_BY_OPERATOR'
+assert cp['operator_status'] == 'SLICE_1_COMPLETION_SYNC_COMPLETED_BY_OPERATOR'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-16'
+assert cp['accepted_at'] == '2026-09-23'
 assert cp['implementation_authorized'] is False
+slice1 = cp['slice_1_completion']
+assert slice1['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET'
+assert slice1['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert slice1['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert slice1['canonical_merge_sha'] == 'c236ac03c3afe3c8f6bfb7c53f72b663374df468'
+assert slice1['reviewed_head_sha'] == '18883e12dc307d22b2928a3c3ece4da3d7bb8fd8'
+assert slice1['reviewed_candidate_fingerprint'] == '1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6'
+assert slice1['independent_review'] == 'SAFE'
+assert cp['next_candidate_seam']['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET'
+assert cp['next_candidate_seam']['selection_status'] == 'SELECTED_NOT_AUTHORIZED'
+assert cp['next_candidate_seam']['implementation_authorized'] is False
 
 phase_h = cp['phase_h_acceptance']
 assert phase_h['phase_id'] == 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1'
@@ -242,15 +253,17 @@ assert 'beautiful work G once u cehck everything being up to standart' in phase_
 assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
 assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['current_phase']
+assert 'SLICE_1_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
+assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['current_phase']
 assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['next_authorized_action']
-assert 'NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['next_authorized_action']
+assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
 assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
-assert 'Do not begin Gmail/Sheets implementation' in PROJECT_STATE['next_authorized_action']
+assert 'separate explicit runtime authorization' in PROJECT_STATE['next_authorized_action']
 current_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[0]
 assert 'Recommendation C remains NOT_AUTHORIZED' in current_action
 assert 'Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED' in current_action
-assert 'No product automation, trace infrastructure, database/UI, new agents, model routing, LLM judges, Recommendation C, Phase I, or successor implementation milestone is authorized by this continuity sync.' in current_action
+assert 'No successor runtime implementation is authorized by this completion sync.' in current_action
 assert 'OPERATE FIRST / BUILD SECOND' not in current_action
 assert 'No new engineering milestone is selected or authorized' not in current_action
 historical_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[1]

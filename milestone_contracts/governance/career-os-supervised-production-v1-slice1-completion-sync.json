@@ -1,0 +1,73 @@
+{
+  "milestone_id": "SUPERVISED_PRODUCTION_V1_SLICE_1_COMPLETION_SYNC",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Synchronize canonical recovery pointers after PR #73 so fresh sessions recover Slice 1 as merged and accepted, and the documented post-Slice-1 gates-plus-Employer-Truth-plus-Match-Truth-to-Sheet seam as selected-but-not-authorized, without implementing that next seam.",
+  "baseline_sha": "c236ac03c3afe3c8f6bfb7c53f72b663374df468",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "milestone_contracts/governance/career-os-supervised-production-v1-slice1-completion-sync.json",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/**",
+    ".github/**"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "Canonical recovery surfaces record PR #73 merged Slice 1 reviewed head 18883e12dc307d22b2928a3c3ece4da3d7bb8fd8 into canonical main c236ac03c3afe3c8f6bfb7c53f72b663374df468.",
+    "The reviewed Slice 1 staged-diff fingerprint 1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6 and final SAFE review are preserved as completion evidence.",
+    "Slice 1 is recorded as COMPLETED_BY_OPERATOR / BORA_ACCEPTED.",
+    "The next candidate seam follows docs/SUPERVISED_PRODUCTION_V1.md Section 9 item 1: attach existing cheap gates + Employer Truth + Match Truth and write outcomes back to Sheet.",
+    "The next candidate seam remains SELECTED_NOT_AUTHORIZED; global implementation_authorized remains false.",
+    "No next-seam runtime implementation, truth-engine mutation, schema mutation, provider integration, or Sheet write code occurs in this sync.",
+    "Historical accepted milestone and recovery-order semantics remain preserved.",
+    "Any modified regression test preserves or strengthens prior fail-closed and authorization invariants.",
+    "The two Assurance-proven historical governance regressions updated by this sync preserve their original Phase H and Recommendation-B facts while advancing only the live checkpoint identity/routing assertions."
+  ],
+  "stop_conditions": [
+    "Any runtime implementation is required.",
+    "Any src, schema, truth-engine, provider, fixture, golden, or docs path must change.",
+    "Any path outside allowed_paths must change.",
+    "The sync would imply implementation authorization for the next seam.",
+    "Global implementation_authorized would become true.",
+    "A historical authorization, recovery-order, or fail-closed invariant would need to be weakened."
+  ],
+  "review_requirements": "CONSEQUENTIAL_GOVERNANCE_DIFF_REQUIRES_INDEPENDENT_ADVERSARIAL_REVIEW_BEFORE_COMMIT_PUSH; DETERMINISTIC_STATE_AND_FULL_ASSURANCE_REQUIRED",
+  "human_approval_requirements": "BORA_AUTHORIZED_THIS_POST_MERGE_GOVERNANCE_SYNC_BY_REQUESTING_CONTINUATION_AFTER_PR_73_MERGE; NEXT_RUNTIME_SEAM_REQUIRES_SEPARATE_EXPLICIT_BORA_AUTHORIZATION_AFTER_ITS_OWN_BOUNDED_MUTATION_CONTRACT"
+}

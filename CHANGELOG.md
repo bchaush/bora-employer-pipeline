@@ -1,5 +1,13 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-23 — SUPERVISED_PRODUCTION_V1 Slice 1 completion continuity sync
+
+- Verified PR #73 merged `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` at canonical `c236ac03c3afe3c8f6bfb7c53f72b663374df468`; reviewed head `18883e12dc307d22b2928a3c3ece4da3d7bb8fd8` is an ancestor of canonical main.
+- Preserved exact reviewed candidate evidence: staged-diff fingerprint `1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6`, local canonical Assurance 102/102 PASS, Golden 15/15 PASS, GitHub Assurance run #151 SUCCESS, final independent exact-byte review SAFE.
+- Recorded Slice 1 as **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-23)**.
+- Selected `SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET` as the next candidate seam from `docs/SUPERVISED_PRODUCTION_V1.md` Section 9 item 1 — attach existing cheap gates + Employer Truth + Match Truth and write outcomes back to Sheet — while keeping it **SELECTED_NOT_AUTHORIZED** and preserving global `implementation_authorized=false`.
+- This sync contains governance continuity only. Slice 2 runtime implementation, truth-engine semantic mutation, provider integration, package work, Vercel work, Scout expansion, browser automation, auto-submit, and database work remain unauthorized pending a separate bounded mutation contract, deterministic validation, independent review, and Bora's explicit runtime authorization.
+
 ## 2026-09-16 — SUPERVISED_PRODUCTION_V1 continuity sync
 
 - Verified PR #71 merged the accepted doctrine-only contract at canonical `01602bf6ba4329b37d8b0365a77f53f953dce597`; reviewed head is `5cb49e0eba7b86773e20738f3e250252c389b3fd`; reviewed/merge tree is `3ddcd3cecb54ad9a3bc053dff59833ebc90e5cfb`.

@@ -7,11 +7,14 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-16_SUPERVISED_PRODUCTION_V1_CONTINUITY_SYNC"
-assert cp["canonical_basis_sha"]=="01602bf6ba4329b37d8b0365a77f53f953dce597"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-23_SUPERVISED_PRODUCTION_V1_SLICE_1_COMPLETION_SYNC"
+assert cp["canonical_basis_sha"]=="c236ac03c3afe3c8f6bfb7c53f72b663374df468"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="CONTINUITY_SYNC_COMPLETED_BY_OPERATOR"
-assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-16"
+assert cp["operator_status"]=="SLICE_1_COMPLETION_SYNC_COMPLETED_BY_OPERATOR"
+assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-23"
+assert cp["slice_1_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
+assert cp["next_candidate_seam"]["milestone_id"]=="SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET"
+assert cp["next_candidate_seam"]["selection_status"]=="SELECTED_NOT_AUTHORIZED"
 assert cp["recommendation_b_completion"]["milestone_id"]=="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 assert cp["implementation_authorized"] is False
 assert cp["recommendation_b_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
@@ -22,7 +25,8 @@ assert "35033992088" in acc["canonical_acceptance_basis"]
 assert cp["recommendation_b_authorization"]["operator_status"]=="NOT_YET_COMPLETED"  # historical authorization snapshot only
 assert "HISTORICAL_AUTHORIZATION_SNAPSHOT" in cp["recommendation_b_authorization"]["record_semantics"]
 assert "OPERATE FIRST / BUILD SECOND" in cp["exact_next_allowed_action"]
-assert "No new engineering milestone is selected or authorized" in cp["exact_next_allowed_action"]
+assert "SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET" in cp["exact_next_allowed_action"]
+assert "Do not implement Slice 2 before that authorization" in cp["exact_next_allowed_action"]
 assert "Recommendation C remains NOT_AUTHORIZED" in cp["exact_next_allowed_action"]
 assert "Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED" in cp["exact_next_allowed_action"]
 assert "BORA_ACCEPTED (2026-09-15)" in ps["current_phase"] and "PENDING_BORA_ACCEPTANCE" not in ps["current_phase"]
