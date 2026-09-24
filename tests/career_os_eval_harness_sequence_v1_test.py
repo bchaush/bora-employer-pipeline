@@ -219,16 +219,15 @@ assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-11) / READ_ONLY_DESIGN_ON
 assert '**SELECTED / READ-ONLY / NO IMPLEMENTATION AUTHORIZED**' not in CURRENT_STATE
 
 assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
-assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['current_phase']
 assert 'SLICE_1_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
 assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['current_phase']
-assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'SLICE_2_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
+assert 'NEXT_CANDIDATE_SEAM NONE_SELECTED' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1' in PROJECT_STATE['current_phase']
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
 assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['next_authorized_action']
-assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'No successor runtime milestone is selected or authorized' in PROJECT_STATE['next_authorized_action']
 assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
-assert 'separate explicit runtime authorization' in PROJECT_STATE['next_authorized_action']
 assert 'PRIOR_IMPLEMENTATION_AUTHORITY_SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL_EXHAUSTED_BY_OPERATOR_COMPLETION' in PROJECT_STATE['current_phase']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-14) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
 assert 'COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-12) / READ_ONLY_DESIGN_ONLY' in PROJECT_STATE['next_authorized_action']
@@ -245,7 +244,7 @@ assert (
     'EXECUTABLE_NOW / RECONSTRUCTION_BACKED_DESIGN_CASE / BLOCKED_CANDIDATE executability'
     not in PROJECT_STATE['next_authorized_action']
 ), 'stale three-class executability summary must not reappear'
-assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-23'
+assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-24'
 
 # Historical Phase B-H / Recommendation-B detail remains in the durable
 # checkpoint lineage; project_state preserves binding semantic invariants while

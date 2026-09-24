@@ -1,0 +1,72 @@
+{
+  "milestone_id": "SUPERVISED_PRODUCTION_V1_SLICE_2_COMPLETION_SYNC",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Synchronize canonical recovery pointers after PR #76 so fresh sessions recover Slice 2 as merged and accepted, preserve exact implementation evidence, and stop with no successor runtime seam selected or authorized. docs/SUPERVISED_PRODUCTION_V1.md Section 9 item 2 remains roadmap context only until a later separately governed selection.",
+  "baseline_sha": "f70ef63386e9eb5134480b4996ad493720abc02c",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "milestone_contracts/governance/supervised-production-v1-slice2-completion-sync.json"
+  ],
+  "forbidden_paths": [
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/**",
+    ".cursorignore",
+    ".claude/**",
+    "src/**",
+    "schemas/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "config/**",
+    "prompts/**",
+    "docs/**",
+    ".github/**"
+  ],
+  "required_tests": [
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "Canonical recovery surfaces record PR #76 merged reviewed head 64483de7b0588a0822ca0e4dc219867c8c054bbb into canonical main f70ef63386e9eb5134480b4996ad493720abc02c.",
+    "The reviewed Slice 2 raw staged-diff fingerprint f425894766c2423f00148c184dbbd4e4f40a9300831ac2d03d813d8cd8add643, reviewed tree 50410d136d352373fb85d39c457805a62118cf50, GitHub Assurance run #157 SUCCESS, local canonical Assurance 103/103 PASS, Golden 15/15 PASS, and final independent exact-byte review SAFE are preserved.",
+    "Slice 2 is recorded as COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-24).",
+    "No successor runtime milestone is selected or authorized by this sync. docs/SUPERVISED_PRODUCTION_V1.md Section 9 item 2 remains roadmap context only.",
+    "Global implementation_authorized remains false.",
+    "No runtime implementation, truth-engine mutation, schema mutation, provider integration, package work, Vercel work, Scout expansion, browser automation, auto-submit, or database work occurs in this sync.",
+    "Historical accepted milestone and recovery-order semantics remain preserved.",
+    "Any modified regression test preserves or strengthens prior fail-closed and authorization invariants."
+  ],
+  "stop_conditions": [
+    "Any runtime implementation is required.",
+    "Any src, schema, truth-engine, provider, fixture, golden, docs, or workflow path must change.",
+    "Any path outside allowed_paths must change.",
+    "The sync would select or imply implementation authorization for a successor runtime seam.",
+    "Global implementation_authorized would become true.",
+    "A historical authorization, recovery-order, or fail-closed invariant would need to be weakened."
+  ],
+  "review_requirements": "CONSEQUENTIAL_GOVERNANCE_DIFF_REQUIRES_INDEPENDENT_ADVERSARIAL_REVIEW_BEFORE_COMMIT_PUSH; DETERMINISTIC_STATE_AND_FULL_ASSURANCE_REQUIRED",
+  "human_approval_requirements": "BORA_AUTHORIZED_THIS_POST_MERGE_GOVERNANCE_SYNC_BY_CONDITIONALLY_DIRECTING THE OPERATOR TO MOVE FORWARD AFTER DOUBLE-CHECKING PR #76; NO SUCCESSOR RUNTIME SEAM IS AUTHORIZED BY THIS CLOSURE"
+}

@@ -60,16 +60,17 @@ for forbidden_path in (
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == 'c236ac03c3afe3c8f6bfb7c53f72b663374df468'
+assert cp['canonical_basis_sha'] == 'f70ef63386e9eb5134480b4996ad493720abc02c'
 assert BASELINE_SHA in cp['phase_h_acceptance']['canonical_merge_verification']
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
-assert cp['operator_status'] == 'SLICE_1_COMPLETION_SYNC_COMPLETED_BY_OPERATOR'
+assert cp['operator_status'] == 'SLICE_2_COMPLETION_SYNC_COMPLETED_BY_OPERATOR'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-23'
+assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False
 assert cp['slice_1_completion']['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['next_candidate_seam']['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET'
-assert cp['next_candidate_seam']['selection_status'] == 'SELECTED_NOT_AUTHORIZED'
+assert cp['slice_2_completion']['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert cp['next_candidate_seam']['milestone_id'] is None
+assert cp['next_candidate_seam']['selection_status'] == 'NONE_SELECTED'
 assert cp['phase_h_acceptance']['phase_id'] == PHASE_H_ID
 assert cp['recommendation_b_completion']['milestone_id'] == REC_B_ID
 
