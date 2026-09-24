@@ -9,13 +9,13 @@ Verify `project_state.json` (mechanically checked against BLUEPRINT.md by
 scripts/verify_assurance_baseline.py Phase 0) and live GitHub PR state
 before trusting the pointer below.
 
-## Current Checkpoint - SUPERVISED_PRODUCTION_V1 (Slice 1 completed; post-merge continuity sync)
+## Current Checkpoint - SUPERVISED_PRODUCTION_V1 (Slice 2 completed; post-merge continuity sync)
 
 Active doctrine: `docs/SUPERVISED_PRODUCTION_V1.md`.
 
-Slice 1 `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-23)**. PR #73 merged reviewed head `18883e12dc307d22b2928a3c3ece4da3d7bb8fd8` into canonical main `c236ac03c3afe3c8f6bfb7c53f72b663374df468`. The reviewed staged-diff fingerprint was `1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6`; local canonical Assurance passed 102/102, Golden passed 15/15, GitHub Assurance run #151 succeeded, and final independent exact-byte review was SAFE.
+Slice 2 `SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET` is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-24)**. PR #76 merged reviewed head `64483de7b0588a0822ca0e4dc219867c8c054bbb` into canonical main `f70ef63386e9eb5134480b4996ad493720abc02c`. The reviewed raw staged-diff fingerprint was `f425894766c2423f00148c184dbbd4e4f40a9300831ac2d03d813d8cd8add643`; reviewed tree and merge tree are both `50410d136d352373fb85d39c457805a62118cf50`; local canonical Assurance passed 103/103, Golden passed 15/15, GitHub Assurance run #157 succeeded, and final independent exact-byte review was SAFE.
 
-Next candidate seam: `SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET` — **SELECTED_NOT_AUTHORIZED**. Scope follows `docs/SUPERVISED_PRODUCTION_V1.md` Section 9 item 1: attach existing cheap gates + Employer Truth + Match Truth and write outcomes back to Sheet. `implementation_authorized=false`. Exact next allowed action is governance only: author/freeze/validate/review a bounded Slice 2 mutation contract and obtain Bora's separate explicit runtime authorization. Do not implement Slice 2 before that authorization.
+No successor runtime seam is selected or authorized by this closure. `implementation_authorized=false`. `docs/SUPERVISED_PRODUCTION_V1.md` Section 9 item 2 remains roadmap context only. Exact next allowed action is operation/recovery or a separate governance decision to select a bounded successor seam; do not begin PURSUE persistence, package generation, Drive persistence, Vercel, scheduling, Scout expansion, browser automation, auto-submit, or database work without a new bounded contract and separate Bora authorization.
 
 The prior one-task Cursor-review exception applied only to the exact doctrine candidate fingerprint `bc073a55b8b14aab954f19a0d220e5eb9184f09607761bf35866b6883590a253`; it does not weaken current or future review requirements.
 

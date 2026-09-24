@@ -25,25 +25,36 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-23_SUPERVISED_PRODUCTION_V1_SLICE_1_COMPLETION_SYNC'
-assert cp['canonical_basis_sha'] == 'c236ac03c3afe3c8f6bfb7c53f72b663374df468'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-24_SUPERVISED_PRODUCTION_V1_SLICE_2_COMPLETION_SYNC'
+assert cp['canonical_basis_sha'] == 'f70ef63386e9eb5134480b4996ad493720abc02c'
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
 assert cp['authorization_status'] == 'BORA_ACCEPTED'
 assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
-assert cp['operator_status'] == 'SLICE_1_COMPLETION_SYNC_COMPLETED_BY_OPERATOR'
+assert cp['operator_status'] == 'SLICE_2_COMPLETION_SYNC_COMPLETED_BY_OPERATOR'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert cp['accepted_at'] == '2026-09-23'
+assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False
 slice1 = cp['slice_1_completion']
 assert slice1['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET'
 assert slice1['operator_status'] == 'COMPLETED_BY_OPERATOR'
 assert slice1['human_acceptance_status'] == 'BORA_ACCEPTED'
-assert slice1['canonical_merge_sha'] == 'c236ac03c3afe3c8f6bfb7c53f72b663374df468'
 assert slice1['reviewed_head_sha'] == '18883e12dc307d22b2928a3c3ece4da3d7bb8fd8'
 assert slice1['reviewed_candidate_fingerprint'] == '1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6'
+assert slice1['local_assurance'] == '102/102_PASS_ALL_PHASES'
+assert slice1['github_assurance'] == 'RUN_151_SUCCESS'
 assert slice1['independent_review'] == 'SAFE'
-assert cp['next_candidate_seam']['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET'
-assert cp['next_candidate_seam']['selection_status'] == 'SELECTED_NOT_AUTHORIZED'
+assert slice1['implementation_authority_status'] == 'EXHAUSTED_BY_COMPLETION'
+slice2 = cp['slice_2_completion']
+assert slice2['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET'
+assert slice2['operator_status'] == 'COMPLETED_BY_OPERATOR'
+assert slice2['human_acceptance_status'] == 'BORA_ACCEPTED'
+assert slice2['canonical_merge_sha'] == 'f70ef63386e9eb5134480b4996ad493720abc02c'
+assert slice2['reviewed_head_sha'] == '64483de7b0588a0822ca0e4dc219867c8c054bbb'
+assert slice2['reviewed_candidate_fingerprint'] == 'f425894766c2423f00148c184dbbd4e4f40a9300831ac2d03d813d8cd8add643'
+assert slice2['reviewed_tree'] == slice2['merge_tree'] == '50410d136d352373fb85d39c457805a62118cf50'
+assert slice2['independent_review'] == 'SAFE'
+assert cp['next_candidate_seam']['milestone_id'] is None
+assert cp['next_candidate_seam']['selection_status'] == 'NONE_SELECTED'
 assert cp['next_candidate_seam']['implementation_authorized'] is False
 
 phase_h = cp['phase_h_acceptance']
@@ -252,14 +263,13 @@ assert 'beautiful work G once u cehck everything being up to standart' in phase_
 
 assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
 assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
-assert 'SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET' in PROJECT_STATE['current_phase']
 assert 'SLICE_1_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
 assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['current_phase']
-assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['current_phase']
+assert 'SLICE_2_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
+assert 'NEXT_CANDIDATE_SEAM NONE_SELECTED' in PROJECT_STATE['current_phase']
 assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['next_authorized_action']
-assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+assert 'No successor runtime milestone is selected or authorized' in PROJECT_STATE['next_authorized_action']
 assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
-assert 'separate explicit runtime authorization' in PROJECT_STATE['next_authorized_action']
 current_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[0]
 assert 'Recommendation C remains NOT_AUTHORIZED' in current_action
 assert 'Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED' in current_action
