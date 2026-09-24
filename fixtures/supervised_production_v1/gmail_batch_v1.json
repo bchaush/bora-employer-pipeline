@@ -1,0 +1,93 @@
+[
+  {
+    "source": "GMAIL",
+    "source_message_id": "MSG_001",
+    "source_thread_id": "THREAD_001",
+    "observed_at": "2026-09-20T09:00:00+00:00",
+    "postings": [
+      {
+        "employer_text": "Acme Corp",
+        "role_text": "Software Engineer",
+        "discovery_url": "https://acme.myworkdayjobs.com/en-US/Acme/job/Remote/Software-Engineer_R-123456",
+        "requisition_text": null
+      }
+    ]
+  },
+  {
+    "source": "GMAIL",
+    "source_message_id": "MSG_001",
+    "source_thread_id": "THREAD_001",
+    "observed_at": "2026-09-20T09:00:00+00:00",
+    "postings": [
+      {
+        "employer_text": "Acme Corp",
+        "role_text": "Software Engineer",
+        "discovery_url": "https://acme.myworkdayjobs.com/en-US/Acme/job/Remote/Software-Engineer_R-123456",
+        "requisition_text": null
+      }
+    ]
+  },
+  {
+    "source": "GMAIL",
+    "source_message_id": "MSG_002",
+    "source_thread_id": "THREAD_002",
+    "observed_at": "2026-09-20T10:00:00+00:00",
+    "postings": [
+      {
+        "employer_text": "Acme Corp",
+        "role_text": "Software Engineer",
+        "discovery_url": "https://acme.wd5.myworkdayjobs.com/en-US/Acme/job/Remote/Software-Engineer_R-123456",
+        "requisition_text": null,
+        "source_claims": {"posting_age": "Posted Today", "fit_label": "Great Match"}
+      }
+    ]
+  },
+  {
+    "source": "GMAIL",
+    "source_message_id": "MSG_003",
+    "source_thread_id": "THREAD_003",
+    "observed_at": "2026-09-20T11:00:00+00:00",
+    "postings": [
+      {
+        "employer_text": "Beta LLC",
+        "role_text": "Data Analyst",
+        "discovery_url": "https://beta.myworkdayjobs.com/en-US/Beta/job/Remote/Data-Analyst",
+        "requisition_text": null
+      }
+    ]
+  },
+  {
+    "source": "GMAIL",
+    "source_message_id": "MSG_004",
+    "source_thread_id": "THREAD_004",
+    "observed_at": "not-a-valid-timestamp",
+    "postings": [
+      {
+        "employer_text": "Malformed Co",
+        "role_text": "Unknown",
+        "discovery_url": null,
+        "requisition_text": null
+      }
+    ]
+  },
+  {
+    "source": "GMAIL",
+    "source_message_id": "MSG_005",
+    "source_thread_id": "THREAD_005",
+    "observed_at": "2026-09-20T12:00:00+00:00",
+    "postings": [
+      {
+        "employer_text": "Gamma Inc",
+        "role_text": "Analyst",
+        "discovery_url": "https://gamma.myworkdayjobs.com/en-US/Gamma/job/Remote/Analyst_R-999999",
+        "requisition_text": null
+      },
+      {
+        "employer_text": "Delta Inc",
+        "role_text": "Analyst",
+        "discovery_url": "https://delta.myworkdayjobs.com/en-US/Delta/job/Remote/Analyst_R-999999",
+        "requisition_text": null
+      }
+    ]
+  }
+]

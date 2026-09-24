@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/production_ledger_mutation.schema.json",
+  "title": "Supervised Production V1 Ledger Mutation Plan",
+  "description": "Deterministic JOBS + LOG mutation plan produced by production_ledger.py. Contains no provider credentials, account IDs, label IDs, or spreadsheet IDs. Provider writes are applied by the supervised connector layer from this plan, not embedded here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["jobs_mutations", "log_mutations"],
+  "properties": {
+    "jobs_mutations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/jobs_mutation" }
+    },
+    "log_mutations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/log_mutation" }
+    }
+  },
+  "$defs": {
+    "pipeline_state": {
+      "type": "string",
+      "enum": ["DISCOVERED", "NORMALIZED", "VERIFICATION_REQUIRED", "PROCESSING_ERROR"]
+    },
+    "jobs_mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "Op",
+        "Job_ID",
+        "Company",
+        "Role",
+        "Discovery_Source",
+        "Discovery_URL",
+        "Official_URL",
+        "First_Seen",
+        "Last_Verified",
+        "Pipeline_State"
+      ],
+      "properties": {
+        "Op": { "type": "string", "enum": ["CREATE", "UPDATE"] },
+        "Job_ID": { "type": "string", "minLength": 1 },
+        "Company": { "type": ["string", "null"] },
+        "Role": { "type": ["string", "null"] },
+        "Discovery_Source": { "type": "string", "enum": ["GMAIL"] },
+        "Discovery_URL": { "type": ["string", "null"], "format": "job-url" },
+        "Official_URL": { "type": ["string", "null"], "format": "job-url" },
+        "First_Seen": { "type": "string", "format": "date-time" },
+        "Last_Verified": { "type": "string", "format": "date-time" },
+        "Pipeline_State": { "$ref": "#/$defs/pipeline_state" }
+      }
+    },
+    "log_mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "Run_ID",
+        "Timestamp",
+        "Stage",
+        "Source",
+        "Job_ID",
+        "Status",
+        "Error_Code",
+        "Engine_Baseline",
+        "Notes"
+      ],
+      "properties": {
+        "Run_ID": { "type": "string", "minLength": 1 },
+        "Timestamp": { "type": "string", "format": "date-time" },
+        "Stage": {
+          "type": "string",
+          "enum": ["INGESTION", "IDENTITY_RESOLUTION", "LEDGER_PERSISTENCE"]
+        },
+        "Source": { "type": "string", "enum": ["GMAIL"] },
+        "Job_ID": { "type": ["string", "null"] },
+        "Status": { "$ref": "#/$defs/pipeline_state" },
+        "Error_Code": { "type": ["string", "null"] },
+        "Engine_Baseline": { "type": "string", "minLength": 1 },
+        "Notes": { "type": "string" }
+      }
+    }
+  }
+}
