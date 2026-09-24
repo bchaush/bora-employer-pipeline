@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/discovery_lead.schema.json",
+  "title": "Supervised Production V1 Discovery Lead",
+  "description": "One untrusted nomination extracted from a bounded Gmail alert observation. Stores source provenance and explicit unresolved states. Must never invent a missing exact-role identifier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "discovery_lead_id",
+    "source",
+    "source_message_id",
+    "source_thread_id",
+    "observed_at",
+    "discovery_urls",
+    "employer_text",
+    "role_text",
+    "requisition_text",
+    "source_claims",
+    "exact_employer_identity",
+    "exact_requisition_id",
+    "identity_resolution_status"
+  ],
+  "properties": {
+    "discovery_lead_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic identifier derived from source + source_message_id + ordinal position within the message. Stable across reprocessing for idempotency."
+    },
+    "source": {
+      "type": "string",
+      "enum": ["GMAIL"],
+      "description": "Slice 1 supports only the Gmail intake adapter."
+    },
+    "source_message_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Provider message identity. Never a spreadsheet ID, account ID, or credential."
+    },
+    "source_thread_id": {
+      "type": ["string", "null"]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the observation was made available to the deterministic core, not a source-claimed posting age."
+    },
+    "discovery_urls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "job-url"
+      },
+      "description": "Absolute http/https URLs observed in the alert. Empty when none were present or none were well-formed."
+    },
+    "employer_text": {
+      "type": ["string", "null"],
+      "description": "Untrusted employer name text as observed. Descriptive only; never Employer Truth."
+    },
+    "role_text": {
+      "type": ["string", "null"],
+      "description": "Untrusted role title text as observed. Descriptive only; never Match Truth."
+    },
+    "requisition_text": {
+      "type": ["string", "null"],
+      "description": "Untrusted free text that may contain a requisition/opportunity identifier."
+    },
+    "source_claims": {
+      "type": "object",
+      "description": "Untrusted source-provided claims preserved as observation provenance only; never Employer Truth or Match Truth.",
+      "additionalProperties": true
+    },
+    "exact_employer_identity": {
+      "type": ["string", "null"],
+      "description": "Exact employer/application-system identity deterministically parsed from a known ATS URL pattern (e.g. Workday tenant, Greenhouse board, Lever company slug). Null when unresolved; never a fuzzy company-name guess."
+    },
+    "exact_requisition_id": {
+      "type": ["string", "null"],
+      "description": "Exact requisition/opportunity identifier deterministically parsed from URL or requisition_text. Null when absent or ambiguous; never fabricated."
+    },
+    "identity_resolution_status": {
+      "type": "string",
+      "enum": ["RESOLVED", "VERIFICATION_REQUIRED"],
+      "description": "RESOLVED only when both exact_employer_identity and exact_requisition_id are present."
+    }
+  }
+}
