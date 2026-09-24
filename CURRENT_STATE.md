@@ -16,11 +16,11 @@ which found this file still declared Blueprint v3.8 while canonical
 outrank this prose. Before trusting anything below, verify it against
 those sources rather than this file alone.
 
-## Current Execution Checkpoint — SUPERVISED_PRODUCTION_V1 (2026-09-16)
+## Current Execution Checkpoint — SUPERVISED_PRODUCTION_V1 (2026-09-23)
 
-`SUPERVISED_PRODUCTION_V1` is the accepted active production doctrine. PR #71 merged the exact accepted contract to canonical main `01602bf6ba4329b37d8b0365a77f53f953dce597`; reviewed head `5cb49e0eba7b86773e20738f3e250252c389b3fd` is its ancestor and reviewed tree equals merge tree `3ddcd3cecb54ad9a3bc053dff59833ebc90e5cfb`.
+`SUPERVISED_PRODUCTION_V1` remains the accepted active production doctrine. Slice 1 `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET` is **COMPLETED_BY_OPERATOR / BORA_ACCEPTED (2026-09-23)**. PR #73 merged reviewed head `18883e12dc307d22b2928a3c3ece4da3d7bb8fd8` into canonical main `c236ac03c3afe3c8f6bfb7c53f72b663374df468`; reviewed staged-diff fingerprint `1620050e603b16fd3a188c8c1f6b4e47b55f5801ec447e1666251a45280f26e6`, local Assurance 102/102 PASS, Golden 15/15 PASS, GitHub Assurance run #151 SUCCESS, final independent exact-byte review SAFE.
 
-The next candidate seam is `SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET`, but it is **SELECTED_NOT_AUTHORIZED**. `implementation_authorized=false`. The exact next allowed action is governance only: author/freeze/validate/review the bounded Slice 1 mutation contract and obtain Bora's separate explicit authorization. No Gmail/Sheets implementation, Match Truth mutation, package work, Vercel work, Scout expansion, browser automation, or database work is authorized by this sync.
+The next candidate seam is `SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET`, following `docs/SUPERVISED_PRODUCTION_V1.md` Section 9 item 1: attach existing cheap gates + Employer Truth + Match Truth and write outcomes back to Sheet. It is **SELECTED_NOT_AUTHORIZED**. `implementation_authorized=false`. The exact next allowed action is governance only: author/freeze/validate/review a bounded Slice 2 mutation contract and obtain Bora's separate explicit runtime authorization. No Slice 2 implementation, truth-engine semantic mutation, package work, Vercel work, Scout expansion, browser automation, auto-submit, or database work is authorized by this sync.
 
 Fresh sessions follow the existing canonical recovery order; once `project_state.json` and `CURRENT_EXECUTION_CHECKPOINT.json` establish supervised production as active, read `docs/SUPERVISED_PRODUCTION_V1.md` as required production context.
 
