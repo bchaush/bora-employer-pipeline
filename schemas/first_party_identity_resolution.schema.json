@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/first_party_identity_resolution.schema.json",
+  "title": "Supervised Production V1 First-Party Identity Resolution Request",
+  "description": "Provider-neutral deterministic input: one durable Slice-1 VERIFICATION_REQUIRED LOG row plus one supervised first-party posting observation. Network/browser/provider retrieval is outside this schema and outside repository truth semantics.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "discovery_log_record",
+    "first_party_observation"
+  ],
+  "properties": {
+    "discovery_log_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "Run_ID",
+        "Timestamp",
+        "Stage",
+        "Source",
+        "Job_ID",
+        "Status",
+        "Error_Code",
+        "Engine_Baseline",
+        "Notes"
+      ],
+      "properties": {
+        "Run_ID": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Stage": {
+          "const": "IDENTITY_RESOLUTION"
+        },
+        "Source": {
+          "const": "GMAIL"
+        },
+        "Job_ID": {
+          "type": "null"
+        },
+        "Status": {
+          "const": "VERIFICATION_REQUIRED"
+        },
+        "Error_Code": {
+          "type": "null"
+        },
+        "Engine_Baseline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "first_party_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_at",
+        "source_kind",
+        "official_url",
+        "observed_employer_name",
+        "observed_role_title",
+        "employer_binding_status",
+        "employer_binding_basis",
+        "exact_employer_identity",
+        "requisition_status",
+        "requisition_authority",
+        "exact_requisition_id",
+        "requisition_evidence"
+      ],
+      "properties": {
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_kind": {
+          "const": "FIRST_PARTY_DIRECT"
+        },
+        "official_url": {
+          "type": "string",
+          "format": "job-url"
+        },
+        "observed_employer_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_role_title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "employer_binding_status": {
+          "type": "string",
+          "enum": [
+            "VERIFIED",
+            "NOT_VERIFIED",
+            "AMBIGUOUS",
+            "MISMATCH"
+          ]
+        },
+        "employer_binding_basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exact_employer_identity": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "requisition_status": {
+          "type": "string",
+          "enum": [
+            "EXACT",
+            "MISSING",
+            "AMBIGUOUS"
+          ]
+        },
+        "requisition_authority": {
+          "type": ["string", "null"],
+          "enum": ["EMPLOYER_OR_ATS_FIRST_PARTY", null]
+        },
+        "exact_requisition_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "requisition_evidence": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "employer_binding_status": {
+                "const": "VERIFIED"
+              }
+            },
+            "required": [
+              "employer_binding_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exact_employer_identity": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "requisition_status": {
+                "const": "EXACT"
+              }
+            },
+            "required": [
+              "requisition_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "requisition_authority": {
+                "const": "EMPLOYER_OR_ATS_FIRST_PARTY"
+              },
+              "exact_requisition_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requisition_evidence": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "requisition_authority": {
+                "type": "null"
+              },
+              "exact_requisition_id": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
