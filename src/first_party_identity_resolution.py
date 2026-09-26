@@ -52,7 +52,7 @@ THIRD_PARTY_DISCOVERY_HOSTS = frozenset(
 
 # F1/F5: an identifier is only "present" in evidence/URL text when it appears as a
 # whole token, not as a substring of a longer digit run or composite identifier.
-_ID_TOKEN_CONTINUATION_CHARS = "a-z0-9-"
+_ID_TOKEN_CONTINUATION_CHARS = "a-z0-9_-"
 
 
 def _canonical_json(value: Any) -> str:
@@ -150,21 +150,67 @@ def _token_bounded_contains(haystack: str, token: str) -> bool:
         rf"(?<![{_ID_TOKEN_CONTINUATION_CHARS}])"
         rf"{re.escape(normalized_token)}"
         rf"(?![{_ID_TOKEN_CONTINUATION_CHARS}])"
+        rf"(?!\.[a-z0-9])"
     )
     return pattern.search(normalized_haystack) is not None
+
+
+def _normalized_hostname(url: str) -> str | None:
+    hostname = urlparse(url).hostname
+    if not hostname:
+        return None
+    return hostname.casefold().rstrip(".")
 
 
 def _official_url_third_party_host(official_url: str) -> str | None:
     """F7: deterministic host check only; no network/provider I/O."""
 
-    hostname = urlparse(official_url).hostname
+    hostname = _normalized_hostname(official_url)
     if not hostname:
         return None
-    hostname = hostname.lower()
     for denied_host in THIRD_PARTY_DISCOVERY_HOSTS:
         if hostname == denied_host or hostname.endswith(f".{denied_host}"):
             return denied_host
     return None
+
+
+def _known_discovery_platform_url(url: str) -> bool:
+    hostname = _normalized_hostname(url)
+    if not hostname:
+        return False
+    return any(
+        hostname == denied_host or hostname.endswith(f".{denied_host}")
+        for denied_host in THIRD_PARTY_DISCOVERY_HOSTS
+    )
+
+
+def _url_contains_identifier(url: str, identifier: str) -> bool:
+    normalized_id = _normalized_evidence_text(identifier)
+    if not normalized_id:
+        return False
+    normalized_url = _normalized_evidence_text(url)
+    return re.search(
+        rf"(?<![a-z0-9]){re.escape(normalized_id)}(?![a-z0-9])",
+        normalized_url,
+    ) is not None
+
+
+def _provenance_value_contains_identifier(value: Any, identifier: str) -> bool:
+    if isinstance(value, Mapping):
+        return any(
+            _provenance_value_contains_identifier(item, identifier)
+            for item in value.values()
+        )
+    if isinstance(value, (list, tuple, set)):
+        return any(
+            _provenance_value_contains_identifier(item, identifier)
+            for item in value
+        )
+    if isinstance(value, bool) or value is None:
+        return False
+    if isinstance(value, (str, int, float)):
+        return _url_contains_identifier(str(value), identifier)
+    return False
 
 
 def _schema_errors(request: Any) -> list[str]:
@@ -339,26 +385,59 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
     assert isinstance(exact_requisition_id, str)
     assert isinstance(evidence, str)
 
-    source_claims = provenance.get("source_claims")
-    discovery_platform_ids: set[str] = set()
-    if isinstance(source_claims, Mapping):
-        # Check the actual provenance values regardless of key name; a discovery
-        # platform ID must never satisfy the exact requisition identity no matter
-        # what the third-party source happened to call it.
-        for value in source_claims.values():
-            if isinstance(value, str) and value.strip():
-                discovery_platform_ids.add(value.strip().casefold())
+    discovery_exact_employer = provenance.get("exact_employer_identity")
+    if (
+        isinstance(discovery_exact_employer, str)
+        and discovery_exact_employer.strip()
+        and _normalize_exact_text(discovery_exact_employer)
+        != _normalize_exact_text(exact_employer_identity)
+    ):
+        return {
+            "outcome": "VERIFICATION_REQUIRED",
+            "error_code": "DISCOVERY_EMPLOYER_IDENTITY_CONTRADICTION",
+            "errors": [],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
 
-    discovery_urls_for_platform_check = provenance.get("discovery_urls")
-    id_present_in_discovery_url = isinstance(discovery_urls_for_platform_check, list) and any(
-        isinstance(url, str) and _token_bounded_contains(url, exact_requisition_id)
-        for url in discovery_urls_for_platform_check
+    discovery_exact_requisition = provenance.get("exact_requisition_id")
+    if (
+        isinstance(discovery_exact_requisition, str)
+        and discovery_exact_requisition.strip()
+        and _normalize_exact_text(discovery_exact_requisition)
+        != _normalize_exact_text(exact_requisition_id)
+    ):
+        return {
+            "outcome": "VERIFICATION_REQUIRED",
+            "error_code": "DISCOVERY_REQUISITION_IDENTITY_CONTRADICTION",
+            "errors": [],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
+
+    source_claims = provenance.get("source_claims")
+    id_present_in_source_claims = _provenance_value_contains_identifier(
+        source_claims, exact_requisition_id
     )
 
-    if (
-        exact_requisition_id.strip().casefold() in discovery_platform_ids
-        or id_present_in_discovery_url
-    ):
+    discovery_urls_for_platform_check = provenance.get("discovery_urls")
+    id_present_in_discovery_url = (
+        isinstance(discovery_urls_for_platform_check, list)
+        and any(
+            isinstance(url, str)
+            and _known_discovery_platform_url(url)
+            and _url_contains_identifier(url, exact_requisition_id)
+            for url in discovery_urls_for_platform_check
+        )
+    )
+
+    if id_present_in_source_claims or id_present_in_discovery_url:
         return {
             "outcome": "PROCESSING_ERROR",
             "error_code": "DISCOVERY_PLATFORM_ID_FORBIDDEN",
