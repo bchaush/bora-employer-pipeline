@@ -57,6 +57,7 @@ def empty_state() -> dict[str, Any]:
         "processed_lead_ids": [],
         "gate_match_fingerprints": {},
         "first_party_resolution_fingerprints": [],
+        "first_party_eligible_lead_ids": [],
     }
 
 
@@ -89,6 +90,7 @@ def state_from_ledger_rows(
             jobs[job_id] = dict(row)
 
     processed_lead_ids: set[str] = set()
+    first_party_eligible_lead_ids: set[str] = set()
     gate_match_fingerprints: dict[str, str] = {}
     first_party_resolution_fingerprints: set[str] = set()
     for row in log_rows:
@@ -104,6 +106,18 @@ def state_from_ledger_rows(
         lead_id = provenance.get("discovery_lead_id")
         if isinstance(lead_id, str) and lead_id:
             processed_lead_ids.add(lead_id)
+            # First-party eligibility is durable Slice-1 discovery provenance
+            # only: the canonical unresolved-identity row that build_mutation_plan
+            # emits for this exact lead, not any later LOG row that happens to
+            # carry the same discovery_lead_id (e.g. a first-party success/error
+            # record, or an unrelated stage's hold). Loose status-only matching
+            # here is what let downstream stages retroactively self-authorize.
+            if (
+                row.get("Stage") == "IDENTITY_RESOLUTION"
+                and row.get("Status") == "VERIFICATION_REQUIRED"
+                and row.get("Engine_Baseline") == ENGINE_BASELINE
+            ):
+                first_party_eligible_lead_ids.add(lead_id)
         gate_match_job_id = provenance.get("operational_job_id")
         gate_match_fingerprint = provenance.get("gate_match_fingerprint")
         if isinstance(gate_match_job_id, str) and gate_match_job_id and isinstance(
@@ -123,6 +137,7 @@ def state_from_ledger_rows(
         "processed_lead_ids": sorted(processed_lead_ids),
         "gate_match_fingerprints": gate_match_fingerprints,
         "first_party_resolution_fingerprints": sorted(first_party_resolution_fingerprints),
+        "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
     }
 
 
@@ -300,6 +315,9 @@ def build_mutation_plan(
             "first_party_resolution_fingerprints": list(
                 base_state.get("first_party_resolution_fingerprints", [])
             ),
+            "first_party_eligible_lead_ids": list(
+                base_state.get("first_party_eligible_lead_ids", [])
+            ),
         },
     }
 
@@ -323,6 +341,9 @@ def build_first_party_identity_resolution_mutation_plan(
         key: dict(value) for key, value in base_state.get("jobs", {}).items()
     }
     processed_lead_ids: set[str] = set(base_state.get("processed_lead_ids", []))
+    first_party_eligible_lead_ids: set[str] = set(
+        base_state.get("first_party_eligible_lead_ids", [])
+    )
     gate_match_fingerprints: dict[str, str] = dict(
         base_state.get("gate_match_fingerprints", {})
     )
@@ -354,7 +375,11 @@ def build_first_party_identity_resolution_mutation_plan(
         if outcome.get("operational_job_id") is not None:
             notes_payload["operational_job_id"] = outcome["operational_job_id"]
 
-        if not isinstance(lead_id, str) or not lead_id or lead_id not in processed_lead_ids:
+        if (
+            not isinstance(lead_id, str)
+            or not lead_id
+            or lead_id not in first_party_eligible_lead_ids
+        ):
             log_mutations.append(
                 _log_mutation(
                     run_id=run_id,
@@ -519,6 +544,7 @@ def build_first_party_identity_resolution_mutation_plan(
             "processed_lead_ids": sorted(processed_lead_ids),
             "gate_match_fingerprints": gate_match_fingerprints,
             "first_party_resolution_fingerprints": sorted(resolution_fingerprints),
+            "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
         },
     }
 
@@ -725,6 +751,9 @@ def build_gate_match_mutation_plan(
             "gate_match_fingerprints": gate_match_fingerprints,
             "first_party_resolution_fingerprints": list(
                 base_state.get("first_party_resolution_fingerprints", [])
+            ),
+            "first_party_eligible_lead_ids": list(
+                base_state.get("first_party_eligible_lead_ids", [])
             ),
         },
     }

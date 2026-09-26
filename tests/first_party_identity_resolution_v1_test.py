@@ -48,19 +48,26 @@ def _seed_lead_provenance(
     state: dict | None, request: dict
 ) -> dict:
     """TEST-ONLY helper: seed a request's durable Slice-1 discovery_lead_id
-    provenance into a mutation-plan state dict, preserving existing contents.
-    Does not manufacture JOBS rows or resolution fingerprints.
+    provenance into a mutation-plan state dict by reconstructing it from the
+    request's own canonical Slice-1 IDENTITY_RESOLUTION/VERIFICATION_REQUIRED
+    LOG row via state_from_ledger_rows, preserving existing contents. Does
+    not manufacture JOBS rows or resolution fingerprints, and does not
+    fabricate eligibility by injecting into state fields directly.
     """
     base = copy.deepcopy(state) if state is not None else {
         "jobs": {},
         "processed_lead_ids": [],
         "gate_match_fingerprints": {},
         "first_party_resolution_fingerprints": [],
+        "first_party_eligible_lead_ids": [],
     }
-    lead_id = json.loads(request["discovery_log_record"]["Notes"])["discovery_lead_id"]
+    reconstructed = state_from_ledger_rows([], [request["discovery_log_record"]])
     processed = set(base.get("processed_lead_ids", []))
-    processed.add(lead_id)
+    processed.update(reconstructed["processed_lead_ids"])
     base["processed_lead_ids"] = sorted(processed)
+    eligible = set(base.get("first_party_eligible_lead_ids", []))
+    eligible.update(reconstructed["first_party_eligible_lead_ids"])
+    base["first_party_eligible_lead_ids"] = sorted(eligible)
     return base
 
 # 1. Production-earned positive/negative matrix.
@@ -571,5 +578,71 @@ assert_true(
     "F7: a known third-party discovery-host URL must not be accepted as a first-party Official_URL",
 )
 print("PASS 18: a known third-party discovery-host URL is rejected as Official_URL (F7).")
+
+# 19. F4-STRICT: a LOG row carrying the same discovery_lead_id under the wrong
+# stage/status (or the wrong stage entirely) must never retroactively authorize
+# first-party JOBS creation. Only a canonical Slice-1 IDENTITY_RESOLUTION /
+# VERIFICATION_REQUIRED LOG row establishes durable first-party eligibility;
+# loose "any LOG row mentioning this discovery_lead_id" matching must not.
+f4_strict_lead_id = json.loads(requests[0]["discovery_log_record"]["Notes"])[
+    "discovery_lead_id"
+]
+wrong_shape_rows = [
+    {
+        "Run_ID": "PROD_WRONG_SHAPE_NORMALIZED",
+        "Timestamp": "2026-09-26T16:00:00-04:00",
+        "Stage": "FIRST_PARTY_IDENTITY_RESOLUTION",
+        "Source": "FIRST_PARTY_VERIFICATION",
+        "Job_ID": "MTA::17407",
+        "Status": "NORMALIZED",
+        "Error_Code": None,
+        "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION",
+        "Notes": json.dumps({"discovery_lead_id": f4_strict_lead_id}),
+    },
+    {
+        "Run_ID": "PROD_WRONG_SHAPE_LEDGER_PERSISTENCE",
+        "Timestamp": "2026-09-26T16:00:00-04:00",
+        "Stage": "LEDGER_PERSISTENCE",
+        "Source": "GMAIL",
+        "Job_ID": "MTA::17407",
+        "Status": "VERIFICATION_REQUIRED",
+        "Error_Code": None,
+        "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+        "Notes": json.dumps({"discovery_lead_id": f4_strict_lead_id}),
+    },
+    {
+        "Run_ID": "PROD_WRONG_SHAPE_PROCESSING_ERROR",
+        "Timestamp": "2026-09-26T16:00:00-04:00",
+        "Stage": "IDENTITY_RESOLUTION",
+        "Source": "GMAIL",
+        "Job_ID": None,
+        "Status": "PROCESSING_ERROR",
+        "Error_Code": "MALFORMED_INPUT",
+        "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+        "Notes": json.dumps({"discovery_lead_id": f4_strict_lead_id}),
+    },
+]
+for wrong_row in wrong_shape_rows:
+    wrong_state = state_from_ledger_rows([], [wrong_row])
+    assert_true(
+        f4_strict_lead_id not in wrong_state.get("first_party_eligible_lead_ids", []),
+        f"F4-STRICT: a {wrong_row['Stage']}/{wrong_row['Status']} LOG row must not "
+        "establish durable first-party eligibility",
+    )
+    wrong_plan = build_first_party_identity_resolution_mutation_plan(
+        [requests[0]],
+        wrong_state,
+        run_id="FPIR_F4_STRICT",
+        processed_at="2026-09-27T02:00:00+00:00",
+    )
+    assert_true(
+        wrong_plan["jobs_mutations"] == [],
+        f"F4-STRICT: a {wrong_row['Stage']}/{wrong_row['Status']} LOG row must not "
+        f"authorize first-party JOBS creation for {f4_strict_lead_id}",
+    )
+print(
+    "PASS 19: wrong-stage/status LOG rows never retroactively authorize "
+    "first-party JOBS creation (F4-STRICT)."
+)
 
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 TESTS PASSED")
