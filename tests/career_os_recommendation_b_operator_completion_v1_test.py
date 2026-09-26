@@ -8,10 +8,10 @@ RID="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 cp=json.loads((ROOT/"CURRENT_EXECUTION_CHECKPOINT.json").read_text(encoding="utf-8"))
 ps=json.loads((ROOT/"project_state.json").read_text(encoding="utf-8"))
 contract=json.loads((ROOT/"milestone_contracts/governance/career-os-recommendation-b-completion-v1.json").read_text(encoding="utf-8"))
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-24_SUPERVISED_PRODUCTION_V1_SLICE_2_COMPLETION_SYNC"
-assert cp["canonical_basis_sha"]=="f70ef63386e9eb5134480b4996ad493720abc02c"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-26_FIRST_PARTY_IDENTITY_RESOLUTION_V1_SELECTION"
+assert cp["canonical_basis_sha"]=="cb6ce803aeaca813c0c8556e290c6bb2b0ff099c"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="SLICE_2_COMPLETION_SYNC_COMPLETED_BY_OPERATOR"
+assert cp["operator_status"]=="FIRST_PARTY_IDENTITY_RESOLUTION_V1_CONTRACT_SELECTED"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["accepted_at"]=="2026-09-24"
 assert cp["recommendation_b_completion"]["milestone_id"]==RID
@@ -27,13 +27,13 @@ assert comp["coverage_preservation"]["missing_old_pass_labels"]==[]
 assert comp["coverage_preservation"]["added_test_function"]=="_test_prepared_baseline_fixture_isolation"
 assert comp["performance_evidence"]["approx_median_improvement_percent"]==8.69
 assert "real controller + real Git behavior" in comp["stop_line"]
-assert "No successor runtime milestone is selected or authorized" in cp["exact_next_allowed_action"]
-assert "Section 9 item 2 is roadmap context only" in cp["exact_next_allowed_action"]
+assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in cp["exact_next_allowed_action"]
+assert "Do not mutate runtime implementation paths yet" in cp["exact_next_allowed_action"]
 assert "OPERATE FIRST / BUILD SECOND" in cp["exact_next_allowed_action"]  # historical context remains preserved
 assert "Recommendation C remains NOT_AUTHORIZED" in cp["exact_next_allowed_action"]
 assert "Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED" in cp["exact_next_allowed_action"]
 assert "COMPLETED_BY_OPERATOR; BORA_ACCEPTED (2026-09-15)" in ps["current_phase"]
-assert "SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET" in ps["next_authorized_action"]
+assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in ps["next_authorized_action"]
 assert "OPERATE FIRST / BUILD SECOND" in ps["next_authorized_action"]  # historical context remains preserved
 assert contract["baseline_sha"]==MERGE and contract["kind"]=="GOVERNANCE_SYNC"
 for forbidden in ("src/**","scripts/**","tests/milestone_run_v1_test.py","milestone_contracts/feature/career-os-milestone-run-v1-targeted-optimization-v1.json"):
@@ -65,9 +65,9 @@ action=ps["next_authorized_action"]
 current_action=action.split(" HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:",1)[0]
 assert not current_action.rstrip().endswith((", and", " and", ",", "-"))
 assert current_action.rstrip().endswith("Global implementation_authorized remains false.")
-assert "SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET" in current_action
-assert "No successor runtime milestone is selected or authorized" in current_action
-assert "No successor runtime implementation is authorized by this completion sync." in current_action
+assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in current_action
+assert "SELECTED_NOT_AUTHORIZED" in current_action
+assert "Runtime implementation remains unauthorized" in current_action
 assert "first_point_of_divergence = A and first_causal_failure_point = B at two different points in the same run" in action
 assert changelog.startswith("# Bora Employer Pipeline OS")
 assert changelog.index("# Bora Employer Pipeline OS") < changelog.index("Career OS Recommendation B operator completion")
