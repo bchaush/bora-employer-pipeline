@@ -58,6 +58,7 @@ def empty_state() -> dict[str, Any]:
         "gate_match_fingerprints": {},
         "first_party_resolution_fingerprints": [],
         "first_party_eligible_lead_ids": [],
+        "first_party_durable_provenance": {},
     }
 
 
@@ -91,6 +92,7 @@ def state_from_ledger_rows(
 
     processed_lead_ids: set[str] = set()
     first_party_eligible_lead_ids: set[str] = set()
+    first_party_durable_provenance: dict[str, dict[str, Any]] = {}
     gate_match_fingerprints: dict[str, str] = {}
     first_party_resolution_fingerprints: set[str] = set()
     for row in log_rows:
@@ -105,19 +107,20 @@ def state_from_ledger_rows(
             continue
         lead_id = provenance.get("discovery_lead_id")
         if isinstance(lead_id, str) and lead_id:
-            processed_lead_ids.add(lead_id)
+            # processed_lead_ids belongs to Slice 1. Downstream first-party
+            # holds/errors carrying the same lead ID must never suppress later
+            # legitimate Slice-1 ingestion.
+            if row.get("Engine_Baseline") == ENGINE_BASELINE:
+                processed_lead_ids.add(lead_id)
             # First-party eligibility is durable Slice-1 discovery provenance
-            # only: the canonical unresolved-identity row that build_mutation_plan
-            # emits for this exact lead, not any later LOG row that happens to
-            # carry the same discovery_lead_id (e.g. a first-party success/error
-            # record, or an unrelated stage's hold). Loose status-only matching
-            # here is what let downstream stages retroactively self-authorize.
+            # only, and the exact canonical provenance is retained for binding.
             if (
                 row.get("Stage") == "IDENTITY_RESOLUTION"
                 and row.get("Status") == "VERIFICATION_REQUIRED"
                 and row.get("Engine_Baseline") == ENGINE_BASELINE
             ):
                 first_party_eligible_lead_ids.add(lead_id)
+                first_party_durable_provenance[lead_id] = dict(provenance)
         gate_match_job_id = provenance.get("operational_job_id")
         gate_match_fingerprint = provenance.get("gate_match_fingerprint")
         if isinstance(gate_match_job_id, str) and gate_match_job_id and isinstance(
@@ -128,7 +131,9 @@ def state_from_ledger_rows(
         if (
             isinstance(first_party_fingerprint, str)
             and first_party_fingerprint
+            and row.get("Engine_Baseline") == FIRST_PARTY_IDENTITY_ENGINE_BASELINE
             and row.get("Status") != "PROCESSING_ERROR"
+            and row.get("Error_Code") != "DURABLE_DISCOVERY_PROVENANCE_REQUIRED"
         ):
             first_party_resolution_fingerprints.add(first_party_fingerprint)
 
@@ -138,6 +143,7 @@ def state_from_ledger_rows(
         "gate_match_fingerprints": gate_match_fingerprints,
         "first_party_resolution_fingerprints": sorted(first_party_resolution_fingerprints),
         "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
+        "first_party_durable_provenance": first_party_durable_provenance,
     }
 
 
@@ -149,6 +155,12 @@ def _bounded_role_key(value: Any) -> str | None:
     if not isinstance(value, str) or not value.strip():
         return None
     return " ".join(value.casefold().split())
+
+
+def _canonical_provenance_json(value: Mapping[str, Any]) -> str:
+    return json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str
+    )
 
 
 def _earliest_timestamp(left: str, right: str) -> str:
@@ -280,7 +292,13 @@ def build_mutation_plan(
             merged = dict(existing_job)
             merged["Op"] = "UPDATE"
             merged["First_Seen"] = _earliest_timestamp(merged["First_Seen"], observed_at)
-            merged["Last_Verified"] = _latest_timestamp(merged["Last_Verified"], observed_at)
+            # Once Official_URL exists, Last_Verified is the authoritative
+            # first-party verification clock. Later discovery observations may
+            # enrich provenance but must not advance that clock.
+            if not merged.get("Official_URL"):
+                merged["Last_Verified"] = _latest_timestamp(
+                    merged["Last_Verified"], observed_at
+                )
             if merged.get("Discovery_URL") is None and discovery_url is not None:
                 merged["Discovery_URL"] = discovery_url
             if merged.get("Company") is None and employer_text is not None:
@@ -318,6 +336,9 @@ def build_mutation_plan(
             "first_party_eligible_lead_ids": list(
                 base_state.get("first_party_eligible_lead_ids", [])
             ),
+            "first_party_durable_provenance": dict(
+                base_state.get("first_party_durable_provenance", {})
+            ),
         },
     }
 
@@ -344,6 +365,11 @@ def build_first_party_identity_resolution_mutation_plan(
     first_party_eligible_lead_ids: set[str] = set(
         base_state.get("first_party_eligible_lead_ids", [])
     )
+    first_party_durable_provenance: dict[str, dict[str, Any]] = {
+        key: dict(value)
+        for key, value in base_state.get("first_party_durable_provenance", {}).items()
+        if isinstance(key, str) and isinstance(value, Mapping)
+    }
     gate_match_fingerprints: dict[str, str] = dict(
         base_state.get("gate_match_fingerprints", {})
     )
@@ -375,10 +401,36 @@ def build_first_party_identity_resolution_mutation_plan(
         if outcome.get("operational_job_id") is not None:
             notes_payload["operational_job_id"] = outcome["operational_job_id"]
 
+        request_provenance: Mapping[str, Any] | None = None
+        if isinstance(request, Mapping):
+            discovery_record = request.get("discovery_log_record")
+            if isinstance(discovery_record, Mapping):
+                raw_notes = discovery_record.get("Notes")
+                if isinstance(raw_notes, str):
+                    try:
+                        parsed_notes = json.loads(raw_notes)
+                    except json.JSONDecodeError:
+                        parsed_notes = None
+                    if isinstance(parsed_notes, Mapping):
+                        request_provenance = parsed_notes
+
+        durable_provenance = (
+            first_party_durable_provenance.get(lead_id)
+            if isinstance(lead_id, str)
+            else None
+        )
+        provenance_matches = (
+            isinstance(request_provenance, Mapping)
+            and isinstance(durable_provenance, Mapping)
+            and _canonical_provenance_json(request_provenance)
+            == _canonical_provenance_json(durable_provenance)
+        )
+
         if (
             not isinstance(lead_id, str)
             or not lead_id
             or lead_id not in first_party_eligible_lead_ids
+            or not provenance_matches
         ):
             log_mutations.append(
                 _log_mutation(
@@ -545,6 +597,7 @@ def build_first_party_identity_resolution_mutation_plan(
             "gate_match_fingerprints": gate_match_fingerprints,
             "first_party_resolution_fingerprints": sorted(resolution_fingerprints),
             "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
+            "first_party_durable_provenance": first_party_durable_provenance,
         },
     }
 
@@ -754,6 +807,9 @@ def build_gate_match_mutation_plan(
             ),
             "first_party_eligible_lead_ids": list(
                 base_state.get("first_party_eligible_lead_ids", [])
+            ),
+            "first_party_durable_provenance": dict(
+                base_state.get("first_party_durable_provenance", {})
             ),
         },
     }

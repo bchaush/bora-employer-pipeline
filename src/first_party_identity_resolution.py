@@ -24,7 +24,7 @@ import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 SRC_PATH = Path(__file__).resolve().parent
 if str(SRC_PATH) not in sys.path:
@@ -50,9 +50,10 @@ THIRD_PARTY_DISCOVERY_HOSTS = frozenset(
     }
 )
 
-# F1/F5: an identifier is only "present" in evidence/URL text when it appears as a
-# whole token, not as a substring of a longer digit run or composite identifier.
-_ID_TOKEN_CONTINUATION_CHARS = "a-z0-9-"
+# Identifier evidence and discovery URLs need different boundary semantics:
+# evidence rejects composite continuations, while URL slugs commonly delimit IDs
+# with hyphens/underscores/dots.
+_COMPOSITE_ID_SEPARATORS = frozenset(".-_/\\\u2010\u2011\u2012\u2013\u2014\u2015")
 
 
 def _canonical_json(value: Any) -> str:
@@ -134,33 +135,93 @@ def _normalized_evidence_text(value: str) -> str:
 
 
 def _token_bounded_contains(haystack: str, token: str) -> bool:
-    """True when normalized `token` occurs in `haystack` as a whole identifier token.
-
-    A truncated fragment of a longer digit run or composite identifier (e.g. "174"
-    inside "17407", or "171010" inside "2026-171010") must not count as a match, so
-    the characters immediately before/after the match may not themselves continue
-    an identifier (alphanumeric or hyphen).
-    """
+    """Return True only for an exact evidence identifier, not a composite fragment."""
 
     normalized_token = _normalized_evidence_text(token)
     if not normalized_token:
         return False
     normalized_haystack = _normalized_evidence_text(haystack)
+    start = 0
+    while True:
+        index = normalized_haystack.find(normalized_token, start)
+        if index < 0:
+            return False
+        left = index - 1
+        right = index + len(normalized_token)
+
+        def _continues(position: int, direction: int) -> bool:
+            if position < 0 or position >= len(normalized_haystack):
+                return False
+            char = normalized_haystack[position]
+            if char.isalnum() or char == "_":
+                return True
+            if char in _COMPOSITE_ID_SEPARATORS:
+                adjacent = position + direction
+                return (
+                    0 <= adjacent < len(normalized_haystack)
+                    and normalized_haystack[adjacent].isalnum()
+                )
+            return False
+
+        if not _continues(left, -1) and not _continues(right, 1):
+            return True
+        start = index + 1
+
+
+def _url_contains_identifier(url: str, identifier: str) -> bool:
+    """URL slugs may delimit a platform ID with punctuation such as '-' or '_'."""
+
+    normalized_identifier = _normalized_evidence_text(identifier)
+    normalized_url = _normalized_evidence_text(url)
+    if not normalized_identifier:
+        return False
     pattern = re.compile(
-        rf"(?<![{_ID_TOKEN_CONTINUATION_CHARS}])"
-        rf"{re.escape(normalized_token)}"
-        rf"(?![{_ID_TOKEN_CONTINUATION_CHARS}])"
+        rf"(?<![a-z0-9]){re.escape(normalized_identifier)}(?![a-z0-9])"
     )
-    return pattern.search(normalized_haystack) is not None
+    return pattern.search(normalized_url) is not None
+
+
+def _source_claim_contains_identifier(value: Any, identifier: str) -> bool:
+    if isinstance(value, Mapping):
+        return any(
+            _source_claim_contains_identifier(child, identifier)
+            for child in value.values()
+        )
+    if isinstance(value, (list, tuple)):
+        return any(_source_claim_contains_identifier(child, identifier) for child in value)
+    if isinstance(value, str):
+        return _token_bounded_contains(value, identifier)
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return str(value).casefold() == identifier.strip().casefold()
+    return False
+
+
+def _provenance_contains_platform_identifier(
+    provenance: Mapping[str, Any], identifier: str
+) -> bool:
+    source_claims = provenance.get("source_claims")
+    if _source_claim_contains_identifier(source_claims, identifier):
+        return True
+    discovery_urls = provenance.get("discovery_urls")
+    return isinstance(discovery_urls, list) and any(
+        isinstance(url, str)
+        and _official_url_third_party_host(url) not in (None, "__invalid_host__")
+        and _url_contains_identifier(url, identifier)
+        for url in discovery_urls
+    )
 
 
 def _official_url_third_party_host(official_url: str) -> str | None:
-    """F7: deterministic host check only; no network/provider I/O."""
+    """F7: deterministic normalized-host check only; no network/provider I/O."""
 
     hostname = urlparse(official_url).hostname
     if not hostname:
         return None
-    hostname = hostname.lower()
+    try:
+        hostname = unicodedata.normalize("NFKC", unquote(hostname)).rstrip(".").lower()
+        hostname = hostname.encode("idna").decode("ascii")
+    except (UnicodeError, ValueError):
+        return "__invalid_host__"
     for denied_host in THIRD_PARTY_DISCOVERY_HOSTS:
         if hostname == denied_host or hostname.endswith(f".{denied_host}"):
             return denied_host
@@ -339,26 +400,60 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
     assert isinstance(exact_requisition_id, str)
     assert isinstance(evidence, str)
 
-    source_claims = provenance.get("source_claims")
-    discovery_platform_ids: set[str] = set()
-    if isinstance(source_claims, Mapping):
-        # Check the actual provenance values regardless of key name; a discovery
-        # platform ID must never satisfy the exact requisition identity no matter
-        # what the third-party source happened to call it.
-        for value in source_claims.values():
-            if isinstance(value, str) and value.strip():
-                discovery_platform_ids.add(value.strip().casefold())
+    # Canonical exact-role keys must never diverge merely because the supplied
+    # requisition uses a compatibility Unicode representation.
+    if unicodedata.normalize("NFKC", exact_requisition_id) != exact_requisition_id:
+        return {
+            "outcome": "PROCESSING_ERROR",
+            "error_code": "EXACT_REQUISITION_ID_NON_CANONICAL",
+            "errors": ["exact_requisition_id must already be in canonical NFKC form"],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
 
-    discovery_urls_for_platform_check = provenance.get("discovery_urls")
-    id_present_in_discovery_url = isinstance(discovery_urls_for_platform_check, list) and any(
-        isinstance(url, str) and _token_bounded_contains(url, exact_requisition_id)
-        for url in discovery_urls_for_platform_check
-    )
-
+    discovery_exact_employer = provenance.get("exact_employer_identity")
     if (
-        exact_requisition_id.strip().casefold() in discovery_platform_ids
-        or id_present_in_discovery_url
+        isinstance(discovery_exact_employer, str)
+        and discovery_exact_employer.strip()
+        and _normalize_exact_text(discovery_exact_employer)
+        != _normalize_exact_text(exact_employer_identity)
     ):
+        return {
+            "outcome": "VERIFICATION_REQUIRED",
+            "error_code": "DISCOVERY_EXACT_EMPLOYER_CONTRADICTION",
+            "errors": [],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
+
+    discovery_exact_requisition = provenance.get("exact_requisition_id")
+    if (
+        isinstance(discovery_exact_requisition, str)
+        and discovery_exact_requisition.strip()
+        and not _provenance_contains_platform_identifier(
+            provenance, discovery_exact_requisition
+        )
+        and _normalize_exact_text(discovery_exact_requisition)
+        != _normalize_exact_text(exact_requisition_id)
+    ):
+        return {
+            "outcome": "VERIFICATION_REQUIRED",
+            "error_code": "DISCOVERY_EXACT_REQUISITION_CONTRADICTION",
+            "errors": [],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
+
+    if _provenance_contains_platform_identifier(provenance, exact_requisition_id):
         return {
             "outcome": "PROCESSING_ERROR",
             "error_code": "DISCOVERY_PLATFORM_ID_FORBIDDEN",

@@ -15,6 +15,7 @@ from first_party_identity_resolution import (  # noqa: E402
 )
 from production_ledger import (  # noqa: E402
     build_first_party_identity_resolution_mutation_plan,
+    build_mutation_plan,
     state_from_ledger_rows,
 )
 
@@ -60,6 +61,7 @@ def _seed_lead_provenance(
         "gate_match_fingerprints": {},
         "first_party_resolution_fingerprints": [],
         "first_party_eligible_lead_ids": [],
+        "first_party_durable_provenance": {},
     }
     reconstructed = state_from_ledger_rows([], [request["discovery_log_record"]])
     processed = set(base.get("processed_lead_ids", []))
@@ -68,6 +70,9 @@ def _seed_lead_provenance(
     eligible = set(base.get("first_party_eligible_lead_ids", []))
     eligible.update(reconstructed["first_party_eligible_lead_ids"])
     base["first_party_eligible_lead_ids"] = sorted(eligible)
+    durable = dict(base.get("first_party_durable_provenance", {}))
+    durable.update(reconstructed.get("first_party_durable_provenance", {}))
+    base["first_party_durable_provenance"] = durable
     return base
 
 # 1. Production-earned positive/negative matrix.
@@ -537,7 +542,7 @@ f6_malformed = copy.deepcopy(requests[0])
 f6_malformed_notes = json.loads(f6_malformed["discovery_log_record"]["Notes"])
 del f6_malformed_notes["role_text"]
 f6_malformed["discovery_log_record"]["Notes"] = json.dumps(f6_malformed_notes)
-f6_state = _seed_lead_provenance(None, f6_malformed)
+f6_state = _seed_lead_provenance(None, requests[0])
 f6_plan_1 = build_first_party_identity_resolution_mutation_plan(
     [f6_malformed],
     f6_state,
@@ -644,5 +649,225 @@ print(
     "PASS 19: wrong-stage/status LOG rows never retroactively authorize "
     "first-party JOBS creation (F4-STRICT)."
 )
+
+
+# 20. R1: durable eligibility must bind to the exact canonical Slice-1 provenance, not lead_id alone.
+r1_state = state_from_ledger_rows([], [requests[0]["discovery_log_record"]])
+r1_forged = copy.deepcopy(requests[0])
+r1_notes = json.loads(r1_forged["discovery_log_record"]["Notes"])
+r1_notes["employer_text"] = "Peraton"
+r1_notes["role_text"] = "Junior Business Analyst"
+r1_notes["observed_at"] = "2026-09-25T18:15:12+00:00"
+r1_notes["source_claims"] = {}
+r1_notes["discovery_urls"] = []
+r1_forged["discovery_log_record"]["Notes"] = json.dumps(r1_notes)
+r1_forged["first_party_observation"] = copy.deepcopy(requests[1]["first_party_observation"])
+r1_plan = build_first_party_identity_resolution_mutation_plan(
+    [r1_forged], r1_state, run_id="FPIR_R1_FORGED", processed_at="2026-09-27T03:00:00+00:00"
+)
+assert_true(r1_plan["jobs_mutations"] == [], "R1: forged provenance under an eligible lead_id must not create JOBS")
+assert_true(
+    len(r1_plan["log_mutations"]) == 1
+    and r1_plan["log_mutations"][0]["Error_Code"] == "DURABLE_DISCOVERY_PROVENANCE_REQUIRED",
+    "R1: forged provenance must fail visibly at the durable-provenance boundary",
+)
+print("PASS 20: durable Slice-1 eligibility is bound to exact immutable provenance, not lead_id alone (R1).")
+
+# 21. R2: later Slice-1 discovery activity must not outrank newer first-party verification.
+r2_state = state_from_ledger_rows([], [requests[0]["discovery_log_record"]])
+r2_v1 = copy.deepcopy(requests[0])
+r2_v1["first_party_observation"]["observed_at"] = "2026-09-26T12:00:00-04:00"
+r2_v1["first_party_observation"]["official_url"] = "https://careers.mta.org/jobs/r2-v1"
+r2_p1 = build_first_party_identity_resolution_mutation_plan(
+    [r2_v1], r2_state, run_id="FPIR_R2_V1", processed_at="2026-09-26T12:01:00-04:00"
+)
+r2_job = {k: v for k, v in r2_p1["jobs_mutations"][0].items() if k != "Op"}
+r2_later_lead = {
+    "discovery_lead_id": "LEAD_R2_LATER",
+    "source_message_id": "MSG_R2_LATER",
+    "source_thread_id": "MSG_R2_LATER",
+    "source": "GMAIL",
+    "identity_resolution_status": "RESOLVED",
+    "observed_at": "2026-09-26T15:00:00-04:00",
+    "discovery_urls": ["https://www.linkedin.com/jobs/view/999"],
+    "employer_text": "Metropolitan Transportation Authority",
+    "role_text": "Data Analyst, Subway Resource & Admin Support, Emerging Talent Intern (Spring)",
+    "requisition_text": "17407",
+    "source_claims": {"source_provider": "LINKEDIN", "source_job_id": "999"},
+    "exact_employer_identity": "MTA",
+    "exact_requisition_id": "17407",
+}
+r2_slice_state = {
+    "jobs": {"MTA::17407": r2_job},
+    "processed_lead_ids": r2_state["processed_lead_ids"],
+    "gate_match_fingerprints": {},
+    "first_party_resolution_fingerprints": r2_p1["next_state"]["first_party_resolution_fingerprints"],
+    "first_party_eligible_lead_ids": r2_state["first_party_eligible_lead_ids"],
+    "first_party_durable_provenance": r2_state["first_party_durable_provenance"],
+}
+r2_slice = build_mutation_plan(
+    [r2_later_lead], r2_slice_state, run_id="FPIR_R2_SLICE", processed_at="2026-09-26T15:01:00-04:00"
+)
+r2_after_slice = {k: v for k, v in r2_slice["jobs_mutations"][0].items() if k != "Op"}
+assert_true(
+    r2_after_slice["Last_Verified"] == "2026-09-26T12:00:00-04:00",
+    "R2: third-party Slice-1 observation must not advance the first-party verification clock",
+)
+r2_v2 = copy.deepcopy(requests[0])
+r2_v2["first_party_observation"]["observed_at"] = "2026-09-26T14:00:00-04:00"
+r2_v2["first_party_observation"]["official_url"] = "https://careers.mta.org/jobs/r2-v2"
+r2_v2_state = dict(r2_slice["next_state"])
+r2_v2_state["jobs"] = {"MTA::17407": r2_after_slice}
+r2_v2_plan = build_first_party_identity_resolution_mutation_plan(
+    [r2_v2], r2_v2_state, run_id="FPIR_R2_V2", processed_at="2026-09-26T15:02:00-04:00"
+)
+assert_true(
+    r2_v2_plan["jobs_mutations"][0]["Official_URL"] == "https://careers.mta.org/jobs/r2-v2"
+    and r2_v2_plan["jobs_mutations"][0]["Last_Verified"] == "2026-09-26T14:00:00-04:00",
+    "R2: newer first-party v2 must advance URL and verification time despite later discovery activity",
+)
+print("PASS 21: Slice-1 discovery timestamps cannot outrank the first-party verification clock (R2).")
+
+# 22. R3: platform IDs embedded in known discovery-platform URL slugs remain forbidden.
+r3 = copy.deepcopy(requests[1])
+r3_notes = json.loads(r3["discovery_log_record"]["Notes"])
+r3_notes["source_claims"] = {"source_provider": "LINKEDIN"}
+r3_notes["discovery_urls"] = [
+    "https://www.linkedin.com/jobs/view/junior-business-analyst-at-peraton-4470043526"
+]
+r3["discovery_log_record"]["Notes"] = json.dumps(r3_notes)
+r3["first_party_observation"]["exact_requisition_id"] = "4470043526"
+r3["first_party_observation"]["requisition_evidence"] = "Official Peraton posting displays requisition 4470043526."
+r3_outcome = evaluate_first_party_identity_request(r3)
+assert_true(r3_outcome["outcome"] != "RESOLVED", "R3: slug-delimited LinkedIn IDs must never become canonical")
+print("PASS 22: known discovery-platform URL slugs cannot supply canonical requisition identity (R3).")
+
+# 23. R4: non-null durable discovery exact identity components contradicting first-party identity fail closed.
+r4_employer = copy.deepcopy(requests[0])
+r4_notes = json.loads(r4_employer["discovery_log_record"]["Notes"])
+r4_notes["exact_employer_identity"] = "SOME_OTHER_EMPLOYER"
+r4_employer["discovery_log_record"]["Notes"] = json.dumps(r4_notes)
+r4_emp_outcome = evaluate_first_party_identity_request(r4_employer)
+assert_true(r4_emp_outcome["outcome"] != "RESOLVED", "R4: contradictory durable employer identity must fail closed")
+r4_req = copy.deepcopy(requests[0])
+r4_req_notes = json.loads(r4_req["discovery_log_record"]["Notes"])
+r4_req_notes["exact_requisition_id"] = "OTHER-REQ"
+r4_req["discovery_log_record"]["Notes"] = json.dumps(r4_req_notes)
+r4_req_outcome = evaluate_first_party_identity_request(r4_req)
+assert_true(r4_req_outcome["outcome"] != "RESOLVED", "R4: contradictory durable requisition identity must fail closed")
+assert_true(
+    evaluate_first_party_identity_request(requests[0])["outcome"] == "RESOLVED",
+    "R4: null discovery identity components must remain non-authoritative",
+)
+print("PASS 23: contradictory durable exact identity components fail closed while null components remain neutral (R4).")
+
+# 24. R5: trailing DNS dot cannot bypass third-party Official_URL host denylist.
+r5 = copy.deepcopy(requests[0])
+r5["first_party_observation"]["official_url"] = "https://www.linkedin.com./jobs/view/18276348/"
+r5_outcome = evaluate_first_party_identity_request(r5)
+assert_true(r5_outcome["outcome"] != "RESOLVED", "R5: trailing-dot LinkedIn host must remain forbidden")
+print("PASS 24: trailing DNS dot cannot bypass the third-party Official_URL host denylist (R5).")
+
+# 25. R6: missing-provenance hold must not poison a later legitimate retry after durable rehydration.
+r6_hold = build_first_party_identity_resolution_mutation_plan(
+    [requests[0]], None, run_id="FPIR_R6_HOLD", processed_at="2026-09-27T04:00:00+00:00"
+)
+r6_rows = [copy.deepcopy(requests[0]["discovery_log_record"])] + [dict(x) for x in r6_hold["log_mutations"]]
+r6_rehydrated = state_from_ledger_rows([], r6_rows)
+r6_retry = build_first_party_identity_resolution_mutation_plan(
+    [requests[0]], r6_rehydrated, run_id="FPIR_R6_RETRY", processed_at="2026-09-27T04:01:00+00:00"
+)
+assert_true(
+    len(r6_retry["jobs_mutations"]) == 1
+    and r6_retry["jobs_mutations"][0]["Job_ID"] == "MTA::17407",
+    "R6: durable-provenance hold must not suppress a later legitimate retry",
+)
+assert_true(
+    len(r6_retry["log_mutations"]) == 1 and r6_retry["log_mutations"][0]["Status"] == "NORMALIZED",
+    "R6: later legitimate retry must remain auditable",
+)
+print("PASS 25: missing-provenance holds do not poison later legitimate retries (R6).")
+
+# 26. R7: composite continuations are not exact requisition evidence tokens.
+for evidence_text, request_index in (
+    ("Official MTA posting displays Job ID 17407.2.", 0),
+    ("Official MTA posting displays Job ID 17407_old.", 0),
+    ("Official OneMain posting displays Job Number R2608-52225.1.", 2),
+):
+    r7 = copy.deepcopy(requests[request_index])
+    r7["first_party_observation"]["requisition_evidence"] = evidence_text
+    r7_outcome = evaluate_first_party_identity_request(r7)
+    assert_true(r7_outcome["outcome"] != "RESOLVED", f"R7: composite continuation must not prove exact ID: {evidence_text}")
+print("PASS 26: composite requisition continuations cannot satisfy exact evidence binding (R7).")
+
+
+# 27. Final-review HIGH: downstream first-party hold/error LOG rows must not poison Slice-1 idempotency.
+fr_hold = build_first_party_identity_resolution_mutation_plan(
+    [requests[0]], None, run_id="FPIR_FR_HOLD", processed_at="2026-09-27T10:00:00+00:00"
+)
+fr_poison_state = state_from_ledger_rows([], [dict(row) for row in fr_hold["log_mutations"]])
+fr_notes = json.loads(requests[0]["discovery_log_record"]["Notes"])
+fr_slice_lead = {
+    "discovery_lead_id": fr_notes["discovery_lead_id"], "source_message_id": fr_notes["source_message_id"],
+    "source_thread_id": fr_notes.get("source_thread_id"), "source": "GMAIL",
+    "identity_resolution_status": "VERIFICATION_REQUIRED", "observed_at": fr_notes["observed_at"],
+    "discovery_urls": fr_notes["discovery_urls"], "employer_text": fr_notes["employer_text"],
+    "role_text": fr_notes["role_text"], "requisition_text": fr_notes.get("requisition_text"),
+    "source_claims": fr_notes["source_claims"], "exact_employer_identity": fr_notes.get("exact_employer_identity"),
+    "exact_requisition_id": fr_notes.get("exact_requisition_id"),
+}
+assert_true(fr_notes["discovery_lead_id"] not in fr_poison_state["processed_lead_ids"],
+    "final HIGH: downstream first-party holds must not become Slice-1 processed lead IDs")
+fr_slice_after_hold = build_mutation_plan(
+    [fr_slice_lead], fr_poison_state, run_id="FPIR_FR_SLICE", processed_at="2026-09-27T10:01:00+00:00"
+)
+assert_true(len(fr_slice_after_hold["log_mutations"]) == 1
+    and fr_slice_after_hold["log_mutations"][0]["Stage"] == "IDENTITY_RESOLUTION",
+    "final HIGH: later legitimate Slice-1 ingestion must still execute after a first-party hold")
+print("PASS 27: downstream first-party holds/errors cannot poison Slice-1 processed-lead idempotency.")
+
+# 28. Final-review MEDIUM: composite punctuation and Unicode dashes cannot prove a partial requisition.
+for request_index, partial_id, evidence_text in (
+    (1, "171010", "Official requisition 2026.171010."),
+    (1, "171010", "Official requisition 2026\u2010171010."),
+    (0, "17407", "Official Job ID 17407/2."),
+):
+    fr_req = copy.deepcopy(requests[request_index])
+    fr_req["first_party_observation"]["exact_requisition_id"] = partial_id
+    fr_req["first_party_observation"]["requisition_evidence"] = evidence_text
+    assert_true(evaluate_first_party_identity_request(fr_req)["outcome"] != "RESOLVED",
+        f"final MEDIUM: composite evidence must not establish partial requisition {partial_id}")
+print("PASS 28: dot/slash/Unicode-dash composites cannot satisfy exact requisition evidence binding.")
+
+# 29. Final-review LOW: encoded/IDNA-equivalent third-party hosts remain forbidden Official_URLs.
+for bad_url in (
+    "https://www.linked%69n.com/jobs/view/1/",
+    "https://www.\uff4c\uff49\uff4e\uff4b\uff45\uff44\uff49\uff4e.com/jobs/view/1/",
+):
+    fr_url_req = copy.deepcopy(requests[0])
+    fr_url_req["first_party_observation"]["official_url"] = bad_url
+    assert_true(evaluate_first_party_identity_request(fr_url_req)["outcome"] != "RESOLVED",
+        f"final LOW: encoded third-party host must fail: {bad_url}")
+print("PASS 29: encoded and IDNA/NFKC-equivalent third-party Official_URL hosts fail visibly.")
+
+# 30. Final-review LOW: non-canonical Unicode requisition IDs cannot create divergent exact-role keys.
+fr_nfkc = copy.deepcopy(requests[0])
+fr_nfkc["first_party_observation"]["exact_requisition_id"] = "\uff11\uff17\uff14\uff10\uff17"
+fr_nfkc_outcome = evaluate_first_party_identity_request(fr_nfkc)
+assert_true(fr_nfkc_outcome["outcome"] != "RESOLVED" and fr_nfkc_outcome["operational_job_id"] is None,
+    "final LOW: NFKC-equivalent raw requisition IDs must fail closed rather than create divergent Job_IDs")
+print("PASS 30: non-canonical Unicode requisition IDs cannot create divergent exact-role keys.")
+
+# 31. Final-review LOW: a discovery-platform ID must not become an authoritative contradiction baseline.
+fr_platform_baseline = copy.deepcopy(requests[2])
+fr_platform_notes = json.loads(fr_platform_baseline["discovery_log_record"]["Notes"])
+fr_platform_notes["exact_requisition_id"] = "9876543"
+fr_platform_notes["discovery_urls"] = ["https://app.joinhandshake.com/stu/jobs/9876543"]
+fr_platform_baseline["discovery_log_record"]["Notes"] = json.dumps(fr_platform_notes)
+fr_platform_outcome = evaluate_first_party_identity_request(fr_platform_baseline)
+assert_true(fr_platform_outcome["outcome"] == "RESOLVED"
+    and fr_platform_outcome["operational_job_id"] == by_id["ONEMAIN_R2608_52225"]["expected_job_id"],
+    "final LOW: discovery-platform requisition IDs must be provenance only, not veto first-party identity")
+print("PASS 31: discovery-platform IDs remain provenance-only and cannot veto authoritative first-party identity.")
 
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 TESTS PASSED")
