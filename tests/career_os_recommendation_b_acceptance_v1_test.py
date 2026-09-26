@@ -7,15 +7,15 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-24_SUPERVISED_PRODUCTION_V1_SLICE_2_COMPLETION_SYNC"
-assert cp["canonical_basis_sha"]=="f70ef63386e9eb5134480b4996ad493720abc02c"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-26_FIRST_PARTY_IDENTITY_RESOLUTION_V1_SELECTION"
+assert cp["canonical_basis_sha"]=="cb6ce803aeaca813c0c8556e290c6bb2b0ff099c"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="SLICE_2_COMPLETION_SYNC_COMPLETED_BY_OPERATOR"
+assert cp["operator_status"]=="FIRST_PARTY_IDENTITY_RESOLUTION_V1_CONTRACT_SELECTED"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-24"
 assert cp["slice_1_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["slice_2_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
-assert cp["next_candidate_seam"]["milestone_id"] is None
-assert cp["next_candidate_seam"]["selection_status"]=="NONE_SELECTED"
+assert cp["next_candidate_seam"]["milestone_id"]=="SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1"
+assert cp["next_candidate_seam"]["selection_status"]=="SELECTED_NOT_AUTHORIZED"
 assert cp["recommendation_b_completion"]["milestone_id"]=="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 assert cp["implementation_authorized"] is False
 assert cp["recommendation_b_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
@@ -26,8 +26,8 @@ assert "35033992088" in acc["canonical_acceptance_basis"]
 assert cp["recommendation_b_authorization"]["operator_status"]=="NOT_YET_COMPLETED"  # historical authorization snapshot only
 assert "HISTORICAL_AUTHORIZATION_SNAPSHOT" in cp["recommendation_b_authorization"]["record_semantics"]
 assert "OPERATE FIRST / BUILD SECOND" in cp["exact_next_allowed_action"]
-assert "No successor runtime milestone is selected or authorized" in cp["exact_next_allowed_action"]
-assert "Section 9 item 2 is roadmap context only" in cp["exact_next_allowed_action"]
+assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in cp["exact_next_allowed_action"]
+assert "Do not mutate runtime implementation paths yet" in cp["exact_next_allowed_action"]
 assert "Recommendation C remains NOT_AUTHORIZED" in cp["exact_next_allowed_action"]
 assert "Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED" in cp["exact_next_allowed_action"]
 assert "BORA_ACCEPTED (2026-09-15)" in ps["current_phase"] and "PENDING_BORA_ACCEPTANCE" not in ps["current_phase"]

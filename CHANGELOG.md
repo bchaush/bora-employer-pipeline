@@ -1,5 +1,13 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-26 — FIRST_PARTY_IDENTITY_RESOLUTION_V1 production-earned seam selection
+
+- Preserved the first real production evidence: `PROD_20260926_FIRST_REAL_BATCH_001` processed five real third-party nominations into five durable `VERIFICATION_REQUIRED` LOG records, zero JOBS rows, zero PROCESSING_ERROR, and an exact rerun produced zero new mutations.
+- Verified that the observed bottleneck is third-party discovery -> first-party exact identity, not a Slice 1/2 core failure: MTA resolves on the current first-party site to Job ID `17407`; Peraton Junior Business Analyst to requisition `2026-171010`; OneMain Analytics Intern to Job Number `R2608-52225`; Middesk and Runlayer remain unresolved for an exact employer requisition/opportunity identifier under the evidence inspected.
+- Selected `SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1` as **SELECTED_NOT_AUTHORIZED** and froze its bounded runtime contract at `milestone_contracts/governance/supervised-production-v1-first-party-identity-resolution-v1-contract.json`.
+- Preserved the existing exact-identity boundary: no discovery-platform ID, company+title pair, fuzzy match, discovery URL, or URL-only identity may become canonical Job_ID; `implementation_authorized=false`.
+- This change is governance/contract selection only. Runtime resolver implementation requires a separate explicit Bora authorization after canonical validation/review/merge/recovery. Match Truth redesign, package work, Vercel, Scout expansion, browser automation, auto-submit, PURSUE persistence, and database work remain unauthorized.
+
 ## 2026-09-24 — SUPERVISED_PRODUCTION_V1 Slice 2 completion continuity sync
 
 - Verified PR #76 merged `SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET` at canonical `f70ef63386e9eb5134480b4996ad493720abc02c`; reviewed head `64483de7b0588a0822ca0e4dc219867c8c054bbb` is an ancestor of canonical main.
