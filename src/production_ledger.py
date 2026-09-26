@@ -441,16 +441,20 @@ def build_first_party_identity_resolution_mutation_plan(
             merged["First_Seen"] = _earliest_timestamp(
                 merged["First_Seen"], outcome["first_seen"]
             )
-            merged["Last_Verified"] = _latest_timestamp(
-                merged["Last_Verified"], outcome["last_verified"]
-            )
+            # Official_URL must stay temporally coherent with Last_Verified: only
+            # a strictly newer first-party observation may advance either one.
+            # An older or equal-timestamped replay preserves both durable values.
+            if _timestamp_key(outcome["last_verified"]) > _timestamp_key(
+                merged["Last_Verified"]
+            ):
+                merged["Last_Verified"] = outcome["last_verified"]
+                merged["Official_URL"] = outcome["official_url"]
             if merged.get("Company") is None:
                 merged["Company"] = outcome["company"]
             if merged.get("Role") is None:
                 merged["Role"] = outcome["role"]
             if merged.get("Discovery_URL") is None:
                 merged["Discovery_URL"] = outcome["discovery_url"]
-            merged["Official_URL"] = outcome["official_url"]
             merged["Pipeline_State"] = merged.get("Pipeline_State") or "NORMALIZED"
             jobs[operational_job_id] = merged
             jobs_mutations.append(dict(merged))

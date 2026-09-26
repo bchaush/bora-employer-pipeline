@@ -277,4 +277,76 @@ assert_true(
 )
 print("PASS 10: malformed first-party input fails visibly without poisoning valid siblings.")
 
+# 11. Stale/equal-time first-party replay must never regress a durable Official_URL.
+newer_official_url = (
+    "https://careers.mta.org/jobs/18276348-data-analyst-subway-resource-and-admin-support-"
+    "emerging-talent-intern-spring"
+)
+older_official_url = newer_official_url + "-STALE-MIRROR"
+tie_official_url = newer_official_url + "-TIE-MIRROR"
+
+newer_observation = copy.deepcopy(requests[0])
+newer_observation["first_party_observation"]["observed_at"] = "2026-09-26T13:00:00-04:00"
+newer_observation["first_party_observation"]["official_url"] = newer_official_url
+durable_plan = build_first_party_identity_resolution_mutation_plan(
+    [newer_observation],
+    None,
+    run_id="FPIR_TEMPORAL_DURABLE",
+    processed_at="2026-09-26T13:01:00-04:00",
+)
+assert_true(
+    durable_plan["jobs_mutations"][0]["Official_URL"] == newer_official_url
+    and durable_plan["jobs_mutations"][0]["Last_Verified"] == "2026-09-26T13:00:00-04:00",
+    "durable baseline must record the newer first-party Official_URL/Last_Verified",
+)
+durable_state = durable_plan["next_state"]
+
+stale_replay = copy.deepcopy(requests[0])
+stale_replay["first_party_observation"]["observed_at"] = "2026-09-26T12:00:00-04:00"
+stale_replay["first_party_observation"]["official_url"] = older_official_url
+stale_plan = build_first_party_identity_resolution_mutation_plan(
+    [stale_replay],
+    durable_state,
+    run_id="FPIR_TEMPORAL_STALE_REPLAY",
+    processed_at="2026-09-26T13:02:00-04:00",
+)
+assert_true(
+    len(stale_plan["jobs_mutations"]) == 1,
+    "stale replay must still converge on the existing JOBS entity",
+)
+stale_job_row = stale_plan["jobs_mutations"][0]
+assert_true(
+    stale_job_row["Job_ID"] == by_id["MTA_17407"]["expected_job_id"],
+    "stale replay must resolve to the same exact canonical Job_ID",
+)
+assert_true(
+    stale_job_row["Last_Verified"] == "2026-09-26T13:00:00-04:00",
+    "an older first-party observation must never regress Last_Verified",
+)
+assert_true(
+    stale_job_row["Official_URL"] == newer_official_url,
+    "an older first-party observation must never overwrite an already-durable, more-recent Official_URL",
+)
+assert_true(
+    len(stale_plan["log_mutations"]) == 1
+    and stale_plan["log_mutations"][0]["Job_ID"] == by_id["MTA_17407"]["expected_job_id"],
+    "the stale observation must still be auditable in LOG even though it does not win Official_URL",
+)
+
+tie_replay = copy.deepcopy(requests[0])
+tie_replay["first_party_observation"]["observed_at"] = "2026-09-26T13:00:00-04:00"
+tie_replay["first_party_observation"]["official_url"] = tie_official_url
+tie_plan = build_first_party_identity_resolution_mutation_plan(
+    [tie_replay],
+    durable_state,
+    run_id="FPIR_TEMPORAL_TIE_REPLAY",
+    processed_at="2026-09-26T13:03:00-04:00",
+)
+tie_job_row = tie_plan["jobs_mutations"][0]
+assert_true(
+    tie_job_row["Official_URL"] == newer_official_url,
+    "an equal-observed_at first-party replay must not arbitrarily overwrite the already-durable Official_URL",
+)
+print("PASS 11: stale/equal-time first-party replay cannot regress a durable Official_URL or Last_Verified.")
+
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 TESTS PASSED")
