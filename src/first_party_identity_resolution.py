@@ -24,6 +24,7 @@ import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import urlparse
 
 SRC_PATH = Path(__file__).resolve().parent
 if str(SRC_PATH) not in sys.path:
@@ -36,6 +37,22 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUEST_SCHEMA_PATH = ROOT / "schemas" / "first_party_identity_resolution.schema.json"
 
 ENGINE_BASELINE = "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1"
+
+# F7: known third-party discovery-platform hosts. Deterministic host check only;
+# never treated as authoritative first-party Official_URL evidence.
+THIRD_PARTY_DISCOVERY_HOSTS = frozenset(
+    {
+        "linkedin.com",
+        "indeed.com",
+        "joinhandshake.com",
+        "handshake.com",
+        "simplify.jobs",
+    }
+)
+
+# F1/F5: an identifier is only "present" in evidence/URL text when it appears as a
+# whole token, not as a substring of a longer digit run or composite identifier.
+_ID_TOKEN_CONTINUATION_CHARS = "a-z0-9-"
 
 
 def _canonical_json(value: Any) -> str:
@@ -114,6 +131,40 @@ def _normalize_exact_text(value: str) -> str:
 def _normalized_evidence_text(value: str) -> str:
     # Preserve punctuation/content; only Unicode/case/whitespace normalization.
     return re.sub(r"\s+", " ", unicodedata.normalize("NFKC", value).casefold()).strip()
+
+
+def _token_bounded_contains(haystack: str, token: str) -> bool:
+    """True when normalized `token` occurs in `haystack` as a whole identifier token.
+
+    A truncated fragment of a longer digit run or composite identifier (e.g. "174"
+    inside "17407", or "171010" inside "2026-171010") must not count as a match, so
+    the characters immediately before/after the match may not themselves continue
+    an identifier (alphanumeric or hyphen).
+    """
+
+    normalized_token = _normalized_evidence_text(token)
+    if not normalized_token:
+        return False
+    normalized_haystack = _normalized_evidence_text(haystack)
+    pattern = re.compile(
+        rf"(?<![{_ID_TOKEN_CONTINUATION_CHARS}])"
+        rf"{re.escape(normalized_token)}"
+        rf"(?![{_ID_TOKEN_CONTINUATION_CHARS}])"
+    )
+    return pattern.search(normalized_haystack) is not None
+
+
+def _official_url_third_party_host(official_url: str) -> str | None:
+    """F7: deterministic host check only; no network/provider I/O."""
+
+    hostname = urlparse(official_url).hostname
+    if not hostname:
+        return None
+    hostname = hostname.lower()
+    for denied_host in THIRD_PARTY_DISCOVERY_HOSTS:
+        if hostname == denied_host or hostname.endswith(f".{denied_host}"):
+            return denied_host
+    return None
 
 
 def _schema_errors(request: Any) -> list[str]:
@@ -246,6 +297,23 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
             "first_party_observation": dict(first_party),
         }
 
+    discovery_employer_text = provenance["employer_text"]
+    observed_employer_name = first_party["observed_employer_name"]
+    assert isinstance(observed_employer_name, str)
+    if _normalize_exact_text(discovery_employer_text) != _normalize_exact_text(observed_employer_name):
+        return {
+            "outcome": "VERIFICATION_REQUIRED",
+            "error_code": "EMPLOYER_BINDING_CONTRADICTS_DISCOVERY",
+            "errors": [
+                "first_party_observation.observed_employer_name contradicts the discovery lead's employer_text"
+            ],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
+
     requisition_status = first_party["requisition_status"]
     if requisition_status != "EXACT":
         code = (
@@ -274,12 +342,23 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
     source_claims = provenance.get("source_claims")
     discovery_platform_ids: set[str] = set()
     if isinstance(source_claims, Mapping):
-        for key in ("source_job_id", "job_id", "listing_id", "opportunity_id"):
-            value = source_claims.get(key)
+        # Check the actual provenance values regardless of key name; a discovery
+        # platform ID must never satisfy the exact requisition identity no matter
+        # what the third-party source happened to call it.
+        for value in source_claims.values():
             if isinstance(value, str) and value.strip():
                 discovery_platform_ids.add(value.strip().casefold())
 
-    if exact_requisition_id.strip().casefold() in discovery_platform_ids:
+    discovery_urls_for_platform_check = provenance.get("discovery_urls")
+    id_present_in_discovery_url = isinstance(discovery_urls_for_platform_check, list) and any(
+        isinstance(url, str) and _token_bounded_contains(url, exact_requisition_id)
+        for url in discovery_urls_for_platform_check
+    )
+
+    if (
+        exact_requisition_id.strip().casefold() in discovery_platform_ids
+        or id_present_in_discovery_url
+    ):
         return {
             "outcome": "PROCESSING_ERROR",
             "error_code": "DISCOVERY_PLATFORM_ID_FORBIDDEN",
@@ -293,12 +372,30 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
             "first_party_observation": dict(first_party),
         }
 
-    if _normalized_evidence_text(exact_requisition_id) not in _normalized_evidence_text(evidence):
+    if not _token_bounded_contains(evidence, exact_requisition_id):
         return {
             "outcome": "PROCESSING_ERROR",
             "error_code": "REQUISITION_EVIDENCE_MISMATCH",
             "errors": [
                 "first_party_observation.requisition_evidence does not contain the supplied exact_requisition_id"
+            ],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
+        }
+
+    official_url = first_party["official_url"]
+    assert isinstance(official_url, str)
+    third_party_host = _official_url_third_party_host(official_url)
+    if third_party_host is not None:
+        return {
+            "outcome": "PROCESSING_ERROR",
+            "error_code": "OFFICIAL_URL_THIRD_PARTY_HOST_FORBIDDEN",
+            "errors": [
+                f"official_url host '{third_party_host}' is a known third-party discovery "
+                "platform, not an authoritative first-party source"
             ],
             "resolution_fingerprint": fingerprint,
             "discovery_lead_id": lead_id,

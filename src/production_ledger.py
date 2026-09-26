@@ -111,7 +111,11 @@ def state_from_ledger_rows(
         ) and gate_match_fingerprint:
             gate_match_fingerprints[gate_match_job_id] = gate_match_fingerprint
         first_party_fingerprint = provenance.get("first_party_resolution_fingerprint")
-        if isinstance(first_party_fingerprint, str) and first_party_fingerprint:
+        if (
+            isinstance(first_party_fingerprint, str)
+            and first_party_fingerprint
+            and row.get("Status") != "PROCESSING_ERROR"
+        ):
             first_party_resolution_fingerprints.add(first_party_fingerprint)
 
     return {
@@ -350,6 +354,22 @@ def build_first_party_identity_resolution_mutation_plan(
         if outcome.get("operational_job_id") is not None:
             notes_payload["operational_job_id"] = outcome["operational_job_id"]
 
+        if not isinstance(lead_id, str) or not lead_id or lead_id not in processed_lead_ids:
+            log_mutations.append(
+                _log_mutation(
+                    run_id=run_id,
+                    timestamp=processed_at,
+                    stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                    source="FIRST_PARTY_VERIFICATION",
+                    job_id=None,
+                    status="VERIFICATION_REQUIRED",
+                    error_code="DURABLE_DISCOVERY_PROVENANCE_REQUIRED",
+                    notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                    engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                )
+            )
+            continue
+
         if outcome["outcome"] == "PROCESSING_ERROR":
             if outcome.get("errors"):
                 notes_payload["errors"] = outcome["errors"]
@@ -366,7 +386,6 @@ def build_first_party_identity_resolution_mutation_plan(
                     engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
                 )
             )
-            resolution_fingerprints.add(fingerprint)
             continue
 
         if outcome["outcome"] == "VERIFICATION_REQUIRED":
@@ -444,7 +463,15 @@ def build_first_party_identity_resolution_mutation_plan(
             # Official_URL must stay temporally coherent with Last_Verified: only
             # a strictly newer first-party observation may advance either one.
             # An older or equal-timestamped replay preserves both durable values.
-            if _timestamp_key(outcome["last_verified"]) > _timestamp_key(
+            # Exception: if no Official_URL has ever been recorded, this
+            # first-party observation is the first authoritative one and sets
+            # both fields as a pair regardless of the existing (possibly
+            # discovery-only) Last_Verified timestamp.
+            existing_official_url = merged.get("Official_URL")
+            if not existing_official_url:
+                merged["Official_URL"] = outcome["official_url"]
+                merged["Last_Verified"] = outcome["last_verified"]
+            elif _timestamp_key(outcome["last_verified"]) > _timestamp_key(
                 merged["Last_Verified"]
             ):
                 merged["Last_Verified"] = outcome["last_verified"]

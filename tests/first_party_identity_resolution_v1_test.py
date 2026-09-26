@@ -43,6 +43,26 @@ requests = [
 
 by_id = {case["case_id"]: case for case in cases}
 
+
+def _seed_lead_provenance(
+    state: dict | None, request: dict
+) -> dict:
+    """TEST-ONLY helper: seed a request's durable Slice-1 discovery_lead_id
+    provenance into a mutation-plan state dict, preserving existing contents.
+    Does not manufacture JOBS rows or resolution fingerprints.
+    """
+    base = copy.deepcopy(state) if state is not None else {
+        "jobs": {},
+        "processed_lead_ids": [],
+        "gate_match_fingerprints": {},
+        "first_party_resolution_fingerprints": [],
+    }
+    lead_id = json.loads(request["discovery_log_record"]["Notes"])["discovery_lead_id"]
+    processed = set(base.get("processed_lead_ids", []))
+    processed.add(lead_id)
+    base["processed_lead_ids"] = sorted(processed)
+    return base
+
 # 1. Production-earned positive/negative matrix.
 for case, request in zip(cases, requests, strict=True):
     outcome = evaluate_first_party_identity_request(request)
@@ -77,9 +97,12 @@ for case, request in zip(cases, requests, strict=True):
 print("PASS 1: production-earned MTA/Peraton/OneMain resolve; Middesk/Runlayer remain unresolved.")
 
 # 2. Mutation plan creates exactly the three resolved JOBS rows, all NORMALIZED.
+seeded_state_all = None
+for _seed_request in requests:
+    seeded_state_all = _seed_lead_provenance(seeded_state_all, _seed_request)
 plan = build_first_party_identity_resolution_mutation_plan(
     requests,
-    None,
+    seeded_state_all,
     run_id="FPIR_TEST_001",
     processed_at="2026-09-26T13:45:00-04:00",
 )
@@ -157,9 +180,10 @@ for case_id in ("MIDDESK_UNRESOLVED", "RUNLAYER_UNRESOLVED"):
         "discovery_log_record": case["discovery_log_record"],
         "first_party_observation": case["first_party_observation"],
     }
+    hold_state = _seed_lead_provenance(None, request)
     hold_plan = build_first_party_identity_resolution_mutation_plan(
         [request],
-        None,
+        hold_state,
         run_id=f"FPIR_{case_id}",
         processed_at="2026-09-26T13:46:00-04:00",
     )
@@ -194,7 +218,7 @@ cross_notes["source_thread_id"] = "SECOND_SOURCE_MESSAGE"
 cross_notes["discovery_urls"] = ["https://example.com/third-party/mta-17407"]
 cross_notes["source_claims"] = {"source_provider": "OTHER_DISCOVERY"}
 cross_source["discovery_log_record"]["Notes"] = json.dumps(cross_notes)
-cross_state = plan["next_state"]
+cross_state = _seed_lead_provenance(plan["next_state"], cross_source)
 cross_plan = build_first_party_identity_resolution_mutation_plan(
     [cross_source],
     cross_state,
@@ -227,9 +251,10 @@ contradictory_notes["discovery_lead_id"] = "LEAD_MTA_CONTRADICTORY_ROLE"
 contradictory_notes["role_text"] = "Different Role Title"
 contradictory["discovery_log_record"]["Notes"] = json.dumps(contradictory_notes)
 contradictory["first_party_observation"]["observed_role_title"] = "Different Role Title"
+contradiction_state = _seed_lead_provenance(plan["next_state"], contradictory)
 contradiction_plan = build_first_party_identity_resolution_mutation_plan(
     [contradictory],
-    plan["next_state"],
+    contradiction_state,
     run_id="FPIR_ROLE_CONTRADICTION",
     processed_at="2026-09-26T13:49:00-04:00",
 )
@@ -248,9 +273,11 @@ print("PASS 9: same exact identity with a contradictory role fails closed with z
 # 10. One malformed request cannot abort or suppress a valid sibling request.
 malformed = copy.deepcopy(requests[0])
 del malformed["first_party_observation"]["official_url"]
+mixed_state = _seed_lead_provenance(None, malformed)
+mixed_state = _seed_lead_provenance(mixed_state, requests[1])
 mixed_plan = build_first_party_identity_resolution_mutation_plan(
     [malformed, requests[1]],
-    None,
+    mixed_state,
     run_id="FPIR_MIXED_BATCH",
     processed_at="2026-09-26T13:50:00-04:00",
 )
@@ -288,9 +315,10 @@ tie_official_url = newer_official_url + "-TIE-MIRROR"
 newer_observation = copy.deepcopy(requests[0])
 newer_observation["first_party_observation"]["observed_at"] = "2026-09-26T13:00:00-04:00"
 newer_observation["first_party_observation"]["official_url"] = newer_official_url
+newer_state = _seed_lead_provenance(None, newer_observation)
 durable_plan = build_first_party_identity_resolution_mutation_plan(
     [newer_observation],
-    None,
+    newer_state,
     run_id="FPIR_TEMPORAL_DURABLE",
     processed_at="2026-09-26T13:01:00-04:00",
 )
@@ -348,5 +376,200 @@ assert_true(
     "an equal-observed_at first-party replay must not arbitrarily overwrite the already-durable Official_URL",
 )
 print("PASS 11: stale/equal-time first-party replay cannot regress a durable Official_URL or Last_Verified.")
+
+# 12. F1: partial/truncated requisition-ID digits must not satisfy exact requisition identity.
+partial_id = copy.deepcopy(requests[0])
+partial_id["first_party_observation"]["exact_requisition_id"] = "174"
+partial_outcome = evaluate_first_party_identity_request(partial_id)
+assert_true(
+    partial_outcome["outcome"] != "RESOLVED" and partial_outcome["operational_job_id"] is None,
+    "F1: a truncated substring of the true requisition ID must never RESOLVE",
+)
+
+partial_id_no_year = copy.deepcopy(requests[1])
+partial_id_no_year["first_party_observation"]["exact_requisition_id"] = "171010"
+partial_outcome_2 = evaluate_first_party_identity_request(partial_id_no_year)
+assert_true(
+    partial_outcome_2["outcome"] != "RESOLVED" and partial_outcome_2["operational_job_id"] is None,
+    "F1: dropping the year prefix from a composite requisition ID must never RESOLVE",
+)
+print("PASS 12: partial/truncated requisition-ID fragments cannot satisfy exact requisition identity (F1).")
+
+# 13. F2: a valid first-party verification must coherently establish Official_URL even when
+# a preexisting non-first-party JOBS row carries a later timestamp.
+existing_non_first_party_job = {
+    "Op": "CREATE",
+    "Job_ID": "MTA::17407",
+    "Company": "Metropolitan Transportation Authority",
+    "Role": "Data Analyst, Subway Resource & Admin Support, Emerging Talent Intern (Spring)",
+    "Discovery_Source": "GMAIL",
+    "Discovery_URL": "https://www.linkedin.com/comm/jobs/view/4470047211/",
+    "Official_URL": None,
+    "First_Seen": "2026-09-27T00:00:00+00:00",
+    "Last_Verified": "2026-09-27T00:00:00+00:00",
+    "Pipeline_State": "NORMALIZED",
+}
+f2_state = _seed_lead_provenance(
+    {
+        "jobs": {"MTA::17407": existing_non_first_party_job},
+        "processed_lead_ids": [],
+        "gate_match_fingerprints": {},
+        "first_party_resolution_fingerprints": [],
+    },
+    requests[0],
+)
+f2_plan = build_first_party_identity_resolution_mutation_plan(
+    [requests[0]],
+    f2_state,
+    run_id="FPIR_TEMPORAL_COHERENCE",
+    processed_at="2026-09-27T01:00:00+00:00",
+)
+assert_true(
+    len(f2_plan["jobs_mutations"]) == 1,
+    "F2: valid first-party verification must mutate the existing JOBS row",
+)
+assert_true(
+    f2_plan["jobs_mutations"][0]["Official_URL"]
+    == requests[0]["first_party_observation"]["official_url"],
+    "F2: first-party Official_URL must be established even when a preexisting non-first-party "
+    "timestamp is later; silently leaving Official_URL None is not a coherent success",
+)
+print("PASS 13: first-party verification coherently establishes Official_URL over a stale non-first-party row (F2).")
+
+# 14. F3: contradictory employer binding (claimed employer identity does not match the
+# employer named in the original discovery lead) must fail closed, not RESOLVE.
+contradictory_employer = copy.deepcopy(requests[3])  # MIDDESK_UNRESOLVED discovery lead
+contradictory_employer["first_party_observation"]["requisition_status"] = "EXACT"
+contradictory_employer["first_party_observation"]["exact_requisition_id"] = "9999"
+contradictory_employer["first_party_observation"]["requisition_evidence"] = (
+    "Official posting displays Job ID 9999."
+)
+contradictory_employer["first_party_observation"]["requisition_authority"] = (
+    "EMPLOYER_OR_ATS_FIRST_PARTY"
+)
+contradictory_employer["first_party_observation"]["observed_employer_name"] = "Acme"
+contradictory_employer["first_party_observation"]["exact_employer_identity"] = "ACME"
+contradictory_outcome = evaluate_first_party_identity_request(contradictory_employer)
+assert_true(
+    contradictory_outcome["outcome"] != "RESOLVED"
+    and contradictory_outcome["operational_job_id"] is None,
+    "F3: an employer identity contradicting the original discovery lead's employer must fail closed",
+)
+print("PASS 14: contradictory employer binding fails closed instead of resolving (F3).")
+
+# 15. F4: a discovery lead with no durably persisted Slice-1 LOG provenance must produce
+# zero JOBS mutations and a visible fail-closed/audit result, not a silent resolve.
+unrelated_log_row = {
+    "Run_ID": "PROD_UNRELATED",
+    "Timestamp": "2026-09-26T16:00:00-04:00",
+    "Stage": "IDENTITY_RESOLUTION",
+    "Source": "GMAIL",
+    "Job_ID": None,
+    "Status": "VERIFICATION_REQUIRED",
+    "Error_Code": None,
+    "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+    "Notes": json.dumps({"discovery_lead_id": "LEAD_UNRELATED_999"}),
+}
+recon_state_missing_provenance = state_from_ledger_rows([], [unrelated_log_row])
+f4_plan = build_first_party_identity_resolution_mutation_plan(
+    [requests[0]],
+    recon_state_missing_provenance,
+    run_id="FPIR_MISSING_PROVENANCE",
+    processed_at="2026-09-27T01:00:00+00:00",
+)
+assert_true(
+    f4_plan["jobs_mutations"] == [],
+    "F4: missing durable Slice-1 lead provenance must produce zero JOBS mutations",
+)
+assert_true(
+    len(f4_plan["log_mutations"]) == 1
+    and f4_plan["log_mutations"][0]["Status"] in ("PROCESSING_ERROR", "VERIFICATION_REQUIRED")
+    and f4_plan["log_mutations"][0]["Error_Code"] is not None,
+    "F4: absence of durable Slice-1 lead provenance must be a visible fail-closed/audit result, "
+    "not a silent resolve",
+)
+print("PASS 15: missing durable Slice-1 lead provenance fails closed with zero JOBS and a visible audit trail (F4).")
+
+# 16. F5: a discovery-platform ID must not become a canonical requisition regardless of
+# which source_claims key it is stored under, or if it is only present inside the discovery URL.
+arbitrary_key_shortcut = copy.deepcopy(requests[0])
+arbitrary_notes = json.loads(arbitrary_key_shortcut["discovery_log_record"]["Notes"])
+arbitrary_claims = arbitrary_notes["source_claims"]
+del arbitrary_claims["source_job_id"]
+arbitrary_claims["linkedin_job_id"] = "4470047211"
+arbitrary_notes["source_claims"] = arbitrary_claims
+arbitrary_key_shortcut["discovery_log_record"]["Notes"] = json.dumps(arbitrary_notes)
+arbitrary_key_shortcut["first_party_observation"]["exact_requisition_id"] = "4470047211"
+arbitrary_key_shortcut["first_party_observation"]["requisition_evidence"] = (
+    "Official MTA Careers posting displays Job ID 4470047211."
+)
+arbitrary_key_outcome = evaluate_first_party_identity_request(arbitrary_key_shortcut)
+assert_true(
+    arbitrary_key_outcome["outcome"] != "RESOLVED",
+    "F5: a discovery-platform ID stashed under an unrecognized source_claims key must still be forbidden",
+)
+
+url_contained_shortcut = copy.deepcopy(requests[0])
+url_contained_notes = json.loads(url_contained_shortcut["discovery_log_record"]["Notes"])
+url_contained_notes["source_claims"] = {"source_provider": "LINKEDIN"}
+url_contained_shortcut["discovery_log_record"]["Notes"] = json.dumps(url_contained_notes)
+url_contained_shortcut["first_party_observation"]["exact_requisition_id"] = "4470047211"
+url_contained_shortcut["first_party_observation"]["requisition_evidence"] = (
+    "Official MTA Careers posting displays Job ID 4470047211."
+)
+url_contained_outcome = evaluate_first_party_identity_request(url_contained_shortcut)
+assert_true(
+    url_contained_outcome["outcome"] != "RESOLVED",
+    "F5: a discovery-platform ID present only inside the discovery URL must still be forbidden",
+)
+print("PASS 16: discovery-platform IDs are forbidden regardless of source_claims key or URL-only presence (F5).")
+
+# 17. F6: a corrected valid request must still execute/audit after a prior malformed attempt
+# with the same lead, and must not be silently suppressed as an already-seen fingerprint.
+f6_malformed = copy.deepcopy(requests[0])
+f6_malformed_notes = json.loads(f6_malformed["discovery_log_record"]["Notes"])
+del f6_malformed_notes["role_text"]
+f6_malformed["discovery_log_record"]["Notes"] = json.dumps(f6_malformed_notes)
+f6_state = _seed_lead_provenance(None, f6_malformed)
+f6_plan_1 = build_first_party_identity_resolution_mutation_plan(
+    [f6_malformed],
+    f6_state,
+    run_id="FPIR_F6_MALFORMED",
+    processed_at="2026-09-27T01:00:00+00:00",
+)
+assert_true(
+    f6_plan_1["jobs_mutations"] == [],
+    "F6: the malformed attempt itself must not create a JOBS row",
+)
+f6_plan_2 = build_first_party_identity_resolution_mutation_plan(
+    [requests[0]],
+    f6_plan_1["next_state"],
+    run_id="FPIR_F6_CORRECTED",
+    processed_at="2026-09-27T01:05:00-04:00",
+)
+assert_true(
+    len(f6_plan_2["jobs_mutations"]) == 1
+    and f6_plan_2["jobs_mutations"][0]["Job_ID"] == by_id["MTA_17407"]["expected_job_id"],
+    "F6: a corrected valid request following a malformed attempt must still execute and create the JOBS row",
+)
+assert_true(
+    len(f6_plan_2["log_mutations"]) == 1
+    and f6_plan_2["log_mutations"][0]["Status"] == "NORMALIZED",
+    "F6: the corrected valid request must still be auditable in LOG, not suppressed",
+)
+print("PASS 17: a corrected valid request after a malformed attempt still executes and is audited (F6).")
+
+# 18. F7: a known third-party discovery-host URL (e.g. linkedin.com) must never be accepted
+# as a first-party Official_URL.
+third_party_official_url = copy.deepcopy(requests[0])
+third_party_official_url["first_party_observation"]["official_url"] = (
+    "https://www.linkedin.com/jobs/view/18276348/"
+)
+third_party_official_url_outcome = evaluate_first_party_identity_request(third_party_official_url)
+assert_true(
+    third_party_official_url_outcome["outcome"] != "RESOLVED",
+    "F7: a known third-party discovery-host URL must not be accepted as a first-party Official_URL",
+)
+print("PASS 18: a known third-party discovery-host URL is rejected as Official_URL (F7).")
 
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 TESTS PASSED")
