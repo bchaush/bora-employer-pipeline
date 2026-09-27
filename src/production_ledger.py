@@ -147,7 +147,7 @@ def state_from_ledger_rows(
             and first_party_fingerprint
             and row.get("Engine_Baseline") == FIRST_PARTY_IDENTITY_ENGINE_BASELINE
             and row.get("Status") != "PROCESSING_ERROR"
-            and row.get("Error_Code") != "DURABLE_DISCOVERY_PROVENANCE_REQUIRED"
+            and row.get("Error_Code") not in ("DURABLE_DISCOVERY_PROVENANCE_REQUIRED", "FIRST_PARTY_OBSERVED_AT_AFTER_PROCESSED_AT")
         ):
             first_party_resolution_fingerprints.add(first_party_fingerprint)
 
@@ -533,7 +533,8 @@ def build_first_party_identity_resolution_mutation_plan(
                     engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
                 )
             )
-            resolution_fingerprints.add(fingerprint)
+            # Do not mark this observation complete: a later run with a
+            # coherent processed_at must be allowed to re-evaluate it.
             continue
 
         operational_job_id = outcome["operational_job_id"]

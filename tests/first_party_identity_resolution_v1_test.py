@@ -1409,3 +1409,131 @@ if _regression_failures:
         "(see REGRESSION FAILURES above)"
     )
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 REGRESSION CASES 37-40 PASSED.")
+
+# ---------------------------------------------------------------------------
+# Regression cases 41-46: fresh exact-byte review findings against 6f3bc1f.
+# These must fail on the rejected runtime and pass only after causal repair.
+# ---------------------------------------------------------------------------
+_review2_failures: list[str] = []
+
+def review2_check(condition: bool, message: str) -> None:
+    if not condition:
+        _review2_failures.append(message)
+
+# 41 HIGH: Official_URL redirect/shortener wrappers must not hide a third-party posting host.
+for wrapped_url in (
+    "https://www.google.com/url?q=https://www.linkedin.com/jobs/view/4470047211/&sa=D",
+    "https://www.google.com/url?q=https%3A%2F%2Fwww.linkedin.com%2Fjobs%2Fview%2F4470047211%2F&sa=D",
+    "https://lnkd.in/abc123",
+):
+    q41 = copy.deepcopy(requests[0])
+    q41["first_party_observation"]["official_url"] = wrapped_url
+    review2_check(
+        evaluate_first_party_identity_request(q41)["outcome"] != "RESOLVED",
+        f"HIGH 41: wrapped/shortened third-party Official_URL resolved: {wrapped_url}",
+    )
+print("CASE 41 exercised: Official_URL wrapper/shortener third-party host handling.")
+
+# 42 HIGH: encoded or path-embedded discovery-platform IDs must remain provenance-only.
+for discovery_url in (
+    "https://www.linkedin.com/jobs/view/%34%34%37%30%30%34%37%32%31%31/",
+    "https://urldefense.com/v3/__https://www.linkedin.com/jobs/view/4470047211/__;!!abc$",
+):
+    q42 = copy.deepcopy(requests[0])
+    q42_notes = json.loads(q42["discovery_log_record"]["Notes"])
+    q42_notes["discovery_urls"] = [discovery_url]
+    q42_notes["source_claims"] = {}
+    q42["discovery_log_record"]["Notes"] = json.dumps(q42_notes)
+    q42["first_party_observation"]["exact_requisition_id"] = "4470047211"
+    q42["first_party_observation"]["requisition_evidence"] = (
+        "Official MTA Careers posting displays Job ID 4470047211."
+    )
+    review2_check(
+        evaluate_first_party_identity_request(q42)["outcome"] != "RESOLVED",
+        f"HIGH 42: encoded/path-embedded platform ID became canonical: {discovery_url}",
+    )
+print("CASE 42 exercised: encoded/path-embedded discovery-platform IDs.")
+
+# 43 HIGH: discovery requisition text must not disable ATS URL requisition contradiction checks.
+q43 = copy.deepcopy(requests[0])
+q43_notes = json.loads(q43["discovery_log_record"]["Notes"])
+q43_notes["requisition_text"] = "Job ID 4470047211"
+q43_notes["source_claims"] = {"source_job_id": "4470047211"}
+q43["discovery_log_record"]["Notes"] = json.dumps(q43_notes)
+q43["first_party_observation"]["official_url"] = "https://boards.greenhouse.io/acme/jobs/4567890"
+q43["first_party_observation"]["exact_employer_identity"] = "ACME"
+q43["first_party_observation"]["exact_requisition_id"] = "9999999"
+q43["first_party_observation"]["requisition_evidence"] = "Official Acme posting displays Job ID 9999999."
+review2_check(
+    evaluate_first_party_identity_request(q43)["outcome"] != "RESOLVED",
+    "HIGH 43: discovery requisition text suppressed ATS URL requisition contradiction",
+)
+print("CASE 43 exercised: ATS URL requisition contradiction cannot be disabled by discovery text.")
+
+# 44 MEDIUM: query/fragment text must never select an ATS namespace when the host is not that ATS.
+q44 = copy.deepcopy(requests[0])
+q44["first_party_observation"]["official_url"] = (
+    "https://careers.mta.org/x#https://boards.greenhouse.io/mta/jobs/17407"
+)
+q44["first_party_observation"]["exact_employer_identity"] = "MTA"
+q44_outcome = evaluate_first_party_identity_request(q44)
+review2_check(
+    q44_outcome["outcome"] != "RESOLVED"
+    or q44_outcome.get("operational_job_id") == "MTA::17407",
+    f"MEDIUM 44: fragment/query text selected foreign ATS namespace: {q44_outcome!r}",
+)
+print("CASE 44 exercised: ATS namespace derives from authoritative host/path only.")
+
+# 45 MEDIUM: ATS-qualified Slice-1 employer identity must remain resolvable with matching official ATS URL.
+for supplied_identity in ("ACME", "GREENHOUSE:ACME"):
+    q45 = copy.deepcopy(requests[0])
+    q45_notes = json.loads(q45["discovery_log_record"]["Notes"])
+    q45_notes["employer_text"] = "Acme Corporation"
+    q45_notes["role_text"] = "Data Analyst"
+    q45_notes["exact_employer_identity"] = "GREENHOUSE:ACME"
+    q45_notes["exact_requisition_id"] = None
+    q45_notes["discovery_urls"] = ["https://boards.greenhouse.io/acme/jobs/4012345"]
+    q45_notes["source_claims"] = {"source_provider": "GREENHOUSE"}
+    q45["discovery_log_record"]["Notes"] = json.dumps(q45_notes)
+    q45["first_party_observation"]["observed_employer_name"] = "Acme Corporation"
+    q45["first_party_observation"]["observed_role_title"] = "Data Analyst"
+    q45["first_party_observation"]["official_url"] = "https://boards.greenhouse.io/acme/jobs/4012345"
+    q45["first_party_observation"]["exact_employer_identity"] = supplied_identity
+    q45["first_party_observation"]["exact_requisition_id"] = "4012345"
+    q45["first_party_observation"]["requisition_evidence"] = "Official Acme posting displays Job ID 4012345."
+    q45_outcome = evaluate_first_party_identity_request(q45)
+    review2_check(
+        q45_outcome["outcome"] == "RESOLVED"
+        and q45_outcome.get("operational_job_id") == "GREENHOUSE:ACME::4012345",
+        f"MEDIUM 45: matching ATS-qualified lead stuck for supplied identity {supplied_identity}: {q45_outcome!r}",
+    )
+print("CASE 45 exercised: matching ATS-qualified Slice-1 employer identity remains resolvable.")
+
+# 46 LOW: future-timestamp hold must not poison retry idempotency.
+q46 = copy.deepcopy(requests[0])
+q46["first_party_observation"]["observed_at"] = "2026-09-26T17:00:00-04:00"
+q46_state = state_from_ledger_rows([], [q46["discovery_log_record"]])
+q46_hold = build_first_party_identity_resolution_mutation_plan(
+    [q46], q46_state, run_id="FPIR_REVIEW2_46_HOLD", processed_at="2026-09-26T16:59:50-04:00"
+)
+q46_rows = [q46["discovery_log_record"]] + [dict(row) for row in q46_hold["log_mutations"]]
+q46_rehydrated = state_from_ledger_rows([], q46_rows)
+q46_retry = build_first_party_identity_resolution_mutation_plan(
+    [q46], q46_rehydrated, run_id="FPIR_REVIEW2_46_RETRY", processed_at="2026-09-26T17:00:10-04:00"
+)
+review2_check(
+    len(q46_retry["jobs_mutations"]) == 1
+    and q46_retry["jobs_mutations"][0]["Job_ID"] == by_id["MTA_17407"]["expected_job_id"],
+    f"LOW 46: future-timestamp hold poisoned later valid retry: {q46_retry!r}",
+)
+print("CASE 46 exercised: future-timestamp hold does not poison a later valid retry.")
+
+if _review2_failures:
+    print(f"REVIEW2 REGRESSION FAILURES (41-46): {len(_review2_failures)}")
+    for _failure_message in _review2_failures:
+        print(f"  - {_failure_message}")
+    raise AssertionError(
+        "expected RED: fresh independent-review findings 41-46 reproduced "
+        "(see REVIEW2 REGRESSION FAILURES above)"
+    )
+print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 REGRESSION CASES 41-46 PASSED.")

@@ -47,6 +47,7 @@ ENGINE_BASELINE = "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1"
 THIRD_PARTY_DISCOVERY_HOSTS = frozenset(
     {
         "linkedin.com",
+        "lnkd.in",
         "indeed.com",
         "joinhandshake.com",
         "handshake.com",
@@ -172,11 +173,23 @@ def _token_bounded_contains(haystack: str, token: str) -> bool:
         start = index + 1
 
 
+def _bounded_unquote(value: str, *, rounds: int = 5) -> str:
+    """Repeatedly percent-decode with a hard bound so encoded IDs cannot hide."""
+
+    decoded = value
+    for _ in range(rounds):
+        next_value = unquote(decoded)
+        if next_value == decoded:
+            break
+        decoded = next_value
+    return decoded
+
+
 def _url_contains_identifier(url: str, identifier: str) -> bool:
     """URL slugs may delimit a platform ID with punctuation such as '-' or '_'."""
 
     normalized_identifier = _normalized_evidence_text(identifier)
-    normalized_url = _normalized_evidence_text(url)
+    normalized_url = _normalized_evidence_text(_bounded_unquote(url))
     if not normalized_identifier:
         return False
     pattern = re.compile(
@@ -223,11 +236,11 @@ _MAX_EMBEDDED_URL_DECODE_ROUNDS = 5
 
 
 def _iter_embedded_urls(url: str) -> list[str]:
-    """Yield `url` plus any http(s) URL reachable via bounded, repeated
-    percent-decoding of its query-parameter values (e.g. a Gmail/Google
-    redirect wrapper's `?q=<url>` or `?url=<url>` parameter), so a
-    discovery-platform host/identifier hidden behind a non-denylisted
-    wrapper host is still inspected.
+    """Yield `url` plus bounded decoded/nested http(s) URL candidates.
+
+    Redirect services may hide a destination in query values, percent-encoded
+    path text, or wrapper-specific path syntax. Every decoded http(s) suffix is
+    inspected so platform provenance cannot disappear behind the outer host.
     """
 
     seen: set[str] = {url}
@@ -238,15 +251,21 @@ def _iter_embedded_urls(url: str) -> list[str]:
             break
         next_frontier: list[str] = []
         for candidate in frontier:
-            for _, raw_value in parse_qsl(urlparse(candidate).query, keep_blank_values=True):
-                decoded_value = unquote(raw_value)
-                if (
-                    decoded_value.lower().startswith(("http://", "https://"))
-                    and decoded_value not in seen
-                ):
-                    seen.add(decoded_value)
-                    candidates.append(decoded_value)
-                    next_frontier.append(decoded_value)
+            decoded_candidate = _bounded_unquote(candidate, rounds=1)
+            extracted: list[str] = []
+            if decoded_candidate != candidate:
+                extracted.append(decoded_candidate)
+            for match in re.finditer(r"https?://", decoded_candidate, re.IGNORECASE):
+                extracted.append(decoded_candidate[match.start():])
+            for _, raw_value in parse_qsl(urlparse(decoded_candidate).query, keep_blank_values=True):
+                decoded_value = _bounded_unquote(raw_value, rounds=1)
+                if decoded_value.lower().startswith(("http://", "https://")):
+                    extracted.append(decoded_value)
+            for decoded_url in extracted:
+                if decoded_url not in seen:
+                    seen.add(decoded_url)
+                    candidates.append(decoded_url)
+                    next_frontier.append(decoded_url)
         frontier = next_frontier
     return candidates
 
@@ -301,24 +320,32 @@ def _browser_normalize_special_url(url: str) -> str:
     return f"{scheme}://{after_slashes.replace(chr(92), '/')}"
 
 
-def _official_url_third_party_host(official_url: str) -> str | None:
-    """F7: deterministic normalized-host check only; no network/provider I/O."""
+def _ats_identity_url(official_url: str) -> str:
+    """Return browser-normalized scheme/authority/path only for ATS parsing."""
 
-    hostname = urlparse(_browser_normalize_special_url(official_url)).hostname
-    if not hostname:
-        # No usable authority could be established at all. A browser would
-        # never silently treat this as "not a denied host" -- an
-        # unparseable Official_URL must fail closed rather than pass through
-        # as implicitly acceptable.
-        return "__invalid_host__"
-    try:
-        hostname = unicodedata.normalize("NFKC", unquote(hostname)).rstrip(".").lower()
-        hostname = hostname.encode("idna").decode("ascii")
-    except (UnicodeError, ValueError):
-        return "__invalid_host__"
-    for denied_host in THIRD_PARTY_DISCOVERY_HOSTS:
-        if hostname == denied_host or hostname.endswith(f".{denied_host}"):
-            return denied_host
+    parsed = urlparse(_browser_normalize_special_url(official_url))
+    return parsed._replace(query="", fragment="").geturl()
+
+
+def _official_url_third_party_host(official_url: str) -> str | None:
+    """F7: fail closed if the outer URL or any embedded destination is third-party."""
+
+    for index, candidate in enumerate(_iter_embedded_urls(official_url)):
+        hostname = urlparse(_browser_normalize_special_url(candidate)).hostname
+        if not hostname:
+            if index == 0:
+                return "__invalid_host__"
+            continue
+        try:
+            hostname = unicodedata.normalize("NFKC", unquote(hostname)).rstrip(".").lower()
+            hostname = hostname.encode("idna").decode("ascii")
+        except (UnicodeError, ValueError):
+            if index == 0:
+                return "__invalid_host__"
+            continue
+        for denied_host in THIRD_PARTY_DISCOVERY_HOSTS:
+            if hostname == denied_host or hostname.endswith(f".{denied_host}"):
+                return denied_host
     return None
 
 
@@ -525,23 +552,46 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
             "first_party_observation": dict(first_party),
         }
 
+    official_url = first_party["official_url"]
+    assert isinstance(official_url, str)
+    ats_identity_url = _ats_identity_url(official_url)
+    ats_qualified_employer_identity = _slice1_ats_employer_identity([ats_identity_url])
+
     discovery_exact_employer = provenance.get("exact_employer_identity")
-    if (
-        isinstance(discovery_exact_employer, str)
-        and discovery_exact_employer.strip()
-        and _normalize_exact_text(discovery_exact_employer)
-        != _normalize_exact_text(exact_employer_identity)
-    ):
-        return {
-            "outcome": "VERIFICATION_REQUIRED",
-            "error_code": "DISCOVERY_EXACT_EMPLOYER_CONTRADICTION",
-            "errors": [],
-            "resolution_fingerprint": fingerprint,
-            "discovery_lead_id": lead_id,
-            "operational_job_id": None,
-            "discovery_provenance": provenance,
-            "first_party_observation": dict(first_party),
-        }
+    if isinstance(discovery_exact_employer, str) and discovery_exact_employer.strip():
+        if ats_qualified_employer_identity is not None:
+            ats_bare_employer = ats_qualified_employer_identity.split(":", 1)[-1]
+            allowed_ats_employer_forms = {
+                _normalize_exact_text(ats_qualified_employer_identity),
+                _normalize_exact_text(ats_bare_employer),
+            }
+            discovery_employer_matches = (
+                _normalize_exact_text(discovery_exact_employer)
+                in allowed_ats_employer_forms
+            )
+            supplied_employer_matches = (
+                _normalize_exact_text(exact_employer_identity)
+                in allowed_ats_employer_forms
+            )
+            discovery_employer_contradiction = not (
+                discovery_employer_matches and supplied_employer_matches
+            )
+        else:
+            discovery_employer_contradiction = (
+                _normalize_exact_text(discovery_exact_employer)
+                != _normalize_exact_text(exact_employer_identity)
+            )
+        if discovery_employer_contradiction:
+            return {
+                "outcome": "VERIFICATION_REQUIRED",
+                "error_code": "DISCOVERY_EXACT_EMPLOYER_CONTRADICTION",
+                "errors": [],
+                "resolution_fingerprint": fingerprint,
+                "discovery_lead_id": lead_id,
+                "operational_job_id": None,
+                "discovery_provenance": provenance,
+                "first_party_observation": dict(first_party),
+            }
 
     discovery_exact_requisition = provenance.get("exact_requisition_id")
     if (
@@ -616,18 +666,14 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
         }
 
     # The same exact ATS posting must converge onto Slice-1's own
-    # ATS-qualified employer namespace (e.g. GREENHOUSE:ACME), reusing its
-    # canonical URL-pattern parsing, rather than diverging into a bare
-    # employer key merely because a first-party observation supplied one.
-    # The SAME browser-normalized form used for the host check above is
-    # reused here so a backslash-equivalent ATS URL cannot diverge from its
-    # ordinary slash-form counterpart.
-    browser_normalized_official_url = _browser_normalize_special_url(official_url)
-    ats_qualified_employer_identity = _slice1_ats_employer_identity(
-        [browser_normalized_official_url]
-    )
+    # ATS-qualified employer namespace. ATS parsing uses only the normalized
+    # scheme/authority/path, never query or fragment text.
     if ats_qualified_employer_identity is not None:
         ats_bare_employer = ats_qualified_employer_identity.split(":", 1)[-1]
+        allowed_ats_employer_forms = {
+            _normalize_exact_text(ats_qualified_employer_identity),
+            _normalize_exact_text(ats_bare_employer),
+        }
         for candidate_label, candidate_value in (
             ("exact_employer_identity", exact_employer_identity),
             ("discovery exact_employer_identity", discovery_exact_employer),
@@ -636,7 +682,7 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
                 isinstance(candidate_value, str)
                 and candidate_value.strip()
                 and _normalize_exact_text(candidate_value)
-                != _normalize_exact_text(ats_bare_employer)
+                not in allowed_ats_employer_forms
             ):
                 return {
                     "outcome": "VERIFICATION_REQUIRED",
@@ -652,8 +698,10 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
                     "first_party_observation": dict(first_party),
                 }
 
+        # Discovery text is provenance, not ATS URL identity authority. Only
+        # the authoritative Official_URL may establish an ATS requisition.
         ats_derived_requisition_id = _slice1_ats_requisition_id(
-            [browser_normalized_official_url], provenance.get("requisition_text")
+            [ats_identity_url], None
         )
         if (
             ats_derived_requisition_id is not None
