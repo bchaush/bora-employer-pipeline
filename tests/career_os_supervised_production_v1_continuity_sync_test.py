@@ -57,10 +57,10 @@ assert s1["independent_review"] == "SAFE"
 assert s1["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
 
 # Slice 2 is now the current completed canonical seam.
-assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-26_FIRST_PARTY_IDENTITY_RESOLUTION_V1_SELECTION"
-assert cp["canonical_basis_sha"] == "cb6ce803aeaca813c0c8556e290c6bb2b0ff099c"
-assert cp["recorded_at"] == "2026-09-26"
-assert cp["operator_status"] == "FIRST_PARTY_IDENTITY_RESOLUTION_V1_CONTRACT_SELECTED"
+assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK"
+assert cp["canonical_basis_sha"] == "9fd9227e2341435358d68725b73fe229d848dc14"
+assert cp["recorded_at"] == "2026-09-27"
+assert cp["operator_status"] == "PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED"
 s2 = cp["slice_2_completion"]
 assert s2["milestone_id"] == SLICE2
 assert s2["operator_status"] == "COMPLETED_BY_OPERATOR"
@@ -79,7 +79,7 @@ assert s2["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
 # Production evidence deliberately selects the next seam without authorizing runtime implementation.
 next_seam = cp["next_candidate_seam"]
 assert next_seam["milestone_id"] == "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1"
-assert next_seam["selection_status"] == "SELECTED_NOT_AUTHORIZED"
+assert next_seam["selection_status"] == "COMPLETED_BY_OPERATOR_BORA_ACCEPTED"
 assert next_seam["implementation_authorized"] is False
 assert next_seam["contract_path"] == "milestone_contracts/governance/supervised-production-v1-first-party-identity-resolution-v1-contract.json"
 assert "NEXT_CANDIDATE_SEAM SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1 SELECTED_NOT_AUTHORIZED" in ps["current_phase"]

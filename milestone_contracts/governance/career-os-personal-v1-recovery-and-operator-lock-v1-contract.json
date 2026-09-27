@@ -1,0 +1,54 @@
+{
+  "milestone_id": "CAREER_OS_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "baseline_sha": "9fd9227e2341435358d68725b73fe229d848dc14",
+  "goal": "Repair post-PR82 recovery drift and record the locked Career OS Personal V1 direction plus compact operator entrypoint so fresh sessions recover current truth without chat-history reconstruction.",
+  "authorization_basis": "Bora explicitly authorized proceeding on 2026-09-27, instructed the operator to conserve Claude usage, log direction and actions durably, and use verified fact-based sources only.",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/CAREER_OS_PERSONAL_V1_DIRECTION.md",
+    "docs/CAREER_OS_OPERATOR_V1.md",
+    "milestone_contracts/governance/career-os-personal-v1-recovery-and-operator-lock-v1-contract.json",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "schemas/**",
+    "golden-tests/**",
+    "evidence/**",
+    "claims/**",
+    "experiences/**",
+    "resume/**",
+    "prompts/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "Canonical baseline is independently verified as origin/main 9fd9227e2341435358d68725b73fe229d848dc14 before mutation.",
+    "Recovery surfaces no longer route FIRST_PARTY_IDENTITY_RESOLUTION_V1 as SELECTED_NOT_AUTHORIZED.",
+    "Recovery surfaces record PR #82 / merge 9fd9227e2341435358d68725b73fe229d848dc14 as the accepted production identity-resolution state.",
+    "docs/CAREER_OS_PERSONAL_V1_DIRECTION.md records the locked product boundary and execution sequence without redefining Candidate Truth, Match Truth, first-party identity, Gold doctrine, storage architecture, or submission policy.",
+    "docs/CAREER_OS_OPERATOR_V1.md gives a fresh-session operating path that routes to canonical authority, requires live Git/ledger verification, and hard-stops package generation before current-role PURSUE.",
+    "The operator contract records the verified local Gold artifact names and SHA-256 values but does not move or mutate the binaries in this milestone.",
+    "No runtime, schema, evidence, claim, experience, resume, prompt, workflow, or CI changes; only the explicitly allowed continuity tests may change to track corrected canonical routing.",
+    "git diff --check passes.",
+    "project_state.json and CURRENT_EXECUTION_CHECKPOINT.json parse as JSON.",
+    "Existing canonical state/assurance validation is run before promotion."
+  ],
+  "review_requirements": "Independent adversarial review required before commit/push; use Cursor for this governance candidate. Claude is conserved for later bounded implementation unless a material ambiguity appears.",
+  "human_approval_requirements": "Bora explicitly authorized this bounded direction/recovery work on 2026-09-27; no later runtime milestone is implicitly authorized by this contract.",
+  "stop_conditions": [
+    "Live origin/main differs from the recorded baseline before mutation.",
+    "Repair requires changing Candidate Truth, Match Truth, identity resolver runtime, package runtime, database architecture, or submission policy.",
+    "A factual status cannot be verified from Git/repository/ledger/artifact evidence.",
+    "The proposed operator contract conflicts with BLUEPRINT.md or accepted later doctrine."
+  ]
+}

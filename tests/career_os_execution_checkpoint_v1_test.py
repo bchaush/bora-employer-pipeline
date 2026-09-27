@@ -25,12 +25,12 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-26_FIRST_PARTY_IDENTITY_RESOLUTION_V1_SELECTION'
-assert cp['canonical_basis_sha'] == 'cb6ce803aeaca813c0c8556e290c6bb2b0ff099c'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK'
+assert cp['canonical_basis_sha'] == '9fd9227e2341435358d68725b73fe229d848dc14'
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
 assert cp['authorization_status'] == 'BORA_ACCEPTED'
 assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
-assert cp['operator_status'] == 'FIRST_PARTY_IDENTITY_RESOLUTION_V1_CONTRACT_SELECTED'
+assert cp['operator_status'] == 'PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False
@@ -54,7 +54,7 @@ assert slice2['reviewed_candidate_fingerprint'] == 'f425894766c2423f00148c184dbb
 assert slice2['reviewed_tree'] == slice2['merge_tree'] == '50410d136d352373fb85d39c457805a62118cf50'
 assert slice2['independent_review'] == 'SAFE'
 assert cp['next_candidate_seam']['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1'
-assert cp['next_candidate_seam']['selection_status'] == 'SELECTED_NOT_AUTHORIZED'
+assert cp['next_candidate_seam']['selection_status'] == 'COMPLETED_BY_OPERATOR_BORA_ACCEPTED'
 assert cp['next_candidate_seam']['implementation_authorized'] is False
 assert cp['next_candidate_seam']['contract_path'] == 'milestone_contracts/governance/supervised-production-v1-first-party-identity-resolution-v1-contract.json'
 

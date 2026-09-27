@@ -1,3 +1,19 @@
+# Current Milestone — Career OS Personal V1 Recovery + Operator Lock (2026-09-27)
+
+Canonical basis: `9fd9227e2341435358d68725b73fe229d848dc14` (PR #82 merge).
+Verified reviewed resolver head: `37d017df647c0311a1a2dc7cdeaf0b1bcb1438e1`.
+Verified shared tree: `7da9116027ffce58010ed34d9e036cf77555f9f0`.
+
+The prior FIRST_PARTY_IDENTITY_RESOLUTION_V1 `SELECTED_NOT_AUTHORIZED` routing is superseded: the seam is implemented, independently reviewed SAFE, merged in PR #82, and production-used.
+
+Current bounded governance milestone: `CAREER_OS_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_V1`.
+
+Locked direction: `docs/CAREER_OS_PERSONAL_V1_DIRECTION.md` and `docs/CAREER_OS_OPERATOR_V1.md`.
+
+After this milestone is canonically merged/recovered, the next bounded product step is `CANONICAL_GOLD_SOURCES_V1`; no runtime redesign is implied.
+
+---
+
 Authority note (CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1):
 this file's pointer and historical log are prose -- informational, never
 authoritative. This exact pointer previously drifted ten pull requests
