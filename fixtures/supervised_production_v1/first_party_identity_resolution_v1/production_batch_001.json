@@ -1,0 +1,152 @@
+[
+  {
+    "case_id": "MTA_17407",
+    "expected_outcome": "RESOLVED",
+    "expected_job_id": "MTA::17407",
+    "discovery_log_record": {
+      "Run_ID": "PROD_20260926_FIRST_REAL_BATCH_001",
+      "Timestamp": "2026-09-26T16:00:00-04:00",
+      "Stage": "IDENTITY_RESOLUTION",
+      "Source": "GMAIL",
+      "Job_ID": null,
+      "Status": "VERIFICATION_REQUIRED",
+      "Error_Code": null,
+      "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+      "Notes": "{\"discovery_lead_id\":\"LEAD_FDBB3892F5DB5623\",\"source_message_id\":\"1a0db2d45314427a\",\"source_thread_id\":\"1a0db2d45314427a\",\"observed_at\":\"2026-09-26T00:46:12+00:00\",\"discovery_urls\":[\"https://www.linkedin.com/comm/jobs/view/4470047211/\"],\"employer_text\":\"Metropolitan Transportation Authority\",\"role_text\":\"Data Analyst, Subway Resource & Admin Support, Emerging Talent Intern (Spring)\",\"requisition_text\":null,\"source_claims\":{\"source_provider\":\"LINKEDIN\",\"source_job_id\":\"4470047211\"},\"exact_employer_identity\":null,\"exact_requisition_id\":null}"
+    },
+    "first_party_observation": {
+      "observed_at": "2026-09-26T12:00:00-04:00",
+      "source_kind": "FIRST_PARTY_DIRECT",
+      "official_url": "https://careers.mta.org/jobs/18276348-data-analyst-subway-resource-and-admin-support-emerging-talent-intern-spring",
+      "observed_employer_name": "Metropolitan Transportation Authority",
+      "observed_role_title": "Data Analyst, Subway Resource & Admin Support, Emerging Talent Intern (Spring)",
+      "employer_binding_status": "VERIFIED",
+      "employer_binding_basis": "Official MTA Careers posting for the same role.",
+      "exact_employer_identity": "MTA",
+      "requisition_status": "EXACT",
+      "exact_requisition_id": "17407",
+      "requisition_evidence": "Official MTA Careers posting displays Job ID 17407.",
+      "requisition_authority": "EMPLOYER_OR_ATS_FIRST_PARTY"
+    }
+  },
+  {
+    "case_id": "PERATON_2026_171010",
+    "expected_outcome": "RESOLVED",
+    "expected_job_id": "PERATON::2026-171010",
+    "discovery_log_record": {
+      "Run_ID": "PROD_20260926_FIRST_REAL_BATCH_001",
+      "Timestamp": "2026-09-26T16:00:00-04:00",
+      "Stage": "IDENTITY_RESOLUTION",
+      "Source": "GMAIL",
+      "Job_ID": null,
+      "Status": "VERIFICATION_REQUIRED",
+      "Error_Code": null,
+      "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+      "Notes": "{\"discovery_lead_id\":\"LEAD_929EDB7E674E728F\",\"source_message_id\":\"1a0d9c74f40498ee\",\"source_thread_id\":\"1a0d9c74f40498ee\",\"observed_at\":\"2026-09-25T18:15:12+00:00\",\"discovery_urls\":[\"https://www.linkedin.com/comm/jobs/view/4470043526/\"],\"employer_text\":\"Peraton\",\"role_text\":\"Junior Business Analyst\",\"requisition_text\":null,\"source_claims\":{\"source_provider\":\"LINKEDIN\",\"source_job_id\":\"4470043526\"},\"exact_employer_identity\":null,\"exact_requisition_id\":null}"
+    },
+    "first_party_observation": {
+      "observed_at": "2026-09-26T12:05:00-04:00",
+      "source_kind": "FIRST_PARTY_DIRECT",
+      "official_url": "https://www.careers.peraton.com/jobs/junior-business-analyst-undefined-undefined-171010-jobs--information-technology--",
+      "observed_employer_name": "Peraton",
+      "observed_role_title": "Junior Business Analyst",
+      "employer_binding_status": "VERIFIED",
+      "employer_binding_basis": "Official Peraton Careers posting for the same role.",
+      "exact_employer_identity": "PERATON",
+      "requisition_status": "EXACT",
+      "exact_requisition_id": "2026-171010",
+      "requisition_evidence": "Official Peraton Careers posting displays requisition 2026-171010.",
+      "requisition_authority": "EMPLOYER_OR_ATS_FIRST_PARTY"
+    }
+  },
+  {
+    "case_id": "ONEMAIN_R2608_52225",
+    "expected_outcome": "RESOLVED",
+    "expected_job_id": "ONEMAIN_FINANCIAL::R2608-52225",
+    "discovery_log_record": {
+      "Run_ID": "PROD_20260926_FIRST_REAL_BATCH_001",
+      "Timestamp": "2026-09-26T16:00:00-04:00",
+      "Stage": "IDENTITY_RESOLUTION",
+      "Source": "GMAIL",
+      "Job_ID": null,
+      "Status": "VERIFICATION_REQUIRED",
+      "Error_Code": null,
+      "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+      "Notes": "{\"discovery_lead_id\":\"LEAD_422B1CEE52FAE7D3\",\"source_message_id\":\"1a0d8fb2aa755a61\",\"source_thread_id\":\"1a0d8fb2aa755a61\",\"observed_at\":\"2026-09-25T14:32:12+00:00\",\"discovery_urls\":[\"https://email.g.joinhandshake.com/c/onemain\"],\"employer_text\":\"OneMain Financial\",\"role_text\":\"Analytics Intern\",\"requisition_text\":null,\"source_claims\":{\"source_provider\":\"HANDSHAKE\"},\"exact_employer_identity\":null,\"exact_requisition_id\":null}"
+    },
+    "first_party_observation": {
+      "observed_at": "2026-09-26T12:10:00-04:00",
+      "source_kind": "FIRST_PARTY_DIRECT",
+      "official_url": "https://jobs.onemainfinancial.com/job/wilmington/analytics-intern/21631/100341806928",
+      "observed_employer_name": "OneMain Financial",
+      "observed_role_title": "Analytics Intern",
+      "employer_binding_status": "VERIFIED",
+      "employer_binding_basis": "Official OneMain Financial careers posting for the same role.",
+      "exact_employer_identity": "ONEMAIN_FINANCIAL",
+      "requisition_status": "EXACT",
+      "exact_requisition_id": "R2608-52225",
+      "requisition_evidence": "Official OneMain Financial careers posting displays Job Number R2608-52225.",
+      "requisition_authority": "EMPLOYER_OR_ATS_FIRST_PARTY"
+    }
+  },
+  {
+    "case_id": "MIDDESK_UNRESOLVED",
+    "expected_outcome": "VERIFICATION_REQUIRED",
+    "expected_error_code": "EXACT_REQUISITION_MISSING",
+    "discovery_log_record": {
+      "Run_ID": "PROD_20260926_FIRST_REAL_BATCH_001",
+      "Timestamp": "2026-09-26T16:00:00-04:00",
+      "Stage": "IDENTITY_RESOLUTION",
+      "Source": "GMAIL",
+      "Job_ID": null,
+      "Status": "VERIFICATION_REQUIRED",
+      "Error_Code": null,
+      "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+      "Notes": "{\"discovery_lead_id\":\"LEAD_28E39D8DFD458F7D\",\"source_message_id\":\"1a0ddab2a5279558\",\"source_thread_id\":\"1a0ddab2a5279558\",\"observed_at\":\"2026-09-26T12:22:57+00:00\",\"discovery_urls\":[\"https://email.matches.simplify.jobs/c/middesk\"],\"employer_text\":\"Middesk\",\"role_text\":\"Data Operations Associate\",\"requisition_text\":null,\"source_claims\":{\"source_provider\":\"SIMPLIFY\"},\"exact_employer_identity\":null,\"exact_requisition_id\":null}"
+    },
+    "first_party_observation": {
+      "observed_at": "2026-09-26T12:15:00-04:00",
+      "source_kind": "FIRST_PARTY_DIRECT",
+      "official_url": "https://www.middesk.com/careers",
+      "observed_employer_name": "Middesk",
+      "observed_role_title": "Data Operations Associate",
+      "employer_binding_status": "VERIFIED",
+      "employer_binding_basis": "Official Middesk careers page lists the same role.",
+      "exact_employer_identity": "MIDDESK",
+      "requisition_status": "MISSING",
+      "exact_requisition_id": null,
+      "requisition_evidence": null,
+      "requisition_authority": null
+    }
+  },
+  {
+    "case_id": "RUNLAYER_UNRESOLVED",
+    "expected_outcome": "VERIFICATION_REQUIRED",
+    "expected_error_code": "EXACT_REQUISITION_MISSING",
+    "discovery_log_record": {
+      "Run_ID": "PROD_20260926_FIRST_REAL_BATCH_001",
+      "Timestamp": "2026-09-26T16:00:00-04:00",
+      "Stage": "IDENTITY_RESOLUTION",
+      "Source": "GMAIL",
+      "Job_ID": null,
+      "Status": "VERIFICATION_REQUIRED",
+      "Error_Code": null,
+      "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+      "Notes": "{\"discovery_lead_id\":\"LEAD_99B5D8D1ED478B9C\",\"source_message_id\":\"1a0ddab2a5279558\",\"source_thread_id\":\"1a0ddab2a5279558\",\"observed_at\":\"2026-09-26T12:22:57+00:00\",\"discovery_urls\":[\"https://email.matches.simplify.jobs/c/runlayer\"],\"employer_text\":\"Runlayer\",\"role_text\":\"Business Operations\",\"requisition_text\":null,\"source_claims\":{\"source_provider\":\"SIMPLIFY\"},\"exact_employer_identity\":null,\"exact_requisition_id\":null}"
+    },
+    "first_party_observation": {
+      "observed_at": "2026-09-26T12:20:00-04:00",
+      "source_kind": "FIRST_PARTY_DIRECT",
+      "official_url": "https://runlayer.com/careers",
+      "observed_employer_name": "Runlayer",
+      "observed_role_title": "Business Operations",
+      "employer_binding_status": "VERIFIED",
+      "employer_binding_basis": "Official Runlayer careers page lists the same role.",
+      "exact_employer_identity": "RUNLAYER",
+      "requisition_status": "MISSING",
+      "exact_requisition_id": null,
+      "requisition_evidence": null,
+      "requisition_authority": null
+    }
+  }
+]

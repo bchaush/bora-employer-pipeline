@@ -31,6 +31,11 @@ if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
 from exact_role_identity import resolve_exact_role_key  # noqa: E402
+from first_party_identity_resolution import (  # noqa: E402
+    ENGINE_BASELINE as FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+    compute_resolution_fingerprint,
+    evaluate_first_party_identity_request,
+)
 from supervised_analysis import (  # noqa: E402
     ENGINE_BASELINE as SLICE_2_ENGINE_BASELINE,
     compute_request_fingerprint,
@@ -47,7 +52,15 @@ PRODUCTION_LEDGER_MUTATION_SCHEMA_PATH = (
 
 def empty_state() -> dict[str, Any]:
     """Return an empty existing_state for a fresh ledger (no prior JOBS/LOG)."""
-    return {"jobs": {}, "processed_lead_ids": [], "gate_match_fingerprints": {}}
+    return {
+        "jobs": {},
+        "processed_lead_ids": [],
+        "gate_match_fingerprints": {},
+        "first_party_resolution_fingerprints": [],
+        "first_party_eligible_lead_ids": [],
+        "first_party_durable_provenance": {},
+        "first_party_resolved_lead_bindings": {},
+    }
 
 
 def _lead_provenance(lead: Mapping[str, Any]) -> str:
@@ -79,7 +92,11 @@ def state_from_ledger_rows(
             jobs[job_id] = dict(row)
 
     processed_lead_ids: set[str] = set()
+    first_party_eligible_lead_ids: set[str] = set()
+    first_party_durable_provenance: dict[str, dict[str, Any]] = {}
     gate_match_fingerprints: dict[str, str] = {}
+    first_party_resolution_fingerprints: set[str] = set()
+    first_party_resolved_lead_bindings: dict[str, str] = {}
     for row in log_rows:
         notes = row.get("Notes")
         if not isinstance(notes, str):
@@ -92,23 +109,73 @@ def state_from_ledger_rows(
             continue
         lead_id = provenance.get("discovery_lead_id")
         if isinstance(lead_id, str) and lead_id:
-            processed_lead_ids.add(lead_id)
+            # processed_lead_ids belongs to Slice 1. Downstream first-party
+            # holds/errors carrying the same lead ID must never suppress later
+            # legitimate Slice-1 ingestion.
+            if row.get("Engine_Baseline") == ENGINE_BASELINE:
+                processed_lead_ids.add(lead_id)
+            # First-party eligibility is durable Slice-1 discovery provenance
+            # only, and the exact canonical provenance is retained for binding.
+            if (
+                row.get("Stage") == "IDENTITY_RESOLUTION"
+                and row.get("Status") == "VERIFICATION_REQUIRED"
+                and row.get("Engine_Baseline") == ENGINE_BASELINE
+            ):
+                first_party_eligible_lead_ids.add(lead_id)
+                first_party_durable_provenance[lead_id] = dict(provenance)
+            # Durable lead -> resolved-Job_ID binding: only a canonical
+            # FIRST_PARTY_IDENTITY_RESOLUTION/NORMALIZED row (a real success)
+            # establishes which exact-role JOBS entity this lead already
+            # resolved to, so a later conflicting resolution can fail closed.
+            if (
+                row.get("Stage") == "FIRST_PARTY_IDENTITY_RESOLUTION"
+                and row.get("Status") == "NORMALIZED"
+                and row.get("Engine_Baseline") == FIRST_PARTY_IDENTITY_ENGINE_BASELINE
+            ):
+                resolved_job_id = row.get("Job_ID")
+                if isinstance(resolved_job_id, str) and resolved_job_id:
+                    first_party_resolved_lead_bindings[lead_id] = resolved_job_id
         gate_match_job_id = provenance.get("operational_job_id")
         gate_match_fingerprint = provenance.get("gate_match_fingerprint")
         if isinstance(gate_match_job_id, str) and gate_match_job_id and isinstance(
             gate_match_fingerprint, str
         ) and gate_match_fingerprint:
             gate_match_fingerprints[gate_match_job_id] = gate_match_fingerprint
+        first_party_fingerprint = provenance.get("first_party_resolution_fingerprint")
+        if (
+            isinstance(first_party_fingerprint, str)
+            and first_party_fingerprint
+            and row.get("Engine_Baseline") == FIRST_PARTY_IDENTITY_ENGINE_BASELINE
+            and row.get("Status") != "PROCESSING_ERROR"
+            and row.get("Error_Code") not in ("DURABLE_DISCOVERY_PROVENANCE_REQUIRED", "FIRST_PARTY_OBSERVED_AT_AFTER_PROCESSED_AT")
+        ):
+            first_party_resolution_fingerprints.add(first_party_fingerprint)
 
     return {
         "jobs": jobs,
         "processed_lead_ids": sorted(processed_lead_ids),
         "gate_match_fingerprints": gate_match_fingerprints,
+        "first_party_resolution_fingerprints": sorted(first_party_resolution_fingerprints),
+        "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
+        "first_party_durable_provenance": first_party_durable_provenance,
+        "first_party_resolved_lead_bindings": first_party_resolved_lead_bindings,
     }
 
 
 def _timestamp_key(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def _bounded_role_key(value: Any) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    return " ".join(value.casefold().split())
+
+
+def _canonical_provenance_json(value: Mapping[str, Any]) -> str:
+    return json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str
+    )
 
 
 def _earliest_timestamp(left: str, right: str) -> str:
@@ -163,6 +230,14 @@ def build_mutation_plan(
         key: dict(value) for key, value in base_state.get("jobs", {}).items()
     }
     processed_lead_ids: set[str] = set(base_state.get("processed_lead_ids", []))
+    first_party_eligible_lead_ids: set[str] = set(
+        base_state.get("first_party_eligible_lead_ids", [])
+    )
+    first_party_durable_provenance: dict[str, dict[str, Any]] = {
+        key: dict(value)
+        for key, value in base_state.get("first_party_durable_provenance", {}).items()
+        if isinstance(key, str) and isinstance(value, Mapping)
+    }
 
     jobs_mutations: list[dict[str, Any]] = []
     log_mutations: list[dict[str, Any]] = []
@@ -198,6 +273,7 @@ def build_mutation_plan(
         exact_role_key = resolve_exact_role_key(exact_employer_identity, exact_requisition_id)
 
         if lead.get("identity_resolution_status") != "RESOLVED" or exact_role_key is None:
+            provenance_notes = _lead_provenance(lead)
             log_mutations.append(
                 _log_mutation(
                     run_id=run_id,
@@ -207,9 +283,16 @@ def build_mutation_plan(
                     job_id=None,
                     status="VERIFICATION_REQUIRED",
                     error_code=None,
-                    notes=_lead_provenance(lead),
+                    notes=provenance_notes,
                 )
             )
+            # Durable first-party eligibility must be established here too,
+            # not only on durable rehydration from LOG rows: otherwise a
+            # first-party resolution chained directly onto this same
+            # in-memory next_state would be falsely held for "missing"
+            # provenance that this very call just durably emitted.
+            first_party_eligible_lead_ids.add(lead_id)
+            first_party_durable_provenance[lead_id] = json.loads(provenance_notes)
             processed_lead_ids.add(lead_id)
             continue
 
@@ -240,7 +323,13 @@ def build_mutation_plan(
             merged = dict(existing_job)
             merged["Op"] = "UPDATE"
             merged["First_Seen"] = _earliest_timestamp(merged["First_Seen"], observed_at)
-            merged["Last_Verified"] = _latest_timestamp(merged["Last_Verified"], observed_at)
+            # Once Official_URL exists, Last_Verified is the authoritative
+            # first-party verification clock. Later discovery observations may
+            # enrich provenance but must not advance that clock.
+            if not merged.get("Official_URL"):
+                merged["Last_Verified"] = _latest_timestamp(
+                    merged["Last_Verified"], observed_at
+                )
             if merged.get("Discovery_URL") is None and discovery_url is not None:
                 merged["Discovery_URL"] = discovery_url
             if merged.get("Company") is None and employer_text is not None:
@@ -272,9 +361,331 @@ def build_mutation_plan(
             "jobs": jobs,
             "processed_lead_ids": sorted(processed_lead_ids),
             "gate_match_fingerprints": dict(base_state.get("gate_match_fingerprints", {})),
+            "first_party_resolution_fingerprints": list(
+                base_state.get("first_party_resolution_fingerprints", [])
+            ),
+            "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
+            "first_party_durable_provenance": first_party_durable_provenance,
+            "first_party_resolved_lead_bindings": dict(
+                base_state.get("first_party_resolved_lead_bindings", {})
+            ),
         },
     }
 
+
+def build_first_party_identity_resolution_mutation_plan(
+    requests: list[Mapping[str, Any]],
+    existing_state: Mapping[str, Any] | None,
+    *,
+    run_id: str,
+    processed_at: str,
+) -> dict[str, Any]:
+    """Project supervised first-party identity evidence onto JOBS + LOG.
+
+    This is a deterministic bridge only. Provider/network retrieval is outside
+    repository code. Every request must start from one durable Slice-1
+    VERIFICATION_REQUIRED LOG record and one bounded first-party observation.
+    """
+
+    base_state = existing_state if existing_state is not None else empty_state()
+    jobs: dict[str, dict[str, Any]] = {
+        key: dict(value) for key, value in base_state.get("jobs", {}).items()
+    }
+    processed_lead_ids: set[str] = set(base_state.get("processed_lead_ids", []))
+    first_party_eligible_lead_ids: set[str] = set(
+        base_state.get("first_party_eligible_lead_ids", [])
+    )
+    first_party_durable_provenance: dict[str, dict[str, Any]] = {
+        key: dict(value)
+        for key, value in base_state.get("first_party_durable_provenance", {}).items()
+        if isinstance(key, str) and isinstance(value, Mapping)
+    }
+    gate_match_fingerprints: dict[str, str] = dict(
+        base_state.get("gate_match_fingerprints", {})
+    )
+    resolution_fingerprints: set[str] = set(
+        base_state.get("first_party_resolution_fingerprints", [])
+    )
+    lead_job_bindings: dict[str, str] = dict(
+        base_state.get("first_party_resolved_lead_bindings", {})
+    )
+
+    jobs_mutations: list[dict[str, Any]] = []
+    log_mutations: list[dict[str, Any]] = []
+
+    for request in requests:
+        fingerprint = compute_resolution_fingerprint(request)
+        if fingerprint in resolution_fingerprints:
+            continue
+
+        outcome = evaluate_first_party_identity_request(request)
+        lead_id = outcome.get("discovery_lead_id")
+
+        notes_payload: dict[str, Any] = {
+            "discovery_lead_id": lead_id,
+            "first_party_resolution_fingerprint": fingerprint,
+            "resolution_outcome": outcome["outcome"],
+            "resolution_error_code": outcome.get("error_code"),
+        }
+        if outcome.get("discovery_provenance") is not None:
+            notes_payload["discovery_provenance"] = outcome["discovery_provenance"]
+        if outcome.get("first_party_observation") is not None:
+            notes_payload["first_party_observation"] = outcome["first_party_observation"]
+        if outcome.get("operational_job_id") is not None:
+            notes_payload["operational_job_id"] = outcome["operational_job_id"]
+
+        request_provenance: Mapping[str, Any] | None = None
+        if isinstance(request, Mapping):
+            discovery_record = request.get("discovery_log_record")
+            if isinstance(discovery_record, Mapping):
+                raw_notes = discovery_record.get("Notes")
+                if isinstance(raw_notes, str):
+                    try:
+                        parsed_notes = json.loads(raw_notes)
+                    except json.JSONDecodeError:
+                        parsed_notes = None
+                    if isinstance(parsed_notes, Mapping):
+                        request_provenance = parsed_notes
+
+        durable_provenance = (
+            first_party_durable_provenance.get(lead_id)
+            if isinstance(lead_id, str)
+            else None
+        )
+        provenance_matches = (
+            isinstance(request_provenance, Mapping)
+            and isinstance(durable_provenance, Mapping)
+            and _canonical_provenance_json(request_provenance)
+            == _canonical_provenance_json(durable_provenance)
+        )
+
+        if (
+            not isinstance(lead_id, str)
+            or not lead_id
+            or lead_id not in first_party_eligible_lead_ids
+            or not provenance_matches
+        ):
+            log_mutations.append(
+                _log_mutation(
+                    run_id=run_id,
+                    timestamp=processed_at,
+                    stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                    source="FIRST_PARTY_VERIFICATION",
+                    job_id=None,
+                    status="VERIFICATION_REQUIRED",
+                    error_code="DURABLE_DISCOVERY_PROVENANCE_REQUIRED",
+                    notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                    engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                )
+            )
+            continue
+
+        if outcome["outcome"] == "PROCESSING_ERROR":
+            if outcome.get("errors"):
+                notes_payload["errors"] = outcome["errors"]
+            log_mutations.append(
+                _log_mutation(
+                    run_id=run_id,
+                    timestamp=processed_at,
+                    stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                    source="FIRST_PARTY_VERIFICATION",
+                    job_id=None,
+                    status="PROCESSING_ERROR",
+                    error_code=outcome.get("error_code"),
+                    notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                    engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                )
+            )
+            continue
+
+        if outcome["outcome"] == "VERIFICATION_REQUIRED":
+            log_mutations.append(
+                _log_mutation(
+                    run_id=run_id,
+                    timestamp=processed_at,
+                    stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                    source="FIRST_PARTY_VERIFICATION",
+                    job_id=None,
+                    status="VERIFICATION_REQUIRED",
+                    error_code=outcome.get("error_code"),
+                    notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                    engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                )
+            )
+            resolution_fingerprints.add(fingerprint)
+            continue
+
+        # A first-party observation timestamped after the run's own
+        # processed_at cannot be a real current-run verification; accepting
+        # it would durably lock a future-dated Last_Verified into the ledger.
+        if _timestamp_key(outcome["last_verified"]) > _timestamp_key(processed_at):
+            notes_payload["processed_at"] = processed_at
+            log_mutations.append(
+                _log_mutation(
+                    run_id=run_id,
+                    timestamp=processed_at,
+                    stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                    source="FIRST_PARTY_VERIFICATION",
+                    job_id=None,
+                    status="VERIFICATION_REQUIRED",
+                    error_code="FIRST_PARTY_OBSERVED_AT_AFTER_PROCESSED_AT",
+                    notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                    engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                )
+            )
+            # Do not mark this observation complete: a later run with a
+            # coherent processed_at must be allowed to re-evaluate it.
+            continue
+
+        operational_job_id = outcome["operational_job_id"]
+        assert isinstance(operational_job_id, str) and operational_job_id
+
+        # One durable discovery lead must bind to exactly one canonical
+        # Job_ID. A later observation under the same lead that resolves to a
+        # different exact-role identity is a contradiction, not a second
+        # valid resolution -- fail closed rather than create a divergent
+        # JOBS entity, whether the conflict lands in the same batch or only
+        # surfaces after durable rehydration.
+        if isinstance(lead_id, str) and lead_id:
+            bound_job_id = lead_job_bindings.get(lead_id)
+            if bound_job_id is not None and bound_job_id != operational_job_id:
+                notes_payload["bound_job_id"] = bound_job_id
+                notes_payload["conflicting_job_id"] = operational_job_id
+                log_mutations.append(
+                    _log_mutation(
+                        run_id=run_id,
+                        timestamp=processed_at,
+                        stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                        source="FIRST_PARTY_VERIFICATION",
+                        job_id=bound_job_id,
+                        status="VERIFICATION_REQUIRED",
+                        error_code="LEAD_JOB_ID_BINDING_CONTRADICTION",
+                        notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                        engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                    )
+                )
+                resolution_fingerprints.add(fingerprint)
+                continue
+
+        existing_job = jobs.get(operational_job_id)
+
+        if existing_job is None:
+            job_row = {
+                "Op": "CREATE",
+                "Job_ID": operational_job_id,
+                "Company": outcome["company"],
+                "Role": outcome["role"],
+                "Discovery_Source": outcome["discovery_source"],
+                "Discovery_URL": outcome["discovery_url"],
+                "Official_URL": outcome["official_url"],
+                "First_Seen": outcome["first_seen"],
+                "Last_Verified": outcome["last_verified"],
+                "Pipeline_State": "NORMALIZED",
+            }
+            jobs[operational_job_id] = dict(job_row)
+            jobs_mutations.append(job_row)
+        else:
+            existing_role_key = _bounded_role_key(existing_job.get("Role"))
+            incoming_role_key = _bounded_role_key(outcome["role"])
+            if (
+                existing_role_key is not None
+                and incoming_role_key is not None
+                and existing_role_key != incoming_role_key
+            ):
+                notes_payload["existing_role"] = existing_job.get("Role")
+                notes_payload["incoming_role"] = outcome["role"]
+                log_mutations.append(
+                    _log_mutation(
+                        run_id=run_id,
+                        timestamp=processed_at,
+                        stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                        source="FIRST_PARTY_VERIFICATION",
+                        job_id=operational_job_id,
+                        status="VERIFICATION_REQUIRED",
+                        error_code="EXACT_IDENTITY_ROLE_CONTRADICTION",
+                        notes=json.dumps(
+                            notes_payload,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                            ensure_ascii=False,
+                        ),
+                        engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                    )
+                )
+                resolution_fingerprints.add(fingerprint)
+                continue
+
+            merged = dict(existing_job)
+            merged["Op"] = "UPDATE"
+            merged["First_Seen"] = _earliest_timestamp(
+                merged["First_Seen"], outcome["first_seen"]
+            )
+            # Official_URL must stay temporally coherent with Last_Verified: only
+            # a strictly newer first-party observation may advance either one.
+            # An older or equal-timestamped replay preserves both durable values.
+            # Exception: if no Official_URL has ever been recorded, this
+            # first-party observation is the first authoritative one and sets
+            # both fields as a pair regardless of the existing (possibly
+            # discovery-only) Last_Verified timestamp.
+            existing_official_url = merged.get("Official_URL")
+            if not existing_official_url:
+                merged["Official_URL"] = outcome["official_url"]
+                merged["Last_Verified"] = outcome["last_verified"]
+            elif _timestamp_key(outcome["last_verified"]) > _timestamp_key(
+                merged["Last_Verified"]
+            ):
+                merged["Last_Verified"] = outcome["last_verified"]
+                merged["Official_URL"] = outcome["official_url"]
+            if merged.get("Company") is None:
+                merged["Company"] = outcome["company"]
+            if merged.get("Role") is None:
+                merged["Role"] = outcome["role"]
+            if merged.get("Discovery_URL") is None:
+                merged["Discovery_URL"] = outcome["discovery_url"]
+            merged["Pipeline_State"] = merged.get("Pipeline_State") or "NORMALIZED"
+            jobs[operational_job_id] = merged
+            jobs_mutations.append(dict(merged))
+
+        notes_payload.update({
+            "exact_employer_identity": outcome["exact_employer_identity"],
+            "exact_requisition_id": outcome["exact_requisition_id"],
+            "official_url": outcome["official_url"],
+        })
+        log_mutations.append(
+            _log_mutation(
+                run_id=run_id,
+                timestamp=processed_at,
+                stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                source="FIRST_PARTY_VERIFICATION",
+                job_id=operational_job_id,
+                status="NORMALIZED",
+                error_code=None,
+                notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+            )
+        )
+        if isinstance(lead_id, str) and lead_id:
+            lead_job_bindings[lead_id] = operational_job_id
+        resolution_fingerprints.add(fingerprint)
+
+    plan = {"jobs_mutations": jobs_mutations, "log_mutations": log_mutations}
+    from schema_validation import build_draft202012_validator
+    validator = build_draft202012_validator(PRODUCTION_LEDGER_MUTATION_SCHEMA_PATH)
+    validator.validate(plan)
+
+    return {
+        "jobs_mutations": jobs_mutations,
+        "log_mutations": log_mutations,
+        "next_state": {
+            "jobs": jobs,
+            "processed_lead_ids": sorted(processed_lead_ids),
+            "gate_match_fingerprints": gate_match_fingerprints,
+            "first_party_resolution_fingerprints": sorted(resolution_fingerprints),
+            "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
+            "first_party_durable_provenance": first_party_durable_provenance,
+            "first_party_resolved_lead_bindings": lead_job_bindings,
+        },
+    }
 
 def build_gate_match_mutation_plan(
     requests: list[Mapping[str, Any]],
@@ -477,5 +888,17 @@ def build_gate_match_mutation_plan(
             "jobs": jobs,
             "processed_lead_ids": sorted(processed_lead_ids),
             "gate_match_fingerprints": gate_match_fingerprints,
+            "first_party_resolution_fingerprints": list(
+                base_state.get("first_party_resolution_fingerprints", [])
+            ),
+            "first_party_eligible_lead_ids": list(
+                base_state.get("first_party_eligible_lead_ids", [])
+            ),
+            "first_party_durable_provenance": dict(
+                base_state.get("first_party_durable_provenance", {})
+            ),
+            "first_party_resolved_lead_bindings": dict(
+                base_state.get("first_party_resolved_lead_bindings", {})
+            ),
         },
     }

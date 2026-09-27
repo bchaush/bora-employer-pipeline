@@ -2,7 +2,7 @@
   "milestone_id": "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1",
   "kind": "IMPLEMENTATION",
   "goal": "Implement the smallest provider-neutral supervised bridge from a persisted VERIFICATION_REQUIRED DiscoveryLead observation to a canonical exact-role JOBS entity only after current first-party employer/ATS evidence verifies the same role and supplies both an exact employer/application-system identity and an exact employer requisition/opportunity identifier. Preserve the original third-party discovery provenance, write Official_URL only from the verified first-party source, remain fail-closed when exact identity is incomplete, and hand the resulting exact operational Job_ID to the already-canonical Slice 2 gate/Match Truth path without changing any existing truth semantics.",
-  "baseline_sha": "cb6ce803aeaca813c0c8556e290c6bb2b0ff099c",
+  "baseline_sha": "c0bb999d6dbbc971c7fde6bf67f70063d678add7",
   "allowed_paths": [
     "src/first_party_identity_resolution.py",
     "src/production_ledger.py",

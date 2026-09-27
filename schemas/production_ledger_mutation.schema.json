@@ -121,11 +121,12 @@
           "enum": [
             "INGESTION",
             "IDENTITY_RESOLUTION",
+            "FIRST_PARTY_IDENTITY_RESOLUTION",
             "LEDGER_PERSISTENCE",
             "GATE_MATCH_PROJECTION"
           ]
         },
-        "Source": { "type": "string", "enum": ["GMAIL", "SUPERVISED_ANALYSIS"] },
+        "Source": { "type": "string", "enum": ["GMAIL", "FIRST_PARTY_VERIFICATION", "SUPERVISED_ANALYSIS"] },
         "Job_ID": { "type": ["string", "null"] },
         "Status": { "$ref": "#/$defs/pipeline_state" },
         "Error_Code": { "type": ["string", "null"] },
