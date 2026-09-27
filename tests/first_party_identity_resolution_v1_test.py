@@ -1721,3 +1721,24 @@ for malformed_host_url in (
         f"host instead of failing closed: {malformed_host_url!r} -> {case50_outcome!r}",
     )
 print("PASS 50: percent-encoded authority delimiters fail closed during canonical host validation.")
+
+# 51. MEDIUM: the post-decoding domain guard must also reject the complete
+# WHATWG forbidden-domain additions that are not already covered by the
+# forbidden-host set: literal percent and U+007F DELETE.
+for malformed_domain_url in (
+    "https://linkedin%25com/jobs/view/123",
+    "https://linkedin%7fcom/jobs/view/123",
+):
+    case51 = copy.deepcopy(requests[0])
+    case51["first_party_observation"]["official_url"] = malformed_domain_url
+    case51["first_party_observation"]["exact_requisition_id"] = "123"
+    case51["first_party_observation"]["requisition_evidence"] = (
+        "Official posting displays Job ID 123."
+    )
+    case51_outcome = evaluate_first_party_identity_request(case51)
+    assert_true(
+        case51_outcome["outcome"] != "RESOLVED",
+        "MEDIUM 51: WHATWG-forbidden domain code point survived percent-decoding "
+        f"and was accepted as authoritative: {malformed_domain_url!r} -> {case51_outcome!r}",
+    )
+print("PASS 51: percent and DELETE are rejected after hostname percent-decoding.")

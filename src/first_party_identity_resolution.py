@@ -346,7 +346,9 @@ def _canonical_http_host(parsed: Any) -> tuple[str | None, int | None]:
         # decoding must not be allowed to introduce authority delimiters that
         # then pass through IDNA as if they were ordinary hostname text.
         if any(
-            ord(char) <= 0x20 or char in '#/:<>?@[\\]^|'
+            ord(char) <= 0x20
+            or ord(char) == 0x7F
+            or char in '#%/:<>?@[\\]^|'
             for char in decoded_host
         ):
             return None, port
