@@ -4,6 +4,7 @@ import copy
 import json
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -1537,3 +1538,165 @@ if _review2_failures:
         "(see REVIEW2 REGRESSION FAILURES above)"
     )
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 REGRESSION CASES 41-46 PASSED.")
+
+# ---------------------------------------------------------------------------
+# Regression cases 47-49: fresh mechanically-reproduced findings against
+# 1a9d3901fef38c7b95c03e5e29e85ae7330d7ee5 (fix/pr81-residual-hardening-v3).
+# These must fail on the untouched v3 runtime and pass only after causal
+# repair.
+# ---------------------------------------------------------------------------
+_review3_failures: list[str] = []
+
+def review3_check(condition: bool, message: str) -> None:
+    if not condition:
+        _review3_failures.append(message)
+
+# 47 MEDIUM: browser-equivalent Greenhouse host spellings (default port,
+# trailing dot, percent-encoded, fullwidth) must canonicalize to the same
+# ATS-qualified GREENHOUSE:ACME namespace as the ordinary host spelling --
+# not silently skip ATS namespace convergence enforcement merely because the
+# raw authority text does not match the ATS parser's literal host pattern.
+_ATS_HOST_CANONICALIZATION_VARIANTS = (
+    "https://boards.greenhouse.io:443/acme/jobs/12345",
+    "https://boards.greenhouse.io./acme/jobs/12345",
+    "https://%62oards.greenhouse.io/acme/jobs/12345",
+    "https://ｂoards.greenhouse.io/acme/jobs/12345",
+)
+for variant_index, host_variant_url in enumerate(_ATS_HOST_CANONICALIZATION_VARIANTS):
+    honest_outcome = evaluate_first_party_identity_request(
+        _greenhouse_request(
+            discovery_lead_id=f"LEAD_47_HONEST_{variant_index}",
+            official_url=host_variant_url,
+            discovery_employer_text="Acme Corporation",
+            observed_employer_name="Acme Corporation",
+            exact_employer_identity="ACME",
+            exact_requisition_id="12345",
+            requisition_evidence="Official Acme Greenhouse posting displays Job ID 12345.",
+        )
+    )
+    review3_check(
+        honest_outcome["outcome"] == "RESOLVED"
+        and honest_outcome.get("operational_job_id") == "GREENHOUSE:ACME::12345",
+        f"MEDIUM 47: browser-equivalent Greenhouse host spelling did not converge onto "
+        f"the ATS-qualified GREENHOUSE:ACME::12345 namespace: {host_variant_url!r} -> "
+        f"{honest_outcome!r}",
+    )
+
+    conflicting_outcome = evaluate_first_party_identity_request(
+        _greenhouse_request(
+            discovery_lead_id=f"LEAD_47_CONFLICT_{variant_index}",
+            official_url=host_variant_url,
+            discovery_employer_text="Otherco Inc",
+            observed_employer_name="Otherco Inc",
+            exact_employer_identity="OTHERCO",
+            exact_requisition_id="99999",
+            requisition_evidence="Official Otherco posting displays Job ID 99999.",
+        )
+    )
+    review3_check(
+        conflicting_outcome["outcome"] != "RESOLVED",
+        f"MEDIUM 47: browser-equivalent Greenhouse host spelling bypassed ATS namespace "
+        f"convergence, letting a non-ATS-qualified employer/requisition resolve: "
+        f"{host_variant_url!r} -> {conflicting_outcome!r}",
+    )
+print("CASE 47 exercised: ATS host canonicalization drift (default port/trailing-dot/percent-encoded/fullwidth).")
+
+# 48 MEDIUM: redirect-wrapper query values containing a browser-equivalent
+# backslash-authority or no-slash-authority embedded LinkedIn destination
+# must remain provenance-only, matching the already-caught fully-slashed
+# encoded form.
+for embedded_destination in (
+    "https:\\www.linkedin.com\\jobs\\view\\3912345678",
+    "https:www.linkedin.com/jobs/view/3912345678",
+):
+    wrapper_url = (
+        "https://www.google.com/url?q=" + quote(embedded_destination, safe="") + "&sa=D"
+    )
+    q48 = copy.deepcopy(requests[0])
+    q48_notes = json.loads(q48["discovery_log_record"]["Notes"])
+    q48_notes["discovery_urls"] = [wrapper_url]
+    q48_notes["source_claims"] = {}
+    q48["discovery_log_record"]["Notes"] = json.dumps(q48_notes)
+    q48["first_party_observation"]["exact_requisition_id"] = "3912345678"
+    q48["first_party_observation"]["requisition_evidence"] = (
+        "Official MTA Careers posting displays Job ID 3912345678."
+    )
+    review3_check(
+        evaluate_first_party_identity_request(q48)["outcome"] != "RESOLVED",
+        "MEDIUM 48: redirect-wrapper embedded LinkedIn destination using a "
+        f"backslash/no-slash authority form evaded platform-ID provenance detection: "
+        f"{embedded_destination!r}",
+    )
+print("CASE 48 exercised: redirect-wrapper embedded browser-equivalent LinkedIn destinations.")
+
+# 49 MEDIUM: a malformed embedded discovery URL (unmatched IPv6-literal
+# bracket) must fail this one request closed with a visible PROCESSING_ERROR
+# -- never raise an uncaught ValueError out of
+# evaluate_first_party_identity_request, and never abort a valid sibling's
+# processing in the same build_first_party_identity_resolution_mutation_plan
+# batch.
+poisoned = copy.deepcopy(requests[0])
+poisoned_notes = json.loads(poisoned["discovery_log_record"]["Notes"])
+poisoned_notes["discovery_urls"] = ["https://employer.example/r?u=https://[bad/jobs"]
+poisoned["discovery_log_record"]["Notes"] = json.dumps(poisoned_notes)
+
+try:
+    poisoned_outcome = evaluate_first_party_identity_request(poisoned)
+    poisoned_raised = None
+except ValueError as exc:
+    poisoned_outcome = None
+    poisoned_raised = exc
+review3_check(
+    poisoned_raised is None,
+    "MEDIUM 49: a malformed embedded discovery URL raised an uncaught ValueError out "
+    f"of evaluate_first_party_identity_request instead of failing closed: {poisoned_raised!r}",
+)
+review3_check(
+    poisoned_raised is not None
+    or (poisoned_outcome is not None and poisoned_outcome.get("outcome") == "PROCESSING_ERROR"),
+    "MEDIUM 49: malformed embedded discovery URL did not fail closed with a visible "
+    f"PROCESSING_ERROR: {poisoned_outcome!r}",
+)
+
+poisoned_batch_state = _seed_lead_provenance(None, poisoned)
+poisoned_batch_state = _seed_lead_provenance(poisoned_batch_state, requests[1])
+try:
+    poisoned_batch_plan = build_first_party_identity_resolution_mutation_plan(
+        [poisoned, requests[1]],
+        poisoned_batch_state,
+        run_id="FPIR_REVIEW3_49_BATCH",
+        processed_at="2026-09-26T13:50:00-04:00",
+    )
+    poisoned_batch_raised = None
+except ValueError as exc:
+    poisoned_batch_plan = None
+    poisoned_batch_raised = exc
+review3_check(
+    poisoned_batch_raised is None,
+    "MEDIUM 49: a malformed sibling raised an uncaught ValueError out of "
+    f"build_first_party_identity_resolution_mutation_plan instead of failing closed "
+    f"per-request: {poisoned_batch_raised!r}",
+)
+review3_check(
+    poisoned_batch_raised is not None
+    or (
+        poisoned_batch_plan is not None
+        and any(
+            mutation.get("Job_ID") == "PERATON::2026-171010"
+            for mutation in poisoned_batch_plan.get("jobs_mutations", [])
+        )
+    ),
+    "MEDIUM 49: a malformed sibling in the batch suppressed the valid sibling's JOBS "
+    f"mutation: {poisoned_batch_plan!r}",
+)
+print("CASE 49 exercised: malformed embedded discovery URL fails closed per-request and never aborts the batch.")
+
+if _review3_failures:
+    print(f"REVIEW3 REGRESSION FAILURES (47-49): {len(_review3_failures)}")
+    for _failure_message in _review3_failures:
+        print(f"  - {_failure_message}")
+    raise AssertionError(
+        "expected RED: fresh independent-review findings 47-49 reproduced "
+        "(see REVIEW3 REGRESSION FAILURES above)"
+    )
+print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 REGRESSION CASES 47-49 PASSED.")

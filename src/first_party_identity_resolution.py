@@ -255,17 +255,27 @@ def _iter_embedded_urls(url: str) -> list[str]:
             extracted: list[str] = []
             if decoded_candidate != candidate:
                 extracted.append(decoded_candidate)
-            for match in re.finditer(r"https?://", decoded_candidate, re.IGNORECASE):
-                extracted.append(decoded_candidate[match.start():])
-            for _, raw_value in parse_qsl(urlparse(decoded_candidate).query, keep_blank_values=True):
+            for match in re.finditer(r"https?:[/\\]*", decoded_candidate, re.IGNORECASE):
+                extracted.append(
+                    _browser_normalize_special_url(decoded_candidate[match.start():])
+                )
+            try:
+                parsed_candidate = urlparse(
+                    _browser_normalize_special_url(decoded_candidate)
+                )
+                query_pairs = parse_qsl(parsed_candidate.query, keep_blank_values=True)
+            except ValueError:
+                query_pairs = []
+            for _, raw_value in query_pairs:
                 decoded_value = _bounded_unquote(raw_value, rounds=1)
-                if decoded_value.lower().startswith(("http://", "https://")):
-                    extracted.append(decoded_value)
+                if re.match(r"^https?:", decoded_value, re.IGNORECASE):
+                    extracted.append(_browser_normalize_special_url(decoded_value))
             for decoded_url in extracted:
-                if decoded_url not in seen:
-                    seen.add(decoded_url)
-                    candidates.append(decoded_url)
-                    next_frontier.append(decoded_url)
+                normalized_url = _browser_normalize_special_url(decoded_url)
+                if normalized_url not in seen:
+                    seen.add(normalized_url)
+                    candidates.append(normalized_url)
+                    next_frontier.append(normalized_url)
         frontier = next_frontier
     return candidates
 
@@ -314,35 +324,62 @@ def _browser_normalize_special_url(url: str) -> str:
     rest = url[match.end():]
     after_slashes = rest.lstrip("/\\")
     if len(after_slashes) == len(rest):
-        # No authority-slash run at all after the scheme colon; nothing to
-        # normalize.
-        return url
+        # WHATWG special schemes also treat "https:host/path" as an
+        # authority-bearing absolute URL.
+        after_slashes = rest
     return f"{scheme}://{after_slashes.replace(chr(92), '/')}"
 
 
-def _ats_identity_url(official_url: str) -> str:
-    """Return browser-normalized scheme/authority/path only for ATS parsing."""
+def _canonical_http_host(parsed: Any) -> tuple[str | None, int | None]:
+    """Return a browser-equivalent canonical ASCII host and parsed port."""
 
-    parsed = urlparse(_browser_normalize_special_url(official_url))
-    return parsed._replace(query="", fragment="").geturl()
+    try:
+        hostname = parsed.hostname
+        port = parsed.port
+    except ValueError:
+        return None, None
+    if not hostname:
+        return None, port
+    try:
+        canonical_host = (
+            unicodedata.normalize("NFKC", unquote(hostname))
+            .rstrip(".")
+            .lower()
+            .encode("idna")
+            .decode("ascii")
+        )
+    except (UnicodeError, ValueError):
+        return None, port
+    return canonical_host, port
+
+
+def _ats_identity_url(official_url: str) -> str:
+    """Return canonical browser-equivalent scheme/authority/path for ATS parsing."""
+
+    normalized = _browser_normalize_special_url(official_url)
+    try:
+        parsed = urlparse(normalized)
+    except ValueError:
+        return normalized
+    hostname, port = _canonical_http_host(parsed)
+    if hostname is None:
+        return normalized
+    default_port = 443 if parsed.scheme.lower() == "https" else 80
+    netloc = hostname if port in (None, default_port) else f"{hostname}:{port}"
+    return parsed._replace(netloc=netloc, query="", fragment="").geturl()
 
 
 def _official_url_third_party_host(official_url: str) -> str | None:
     """F7: fail closed if the outer URL or any embedded destination is third-party."""
 
     for index, candidate in enumerate(_iter_embedded_urls(official_url)):
-        hostname = urlparse(_browser_normalize_special_url(candidate)).hostname
-        if not hostname:
-            if index == 0:
-                return "__invalid_host__"
-            continue
         try:
-            hostname = unicodedata.normalize("NFKC", unquote(hostname)).rstrip(".").lower()
-            hostname = hostname.encode("idna").decode("ascii")
-        except (UnicodeError, ValueError):
-            if index == 0:
-                return "__invalid_host__"
-            continue
+            parsed_candidate = urlparse(_browser_normalize_special_url(candidate))
+        except ValueError:
+            return "__invalid_host__"
+        hostname, _ = _canonical_http_host(parsed_candidate)
+        if not hostname:
+            return "__invalid_host__"
         for denied_host in THIRD_PARTY_DISCOVERY_HOSTS:
             if hostname == denied_host or hostname.endswith(f".{denied_host}"):
                 return denied_host
@@ -441,6 +478,26 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
         }
 
     lead_id = provenance["discovery_lead_id"]
+
+    # Durable discovery provenance is untrusted input. A malformed outer or
+    # embedded URL must fail this request closed instead of escaping urlparse
+    # and aborting the surrounding batch.
+    for discovery_url in provenance.get("discovery_urls") or []:
+        if (
+            isinstance(discovery_url, str)
+            and _official_url_third_party_host(discovery_url) == "__invalid_host__"
+        ):
+            return {
+                "outcome": "PROCESSING_ERROR",
+                "error_code": "DISCOVERY_URL_UNPARSEABLE",
+                "errors": ["discovery provenance contains an unparseable URL"],
+                "resolution_fingerprint": fingerprint,
+                "discovery_lead_id": lead_id,
+                "operational_job_id": None,
+                "discovery_provenance": provenance,
+                "first_party_observation": dict(first_party),
+            }
+
     observed_at = first_party.get("observed_at")
     first_party_observed_at = _aware_datetime(observed_at)
     if first_party_observed_at is None:
