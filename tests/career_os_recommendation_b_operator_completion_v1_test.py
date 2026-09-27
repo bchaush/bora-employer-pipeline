@@ -8,10 +8,10 @@ RID="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 cp=json.loads((ROOT/"CURRENT_EXECUTION_CHECKPOINT.json").read_text(encoding="utf-8"))
 ps=json.loads((ROOT/"project_state.json").read_text(encoding="utf-8"))
 contract=json.loads((ROOT/"milestone_contracts/governance/career-os-recommendation-b-completion-v1.json").read_text(encoding="utf-8"))
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK"
-assert cp["canonical_basis_sha"]=="9fd9227e2341435358d68725b73fe229d848dc14"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"]=="774d3e26e7b0cc0441dec817b4cc542c7dfe541b"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED"
+assert cp["operator_status"]=="PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_CANONICALLY_CLOSED"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["accepted_at"]=="2026-09-24"
 assert cp["recommendation_b_completion"]["milestone_id"]==RID
@@ -67,7 +67,7 @@ assert not current_action.rstrip().endswith((", and", " and", ",", "-"))
 assert "Global implementation_authorized remains false" in current_action
 assert "CANONICAL_GOLD_SOURCES_V1" in current_action
 assert "SELECTED_NOT_AUTHORIZED" not in current_action
-assert "Runtime implementation remains unauthorized by this governance sync" in current_action
+assert "Runtime implementation remains unauthorized by this closure sync" in current_action
 assert "first_point_of_divergence = A and first_causal_failure_point = B at two different points in the same run" in action
 assert "2026-09-27 — Career OS Personal V1 recovery/operator direction lock" in changelog
 assert "# Bora Employer Pipeline OS" in changelog

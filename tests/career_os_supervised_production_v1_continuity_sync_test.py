@@ -57,10 +57,10 @@ assert s1["independent_review"] == "SAFE"
 assert s1["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
 
 # Slice 2 is now the current completed canonical seam.
-assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK"
-assert cp["canonical_basis_sha"] == "9fd9227e2341435358d68725b73fe229d848dc14"
+assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"] == "774d3e26e7b0cc0441dec817b4cc542c7dfe541b"
 assert cp["recorded_at"] == "2026-09-27"
-assert cp["operator_status"] == "PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED"
+assert cp["operator_status"] == "PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_CANONICALLY_CLOSED"
 s2 = cp["slice_2_completion"]
 assert s2["milestone_id"] == SLICE2
 assert s2["operator_status"] == "COMPLETED_BY_OPERATOR"

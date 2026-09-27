@@ -1,0 +1,52 @@
+{
+  "milestone_id": "CAREER_OS_PERSONAL_V1_POSTMERGE_CLOSURE_SYNC_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "baseline_sha": "774d3e26e7b0cc0441dec817b4cc542c7dfe541b",
+  "goal": "Close PR #83 continuity truth after verified merge/post-merge Assurance and route the next bounded candidate to CANONICAL_GOLD_SOURCES_V1 without beginning product/runtime mutation.",
+  "authorization_basis": "Bora authorized the Career OS Personal V1 direction and execution; this sync records already-verified canonical facts only. It does not extend the one-task Cursor-review exception beyond CAREER_OS_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_V1.",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "milestone_contracts/governance/career-os-personal-v1-postmerge-closure-sync-v1-contract.json",
+    "tests/career_os_eval_harness_sequence_v1_test.py",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "schemas/**",
+    "golden-tests/**",
+    "evidence/**",
+    "claims/**",
+    "experiences/**",
+    "resume/**",
+    "prompts/**",
+    ".github/**",
+    "docs/CAREER_OS_OPERATOR_V1.md",
+    "docs/CAREER_OS_PERSONAL_V1_DIRECTION.md"
+  ],
+  "acceptance_conditions": [
+    "PR #83 is verified MERGED with merge SHA 774d3e26e7b0cc0441dec817b4cc542c7dfe541b.",
+    "PR #83 reviewed head 065547fe564c84577ba7b7af9fe6b9f5f79b2d82 is a parent/ancestor of canonical main.",
+    "Merge tree equals reviewed candidate tree 7593b70f4cbfa3c485b11fc9f2092f1072b7647d.",
+    "Post-merge Assurance run 36340272353 on the exact merge SHA completed SUCCESS.",
+    "Recovery surfaces no longer instruct an operator to finish/promote the already merged PR #83 milestone.",
+    "latest_closed_milestone_id/latest_closed_milestone_pr identify CAREER_OS_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_V1 / PR #83.",
+    "CANONICAL_GOLD_SOURCES_V1 is the selected next bounded candidate but this closure sync does not itself authorize Gold-source mutation.",
+    "Only explicitly allowed continuity tests change; no runtime/schema/evidence/resume/prompt/CI files change.",
+    "git diff --check passes and canonical Assurance passes."
+  ],
+  "review_requirements": "Bora explicitly authorized on 2026-09-27 a one-task exception to mandatory Cursor review for CAREER_OS_PERSONAL_V1_POSTMERGE_CLOSURE_SYNC_V1 and authorized Claude to perform the independent read-only adversarial review for this exact frozen candidate only. This exception is scoped only to this closure-sync candidate and is exhausted by its review; normal Cursor review resumes afterward.",
+  "human_approval_requirements": "No product/runtime mutation authority is created by this closure sync.",
+  "stop_conditions": [
+    "Any merge/tree/run fact above cannot be re-verified.",
+    "Closure requires runtime/schema/product mutation.",
+    "A proposed next-step statement exceeds the locked Personal V1 direction."
+  ]
+}

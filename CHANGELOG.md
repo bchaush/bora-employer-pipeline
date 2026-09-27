@@ -1,5 +1,13 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-27 — Career OS Personal V1 PR #83 canonical closure
+
+- Verified PR #83 merged reviewed head `065547fe564c84577ba7b7af9fe6b9f5f79b2d82` to canonical main `774d3e26e7b0cc0441dec817b4cc542c7dfe541b`.
+- Verified reviewed tree == merge tree `7593b70f4cbfa3c485b11fc9f2092f1072b7647d`.
+- Verified PR-head Assurance run #168 SUCCESS and post-merge push Assurance run `36340272353` SUCCESS.
+- Closed `CAREER_OS_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_V1` and selected `CANONICAL_GOLD_SOURCES_V1` as the next bounded candidate without authorizing mutation.
+- The prior PR #83 one-task Claude reviewer exception is exhausted. Bora separately and explicitly authorized a new one-task Claude read-only reviewer exception for `CAREER_OS_PERSONAL_V1_POSTMERGE_CLOSURE_SYNC_V1` only; normal Cursor review resumes after this exact closure candidate.
+
 ## 2026-09-27 — Career OS Personal V1 recovery/operator direction lock
 
 - Independently re-fetched and verified canonical `origin/main = 9fd9227e2341435358d68725b73fe229d848dc14` (PR #82).
