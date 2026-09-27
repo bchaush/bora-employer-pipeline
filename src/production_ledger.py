@@ -59,6 +59,7 @@ def empty_state() -> dict[str, Any]:
         "first_party_resolution_fingerprints": [],
         "first_party_eligible_lead_ids": [],
         "first_party_durable_provenance": {},
+        "first_party_resolved_lead_bindings": {},
     }
 
 
@@ -95,6 +96,7 @@ def state_from_ledger_rows(
     first_party_durable_provenance: dict[str, dict[str, Any]] = {}
     gate_match_fingerprints: dict[str, str] = {}
     first_party_resolution_fingerprints: set[str] = set()
+    first_party_resolved_lead_bindings: dict[str, str] = {}
     for row in log_rows:
         notes = row.get("Notes")
         if not isinstance(notes, str):
@@ -121,6 +123,18 @@ def state_from_ledger_rows(
             ):
                 first_party_eligible_lead_ids.add(lead_id)
                 first_party_durable_provenance[lead_id] = dict(provenance)
+            # Durable lead -> resolved-Job_ID binding: only a canonical
+            # FIRST_PARTY_IDENTITY_RESOLUTION/NORMALIZED row (a real success)
+            # establishes which exact-role JOBS entity this lead already
+            # resolved to, so a later conflicting resolution can fail closed.
+            if (
+                row.get("Stage") == "FIRST_PARTY_IDENTITY_RESOLUTION"
+                and row.get("Status") == "NORMALIZED"
+                and row.get("Engine_Baseline") == FIRST_PARTY_IDENTITY_ENGINE_BASELINE
+            ):
+                resolved_job_id = row.get("Job_ID")
+                if isinstance(resolved_job_id, str) and resolved_job_id:
+                    first_party_resolved_lead_bindings[lead_id] = resolved_job_id
         gate_match_job_id = provenance.get("operational_job_id")
         gate_match_fingerprint = provenance.get("gate_match_fingerprint")
         if isinstance(gate_match_job_id, str) and gate_match_job_id and isinstance(
@@ -144,6 +158,7 @@ def state_from_ledger_rows(
         "first_party_resolution_fingerprints": sorted(first_party_resolution_fingerprints),
         "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
         "first_party_durable_provenance": first_party_durable_provenance,
+        "first_party_resolved_lead_bindings": first_party_resolved_lead_bindings,
     }
 
 
@@ -339,6 +354,9 @@ def build_mutation_plan(
             "first_party_durable_provenance": dict(
                 base_state.get("first_party_durable_provenance", {})
             ),
+            "first_party_resolved_lead_bindings": dict(
+                base_state.get("first_party_resolved_lead_bindings", {})
+            ),
         },
     }
 
@@ -375,6 +393,9 @@ def build_first_party_identity_resolution_mutation_plan(
     )
     resolution_fingerprints: set[str] = set(
         base_state.get("first_party_resolution_fingerprints", [])
+    )
+    lead_job_bindings: dict[str, str] = dict(
+        base_state.get("first_party_resolved_lead_bindings", {})
     )
 
     jobs_mutations: list[dict[str, Any]] = []
@@ -482,8 +503,57 @@ def build_first_party_identity_resolution_mutation_plan(
             resolution_fingerprints.add(fingerprint)
             continue
 
+        # A first-party observation timestamped after the run's own
+        # processed_at cannot be a real current-run verification; accepting
+        # it would durably lock a future-dated Last_Verified into the ledger.
+        if _timestamp_key(outcome["last_verified"]) > _timestamp_key(processed_at):
+            notes_payload["processed_at"] = processed_at
+            log_mutations.append(
+                _log_mutation(
+                    run_id=run_id,
+                    timestamp=processed_at,
+                    stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                    source="FIRST_PARTY_VERIFICATION",
+                    job_id=None,
+                    status="VERIFICATION_REQUIRED",
+                    error_code="FIRST_PARTY_OBSERVED_AT_AFTER_PROCESSED_AT",
+                    notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                    engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                )
+            )
+            resolution_fingerprints.add(fingerprint)
+            continue
+
         operational_job_id = outcome["operational_job_id"]
         assert isinstance(operational_job_id, str) and operational_job_id
+
+        # One durable discovery lead must bind to exactly one canonical
+        # Job_ID. A later observation under the same lead that resolves to a
+        # different exact-role identity is a contradiction, not a second
+        # valid resolution -- fail closed rather than create a divergent
+        # JOBS entity, whether the conflict lands in the same batch or only
+        # surfaces after durable rehydration.
+        if isinstance(lead_id, str) and lead_id:
+            bound_job_id = lead_job_bindings.get(lead_id)
+            if bound_job_id is not None and bound_job_id != operational_job_id:
+                notes_payload["bound_job_id"] = bound_job_id
+                notes_payload["conflicting_job_id"] = operational_job_id
+                log_mutations.append(
+                    _log_mutation(
+                        run_id=run_id,
+                        timestamp=processed_at,
+                        stage="FIRST_PARTY_IDENTITY_RESOLUTION",
+                        source="FIRST_PARTY_VERIFICATION",
+                        job_id=bound_job_id,
+                        status="VERIFICATION_REQUIRED",
+                        error_code="LEAD_JOB_ID_BINDING_CONTRADICTION",
+                        notes=json.dumps(notes_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                        engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
+                    )
+                )
+                resolution_fingerprints.add(fingerprint)
+                continue
+
         existing_job = jobs.get(operational_job_id)
 
         if existing_job is None:
@@ -581,6 +651,8 @@ def build_first_party_identity_resolution_mutation_plan(
                 engine_baseline=FIRST_PARTY_IDENTITY_ENGINE_BASELINE,
             )
         )
+        if isinstance(lead_id, str) and lead_id:
+            lead_job_bindings[lead_id] = operational_job_id
         resolution_fingerprints.add(fingerprint)
 
     plan = {"jobs_mutations": jobs_mutations, "log_mutations": log_mutations}
@@ -598,6 +670,7 @@ def build_first_party_identity_resolution_mutation_plan(
             "first_party_resolution_fingerprints": sorted(resolution_fingerprints),
             "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
             "first_party_durable_provenance": first_party_durable_provenance,
+            "first_party_resolved_lead_bindings": lead_job_bindings,
         },
     }
 
@@ -810,6 +883,9 @@ def build_gate_match_mutation_plan(
             ),
             "first_party_durable_provenance": dict(
                 base_state.get("first_party_durable_provenance", {})
+            ),
+            "first_party_resolved_lead_bindings": dict(
+                base_state.get("first_party_resolved_lead_bindings", {})
             ),
         },
     }

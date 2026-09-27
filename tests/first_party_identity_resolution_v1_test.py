@@ -870,4 +870,231 @@ assert_true(fr_platform_outcome["outcome"] == "RESOLVED"
     "final LOW: discovery-platform requisition IDs must be provenance only, not veto first-party identity")
 print("PASS 31: discovery-platform IDs remain provenance-only and cannot veto authoritative first-party identity.")
 
+# 32. Review HIGH-1: backslash-delimited Official_URL hosts (WHATWG-vs-urlparse divergence)
+# must fail closed. Python's urlparse does not treat '\' as a netloc/path delimiter the way
+# WHATWG-compliant URL parsers (browsers, real employer-site link resolution) do, so a
+# backslash-obfuscated linkedin.com Official_URL must not silently bypass the third-party
+# discovery-host denylist.
+for bad_backslash_url in (
+    "https://www.linkedin.com\\jobs/view/4470047211",
+    "https://www.linkedin.com\\",
+):
+    backslash_req = copy.deepcopy(requests[0])
+    backslash_req["first_party_observation"]["official_url"] = bad_backslash_url
+    backslash_outcome = evaluate_first_party_identity_request(backslash_req)
+    assert_true(
+        backslash_outcome["outcome"] != "RESOLVED",
+        "HIGH-1: a backslash-delimited third-party discovery host must remain forbidden "
+        f"as Official_URL, not RESOLVE: {bad_backslash_url!r}",
+    )
+print("PASS 32: backslash/WHATWG-vs-urlparse Official_URL host bypass fails closed (HIGH-1).")
+
+# 33. Review HIGH-2: one durable discovery lead resolving to conflicting canonical requisitions
+# (two different exact_requisition_id values under the same discovery_lead_id/provenance) must
+# fail closed rather than create a second, divergent JOBS entity for the same lead -- both when
+# the conflicting observations land in the same batch and when the second observation arrives
+# after the first resolution has been durably persisted and rehydrated.
+conflicting_second_observation = copy.deepcopy(requests[1])
+conflicting_second_observation["first_party_observation"]["official_url"] = (
+    "https://www.careers.peraton.com/jobs/junior-business-analyst-conflicting-9999"
+)
+conflicting_second_observation["first_party_observation"]["exact_requisition_id"] = "9999"
+conflicting_second_observation["first_party_observation"]["requisition_evidence"] = (
+    "Official Peraton Careers posting displays requisition 9999."
+)
+sanity_conflict_outcome = evaluate_first_party_identity_request(conflicting_second_observation)
+assert_true(
+    sanity_conflict_outcome["outcome"] == "RESOLVED"
+    and sanity_conflict_outcome["operational_job_id"] == "PERATON::9999",
+    "sanity: the conflicting second observation must independently satisfy every other exact-identity "
+    "gate so the same-lead conflict itself is what is under test",
+)
+
+same_batch_state = _seed_lead_provenance(None, requests[1])
+same_batch_plan = build_first_party_identity_resolution_mutation_plan(
+    [requests[1], conflicting_second_observation],
+    same_batch_state,
+    run_id="FPIR_CONFLICT_SAME_BATCH",
+    processed_at="2026-09-26T14:00:00-04:00",
+)
+same_batch_job_ids = {row["Job_ID"] for row in same_batch_plan["jobs_mutations"]}
+assert_true(
+    len(same_batch_job_ids) == 1,
+    "HIGH-2: one durable discovery lead resolving to conflicting canonical requisitions in the same "
+    f"batch must fail closed to a single Job_ID, not create multiple JOBS rows: {same_batch_job_ids}",
+)
+
+initial_conflict_plan = build_first_party_identity_resolution_mutation_plan(
+    [requests[1]],
+    _seed_lead_provenance(None, requests[1]),
+    run_id="FPIR_CONFLICT_INITIAL",
+    processed_at="2026-09-26T14:01:00-04:00",
+)
+assert_true(
+    len(initial_conflict_plan["jobs_mutations"]) == 1,
+    "sanity: the initial Peraton resolution must create exactly one JOBS row before rehydration",
+)
+conflict_jobs_rows = [
+    {k: v for k, v in row.items() if k != "Op"}
+    for row in initial_conflict_plan["jobs_mutations"]
+]
+conflict_log_rows = [dict(row) for row in initial_conflict_plan["log_mutations"]] + [
+    requests[1]["discovery_log_record"]
+]
+rehydrated_conflict_state = state_from_ledger_rows(conflict_jobs_rows, conflict_log_rows)
+after_rehydration_plan = build_first_party_identity_resolution_mutation_plan(
+    [conflicting_second_observation],
+    rehydrated_conflict_state,
+    run_id="FPIR_CONFLICT_AFTER_REHYDRATION",
+    processed_at="2026-09-26T14:02:00-04:00",
+)
+resulting_job_ids = set(rehydrated_conflict_state["jobs"].keys()) | {
+    row["Job_ID"] for row in after_rehydration_plan["jobs_mutations"]
+}
+assert_true(
+    len(resulting_job_ids) == 1,
+    "HIGH-2: one durable discovery lead resolving to a conflicting canonical requisition after durable "
+    f"rehydration must fail closed rather than create a second JOBS entity: {resulting_job_ids}",
+)
+print(
+    "PASS 33: a single durable discovery lead resolving to conflicting canonical requisitions fails "
+    "closed rather than creating multiple JOBS rows, in-batch and after durable rehydration (HIGH-2)."
+)
+
+# 34. Review HIGH-3: discovery-platform IDs disguised inside source_claims values -- a full
+# LinkedIn slug URL stored as a claim value, a hyphen-prefixed platform ID ("LI-<id>"), and a
+# JSON numeral ("<id>.0") -- must remain provenance-only and never become the canonical
+# exact_requisition_id, regardless of how the identifier is encoded within source_claims.
+def _disguised_platform_id_request(source_claims_value: dict) -> dict:
+    req = copy.deepcopy(requests[0])
+    disguised_notes = json.loads(req["discovery_log_record"]["Notes"])
+    disguised_notes["source_claims"] = source_claims_value
+    req["discovery_log_record"]["Notes"] = json.dumps(disguised_notes)
+    req["first_party_observation"]["exact_requisition_id"] = "4470047211"
+    req["first_party_observation"]["requisition_evidence"] = (
+        "Official MTA Careers posting displays Job ID 4470047211."
+    )
+    return req
+
+
+disguised_source_claims_cases = (
+    {"source_provider": "LINKEDIN", "source_url": "https://www.linkedin.com/jobs/view/4470047211/"},
+    {"source_provider": "LINKEDIN", "source_ref": "LI-4470047211"},
+    {"source_provider": "LINKEDIN", "source_job_id": 4470047211.0},
+)
+for disguised_claims in disguised_source_claims_cases:
+    disguised_outcome = evaluate_first_party_identity_request(
+        _disguised_platform_id_request(disguised_claims)
+    )
+    assert_true(
+        disguised_outcome["outcome"] != "RESOLVED",
+        "HIGH-3: a discovery-platform ID disguised inside a source_claims value must remain "
+        f"provenance-only, never canonical: {disguised_claims!r}",
+    )
+print(
+    "PASS 34: discovery-platform IDs disguised inside source_claims values (slug URL, "
+    "hyphen-prefixed, and numeric-float encodings) remain provenance-only (HIGH-3)."
+)
+
+# 35. Review MEDIUM-1: incoherent first-party timestamps must fail closed -- a first-party
+# observed_at earlier than the discovery lead's own observed_at is temporally impossible
+# (the posting cannot have been first-party-verified before it was even discovered), and a
+# first-party observed_at far later than the run's own processed_at must not durably lock a
+# future-dated Last_Verified into the ledger.
+discovery_observed_at = json.loads(requests[0]["discovery_log_record"]["Notes"])["observed_at"]
+assert_true(
+    discovery_observed_at == "2026-09-26T00:46:12+00:00",
+    "sanity: discovery lead's own observed_at must match the fixture baseline",
+)
+earlier_than_discovery = copy.deepcopy(requests[0])
+earlier_than_discovery["first_party_observation"]["observed_at"] = "2026-09-25T00:00:00+00:00"
+earlier_than_discovery_outcome = evaluate_first_party_identity_request(earlier_than_discovery)
+assert_true(
+    earlier_than_discovery_outcome["outcome"] != "RESOLVED",
+    "MEDIUM-1: a first-party observed_at earlier than the discovery lead's own observed_at is "
+    "temporally incoherent and must fail closed, not RESOLVE",
+)
+
+future_timestamp_lock = copy.deepcopy(requests[0])
+future_timestamp_lock["first_party_observation"]["observed_at"] = "2099-01-01T00:00:00+00:00"
+future_timestamp_lock_state = _seed_lead_provenance(None, future_timestamp_lock)
+future_timestamp_lock_plan = build_first_party_identity_resolution_mutation_plan(
+    [future_timestamp_lock],
+    future_timestamp_lock_state,
+    run_id="FPIR_FUTURE_TIMESTAMP_LOCK",
+    processed_at="2026-09-26T14:00:00-04:00",
+)
+assert_true(
+    future_timestamp_lock_plan["jobs_mutations"] == [],
+    "MEDIUM-1: a first-party observed_at far later than the run's processed_at must fail closed, "
+    "not durably lock a future-dated Last_Verified into the ledger",
+)
+print(
+    "PASS 35: first-party timestamps earlier than discovery or later than processed_at fail "
+    "closed, including the future-timestamp lock regression (MEDIUM-1)."
+)
+
+# 36. Review MEDIUM-2: the same exact ATS posting must converge to the Slice-1 canonical
+# employer namespace. A Greenhouse-hosted posting (boards.greenhouse.io/acme/jobs/4012345)
+# carries an ATS-qualified canonical identity of GREENHOUSE:ACME under Slice-1's own
+# discovery_lead.py parsing convention; a first-party observation supplying the bare employer
+# identity "ACME" for the identical posting must not diverge into a separate ACME::4012345
+# canonical Job_ID.
+greenhouse_discovery_record = {
+    "Run_ID": "PROD_GREENHOUSE_NAMESPACE",
+    "Timestamp": "2026-09-26T16:00:00-04:00",
+    "Stage": "IDENTITY_RESOLUTION",
+    "Source": "GMAIL",
+    "Job_ID": None,
+    "Status": "VERIFICATION_REQUIRED",
+    "Error_Code": None,
+    "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+    "Notes": json.dumps(
+        {
+            "discovery_lead_id": "LEAD_GREENHOUSE_ACME_4012345",
+            "source_message_id": "MSG_GREENHOUSE_ACME",
+            "source_thread_id": "MSG_GREENHOUSE_ACME",
+            "observed_at": "2026-09-26T00:00:00+00:00",
+            "discovery_urls": ["https://boards.greenhouse.io/acme/jobs/4012345"],
+            "employer_text": "Acme Corporation",
+            "role_text": "Data Analyst",
+            "requisition_text": None,
+            "source_claims": {"source_provider": "GREENHOUSE"},
+            "exact_employer_identity": None,
+            "exact_requisition_id": None,
+        }
+    ),
+}
+greenhouse_first_party_observation = {
+    "observed_at": "2026-09-26T12:00:00-04:00",
+    "source_kind": "FIRST_PARTY_DIRECT",
+    "official_url": "https://boards.greenhouse.io/acme/jobs/4012345",
+    "observed_employer_name": "Acme Corporation",
+    "observed_role_title": "Data Analyst",
+    "employer_binding_status": "VERIFIED",
+    "employer_binding_basis": "Official Acme Greenhouse careers posting for the same role.",
+    "exact_employer_identity": "ACME",
+    "requisition_status": "EXACT",
+    "exact_requisition_id": "4012345",
+    "requisition_evidence": "Official Acme Greenhouse posting displays Job ID 4012345.",
+    "requisition_authority": "EMPLOYER_OR_ATS_FIRST_PARTY",
+}
+greenhouse_outcome = evaluate_first_party_identity_request(
+    {
+        "discovery_log_record": greenhouse_discovery_record,
+        "first_party_observation": greenhouse_first_party_observation,
+    }
+)
+assert_true(
+    greenhouse_outcome["outcome"] != "RESOLVED"
+    or greenhouse_outcome["operational_job_id"] == "GREENHOUSE:ACME::4012345",
+    "MEDIUM-2: the same exact ATS posting must converge to the Slice-1 canonical employer namespace "
+    "(GREENHOUSE:ACME), not diverge into a bare-employer key: "
+    f"{greenhouse_outcome.get('operational_job_id')!r}",
+)
+print(
+    "PASS 36: a bare-employer first-party identity for a Greenhouse-hosted posting must converge to "
+    "the Slice-1 canonical ATS-qualified namespace, not diverge into ACME::4012345 (MEDIUM-2)."
+)
+
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 TESTS PASSED")

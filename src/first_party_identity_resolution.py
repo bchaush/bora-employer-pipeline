@@ -30,6 +30,9 @@ SRC_PATH = Path(__file__).resolve().parent
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
+from discovery_lead import (  # noqa: E402
+    _parse_exact_employer_identity as _slice1_ats_employer_identity,
+)
 from exact_role_identity import resolve_exact_role_key  # noqa: E402
 from schema_validation import build_draft202012_validator  # noqa: E402
 
@@ -190,9 +193,20 @@ def _source_claim_contains_identifier(value: Any, identifier: str) -> bool:
     if isinstance(value, (list, tuple)):
         return any(_source_claim_contains_identifier(child, identifier) for child in value)
     if isinstance(value, str):
-        return _token_bounded_contains(value, identifier)
+        # A platform ID may appear in source_claims either as an exact
+        # evidence-style token or delimited within a URL/slug (e.g.
+        # "LI-<id>", a full job-posting URL); both boundary styles must
+        # be checked so neither encoding becomes an undetected bypass.
+        return _token_bounded_contains(value, identifier) or _url_contains_identifier(
+            value, identifier
+        )
     if isinstance(value, (int, float)) and not isinstance(value, bool):
-        return str(value).casefold() == identifier.strip().casefold()
+        numeric_text = (
+            str(int(value))
+            if isinstance(value, float) and value.is_integer()
+            else str(value)
+        )
+        return numeric_text.casefold() == identifier.strip().casefold()
     return False
 
 
@@ -214,7 +228,10 @@ def _provenance_contains_platform_identifier(
 def _official_url_third_party_host(official_url: str) -> str | None:
     """F7: deterministic normalized-host check only; no network/provider I/O."""
 
-    hostname = urlparse(official_url).hostname
+    # WHATWG URL parsing treats '\' as a host/path delimiter for special
+    # schemes (http/https), same as '/'; urlparse does not, which would
+    # otherwise let a backslash-obfuscated host slip past this denylist.
+    hostname = urlparse(official_url.replace("\\", "/")).hostname
     if not hostname:
         return None
     try:
@@ -321,7 +338,8 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
 
     lead_id = provenance["discovery_lead_id"]
     observed_at = first_party.get("observed_at")
-    if _aware_datetime(observed_at) is None:
+    first_party_observed_at = _aware_datetime(observed_at)
+    if first_party_observed_at is None:
         return {
             "outcome": "PROCESSING_ERROR",
             "error_code": "FIRST_PARTY_OBSERVED_AT_INVALID",
@@ -329,6 +347,22 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
             "resolution_fingerprint": fingerprint,
             "discovery_lead_id": lead_id,
             "operational_job_id": None,
+        }
+
+    # A posting cannot have been first-party-verified before it was even
+    # discovered; an earlier first-party timestamp is temporally impossible.
+    discovery_observed_at = _aware_datetime(provenance["observed_at"])
+    assert discovery_observed_at is not None
+    if first_party_observed_at < discovery_observed_at:
+        return {
+            "outcome": "VERIFICATION_REQUIRED",
+            "error_code": "FIRST_PARTY_OBSERVED_AT_PRECEDES_DISCOVERY",
+            "errors": [],
+            "resolution_fingerprint": fingerprint,
+            "discovery_lead_id": lead_id,
+            "operational_job_id": None,
+            "discovery_provenance": provenance,
+            "first_party_observation": dict(first_party),
         }
 
     discovery_role = provenance["role_text"]
@@ -499,8 +533,13 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
             "first_party_observation": dict(first_party),
         }
 
+    # The same exact ATS posting must converge onto Slice-1's own
+    # ATS-qualified employer namespace (e.g. GREENHOUSE:ACME), reusing its
+    # canonical URL-pattern parsing, rather than diverging into a bare
+    # employer key merely because a first-party observation supplied one.
+    ats_qualified_employer_identity = _slice1_ats_employer_identity([official_url])
     operational_job_id = resolve_exact_role_key(
-        exact_employer_identity,
+        ats_qualified_employer_identity or exact_employer_identity,
         exact_requisition_id,
     )
     if operational_job_id is None:
