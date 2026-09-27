@@ -230,6 +230,14 @@ def build_mutation_plan(
         key: dict(value) for key, value in base_state.get("jobs", {}).items()
     }
     processed_lead_ids: set[str] = set(base_state.get("processed_lead_ids", []))
+    first_party_eligible_lead_ids: set[str] = set(
+        base_state.get("first_party_eligible_lead_ids", [])
+    )
+    first_party_durable_provenance: dict[str, dict[str, Any]] = {
+        key: dict(value)
+        for key, value in base_state.get("first_party_durable_provenance", {}).items()
+        if isinstance(key, str) and isinstance(value, Mapping)
+    }
 
     jobs_mutations: list[dict[str, Any]] = []
     log_mutations: list[dict[str, Any]] = []
@@ -265,6 +273,7 @@ def build_mutation_plan(
         exact_role_key = resolve_exact_role_key(exact_employer_identity, exact_requisition_id)
 
         if lead.get("identity_resolution_status") != "RESOLVED" or exact_role_key is None:
+            provenance_notes = _lead_provenance(lead)
             log_mutations.append(
                 _log_mutation(
                     run_id=run_id,
@@ -274,9 +283,16 @@ def build_mutation_plan(
                     job_id=None,
                     status="VERIFICATION_REQUIRED",
                     error_code=None,
-                    notes=_lead_provenance(lead),
+                    notes=provenance_notes,
                 )
             )
+            # Durable first-party eligibility must be established here too,
+            # not only on durable rehydration from LOG rows: otherwise a
+            # first-party resolution chained directly onto this same
+            # in-memory next_state would be falsely held for "missing"
+            # provenance that this very call just durably emitted.
+            first_party_eligible_lead_ids.add(lead_id)
+            first_party_durable_provenance[lead_id] = json.loads(provenance_notes)
             processed_lead_ids.add(lead_id)
             continue
 
@@ -348,12 +364,8 @@ def build_mutation_plan(
             "first_party_resolution_fingerprints": list(
                 base_state.get("first_party_resolution_fingerprints", [])
             ),
-            "first_party_eligible_lead_ids": list(
-                base_state.get("first_party_eligible_lead_ids", [])
-            ),
-            "first_party_durable_provenance": dict(
-                base_state.get("first_party_durable_provenance", {})
-            ),
+            "first_party_eligible_lead_ids": sorted(first_party_eligible_lead_ids),
+            "first_party_durable_provenance": first_party_durable_provenance,
             "first_party_resolved_lead_bindings": dict(
                 base_state.get("first_party_resolved_lead_bindings", {})
             ),

@@ -24,7 +24,7 @@ import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qsl, unquote, urlparse
 
 SRC_PATH = Path(__file__).resolve().parent
 if str(SRC_PATH) not in sys.path:
@@ -32,6 +32,7 @@ if str(SRC_PATH) not in sys.path:
 
 from discovery_lead import (  # noqa: E402
     _parse_exact_employer_identity as _slice1_ats_employer_identity,
+    _parse_exact_requisition_id as _slice1_ats_requisition_id,
 )
 from exact_role_identity import resolve_exact_role_key  # noqa: E402
 from schema_validation import build_draft202012_validator  # noqa: E402
@@ -186,9 +187,13 @@ def _url_contains_identifier(url: str, identifier: str) -> bool:
 
 def _source_claim_contains_identifier(value: Any, identifier: str) -> bool:
     if isinstance(value, Mapping):
+        # A platform ID can be stashed as a mapping KEY (e.g.
+        # {"<id>": True}) just as easily as a value; both must be scanned so
+        # neither position becomes an undetected bypass.
         return any(
-            _source_claim_contains_identifier(child, identifier)
-            for child in value.values()
+            _source_claim_contains_identifier(key, identifier)
+            or _source_claim_contains_identifier(child, identifier)
+            for key, child in value.items()
         )
     if isinstance(value, (list, tuple)):
         return any(_source_claim_contains_identifier(child, identifier) for child in value)
@@ -210,6 +215,42 @@ def _source_claim_contains_identifier(value: Any, identifier: str) -> bool:
     return False
 
 
+# Bounds how many rounds of embedded-URL discovery/percent-decoding are
+# followed for one discovery URL (e.g. a Gmail/Google redirect wrapper
+# nesting another wrapper); prevents pathological/adversarial nesting from
+# causing unbounded work.
+_MAX_EMBEDDED_URL_DECODE_ROUNDS = 5
+
+
+def _iter_embedded_urls(url: str) -> list[str]:
+    """Yield `url` plus any http(s) URL reachable via bounded, repeated
+    percent-decoding of its query-parameter values (e.g. a Gmail/Google
+    redirect wrapper's `?q=<url>` or `?url=<url>` parameter), so a
+    discovery-platform host/identifier hidden behind a non-denylisted
+    wrapper host is still inspected.
+    """
+
+    seen: set[str] = {url}
+    candidates: list[str] = [url]
+    frontier = [url]
+    for _ in range(_MAX_EMBEDDED_URL_DECODE_ROUNDS):
+        if not frontier:
+            break
+        next_frontier: list[str] = []
+        for candidate in frontier:
+            for _, raw_value in parse_qsl(urlparse(candidate).query, keep_blank_values=True):
+                decoded_value = unquote(raw_value)
+                if (
+                    decoded_value.lower().startswith(("http://", "https://"))
+                    and decoded_value not in seen
+                ):
+                    seen.add(decoded_value)
+                    candidates.append(decoded_value)
+                    next_frontier.append(decoded_value)
+        frontier = next_frontier
+    return candidates
+
+
 def _provenance_contains_platform_identifier(
     provenance: Mapping[str, Any], identifier: str
 ) -> bool:
@@ -217,23 +258,59 @@ def _provenance_contains_platform_identifier(
     if _source_claim_contains_identifier(source_claims, identifier):
         return True
     discovery_urls = provenance.get("discovery_urls")
-    return isinstance(discovery_urls, list) and any(
-        isinstance(url, str)
-        and _official_url_third_party_host(url) not in (None, "__invalid_host__")
-        and _url_contains_identifier(url, identifier)
-        for url in discovery_urls
-    )
+    if not isinstance(discovery_urls, list):
+        return False
+    for url in discovery_urls:
+        if not isinstance(url, str):
+            continue
+        for candidate in _iter_embedded_urls(url):
+            if (
+                _official_url_third_party_host(candidate) not in (None, "__invalid_host__")
+                and _url_contains_identifier(candidate, identifier)
+            ):
+                return True
+    return False
+
+
+_SPECIAL_SCHEME_RE = re.compile(r"^(https?):", re.IGNORECASE)
+
+
+def _browser_normalize_special_url(url: str) -> str:
+    """Normalize backslash/slash authority-separator forms to their
+    WHATWG-equivalent canonical form for special (http/https) schemes.
+
+    Real browsers (and employer-site link resolution) collapse any run of
+    leading '/'/'\\' immediately after the scheme colon into one authority
+    boundary, then treat every remaining '\\' exactly like '/'. A naive
+    `.replace("\\", "/")` does not reproduce this: a leading "://\\" becomes
+    ":///" (an extra empty path segment) instead of the browser's "://",
+    which makes `urlparse` return hostname=None for an otherwise
+    well-formed, browser-parseable authority.
+    """
+
+    match = _SPECIAL_SCHEME_RE.match(url)
+    if not match:
+        return url
+    scheme = match.group(1)
+    rest = url[match.end():]
+    after_slashes = rest.lstrip("/\\")
+    if len(after_slashes) == len(rest):
+        # No authority-slash run at all after the scheme colon; nothing to
+        # normalize.
+        return url
+    return f"{scheme}://{after_slashes.replace(chr(92), '/')}"
 
 
 def _official_url_third_party_host(official_url: str) -> str | None:
     """F7: deterministic normalized-host check only; no network/provider I/O."""
 
-    # WHATWG URL parsing treats '\' as a host/path delimiter for special
-    # schemes (http/https), same as '/'; urlparse does not, which would
-    # otherwise let a backslash-obfuscated host slip past this denylist.
-    hostname = urlparse(official_url.replace("\\", "/")).hostname
+    hostname = urlparse(_browser_normalize_special_url(official_url)).hostname
     if not hostname:
-        return None
+        # No usable authority could be established at all. A browser would
+        # never silently treat this as "not a denied host" -- an
+        # unparseable Official_URL must fail closed rather than pass through
+        # as implicitly acceptable.
+        return "__invalid_host__"
     try:
         hostname = unicodedata.normalize("NFKC", unquote(hostname)).rstrip(".").lower()
         hostname = hostname.encode("idna").decode("ascii")
@@ -519,13 +596,18 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
     assert isinstance(official_url, str)
     third_party_host = _official_url_third_party_host(official_url)
     if third_party_host is not None:
+        error_message = (
+            "official_url does not resolve to a usable authoritative host"
+            if third_party_host == "__invalid_host__"
+            else (
+                f"official_url host '{third_party_host}' is a known third-party discovery "
+                "platform, not an authoritative first-party source"
+            )
+        )
         return {
             "outcome": "PROCESSING_ERROR",
             "error_code": "OFFICIAL_URL_THIRD_PARTY_HOST_FORBIDDEN",
-            "errors": [
-                f"official_url host '{third_party_host}' is a known third-party discovery "
-                "platform, not an authoritative first-party source"
-            ],
+            "errors": [error_message],
             "resolution_fingerprint": fingerprint,
             "discovery_lead_id": lead_id,
             "operational_job_id": None,
@@ -537,7 +619,61 @@ def evaluate_first_party_identity_request(request: Mapping[str, Any] | Any) -> d
     # ATS-qualified employer namespace (e.g. GREENHOUSE:ACME), reusing its
     # canonical URL-pattern parsing, rather than diverging into a bare
     # employer key merely because a first-party observation supplied one.
-    ats_qualified_employer_identity = _slice1_ats_employer_identity([official_url])
+    # The SAME browser-normalized form used for the host check above is
+    # reused here so a backslash-equivalent ATS URL cannot diverge from its
+    # ordinary slash-form counterpart.
+    browser_normalized_official_url = _browser_normalize_special_url(official_url)
+    ats_qualified_employer_identity = _slice1_ats_employer_identity(
+        [browser_normalized_official_url]
+    )
+    if ats_qualified_employer_identity is not None:
+        ats_bare_employer = ats_qualified_employer_identity.split(":", 1)[-1]
+        for candidate_label, candidate_value in (
+            ("exact_employer_identity", exact_employer_identity),
+            ("discovery exact_employer_identity", discovery_exact_employer),
+        ):
+            if (
+                isinstance(candidate_value, str)
+                and candidate_value.strip()
+                and _normalize_exact_text(candidate_value)
+                != _normalize_exact_text(ats_bare_employer)
+            ):
+                return {
+                    "outcome": "VERIFICATION_REQUIRED",
+                    "error_code": "ATS_EMPLOYER_IDENTITY_CONTRADICTION",
+                    "errors": [
+                        f"URL-derived ATS employer identity '{ats_qualified_employer_identity}' "
+                        f"conflicts with supplied {candidate_label} '{candidate_value}'"
+                    ],
+                    "resolution_fingerprint": fingerprint,
+                    "discovery_lead_id": lead_id,
+                    "operational_job_id": None,
+                    "discovery_provenance": provenance,
+                    "first_party_observation": dict(first_party),
+                }
+
+        ats_derived_requisition_id = _slice1_ats_requisition_id(
+            [browser_normalized_official_url], provenance.get("requisition_text")
+        )
+        if (
+            ats_derived_requisition_id is not None
+            and _normalize_exact_text(ats_derived_requisition_id)
+            != _normalize_exact_text(exact_requisition_id)
+        ):
+            return {
+                "outcome": "VERIFICATION_REQUIRED",
+                "error_code": "ATS_REQUISITION_ID_CONTRADICTION",
+                "errors": [
+                    f"URL-derived ATS requisition ID '{ats_derived_requisition_id}' conflicts "
+                    f"with supplied exact_requisition_id '{exact_requisition_id}'"
+                ],
+                "resolution_fingerprint": fingerprint,
+                "discovery_lead_id": lead_id,
+                "operational_job_id": None,
+                "discovery_provenance": provenance,
+                "first_party_observation": dict(first_party),
+            }
+
     operational_job_id = resolve_exact_role_key(
         ats_qualified_employer_identity or exact_employer_identity,
         exact_requisition_id,

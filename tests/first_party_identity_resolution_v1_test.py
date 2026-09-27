@@ -1098,3 +1098,314 @@ print(
 )
 
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 TESTS PASSED")
+
+
+# ---------------------------------------------------------------------------
+# Regression cases 37-40: production/reviewer-earned regressions.
+# These cases must PASS on the repaired runtime. A single aggregate failure
+# collector is used instead of assert_true's immediate raise so every
+# remaining failure stays visible in one run rather than the script halting
+# at the first one.
+# ---------------------------------------------------------------------------
+
+_regression_failures: list[str] = []
+
+
+def regression_check(condition: bool, message: str) -> None:
+    if not condition:
+        _regression_failures.append(message)
+
+
+# 37. HIGH: browser/WHATWG authority-parsing bypass. A literal backslash
+# immediately after the scheme separator (instead of, or mixed with, the
+# ordinary '//') is a synonym for '/' in the WHATWG "special authority
+# slashes" state, so real browsers / employer-site link resolution parse
+# these forms exactly like the ordinary https://<host>/... authority. The
+# runtime's own handling (`official_url.replace("\\", "/")`) does not
+# reproduce that: it turns a leading "://\\" into ":///" (an extra empty
+# path segment), urlparse then returns hostname=None, and a None hostname is
+# silently treated as "not a denied host" instead of a parse failure that
+# must fail closed.
+for bad_authority_url in (
+    "https://\\www.linkedin.com/jobs/view/4470047211",
+    "https://\\/linkedin.com/x",
+):
+    authority_bypass_req = copy.deepcopy(requests[0])
+    authority_bypass_req["first_party_observation"]["official_url"] = bad_authority_url
+    authority_bypass_outcome = evaluate_first_party_identity_request(authority_bypass_req)
+    regression_check(
+        authority_bypass_outcome["outcome"] != "RESOLVED",
+        "HIGH (37): a browser/WHATWG-equivalent backslash-delimited third-party "
+        f"authority must remain forbidden as Official_URL, not RESOLVE: {bad_authority_url!r} "
+        f"(got outcome={authority_bypass_outcome['outcome']!r}, "
+        f"operational_job_id={authority_bypass_outcome.get('operational_job_id')!r})",
+    )
+print("PASS 37: browser/WHATWG authority-parsing Official_URL bypass fails closed (HIGH).")
+
+
+# 38. MEDIUM: ATS namespace consistency for known ATS (Greenhouse) URLs.
+def _greenhouse_request(
+    *,
+    discovery_lead_id: str,
+    official_url: str,
+    discovery_employer_text: str,
+    observed_employer_name: str,
+    exact_employer_identity: str,
+    exact_requisition_id: str,
+    requisition_evidence: str,
+) -> dict:
+    discovery_log_record = {
+        "Run_ID": "PROD_GREENHOUSE_38",
+        "Timestamp": "2026-09-26T16:00:00-04:00",
+        "Stage": "IDENTITY_RESOLUTION",
+        "Source": "GMAIL",
+        "Job_ID": None,
+        "Status": "VERIFICATION_REQUIRED",
+        "Error_Code": None,
+        "Engine_Baseline": "SUPERVISED_PRODUCTION_V1_SLICE_1_GMAIL_TO_SHEET",
+        "Notes": json.dumps(
+            {
+                "discovery_lead_id": discovery_lead_id,
+                "source_message_id": f"MSG_{discovery_lead_id}",
+                "source_thread_id": f"MSG_{discovery_lead_id}",
+                "observed_at": "2026-09-26T00:00:00+00:00",
+                "discovery_urls": [official_url],
+                "employer_text": discovery_employer_text,
+                "role_text": "Data Analyst",
+                "requisition_text": None,
+                "source_claims": {"source_provider": "GREENHOUSE"},
+                "exact_employer_identity": None,
+                "exact_requisition_id": None,
+            }
+        ),
+    }
+    first_party_observation = {
+        "observed_at": "2026-09-26T12:00:00-04:00",
+        "source_kind": "FIRST_PARTY_DIRECT",
+        "official_url": official_url,
+        "observed_employer_name": observed_employer_name,
+        "observed_role_title": "Data Analyst",
+        "employer_binding_status": "VERIFIED",
+        "employer_binding_basis": "Official Greenhouse careers posting for the same role.",
+        "exact_employer_identity": exact_employer_identity,
+        "requisition_status": "EXACT",
+        "exact_requisition_id": exact_requisition_id,
+        "requisition_evidence": requisition_evidence,
+        "requisition_authority": "EMPLOYER_OR_ATS_FIRST_PARTY",
+    }
+    return {"discovery_log_record": discovery_log_record, "first_party_observation": first_party_observation}
+
+
+# 38a: a browser-equivalent backslash authority/path variant of a known ATS
+# URL must converge to the same ATS-qualified canonical namespace
+# (GREENHOUSE:ACME) as the ordinary slash form, not diverge into a bare
+# employer key.
+greenhouse_slash_outcome = evaluate_first_party_identity_request(
+    _greenhouse_request(
+        discovery_lead_id="LEAD_GREENHOUSE_38_SLASH",
+        official_url="https://boards.greenhouse.io/acme/jobs/4012345",
+        discovery_employer_text="Acme Corporation",
+        observed_employer_name="Acme Corporation",
+        exact_employer_identity="ACME",
+        exact_requisition_id="4012345",
+        requisition_evidence="Official Acme Greenhouse posting displays Job ID 4012345.",
+    )
+)
+assert_true(
+    greenhouse_slash_outcome["outcome"] == "RESOLVED"
+    and greenhouse_slash_outcome["operational_job_id"] == "GREENHOUSE:ACME::4012345",
+    "sanity (38a): the ordinary slash-form Greenhouse posting must resolve to the "
+    f"ATS-qualified namespace, got {greenhouse_slash_outcome!r}",
+)
+greenhouse_backslash_outcome = evaluate_first_party_identity_request(
+    _greenhouse_request(
+        discovery_lead_id="LEAD_GREENHOUSE_38_BACKSLASH",
+        official_url="https://boards.greenhouse.io\\acme/jobs/4012345",
+        discovery_employer_text="Acme Corporation",
+        observed_employer_name="Acme Corporation",
+        exact_employer_identity="ACME",
+        exact_requisition_id="4012345",
+        requisition_evidence="Official Acme Greenhouse posting displays Job ID 4012345.",
+    )
+)
+regression_check(
+    greenhouse_backslash_outcome["outcome"] != "RESOLVED"
+    or greenhouse_backslash_outcome["operational_job_id"] == "GREENHOUSE:ACME::4012345",
+    "MEDIUM (38a): a browser-equivalent backslash path/authority variant of a known "
+    "Greenhouse ATS URL must converge to the GREENHOUSE:ACME canonical namespace, not "
+    f"diverge into a bare-employer key: {greenhouse_backslash_outcome.get('operational_job_id')!r}",
+)
+
+# 38b: URL-derived ATS employer identity (GREENHOUSE:ACME, from the 'acme'
+# Greenhouse board) conflicting with the supplied verified
+# exact_employer_identity/provenance employer identity ("OTHERCORP") must
+# fail closed, not silently RESOLVE using the URL-derived identity alone.
+greenhouse_employer_conflict_outcome = evaluate_first_party_identity_request(
+    _greenhouse_request(
+        discovery_lead_id="LEAD_GREENHOUSE_38_EMPLOYER_CONFLICT",
+        official_url="https://boards.greenhouse.io/acme/jobs/4012345",
+        discovery_employer_text="Othercorp Inc",
+        observed_employer_name="Othercorp Inc",
+        exact_employer_identity="OTHERCORP",
+        exact_requisition_id="4012345",
+        requisition_evidence="Official Othercorp posting displays Job ID 4012345.",
+    )
+)
+regression_check(
+    greenhouse_employer_conflict_outcome["outcome"] != "RESOLVED",
+    "MEDIUM (38b): a URL-derived ATS employer identity (GREENHOUSE:ACME) conflicting "
+    "with the supplied verified exact_employer_identity (OTHERCORP) must fail closed, "
+    f"not RESOLVE: {greenhouse_employer_conflict_outcome!r}",
+)
+
+# 38c: URL-derived ATS requisition ID (4012345, from the Greenhouse posting
+# path) conflicting with the supplied exact_requisition_id ("9999999") must
+# fail closed, not silently RESOLVE using the supplied requisition alone.
+greenhouse_requisition_conflict_outcome = evaluate_first_party_identity_request(
+    _greenhouse_request(
+        discovery_lead_id="LEAD_GREENHOUSE_38_REQUISITION_CONFLICT",
+        official_url="https://boards.greenhouse.io/acme/jobs/4012345",
+        discovery_employer_text="Acme Corporation",
+        observed_employer_name="Acme Corporation",
+        exact_employer_identity="ACME",
+        exact_requisition_id="9999999",
+        requisition_evidence="Official Acme Greenhouse posting displays Job ID 9999999.",
+    )
+)
+regression_check(
+    greenhouse_requisition_conflict_outcome["outcome"] != "RESOLVED",
+    "MEDIUM (38c): a URL-derived ATS requisition ID (4012345) conflicting with the "
+    "supplied exact_requisition_id (9999999) must fail closed, not RESOLVE: "
+    f"{greenhouse_requisition_conflict_outcome!r}",
+)
+print("PASS 38: ATS namespace consistency (Greenhouse) converges and contradictions fail closed (MEDIUM).")
+
+
+# 39. MEDIUM: discovery-platform ID leakage via a non-denylisted redirect
+# host and via source_claims mapping KEYS (not just values).
+
+# 39a: a Gmail/Google redirect wrapper URL (host is google.com, not a denied
+# third-party discovery host) containing a percent-encoded LinkedIn job URL
+# with ID 4470047211 must still make that ID provenance-only, never
+# canonical -- the identifier must not become the exact_requisition_id
+# merely because the wrapping host itself is absent from the denylist.
+gmail_redirect_req = copy.deepcopy(requests[0])
+gmail_redirect_notes = json.loads(gmail_redirect_req["discovery_log_record"]["Notes"])
+gmail_redirect_notes["discovery_urls"] = [
+    "https://www.google.com/url?q=https%3A%2F%2Fwww.linkedin.com%2Fjobs%2Fview%2F4470047211%2F&sa=D"
+]
+gmail_redirect_notes["source_claims"] = {"source_provider": "GMAIL_REDIRECT"}
+gmail_redirect_req["discovery_log_record"]["Notes"] = json.dumps(gmail_redirect_notes)
+gmail_redirect_req["first_party_observation"]["exact_requisition_id"] = "4470047211"
+gmail_redirect_req["first_party_observation"]["requisition_evidence"] = (
+    "Official MTA Careers posting displays Job ID 4470047211."
+)
+gmail_redirect_outcome = evaluate_first_party_identity_request(gmail_redirect_req)
+regression_check(
+    gmail_redirect_outcome["outcome"] != "RESOLVED",
+    "MEDIUM (39a): a discovery-platform ID reachable only through a Gmail/Google "
+    "redirect wrapper (non-denylisted host, percent-encoded LinkedIn URL) must remain "
+    f"provenance-only, not RESOLVE: {gmail_redirect_outcome!r}",
+)
+
+# 39b: source_claims mapping KEYS carrying the discovery-platform ID (not
+# just values) must also be scanned and forbidden.
+source_claims_key_req = copy.deepcopy(requests[0])
+source_claims_key_notes = json.loads(source_claims_key_req["discovery_log_record"]["Notes"])
+source_claims_key_notes["source_claims"] = {"ids": {"4470047211": True}}
+source_claims_key_notes["discovery_urls"] = []
+source_claims_key_req["discovery_log_record"]["Notes"] = json.dumps(source_claims_key_notes)
+source_claims_key_req["first_party_observation"]["exact_requisition_id"] = "4470047211"
+source_claims_key_req["first_party_observation"]["requisition_evidence"] = (
+    "Official MTA Careers posting displays Job ID 4470047211."
+)
+source_claims_key_outcome = evaluate_first_party_identity_request(source_claims_key_req)
+regression_check(
+    source_claims_key_outcome["outcome"] != "RESOLVED",
+    "MEDIUM (39b): a discovery-platform ID stored as a source_claims mapping KEY (not "
+    f"a value) must remain provenance-only, not RESOLVE: {source_claims_key_outcome!r}",
+)
+print("PASS 39: discovery-platform IDs in redirect wrappers and source_claims keys remain provenance-only (MEDIUM).")
+
+
+# 40. LOW: Slice-1 build_mutation_plan's own returned next_state must match
+# durable rehydration (state_from_ledger_rows) for
+# first_party_eligible_lead_ids / first_party_durable_provenance when it
+# emits an IDENTITY_RESOLUTION/VERIFICATION_REQUIRED row, and chaining
+# first-party resolution directly on that next_state must not be falsely
+# held for "missing" durable provenance that in fact was just established.
+slice1_notes = json.loads(requests[0]["discovery_log_record"]["Notes"])
+slice1_lead = {
+    "discovery_lead_id": slice1_notes["discovery_lead_id"],
+    "source": "GMAIL",
+    "source_message_id": slice1_notes["source_message_id"],
+    "source_thread_id": slice1_notes.get("source_thread_id"),
+    "observed_at": slice1_notes["observed_at"],
+    "discovery_urls": slice1_notes["discovery_urls"],
+    "employer_text": slice1_notes["employer_text"],
+    "role_text": slice1_notes["role_text"],
+    "requisition_text": slice1_notes.get("requisition_text"),
+    "source_claims": slice1_notes["source_claims"],
+    "exact_employer_identity": slice1_notes.get("exact_employer_identity"),
+    "exact_requisition_id": slice1_notes.get("exact_requisition_id"),
+    "identity_resolution_status": "VERIFICATION_REQUIRED",
+}
+slice1_plan = build_mutation_plan(
+    [slice1_lead], None, run_id="FPIR_TEST40_SLICE1", processed_at="2026-09-26T16:05:00-04:00"
+)
+assert_true(
+    len(slice1_plan["log_mutations"]) == 1
+    and slice1_plan["log_mutations"][0]["Stage"] == "IDENTITY_RESOLUTION"
+    and slice1_plan["log_mutations"][0]["Status"] == "VERIFICATION_REQUIRED",
+    "sanity (40): the unresolved Slice-1 lead must produce exactly one durable "
+    "IDENTITY_RESOLUTION/VERIFICATION_REQUIRED LOG row",
+)
+slice1_rehydrated = state_from_ledger_rows(
+    slice1_plan["jobs_mutations"], slice1_plan["log_mutations"]
+)
+regression_check(
+    slice1_plan["next_state"]["first_party_eligible_lead_ids"]
+    == slice1_rehydrated["first_party_eligible_lead_ids"],
+    "LOW (40): build_mutation_plan's own returned next_state must match durable "
+    "rehydration of the LOG row it just emitted for first_party_eligible_lead_ids; got "
+    f"plan={slice1_plan['next_state']['first_party_eligible_lead_ids']!r} vs "
+    f"rehydrated={slice1_rehydrated['first_party_eligible_lead_ids']!r}",
+)
+regression_check(
+    slice1_plan["next_state"]["first_party_durable_provenance"]
+    == slice1_rehydrated["first_party_durable_provenance"],
+    "LOW (40): build_mutation_plan's own returned next_state must match durable "
+    "rehydration of the LOG row it just emitted for first_party_durable_provenance; got "
+    f"plan keys={sorted(slice1_plan['next_state']['first_party_durable_provenance'])!r} vs "
+    f"rehydrated keys={sorted(slice1_rehydrated['first_party_durable_provenance'])!r}",
+)
+
+slice1_chained_request = {
+    "discovery_log_record": requests[0]["discovery_log_record"],
+    "first_party_observation": requests[0]["first_party_observation"],
+}
+slice1_chained_plan = build_first_party_identity_resolution_mutation_plan(
+    [slice1_chained_request],
+    slice1_plan["next_state"],
+    run_id="FPIR_TEST40_CHAINED",
+    processed_at="2026-09-26T16:06:00-04:00",
+)
+regression_check(
+    len(slice1_chained_plan["jobs_mutations"]) == 1
+    and slice1_chained_plan["jobs_mutations"][0]["Job_ID"] == by_id["MTA_17407"]["expected_job_id"],
+    "LOW (40): chaining first-party resolution directly on build_mutation_plan's own "
+    "next_state must not be falsely held for missing durable provenance when that "
+    f"provenance was legitimately just established: {slice1_chained_plan!r}",
+)
+print("PASS 40: build_mutation_plan next_state matches durable rehydration and supports direct chaining (LOW).")
+
+
+if _regression_failures:
+    print(f"REGRESSION FAILURES REPRODUCED (37-40): {len(_regression_failures)}")
+    for _failure_message in _regression_failures:
+        print(f"  - {_failure_message}")
+    raise AssertionError(
+        "regression failures remain in independent-review cases 37-40 "
+        "(see REGRESSION FAILURES above)"
+    )
+print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 REGRESSION CASES 37-40 PASSED.")
