@@ -244,7 +244,7 @@ assert (
     'EXECUTABLE_NOW / RECONSTRUCTION_BACKED_DESIGN_CASE / BLOCKED_CANDIDATE executability'
     not in PROJECT_STATE['next_authorized_action']
 ), 'stale three-class executability summary must not reappear'
-assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-26'
+assert PROJECT_STATE['semantic_state_updated_at'] == '2026-09-27'
 
 # Historical Phase B-H / Recommendation-B detail remains in the durable
 # checkpoint lineage; project_state preserves binding semantic invariants while

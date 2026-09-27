@@ -1,3 +1,15 @@
+# Current State Update — 2026-09-27 Personal V1 Lock
+
+Live canonical Git was independently re-fetched and verified at `9fd9227e2341435358d68725b73fe229d848dc14` (PR #82). Resolver head `37d017df647c0311a1a2dc7cdeaf0b1bcb1438e1` is an ancestor of canonical main and both resolve to tree `7da9116027ffce58010ed34d9e036cf77555f9f0`.
+
+Therefore, older recovery text saying `SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1 = SELECTED_NOT_AUTHORIZED` is historical/superseded, not current routing.
+
+Career OS Personal V1 is now locked as a personal evidence-controlled job-search OS and BUILD → VERIFY → OPERATE case study. Its canonical direction and fresh-session operator path are recorded in `docs/CAREER_OS_PERSONAL_V1_DIRECTION.md` and `docs/CAREER_OS_OPERATOR_V1.md`.
+
+The exact Gold resume DOCX, Gold cover-letter DOCX, and visual-reference PDF were independently found locally on 2026-09-27 and all three SHA-256 values match canonical doctrine. This milestone records those facts only; it does not move or mutate the binaries.
+
+---
+
 # Bora Employer Pipeline OS — Current State
 
 Updated: 2026-09-07 (CAREER_OS_MILESTONE_CONTRACT_AND_STATE_VALIDATION_V1 catch-up)

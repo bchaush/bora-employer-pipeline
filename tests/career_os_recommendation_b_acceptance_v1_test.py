@@ -7,15 +7,15 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-26_FIRST_PARTY_IDENTITY_RESOLUTION_V1_SELECTION"
-assert cp["canonical_basis_sha"]=="cb6ce803aeaca813c0c8556e290c6bb2b0ff099c"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK"
+assert cp["canonical_basis_sha"]=="9fd9227e2341435358d68725b73fe229d848dc14"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="FIRST_PARTY_IDENTITY_RESOLUTION_V1_CONTRACT_SELECTED"
+assert cp["operator_status"]=="PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-24"
 assert cp["slice_1_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["slice_2_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["next_candidate_seam"]["milestone_id"]=="SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1"
-assert cp["next_candidate_seam"]["selection_status"]=="SELECTED_NOT_AUTHORIZED"
+assert cp["next_candidate_seam"]["selection_status"]=="COMPLETED_BY_OPERATOR_BORA_ACCEPTED"
 assert cp["recommendation_b_completion"]["milestone_id"]=="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 assert cp["implementation_authorized"] is False
 assert cp["recommendation_b_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"

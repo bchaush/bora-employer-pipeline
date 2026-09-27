@@ -1,5 +1,15 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-27 — Career OS Personal V1 recovery/operator direction lock
+
+- Independently re-fetched and verified canonical `origin/main = 9fd9227e2341435358d68725b73fe229d848dc14` (PR #82).
+- Verified reviewed resolver head `37d017df647c0311a1a2dc7cdeaf0b1bcb1438e1` is an ancestor of canonical main and reviewed/merge trees both equal `7da9116027ffce58010ed34d9e036cf77555f9f0`.
+- Corrected recovery routing so FIRST_PARTY_IDENTITY_RESOLUTION_V1 is treated as completed/accepted production state rather than `SELECTED_NOT_AUTHORIZED`.
+- Added `docs/CAREER_OS_PERSONAL_V1_DIRECTION.md` and `docs/CAREER_OS_OPERATOR_V1.md`.
+- Recorded independently verified local Gold source hashes; no Gold binary was mutated or reconstructed.
+- Bora explicitly authorized proceeding on 2026-09-27, requested durable logging/fresh-session recoverability, fact-based verified sources only, and conservative Claude usage.
+- No runtime, schema, evidence, claim, resume, prompt, workflow, CI, database, Match Truth, Candidate Truth, or submission-policy change.
+
 ## 2026-09-26 — FIRST_PARTY_IDENTITY_RESOLUTION_V1 production-earned seam selection
 
 - Preserved the first real production evidence: `PROD_20260926_FIRST_REAL_BATCH_001` processed five real third-party nominations into five durable `VERIFICATION_REQUIRED` LOG records, zero JOBS rows, zero PROCESSING_ERROR, and an exact rerun produced zero new mutations.

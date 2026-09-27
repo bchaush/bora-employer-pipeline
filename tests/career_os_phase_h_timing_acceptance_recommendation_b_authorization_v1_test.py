@@ -60,17 +60,17 @@ for forbidden_path in (
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == 'cb6ce803aeaca813c0c8556e290c6bb2b0ff099c'
+assert cp['canonical_basis_sha'] == '9fd9227e2341435358d68725b73fe229d848dc14'
 assert BASELINE_SHA in cp['phase_h_acceptance']['canonical_merge_verification']
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
-assert cp['operator_status'] == 'FIRST_PARTY_IDENTITY_RESOLUTION_V1_CONTRACT_SELECTED'
+assert cp['operator_status'] == 'PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False
 assert cp['slice_1_completion']['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['slice_2_completion']['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['next_candidate_seam']['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1'
-assert cp['next_candidate_seam']['selection_status'] == 'SELECTED_NOT_AUTHORIZED'
+assert cp['next_candidate_seam']['selection_status'] == 'COMPLETED_BY_OPERATOR_BORA_ACCEPTED'
 assert cp['phase_h_acceptance']['phase_id'] == PHASE_H_ID
 assert cp['recommendation_b_completion']['milestone_id'] == REC_B_ID
 
