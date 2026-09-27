@@ -7,10 +7,10 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK"
-assert cp["canonical_basis_sha"]=="9fd9227e2341435358d68725b73fe229d848dc14"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"]=="774d3e26e7b0cc0441dec817b4cc542c7dfe541b"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_AUTHORIZED"
+assert cp["operator_status"]=="PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_CANONICALLY_CLOSED"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-24"
 assert cp["slice_1_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["slice_2_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"

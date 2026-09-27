@@ -1,3 +1,11 @@
+# Current Milestone — Personal V1 Post-Merge Closure (2026-09-27)
+
+PR #83 is canonically merged at `774d3e26e7b0cc0441dec817b4cc542c7dfe541b`. Reviewed head: `065547fe564c84577ba7b7af9fe6b9f5f79b2d82`. Reviewed/merge tree: `7593b70f4cbfa3c485b11fc9f2092f1072b7647d`. Post-merge Assurance run `36340272353`: SUCCESS.
+
+`CAREER_OS_PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_V1` is closed. The next bounded candidate is `CANONICAL_GOLD_SOURCES_V1` — **SELECTED_NOT_AUTHORIZED**. This closure sync creates no Gold-source mutation authority.
+
+---
+
 # Current Milestone — Career OS Personal V1 Recovery + Operator Lock (2026-09-27)
 
 Canonical basis: `9fd9227e2341435358d68725b73fe229d848dc14` (PR #82 merge).
