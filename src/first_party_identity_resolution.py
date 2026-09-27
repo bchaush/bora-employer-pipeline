@@ -341,13 +341,16 @@ def _canonical_http_host(parsed: Any) -> tuple[str | None, int | None]:
     if not hostname:
         return None, port
     try:
-        canonical_host = (
-            unicodedata.normalize("NFKC", unquote(hostname))
-            .rstrip(".")
-            .lower()
-            .encode("idna")
-            .decode("ascii")
-        )
+        decoded_host = unicodedata.normalize("NFKC", unquote(hostname)).lower()
+        # WHATWG domain/host parsing rejects these code points. Percent
+        # decoding must not be allowed to introduce authority delimiters that
+        # then pass through IDNA as if they were ordinary hostname text.
+        if any(
+            ord(char) <= 0x20 or char in '#/:<>?@[\\]^|'
+            for char in decoded_host
+        ):
+            return None, port
+        canonical_host = decoded_host.rstrip(".").encode("idna").decode("ascii")
     except (UnicodeError, ValueError):
         return None, port
     return canonical_host, port

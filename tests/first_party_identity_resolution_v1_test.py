@@ -1700,3 +1700,24 @@ if _review3_failures:
         "(see REVIEW3 REGRESSION FAILURES above)"
     )
 print("ALL FIRST_PARTY_IDENTITY_RESOLUTION_V1 REGRESSION CASES 47-49 PASSED.")
+
+# 50. MEDIUM: percent-decoding/NFKC of a hostname must never introduce
+# forbidden authority delimiters that are then accepted as a usable host.
+# These malformed discovery-platform-shaped authorities must fail closed.
+for malformed_host_url in (
+    "https://linkedin%2fcom/jobs/view/123",
+    "https://linkedin%5c.com/jobs/view/123",
+):
+    case50 = copy.deepcopy(requests[0])
+    case50["first_party_observation"]["official_url"] = malformed_host_url
+    case50["first_party_observation"]["exact_requisition_id"] = "123"
+    case50["first_party_observation"]["requisition_evidence"] = (
+        "Official posting displays Job ID 123."
+    )
+    case50_outcome = evaluate_first_party_identity_request(case50)
+    assert_true(
+        case50_outcome["outcome"] != "RESOLVED",
+        "MEDIUM 50: percent-decoded host delimiter produced an accepted authoritative "
+        f"host instead of failing closed: {malformed_host_url!r} -> {case50_outcome!r}",
+    )
+print("PASS 50: percent-encoded authority delimiters fail closed during canonical host validation.")
