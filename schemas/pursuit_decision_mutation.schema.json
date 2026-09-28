@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/pursuit_decision_mutation.schema.json",
+  "title": "Career OS Pursuit Decision Mutation Plan",
+  "description": "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1. Deterministic JOBS + LOG mutation plan produced by pursuit_decision.py. JOBS mutations may set only Bora_Decision (a display-only projection, never an authorization surface). LOG mutations are PURSUIT_DECISION rows only. Empty arrays represent an idempotent replay. Contains no provider credentials or spreadsheet identifiers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["jobs_mutations", "log_mutations"],
+  "properties": {
+    "jobs_mutations": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["Op", "Job_ID", "Bora_Decision"],
+        "properties": {
+          "Op": { "type": "string", "const": "UPDATE" },
+          "Job_ID": { "type": "string", "minLength": 1 },
+          "Bora_Decision": { "type": "string", "enum": ["PURSUE", "WATCH", "REJECT"] }
+        }
+      }
+    },
+    "log_mutations": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Run_ID",
+          "Timestamp",
+          "Stage",
+          "Source",
+          "Job_ID",
+          "Status",
+          "Error_Code",
+          "Engine_Baseline",
+          "Notes"
+        ],
+        "properties": {
+          "Run_ID": { "type": "string", "minLength": 1 },
+          "Timestamp": { "type": "string", "format": "date-time" },
+          "Stage": { "type": "string", "const": "PURSUIT_DECISION" },
+          "Source": { "type": "string", "const": "BORA" },
+          "Job_ID": { "type": "string", "minLength": 1 },
+          "Status": { "type": "string", "const": "NORMALIZED" },
+          "Error_Code": { "type": "null" },
+          "Engine_Baseline": { "type": "string", "const": "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1" },
+          "Notes": { "type": "string", "minLength": 2 }
+        }
+      }
+    }
+  }
+}

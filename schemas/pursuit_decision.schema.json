@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/pursuit_decision.schema.json",
+  "title": "Career OS Pursuit Decision Event",
+  "description": "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1. One append-only human (Bora) PURSUE/WATCH/REJECT decision event: the canonical Notes payload of a PURSUIT_DECISION LOG row. Pursuit Truth only -- never Match Truth, Application Truth, package authorization, or submission authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "Job_ID",
+    "decision",
+    "decided_at",
+    "decided_by",
+    "decision_run_id",
+    "reason_note",
+    "reviewed_context_fingerprint",
+    "decision_context_fingerprint",
+    "event_id",
+    "supersedes_event_id"
+  ],
+  "properties": {
+    "Job_ID": { "type": "string", "minLength": 1 },
+    "decision": { "type": "string", "enum": ["PURSUE", "WATCH", "REJECT"] },
+    "decided_at": { "type": "string", "format": "date-time" },
+    "decided_by": { "type": "string", "const": "BORA" },
+    "decision_run_id": { "type": "string", "minLength": 1 },
+    "reason_note": { "type": ["string", "null"] },
+    "reviewed_context_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "decision_context_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "event_id": { "type": "string", "pattern": "^PDE_V1::[0-9a-f]{64}$" },
+    "supersedes_event_id": {
+      "type": ["string", "null"],
+      "pattern": "^PDE_V1::[0-9a-f]{64}$"
+    }
+  }
+}
