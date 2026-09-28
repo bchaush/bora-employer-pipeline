@@ -1,5 +1,14 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-27 — CANONICAL_GOLD_SOURCES_V1 PR #85 canonical closure
+
+- Merged reviewed Gold-source candidate head `82b3cda83bb5750602f87d2f154e9c9273fdd7f2` as PR #85 at canonical main `a7f94f23f0ac446077a175cab510349bd414cd6b`.
+- Verified reviewed tree equals merge tree `91394343138122020b7c165e55c5fd57fff0bc63`.
+- PR-head Assurance run `36364109816` SUCCESS; post-merge push Assurance run `36364205076` SUCCESS.
+- Closed `CANONICAL_GOLD_SOURCES_V1` canonically; exact private Drive Gold binaries remain filename/byte-size/SHA-256 verified and no private binary entered Git.
+- Routed the next candidate to `MANUAL_DISCOVERY_V1` as `SELECTED_NOT_AUTHORIZED`; no implementation starts in this closure.
+- Preserved PURSUE, current-role first-party actionability, Requirement/EvidenceMatch crosswalk, package QA, Bora review, and manual SUBMIT gates.
+
 ## 2026-09-27 — CANONICAL_GOLD_SOURCES_V1 Drive-verified completion candidate
 
 - Bora explicitly authorized the bounded Gold-source canonicalization milestone.

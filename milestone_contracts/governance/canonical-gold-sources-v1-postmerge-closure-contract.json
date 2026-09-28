@@ -1,0 +1,51 @@
+{
+    "milestone_id":  "CANONICAL_GOLD_SOURCES_V1_POSTMERGE_CLOSURE",
+    "kind":  "GOVERNANCE_CONTINUITY_CLOSURE",
+    "baseline_sha":  "a7f94f23f0ac446077a175cab510349bd414cd6b",
+    "goal":  "Replace pre-merge completion-ready routing with truthful post-merge canonical closure and route MANUAL_DISCOVERY_V1 as the next selected-not-authorized candidate.",
+    "allowed_repo_paths":  [
+                               "CHANGELOG.md",
+                               "CURRENT_EXECUTION_CHECKPOINT.json",
+                               "CURRENT_MILESTONE.md",
+                               "CURRENT_STATE.md",
+                               "project_state.json",
+                               "docs/gold/CANONICAL_GOLD_SOURCES_V1.json",
+                               "milestone_contracts/governance/canonical-gold-sources-v1-postmerge-closure-contract.json",
+                               "tests/career_os_execution_checkpoint_v1_test.py",
+                               "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+                               "tests/career_os_recommendation_b_acceptance_v1_test.py",
+                               "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+                               "tests/career_os_supervised_production_v1_continuity_sync_test.py"
+                           ],
+    "forbidden_repo_paths":  [
+                                 "src/**",
+                                 "schemas/**",
+                                 "resume/**",
+                                 "prompts/**",
+                                 ".github/**",
+                                 "evidence/**",
+                                 "claims/**"
+                             ],
+    "required_evidence":  {
+                              "pr":  85,
+                              "reviewed_head_sha":  "82b3cda83bb5750602f87d2f154e9c9273fdd7f2",
+                              "canonical_merge_sha":  "a7f94f23f0ac446077a175cab510349bd414cd6b",
+                              "reviewed_tree":  "91394343138122020b7c165e55c5fd57fff0bc63",
+                              "merge_tree":  "91394343138122020b7c165e55c5fd57fff0bc63",
+                              "pr_assurance_run":  "36364109816",
+                              "post_merge_assurance_run":  "36364205076"
+                          },
+    "next_candidate":  {
+                           "milestone_id":  "MANUAL_DISCOVERY_V1",
+                           "selection_status":  "SELECTED_NOT_AUTHORIZED",
+                           "implementation_authorized":  false
+                       },
+    "hard_stops":  [
+                       "Do not modify runtime/product implementation.",
+                       "Do not start MANUAL_DISCOVERY_V1 implementation.",
+                       "Do not weaken PURSUE, current-role first-party actionability, Requirement/EvidenceMatch crosswalk, package QA, Bora review, or manual SUBMIT gates.",
+                       "Do not reconstruct or commit private Gold binaries."
+                   ],
+    "review_requirements":  "Bora explicitly authorized a fresh one-task Claude read-only reviewer exception for this exact post-merge closure candidate after Cursor was attempted and blocked by quota. The prior pre-merge Claude exception remains exhausted and is not reused. This exception is scoped only to the exact frozen post-merge closure candidate and does not create standing Claude review authority.",
+    "implementation_authorized":  false
+}

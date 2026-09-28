@@ -1,6 +1,6 @@
 {
   "manifest_id": "CANONICAL_GOLD_SOURCES_V1",
-  "status": "DRIVE_VERIFIED_COMPLETION_READY",
+  "status": "CANONICALLY_CLOSED",
   "recorded_at": "2026-09-27",
   "canonical_drive": {
     "career_os_folder_id": "1iHP8Y_s_i2Z-3lsCDZyCMpSZQgMkpGlT",
@@ -48,5 +48,15 @@
     "drive_retrieval_verified": true,
     "verification_result": "All three authenticated Drive downloads independently matched canonical filenames, byte sizes, and SHA-256 values."
   },
-  "package_permission": "GOLD_SOURCE_AVAILABILITY_UNBLOCKED_NORMAL_PURSUIT_AND_PACKAGE_GATES_STILL_REQUIRED"
+  "package_permission": "GOLD_SOURCE_AVAILABILITY_UNBLOCKED_NORMAL_PURSUIT_AND_PACKAGE_GATES_STILL_REQUIRED",
+  "canonical_closure": {
+    "pull_request": 85,
+    "reviewed_head_sha": "82b3cda83bb5750602f87d2f154e9c9273fdd7f2",
+    "canonical_merge_sha": "a7f94f23f0ac446077a175cab510349bd414cd6b",
+    "reviewed_tree": "91394343138122020b7c165e55c5fd57fff0bc63",
+    "merge_tree": "91394343138122020b7c165e55c5fd57fff0bc63",
+    "pr_assurance_run": "36364109816",
+    "post_merge_assurance_run": "36364205076",
+    "independent_review": "CLAUDE_SAFE_FINDINGS_EMPTY_BORA_ONE_TASK_EXCEPTION"
+  }
 }

@@ -1,16 +1,14 @@
-# Current Milestone — CANONICAL_GOLD_SOURCES_V1 (2026-09-27)
+# Current Milestone — CANONICAL_GOLD_SOURCES_V1 Canonical Closure (2026-09-27)
 
-Status: **DRIVE_VERIFIED / COMPLETION_READY**.
+Status: CLOSED / CANONICAL PR #85.
 
-Authorized scope: make the already verified Gold source binaries canonically retrievable without reconstruction or package-runtime redesign.
+Canonical merge: a7f94f23f0ac446077a175cab510349bd414cd6b. Reviewed head: 82b3cda83bb5750602f87d2f154e9c9273fdd7f2. Reviewed/merge tree: 91394343138122020b7c165e55c5fd57fff0bc63. PR-head Assurance run 36364109816: SUCCESS. Post-merge push Assurance run 36364205076: SUCCESS.
 
-Verified now:
-- exact canonical Gold résumé DOCX, cover-letter DOCX, and visual-reference PDF are stored in private `Career OS / Gold References`;
-- authenticated Drive retrieval independently matches all three canonical filenames, byte sizes, and SHA-256 values;
-- Drive reports all three files as `shared=false`;
-- stable Drive file IDs/URLs are recorded in `docs/gold/CANONICAL_GOLD_SOURCES_V1.json`.
+The exact private Gold résumé DOCX, cover-letter DOCX, and visual-reference PDF remain authenticated-Drive-retrievable and hash-verified. TRANSPORT_BLOCKED is resolved; no Gold binary was reconstructed or committed to Git.
 
-The prior `TRANSPORT_BLOCKED` condition is resolved. Gold-source availability is unblocked only; all normal current-role PURSUE, first-party actionability, requirement-crosswalk, package QA, and SUBMIT gates remain unchanged. No Gold binary was reconstructed or committed to Git.
+Next candidate: MANUAL_DISCOVERY_V1 — SELECTED_NOT_AUTHORIZED. This closure does not authorize implementation. Its future purpose is URL/screenshot nomination into the same lawful DiscoveryLead downstream contract, existing identity resolver, existing gates, and existing Match Truth. No parallel manual mode and no second identity architecture.
+
+All current-role PURSUE, first-party actionability, Requirement/EvidenceMatch crosswalk, package QA, Bora review, and manual SUBMIT gates remain unchanged.
 
 ---
 # Current Milestone — Personal V1 Post-Merge Closure (2026-09-27)
