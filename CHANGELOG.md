@@ -1,5 +1,14 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-09-27 — CANONICAL_GOLD_SOURCES_V1 Drive-verified completion candidate
+
+- Bora explicitly authorized the bounded Gold-source canonicalization milestone.
+- Re-verified all three exact canonical Gold binaries through authenticated Drive retrieval.
+- Independently confirmed exact byte sizes and SHA-256 values for the résumé DOCX (`26183`), cover-letter DOCX (`36564`), and cover-letter visual-reference PDF (`71216`).
+- Recorded stable Drive file IDs/URLs in `docs/gold/CANONICAL_GOLD_SOURCES_V1.json`; Drive reports each file as `shared=false`.
+- Cleared the stale `TRANSPORT_BLOCKED` condition and marked the milestone `DRIVE_VERIFIED / COMPLETION_READY`.
+- Gold-source availability is unblocked only; all normal PURSUE/current-role/crosswalk/package-QA/SUBMIT gates remain unchanged. No reconstruction, conversion, package-runtime change, or binary repo commit occurred.
+
 ## 2026-09-27 — Career OS Personal V1 PR #83 canonical closure
 
 - Verified PR #83 merged reviewed head `065547fe564c84577ba7b7af9fe6b9f5f79b2d82` to canonical main `774d3e26e7b0cc0441dec817b4cc542c7dfe541b`.
