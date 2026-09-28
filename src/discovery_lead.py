@@ -36,7 +36,7 @@ from schema_validation import build_draft202012_validator  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 DISCOVERY_LEAD_SCHEMA_PATH = ROOT / "schemas" / "discovery_lead.schema.json"
 
-SUPPORTED_SOURCES = frozenset({"GMAIL"})
+SUPPORTED_SOURCES = frozenset({"GMAIL", "MANUAL_URL", "MANUAL_SCREENSHOT"})
 
 
 class MalformedMessageError(ValueError):

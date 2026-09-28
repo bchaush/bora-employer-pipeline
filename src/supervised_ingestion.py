@@ -22,7 +22,7 @@ SRC_PATH = Path(__file__).resolve().parent
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
-from discovery_lead import MalformedMessageError, extract_discovery_leads  # noqa: E402
+from discovery_lead import MalformedMessageError, SUPPORTED_SOURCES, extract_discovery_leads  # noqa: E402
 from production_ledger import build_mutation_plan, empty_state  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,7 +71,7 @@ def process_batch(
             all_leads.append(
                 {
                     "discovery_lead_id": _malformed_message_lead_id(raw_message),
-                    "source": source if source in ("GMAIL",) else "GMAIL",
+                    "source": source if source in SUPPORTED_SOURCES else "GMAIL",
                     "source_message_id": (
                         raw_message.get("source_message_id")
                         if isinstance(raw_message, Mapping)
