@@ -8,10 +8,10 @@ RID="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 cp=json.loads((ROOT/"CURRENT_EXECUTION_CHECKPOINT.json").read_text(encoding="utf-8"))
 ps=json.loads((ROOT/"project_state.json").read_text(encoding="utf-8"))
 contract=json.loads((ROOT/"milestone_contracts/governance/career-os-recommendation-b-completion-v1.json").read_text(encoding="utf-8"))
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_CANONICAL_GOLD_SOURCES_V1_DRIVE_VERIFIED_COMPLETION_READY"
-assert cp["canonical_basis_sha"]=="5b3ce065367e2ca048bbd67892ab30d75022ab18"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_CANONICAL_GOLD_SOURCES_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"]=="a7f94f23f0ac446077a175cab510349bd414cd6b"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="CANONICAL_GOLD_SOURCES_V1_DRIVE_VERIFIED_COMPLETION_READY"
+assert cp["operator_status"]=="CANONICAL_GOLD_SOURCES_V1_CANONICALLY_CLOSED"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["accepted_at"]=="2026-09-24"
 assert cp["recommendation_b_completion"]["milestone_id"]==RID
@@ -66,7 +66,8 @@ current_action=action.split(" HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHO
 assert not current_action.rstrip().endswith((", and", " and", ",", "-"))
 assert "Global implementation_authorized remains false" in current_action
 assert "CANONICAL_GOLD_SOURCES_V1" in current_action
-assert "SELECTED_NOT_AUTHORIZED" not in current_action
+assert "MANUAL_DISCOVERY_V1" in current_action
+assert "SELECTED_NOT_AUTHORIZED" in current_action
 assert "Runtime implementation remains unauthorized by this closure sync" in current_action
 assert "first_point_of_divergence = A and first_causal_failure_point = B at two different points in the same run" in action
 assert "2026-09-27 — Career OS Personal V1 recovery/operator direction lock" in changelog

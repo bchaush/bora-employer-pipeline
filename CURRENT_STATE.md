@@ -1,10 +1,10 @@
-# Current State Update — CANONICAL_GOLD_SOURCES_V1 Drive Verification (2026-09-27)
+# Current State Update — CANONICAL_GOLD_SOURCES_V1 Canonically Closed (2026-09-27)
 
-The canonical private Drive destination exists at `Career OS / Gold References`. All three exact Gold binaries were authenticated-retrieved from Drive and independently matched their canonical filenames, byte sizes, and SHA-256 values. Drive reports each file as `shared=false`.
+PR #85 is canonically merged at a7f94f23f0ac446077a175cab510349bd414cd6b. Reviewed head 82b3cda83bb5750602f87d2f154e9c9273fdd7f2 is a merge parent/ancestor, reviewed tree equals merge tree 91394343138122020b7c165e55c5fd57fff0bc63, PR-head Assurance run 36364109816 succeeded, and post-merge push Assurance run 36364205076 succeeded.
 
-`CANONICAL_GOLD_SOURCES_V1` is now **DRIVE_VERIFIED / COMPLETION_READY**. The prior `TRANSPORT_BLOCKED` condition is resolved.
+CANONICAL_GOLD_SOURCES_V1 is CANONICALLY_CLOSED. The exact private Gold binaries remain authenticated-Drive-retrievable and independently hash-verified; the prior TRANSPORT_BLOCKED condition is resolved.
 
-Gold-source availability is therefore unblocked, but this does not authorize package generation by itself: current-role PURSUE, first-party actionability, requirement-crosswalk, package QA, and SUBMIT gates remain unchanged. Reconstruction, conversion, resaving, substitution, or Git-committing the private Gold binaries remains prohibited.
+Next candidate: MANUAL_DISCOVERY_V1 — SELECTED_NOT_AUTHORIZED. It has not started and this closure grants no implementation authority. Gold-source availability does not bypass PURSUE, current-role first-party actionability, Requirement/EvidenceMatch crosswalk, package QA, Bora review, or manual SUBMIT.
 
 ---
 # Current State Update — PR #83 Canonical Closure (2026-09-27)
@@ -2307,4 +2307,3 @@ Ingest MarketMind AI as an evidence-controlled project using only facts supporte
 **Status**
 
 `MARKETMIND_EVIDENCE_EXTRACTION_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW` (superseded by closure entry above)
-
