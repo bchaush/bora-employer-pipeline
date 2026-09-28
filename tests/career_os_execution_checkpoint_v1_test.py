@@ -25,12 +25,13 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-27_CANONICAL_GOLD_SOURCES_V1_POSTMERGE_CLOSURE'
-assert cp['canonical_basis_sha'] == 'a7f94f23f0ac446077a175cab510349bd414cd6b'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE'
+assert cp['canonical_basis_sha'] == '4380edad4399279b250eac7b18b704be3d7b0e03'
+assert cp['recorded_at'] == '2026-09-28'
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
 assert cp['authorization_status'] == 'BORA_ACCEPTED'
 assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
-assert cp['operator_status'] == 'CANONICAL_GOLD_SOURCES_V1_CANONICALLY_CLOSED'
+assert cp['operator_status'] == 'MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False
@@ -57,6 +58,19 @@ assert cp['next_candidate_seam']['milestone_id'] == 'SUPERVISED_PRODUCTION_V1_FI
 assert cp['next_candidate_seam']['selection_status'] == 'COMPLETED_BY_OPERATOR_BORA_ACCEPTED'
 assert cp['next_candidate_seam']['implementation_authorized'] is False
 assert cp['next_candidate_seam']['contract_path'] == 'milestone_contracts/governance/supervised-production-v1-first-party-identity-resolution-v1-contract.json'
+
+manual = cp['manual_discovery_v1_completion']
+assert manual['milestone_id'] == 'MANUAL_DISCOVERY_V1'
+assert manual['operator_status'] == 'CANONICALLY_IMPLEMENTED'
+assert manual['closure_status'] == 'CLOSED_PR_88'
+assert manual['pr_number'] == 88
+assert manual['reviewed_head_sha'] == 'ea2e18e66eb3f4f911388b285e20a9d9fb10930f'
+assert manual['canonical_merge_sha'] == '4380edad4399279b250eac7b18b704be3d7b0e03'
+assert manual['reviewed_tree_sha'] == manual['merge_tree_sha'] == '80bdaf6db71e621a8b0120b2eced6ae6b4c7a279'
+assert manual['post_merge_assurance'] == 'RUN_36377625749_SUCCESS'
+assert manual['implementation_authority_status'] == 'EXHAUSTED_BY_COMPLETION'
+assert manual['next_operating_action'] == 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY'
+assert manual['successor_product_milestone_authorized'] is False
 
 phase_h = cp['phase_h_acceptance']
 assert phase_h['phase_id'] == 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1'
@@ -113,12 +127,14 @@ assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allow
 current_next_action = cp['exact_next_allowed_action'].split(
     ' HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:', 1
 )[0]
-assert 'CANONICAL_GOLD_SOURCES_V1 is canonically closed' in current_next_action
-assert 'MANUAL_DISCOVERY_V1' in current_next_action
-assert 'SELECTED_NOT_AUTHORIZED' in current_next_action
-assert 'separately gives explicit authorization' in current_next_action
-assert 'Perform a byte-preserving copy/upload' not in current_next_action
-assert 'Only after all three verify may the milestone close' not in current_next_action
+assert 'MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88' in current_next_action
+assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in current_next_action
+assert 'SELECTED_NOT_AUTHORIZED' not in current_next_action
+assert 'Do not launch another product milestone from this closure' in current_next_action
+assert 'durable PURSUE/WATCH/REJECT persistence' in current_next_action
+assert 'Gold package generation' in current_next_action
+assert 'scheduled Gmail' in current_next_action
+assert 'automatic submission' in current_next_action
 
 # terminal_adjudication must reflect the prior GOVERNING policy, Phase D/E/F/G's
 # preserved acceptance, AND Phase H's acceptance plus Recommendation B's scoped
@@ -272,20 +288,25 @@ phase_g_acceptance_reference = ' '.join(cp['phase_g_acceptance_phase_h_authoriza
 assert 'beautiful work G once u cehck everything being up to standart' in phase_g_acceptance_reference
 
 assert PROJECT_STATE['current_phase'].startswith('SUPERVISED_PRODUCTION_V1')
-assert 'CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1' in PROJECT_STATE['current_phase']
-assert 'SLICE_1_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
-assert 'SUPERVISED_PRODUCTION_V1_SLICE_2_GATES_MATCH_TRUTH_TO_SHEET' in PROJECT_STATE['current_phase']
-assert 'SLICE_2_COMPLETED_BY_OPERATOR_BORA_ACCEPTED' in PROJECT_STATE['current_phase']
-assert 'NEXT_CANDIDATE_SEAM SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1 SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['current_phase']
-assert 'SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1' in PROJECT_STATE['next_authorized_action']
-assert 'SELECTED_NOT_AUTHORIZED' in PROJECT_STATE['next_authorized_action']
+current_phase = PROJECT_STATE['current_phase'].split(
+    ' -- HISTORICAL_SUPERSEDED_ROUTING:', 1
+)[0]
+assert 'MANUAL_DISCOVERY_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR88' in current_phase
+assert 'NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in current_phase
+assert 'NO_SUCCESSOR_PRODUCT_MILESTONE_AUTHORIZED' in current_phase
+assert 'SELECTED_NOT_AUTHORIZED' not in current_phase
+
+assert PROJECT_STATE['latest_closed_milestone_id'] == 'MANUAL_DISCOVERY_V1'
+assert PROJECT_STATE['latest_closed_milestone_pr'] == 88
 assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
 current_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[0]
+assert 'MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88' in current_action
+assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in current_action
+assert 'No successor product milestone is selected or authorized by this closure' in current_action
+assert 'SELECTED_NOT_AUTHORIZED' not in current_action
 assert 'Recommendation C remains NOT_AUTHORIZED' in current_action
 assert 'Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED' in current_action
-assert 'Runtime implementation remains unauthorized' in current_action
 assert 'OPERATE FIRST / BUILD SECOND' not in current_action
-assert 'No new engineering milestone is selected or authorized' not in current_action
 historical_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[1]
 assert 'OPERATE FIRST / BUILD SECOND' in historical_action
 assert 'No new engineering milestone is selected or authorized' in historical_action

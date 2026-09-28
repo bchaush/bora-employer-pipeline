@@ -1,3 +1,21 @@
+# Current State Update — MANUAL_DISCOVERY_V1 Canonically Implemented / Closed PR #88 (2026-09-28)
+
+Verified canonical main: `4380edad4399279b250eac7b18b704be3d7b0e03`.
+
+PR #88 reviewed head: `ea2e18e66eb3f4f911388b285e20a9d9fb10930f`.
+
+Reviewed tree and merge tree: `80bdaf6db71e621a8b0120b2eced6ae6b4c7a279`.
+
+Post-merge Assurance run `36377625749`: SUCCESS.
+
+`MANUAL_DISCOVERY_V1` is now **CANONICALLY_IMPLEMENTED / CLOSED_PR_88**. Historical pre-PR88 status text below is superseded audit history, not current routing.
+
+Next operating action: **DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY**.
+
+No successor product milestone is selected or authorized by this continuity closure. Durable `PURSUE / WATCH / REJECT`, Gold package generation, exact application-history expansion, UI, scheduled Gmail, and automatic submission remain outside this closure. Permanent `PURSUE`, Bora review, and manual `SUBMIT` gates remain unchanged.
+
+---
+
 # Current State Update — CANONICAL_GOLD_SOURCES_V1 Canonically Closed (2026-09-27)
 
 PR #85 is canonically merged at a7f94f23f0ac446077a175cab510349bd414cd6b. Reviewed head 82b3cda83bb5750602f87d2f154e9c9273fdd7f2 is a merge parent/ancestor, reviewed tree equals merge tree 91394343138122020b7c165e55c5fd57fff0bc63, PR-head Assurance run 36364109816 succeeded, and post-merge push Assurance run 36364205076 succeeded.

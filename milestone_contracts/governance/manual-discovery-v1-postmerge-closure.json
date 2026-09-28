@@ -1,0 +1,62 @@
+{
+  "milestone_id": "MANUAL_DISCOVERY_V1_POSTMERGE_CONTINUITY_CLOSURE",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Synchronize canonical recovery/routing surfaces with the already-merged MANUAL_DISCOVERY_V1 implementation from PR #88, preserve superseded SELECTED_NOT_AUTHORIZED text only as historical audit evidence, and route the next operating action to real-job Manual Discovery dogfooding without authorizing any successor product milestone.",
+  "baseline_sha": "4380edad4399279b250eac7b18b704be3d7b0e03",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "milestone_contracts/governance/manual-discovery-v1-postmerge-closure.json",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "schemas/**",
+    "docs/**",
+    "golden-tests/**",
+    "resume/**",
+    "prompts/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    ".github/**"
+  ],
+  "required_tests": [
+    "python tests/career_os_execution_checkpoint_v1_test.py",
+    "python tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "python tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "python tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "python tests/career_os_recommendation_b_operator_completion_v1_test.py"
+  ],
+  "acceptance_conditions": [
+    "PR #88 is recorded as canonically merged at 4380edad4399279b250eac7b18b704be3d7b0e03.",
+    "PR #88 reviewed head is recorded as ea2e18e66eb3f4f911388b285e20a9d9fb10930f.",
+    "Reviewed-head tree and merge tree are recorded as equal to 80bdaf6db71e621a8b0120b2eced6ae6b4c7a279.",
+    "Post-merge Assurance run 36377625749 is recorded as SUCCESS on the exact canonical merge.",
+    "Current recovery routing records MANUAL_DISCOVERY_V1 as CANONICALLY_IMPLEMENTED / CLOSED_PR_88 rather than SELECTED_NOT_AUTHORIZED.",
+    "Historical SELECTED_NOT_AUTHORIZED statements remain preserved where they are explicitly historical or superseded audit evidence.",
+    "The next operating action is DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY.",
+    "No successor product milestone is selected or authorized by this closure.",
+    "Permanent PURSUE, Bora review, and manual SUBMIT gates remain unchanged.",
+    "No runtime, schema, Gold, package, identity, Gmail, UI, CI, or submission implementation changes.",
+    "git diff --check passes.",
+    "Focused continuity regressions pass.",
+    "Canonical full Assurance passes on the exact frozen candidate."
+  ],
+  "stop_conditions": [
+    "Any PR #88 merge, parent, tree, or Assurance fact cannot be re-verified.",
+    "The closure requires modifying any runtime, product, or schema path.",
+    "The closure would authorize durable PURSUE/WATCH/REJECT persistence, Gold package generation, application-history expansion, UI, scheduled Gmail, automatic submission, or another successor product milestone.",
+    "Historical audit evidence would need to be rewritten rather than clearly superseded by current routing.",
+    "Focused validation or canonical Assurance regresses."
+  ],
+  "review_requirements": "Normal independent reviewer discipline remains unchanged. Freeze an exact candidate fingerprint first. Cursor is the normal reviewer when available. No prior Claude authorization carries forward; if Cursor is unavailable, stop before promotion unless Bora grants a fresh exact-task/fingerprint-scoped exception.",
+  "human_approval_requirements": "Bora authorized this narrow governance/state continuity closure only. It records already-verified canonical PR #88 facts and grants no successor product/runtime authority. Promotion must follow the established exact-byte review and release discipline."
+}
