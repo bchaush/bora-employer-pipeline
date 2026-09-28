@@ -1,3 +1,21 @@
+# Current Milestone — MANUAL_DISCOVERY_V1 Post-Merge Continuity Closure (2026-09-28)
+
+PR #88 is canonically merged at `4380edad4399279b250eac7b18b704be3d7b0e03`.
+
+Reviewed head: `ea2e18e66eb3f4f911388b285e20a9d9fb10930f`.
+
+Reviewed / merge tree: `80bdaf6db71e621a8b0120b2eced6ae6b4c7a279`.
+
+Post-merge Assurance run `36377625749`: SUCCESS.
+
+`MANUAL_DISCOVERY_V1` is **CANONICALLY_IMPLEMENTED / CLOSED_PR_88**.
+
+Next operating action: **DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY**.
+
+No successor product milestone is selected or authorized by this continuity closure. No runtime, schema, Gold, package, identity, Gmail, UI, CI, or submission implementation is authorized here. Historical pre-PR88 routing text below remains preserved solely as superseded audit history.
+
+---
+
 # Current Milestone — CANONICAL_GOLD_SOURCES_V1 Canonical Closure (2026-09-27)
 
 Status: CLOSED / CANONICAL PR #85.

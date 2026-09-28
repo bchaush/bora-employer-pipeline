@@ -7,10 +7,10 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-27_CANONICAL_GOLD_SOURCES_V1_POSTMERGE_CLOSURE"
-assert cp["canonical_basis_sha"]=="a7f94f23f0ac446077a175cab510349bd414cd6b"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"]=="4380edad4399279b250eac7b18b704be3d7b0e03"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="CANONICAL_GOLD_SOURCES_V1_CANONICALLY_CLOSED"
+assert cp["operator_status"]=="MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-24"
 assert cp["slice_1_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["slice_2_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"

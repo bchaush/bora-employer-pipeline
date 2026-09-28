@@ -56,11 +56,11 @@ assert s1["github_assurance"] == "RUN_151_SUCCESS"
 assert s1["independent_review"] == "SAFE"
 assert s1["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
 
-# Slice 2 is now the current completed canonical seam.
-assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-27_CANONICAL_GOLD_SOURCES_V1_POSTMERGE_CLOSURE"
-assert cp["canonical_basis_sha"] == "a7f94f23f0ac446077a175cab510349bd414cd6b"
-assert cp["recorded_at"] == "2026-09-27"
-assert cp["operator_status"] == "CANONICAL_GOLD_SOURCES_V1_CANONICALLY_CLOSED"
+# Manual Discovery V1 is now the latest completed canonical seam.
+assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"] == "4380edad4399279b250eac7b18b704be3d7b0e03"
+assert cp["recorded_at"] == "2026-09-28"
+assert cp["operator_status"] == "MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88"
 s2 = cp["slice_2_completion"]
 assert s2["milestone_id"] == SLICE2
 assert s2["operator_status"] == "COMPLETED_BY_OPERATOR"
@@ -82,31 +82,59 @@ assert next_seam["milestone_id"] == "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTI
 assert next_seam["selection_status"] == "COMPLETED_BY_OPERATOR_BORA_ACCEPTED"
 assert next_seam["implementation_authorized"] is False
 assert next_seam["contract_path"] == "milestone_contracts/governance/supervised-production-v1-first-party-identity-resolution-v1-contract.json"
-assert "NEXT_CANDIDATE_SEAM SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1 SELECTED_NOT_AUTHORIZED" in ps["current_phase"]
-assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in ps["next_authorized_action"]
-assert "SELECTED_NOT_AUTHORIZED" in ps["next_authorized_action"]
+
+manual = cp["manual_discovery_v1_completion"]
+assert manual["milestone_id"] == "MANUAL_DISCOVERY_V1"
+assert manual["operator_status"] == "CANONICALLY_IMPLEMENTED"
+assert manual["closure_status"] == "CLOSED_PR_88"
+assert manual["pr_number"] == 88
+assert manual["reviewed_head_sha"] == "ea2e18e66eb3f4f911388b285e20a9d9fb10930f"
+assert manual["canonical_merge_sha"] == "4380edad4399279b250eac7b18b704be3d7b0e03"
+assert manual["reviewed_tree_sha"] == manual["merge_tree_sha"] == "80bdaf6db71e621a8b0120b2eced6ae6b4c7a279"
+assert manual["post_merge_assurance"] == "RUN_36377625749_SUCCESS"
+assert manual["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
+assert manual["next_operating_action"] == "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY"
+assert manual["successor_product_milestone_authorized"] is False
+current_phase = ps["current_phase"].split(
+    " -- HISTORICAL_SUPERSEDED_ROUTING:", 1
+)[0]
+assert "MANUAL_DISCOVERY_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR88" in current_phase
+assert "NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_phase
+assert "NO_SUCCESSOR_PRODUCT_MILESTONE_AUTHORIZED" in current_phase
+assert "SELECTED_NOT_AUTHORIZED" not in current_phase
+assert ps["latest_closed_milestone_id"] == "MANUAL_DISCOVERY_V1"
+assert ps["latest_closed_milestone_pr"] == 88
 assert "Global implementation_authorized remains false" in ps["next_authorized_action"]
 checkpoint_action_parts = cp["exact_next_allowed_action"].split(
     " HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:", 1
 )
 assert len(checkpoint_action_parts) == 2
 current_checkpoint_action, historical_checkpoint_action = checkpoint_action_parts
-assert "CANONICAL_GOLD_SOURCES_V1 is canonically closed" in current_checkpoint_action
-assert "MANUAL_DISCOVERY_V1" in current_checkpoint_action
-assert "SELECTED_NOT_AUTHORIZED" in current_checkpoint_action
-assert "separately gives explicit authorization" in current_checkpoint_action
-assert "Perform a byte-preserving copy/upload" not in current_checkpoint_action
-assert "Only after all three verify may the milestone close" not in current_checkpoint_action
+assert "MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88" in current_checkpoint_action
+assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_checkpoint_action
+assert "SELECTED_NOT_AUTHORIZED" not in current_checkpoint_action
+assert "Do not launch another product milestone from this closure" in current_checkpoint_action
+assert "durable PURSUE/WATCH/REJECT persistence" in current_checkpoint_action
+assert "Gold package generation" in current_checkpoint_action
+assert "scheduled Gmail" in current_checkpoint_action
+assert "automatic submission" in current_checkpoint_action
 assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in historical_checkpoint_action
 assert "Historical Recommendation-B implementation authority was SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL and is exhausted/closed; never a blanket/global implementation grant." in historical_checkpoint_action
 assert " ? " not in cp["exact_next_allowed_action"]
 assert " ? " not in cp["continuity_rule"]
 
-# Human-readable recovery pointers agree with the machine-readable routing.
-for text in (milestone, state):
-    assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in text
-    assert "SELECTED_NOT_AUTHORIZED" in text
-    assert "implementation_authorized=false" in text
+# Human-readable recovery pointers agree with the machine-readable CURRENT routing.
+for recovery_text in (milestone, state):
+    current_recovery = recovery_text.split("\n---\n", 1)[0]
+    assert "MANUAL_DISCOVERY_V1" in current_recovery
+    assert "CANONICALLY_IMPLEMENTED / CLOSED_PR_88" in current_recovery
+    assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_recovery
+    assert "SELECTED_NOT_AUTHORIZED" not in current_recovery
+    assert "No successor product milestone" in current_recovery
+
+# Superseded status language remains preserved below the current-routing header as audit history.
+assert "SELECTED_NOT_AUTHORIZED" in milestone
+assert "SELECTED_NOT_AUTHORIZED" in state
 
 assert "2026-09-24 — SUPERVISED_PRODUCTION_V1 Slice 2 completion continuity sync" in changelog
 assert SLICE2_FINGERPRINT in changelog
