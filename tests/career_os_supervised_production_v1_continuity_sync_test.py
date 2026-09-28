@@ -86,8 +86,19 @@ assert "NEXT_CANDIDATE_SEAM SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLU
 assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in ps["next_authorized_action"]
 assert "SELECTED_NOT_AUTHORIZED" in ps["next_authorized_action"]
 assert "Global implementation_authorized remains false" in ps["next_authorized_action"]
-assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in cp["exact_next_allowed_action"]
-assert "Historical Recommendation-B implementation authority was SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL and is exhausted/closed; never a blanket/global implementation grant." in cp["exact_next_allowed_action"]
+checkpoint_action_parts = cp["exact_next_allowed_action"].split(
+    " HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:", 1
+)
+assert len(checkpoint_action_parts) == 2
+current_checkpoint_action, historical_checkpoint_action = checkpoint_action_parts
+assert "CANONICAL_GOLD_SOURCES_V1 is canonically closed" in current_checkpoint_action
+assert "MANUAL_DISCOVERY_V1" in current_checkpoint_action
+assert "SELECTED_NOT_AUTHORIZED" in current_checkpoint_action
+assert "separately gives explicit authorization" in current_checkpoint_action
+assert "Perform a byte-preserving copy/upload" not in current_checkpoint_action
+assert "Only after all three verify may the milestone close" not in current_checkpoint_action
+assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in historical_checkpoint_action
+assert "Historical Recommendation-B implementation authority was SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL and is exhausted/closed; never a blanket/global implementation grant." in historical_checkpoint_action
 assert " ? " not in cp["exact_next_allowed_action"]
 assert " ? " not in cp["continuity_rule"]
 
