@@ -25,12 +25,12 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-27_PERSONAL_V1_POSTMERGE_CLOSURE'
-assert cp['canonical_basis_sha'] == '774d3e26e7b0cc0441dec817b4cc542c7dfe541b'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-27_CANONICAL_GOLD_SOURCES_V1_DRIVE_VERIFIED_COMPLETION_READY'
+assert cp['canonical_basis_sha'] == '5b3ce065367e2ca048bbd67892ab30d75022ab18'
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
 assert cp['authorization_status'] == 'BORA_ACCEPTED'
 assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
-assert cp['operator_status'] == 'PERSONAL_V1_RECOVERY_AND_OPERATOR_LOCK_CANONICALLY_CLOSED'
+assert cp['operator_status'] == 'CANONICAL_GOLD_SOURCES_V1_DRIVE_VERIFIED_COMPLETION_READY'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False

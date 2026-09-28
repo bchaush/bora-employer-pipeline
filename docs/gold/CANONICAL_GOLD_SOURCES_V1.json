@@ -1,0 +1,52 @@
+{
+  "manifest_id": "CANONICAL_GOLD_SOURCES_V1",
+  "status": "DRIVE_VERIFIED_COMPLETION_READY",
+  "recorded_at": "2026-09-27",
+  "canonical_drive": {
+    "career_os_folder_id": "1iHP8Y_s_i2Z-3lsCDZyCMpSZQgMkpGlT",
+    "career_os_folder_url": "https://drive.google.com/drive/folders/1iHP8Y_s_i2Z-3lsCDZyCMpSZQgMkpGlT",
+    "gold_references_folder_id": "1X184fMDFLCA471eInAWzisR8fZrSodwN",
+    "gold_references_folder_url": "https://drive.google.com/drive/folders/1X184fMDFLCA471eInAWzisR8fZrSodwN",
+    "sharing_intent": "private",
+    "shared": false,
+    "source_visibility_status": "permission_metadata_available"
+  },
+  "artifacts": [
+    {
+      "role": "resume_gold_docx",
+      "filename": "Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx",
+      "sha256": "ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70",
+      "byte_size": 26183,
+      "drive_file_id": "15lFA4jKuiTv2RjAfu2w75pZxn1kD8qAu",
+      "drive_url": "https://docs.google.com/document/d/15lFA4jKuiTv2RjAfu2w75pZxn1kD8qAu/edit?usp=drivesdk&ouid=103036464774327028348&rtpof=true&sd=true",
+      "drive_hash_verified": true,
+      "shared": false
+    },
+    {
+      "role": "cover_letter_gold_docx",
+      "filename": "Bora_Chaush_Cover_Letter_Gold_Reference.docx",
+      "sha256": "264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90",
+      "byte_size": 36564,
+      "drive_file_id": "1zJwiP_nnZR6BBYCDAHI4PpYVqiomkq4m",
+      "drive_url": "https://docs.google.com/document/d/1zJwiP_nnZR6BBYCDAHI4PpYVqiomkq4m/edit?usp=drivesdk&ouid=103036464774327028348&rtpof=true&sd=true",
+      "drive_hash_verified": true,
+      "shared": false
+    },
+    {
+      "role": "cover_letter_visual_reference_pdf",
+      "filename": "Bora_Chaush_Cover_Letter_Gold_Reference.pdf",
+      "sha256": "0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42",
+      "byte_size": 71216,
+      "drive_file_id": "1eMl7BHw_UrgnPAPZon_43MAlwqawBe3j",
+      "drive_url": "https://drive.google.com/file/d/1eMl7BHw_UrgnPAPZon_43MAlwqawBe3j/view?usp=drivesdk",
+      "drive_hash_verified": true,
+      "shared": false
+    }
+  ],
+  "transport": {
+    "desktop_originals_verified": true,
+    "drive_retrieval_verified": true,
+    "verification_result": "All three authenticated Drive downloads independently matched canonical filenames, byte sizes, and SHA-256 values."
+  },
+  "package_permission": "GOLD_SOURCE_AVAILABILITY_UNBLOCKED_NORMAL_PURSUIT_AND_PACKAGE_GATES_STILL_REQUIRED"
+}

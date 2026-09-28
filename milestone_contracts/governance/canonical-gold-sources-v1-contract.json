@@ -1,0 +1,75 @@
+{
+  "milestone_id": "CANONICAL_GOLD_SOURCES_V1",
+  "kind": "PRIVATE_ARTIFACT_CANONICALIZATION",
+  "baseline_sha": "5b3ce065367e2ca048bbd67892ab30d75022ab18",
+  "authorization_basis": "Bora explicitly authorized CANONICAL_GOLD_SOURCES_V1 on 2026-09-27 to define and implement the smallest safe canonical storage/retrieval path for already verified Gold artifacts, preserving exact hashes and originals, with no reconstruction and no package-runtime redesign.",
+  "goal": "Make the exact approved Gold resume/cover-letter source binaries canonically retrievable from a private Drive location and independently hash-verifiable before any package work.",
+  "allowed_repo_paths": [
+    "CHANGELOG.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "project_state.json",
+    "docs/gold/CANONICAL_GOLD_SOURCES_V1.json",
+    "milestone_contracts/governance/canonical-gold-sources-v1-contract.json",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py"
+  ],
+  "forbidden_repo_paths": [
+    "src/**",
+    "schemas/**",
+    "resume/**",
+    "prompts/**",
+    ".github/**",
+    "evidence/**",
+    "claims/**"
+  ],
+  "canonical_private_storage": {
+    "provider": "Google Drive",
+    "folder_structure": [
+      "Career OS",
+      "Gold References"
+    ],
+    "sharing_rule": "private/not broadly shared",
+    "binary_files_must_not_be_committed_to_repo": true
+  },
+  "required_artifacts": [
+    {
+      "role": "resume_gold_docx",
+      "filename": "Bora_Chaush_Cable_One_Claude_First_G_Adjudicated.docx",
+      "sha256": "ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70"
+    },
+    {
+      "role": "cover_letter_gold_docx",
+      "filename": "Bora_Chaush_Cover_Letter_Gold_Reference.docx",
+      "sha256": "264f7a8cc194e0211ce7f0af411b0ab6c07fa2438c557aa2e470536fded67e90"
+    },
+    {
+      "role": "cover_letter_visual_reference_pdf",
+      "filename": "Bora_Chaush_Cover_Letter_Gold_Reference.pdf",
+      "sha256": "0b7da43108b0fae5ba4211078b4308cad9014d1e11cb533bc25ed64feec8df42"
+    }
+  ],
+  "hard_stops": [
+    "Do not reconstruct, convert, resave, normalize, or otherwise mutate any Gold binary.",
+    "Do not mark the milestone complete unless each canonical Drive binary is fetched/downloaded and independently SHA-256 verified.",
+    "Do not use a different filename or merely visually equivalent document as a substitute.",
+    "Do not begin package-runtime redesign or package generation in this milestone.",
+    "If a supported byte-preserving transport from the verified desktop originals to Drive is unavailable, record TRANSPORT_BLOCKED and require an exact binary attachment/upload rather than inventing a workaround."
+  ],
+  "acceptance_conditions": [
+    "Desktop originals are re-verified against the three canonical SHA-256 values.",
+    "A private Career OS/Gold References Drive location exists and is recorded by stable Drive IDs/URLs.",
+    "Exact binaries are present in that folder under canonical filenames.",
+    "Each Drive binary can be retrieved through an authenticated supported path and independently matches its canonical SHA-256.",
+    "Repo stores only metadata/retrieval manifest, not private Gold binary bytes.",
+    "Fresh-session operator can locate the manifest and retrieve the correct source without chat-memory reconstruction.",
+    "No package runtime, Candidate Truth, Match Truth, identity, submission, or database architecture change occurs.",
+    "Canonical Assurance passes before promotion."
+  ],
+  "review_requirements": "Normal independent Cursor adversarial review applies before repo promotion. No Cursor exception has been granted for CANONICAL_GOLD_SOURCES_V1.",
+  "implementation_authorized": true
+}
