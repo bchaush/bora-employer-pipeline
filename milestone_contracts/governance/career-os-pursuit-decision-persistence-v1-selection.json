@@ -1,0 +1,52 @@
+{
+  "milestone_id": "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1_SELECTION",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Select and freeze the smallest production-earned implementation contract for durable Bora PURSUE/WATCH/REJECT persistence after the five-role Manual Discovery dogfood batch. This governance branch may author the exact implementation contract only; it must not mutate runtime, schemas, Sheets, application history, Match Truth, identity, package logic, Gold sources, or submission policy.",
+  "baseline_sha": "3af83a92f0ff08b73edd863145fee943870bda70",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-pursuit-decision-persistence-v1-selection.json",
+    "milestone_contracts/governance/career-os-pursuit-decision-persistence-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    "docs/**",
+    "resume/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_STATE.md",
+    "project_state.json",
+    "CHANGELOG.md",
+    ".github/**"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py"
+  ],
+  "acceptance_conditions": [
+    "The exact implementation candidate is named CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 and is grounded in the locked Personal V1 step 6 plus the five-role dogfood evidence.",
+    "The implementation contract requires exact canonical Job_ID membership before any human decision can be persisted; discovery-platform IDs, titles, URLs, screenshots, or company+role text alone cannot create a decision subject.",
+    "The implementation contract preserves system recommendation and Bora decision as separate co-existing truths.",
+    "The implementation contract preserves append-only decision history and explicit supersession so the two temporary PURSUE test events can coexist with the final REJECT decisions.",
+    "The implementation contract defines stale-intent invalidation/reconfirmation semantics bound to current opportunity/analysis context.",
+    "The implementation contract reuses the existing JOBS and LOG Sheets V1 surfaces and introduces no new database or sheet tab.",
+    "The implementation contract keeps application history, package persistence, Gold generation, and external submission out of scope.",
+    "No path outside this governance branch's allowed_paths changes."
+  ],
+  "stop_conditions": [
+    "Contract design requires fuzzy or third-party-only identity to persist a decision.",
+    "Contract design requires changing Match Truth, Candidate Truth, Employer Truth, exact-role identity, qualification semantics, Gold doctrine, application history semantics, or submission policy.",
+    "Contract design requires a new database, new sheet tab, UI, scheduled Gmail, browser automation, or automatic submission.",
+    "Any runtime/schema/test path changes on this governance-only branch.",
+    "Canonical Assurance regresses."
+  ],
+  "review_requirements": "This governance candidate must receive independent adversarial review before promotion. Cursor is the normal reviewer when available. Any alternate reviewer requires a fresh Bora exception scoped to the exact frozen candidate; no prior Claude exception carries forward.",
+  "human_approval_requirements": "Merging/accepting this governance contract does not itself authorize runtime implementation. Bora must separately and explicitly authorize the exact CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 implementation contract after review and canonical recovery."
+}
