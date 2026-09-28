@@ -110,6 +110,15 @@ assert prior_prior_prior_phase['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert prior_prior_prior_phase['accepted_at'] == '2026-09-12'
 
 assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allowed_action'].strip()
+current_next_action = cp['exact_next_allowed_action'].split(
+    ' HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:', 1
+)[0]
+assert 'CANONICAL_GOLD_SOURCES_V1 is canonically closed' in current_next_action
+assert 'MANUAL_DISCOVERY_V1' in current_next_action
+assert 'SELECTED_NOT_AUTHORIZED' in current_next_action
+assert 'separately gives explicit authorization' in current_next_action
+assert 'Perform a byte-preserving copy/upload' not in current_next_action
+assert 'Only after all three verify may the milestone close' not in current_next_action
 
 # terminal_adjudication must reflect the prior GOVERNING policy, Phase D/E/F/G's
 # preserved acceptance, AND Phase H's acceptance plus Recommendation B's scoped
