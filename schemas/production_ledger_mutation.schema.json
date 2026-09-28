@@ -83,7 +83,7 @@
         "Job_ID": { "type": "string", "minLength": 1 },
         "Company": { "type": ["string", "null"] },
         "Role": { "type": ["string", "null"] },
-        "Discovery_Source": { "type": "string", "enum": ["GMAIL"] },
+        "Discovery_Source": { "type": "string", "enum": ["GMAIL", "MANUAL_URL", "MANUAL_SCREENSHOT"] },
         "Discovery_URL": { "type": ["string", "null"], "format": "job-url" },
         "Official_URL": { "type": ["string", "null"], "format": "job-url" },
         "First_Seen": { "type": "string", "format": "date-time" },
@@ -126,7 +126,7 @@
             "GATE_MATCH_PROJECTION"
           ]
         },
-        "Source": { "type": "string", "enum": ["GMAIL", "FIRST_PARTY_VERIFICATION", "SUPERVISED_ANALYSIS"] },
+        "Source": { "type": "string", "enum": ["GMAIL", "MANUAL_URL", "MANUAL_SCREENSHOT", "FIRST_PARTY_VERIFICATION", "SUPERVISED_ANALYSIS"] },
         "Job_ID": { "type": ["string", "null"] },
         "Status": { "$ref": "#/$defs/pipeline_state" },
         "Error_Code": { "type": ["string", "null"] },

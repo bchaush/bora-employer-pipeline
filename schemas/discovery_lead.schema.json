@@ -28,8 +28,8 @@
     },
     "source": {
       "type": "string",
-      "enum": ["GMAIL"],
-      "description": "Slice 1 supports only the Gmail intake adapter."
+      "enum": ["GMAIL", "MANUAL_URL", "MANUAL_SCREENSHOT"],
+      "description": "Supported bounded discovery adapters. Source identity is provenance only and never Employer Truth or Match Truth."
     },
     "source_message_id": {
       "type": "string",
