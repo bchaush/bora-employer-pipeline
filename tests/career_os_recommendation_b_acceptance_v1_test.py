@@ -7,10 +7,10 @@ agents=(ROOT/"AGENTS.md").read_text(encoding="utf-8")
 state=(ROOT/"CURRENT_STATE.md").read_text(encoding="utf-8")
 milestone=(ROOT/"CURRENT_MILESTONE.md").read_text(encoding="utf-8")
 adr=(ROOT/"docs/decisions/ADR-CAREER-OS-EVAL-HARNESS-SEQUENCE-V1.md").read_text(encoding="utf-8")
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE"
-assert cp["canonical_basis_sha"]=="4380edad4399279b250eac7b18b704be3d7b0e03"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-28_PURSUIT_DECISION_PERSISTENCE_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"]=="9f337df09b154faca3bcbab871585820377d6490"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88"
+assert cp["operator_status"]=="PURSUIT_DECISION_PERSISTENCE_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR91"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED" and cp["accepted_at"]=="2026-09-24"
 assert cp["slice_1_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["slice_2_completion"]["human_acceptance_status"]=="BORA_ACCEPTED"

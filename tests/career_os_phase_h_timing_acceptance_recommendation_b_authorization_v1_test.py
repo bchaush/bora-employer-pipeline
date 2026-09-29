@@ -60,10 +60,10 @@ for forbidden_path in (
 
 assert CHECKPOINT.exists(), 'canonical execution checkpoint missing'
 cp = json.loads(CHECKPOINT.read_text(encoding='utf-8'))
-assert cp['canonical_basis_sha'] == '4380edad4399279b250eac7b18b704be3d7b0e03'
+assert cp['canonical_basis_sha'] == '9f337df09b154faca3bcbab871585820377d6490'
 assert BASELINE_SHA in cp['phase_h_acceptance']['canonical_merge_verification']
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
-assert cp['operator_status'] == 'MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88'
+assert cp['operator_status'] == 'PURSUIT_DECISION_PERSISTENCE_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR91'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False

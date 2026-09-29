@@ -8,10 +8,10 @@ RID="CAREER_OS_MILESTONE_RUN_V1_TARGETED_OPTIMIZATION_V1"
 cp=json.loads((ROOT/"CURRENT_EXECUTION_CHECKPOINT.json").read_text(encoding="utf-8"))
 ps=json.loads((ROOT/"project_state.json").read_text(encoding="utf-8"))
 contract=json.loads((ROOT/"milestone_contracts/governance/career-os-recommendation-b-completion-v1.json").read_text(encoding="utf-8"))
-assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE"
-assert cp["canonical_basis_sha"]=="4380edad4399279b250eac7b18b704be3d7b0e03"
+assert cp["checkpoint_id"]=="CAREER_OS_CHECKPOINT_2026-09-28_PURSUIT_DECISION_PERSISTENCE_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"]=="9f337df09b154faca3bcbab871585820377d6490"
 assert cp["phase_id"]=="SUPERVISED_PRODUCTION_V1"
-assert cp["operator_status"]=="MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88"
+assert cp["operator_status"]=="PURSUIT_DECISION_PERSISTENCE_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR91"
 assert cp["human_acceptance_status"]=="BORA_ACCEPTED"
 assert cp["accepted_at"]=="2026-09-24"
 assert cp["recommendation_b_completion"]["milestone_id"]==RID
@@ -65,10 +65,10 @@ action=ps["next_authorized_action"]
 current_action=action.split(" HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:",1)[0]
 assert not current_action.rstrip().endswith((", and", " and", ",", "-"))
 assert "Global implementation_authorized remains false" in current_action
-assert "MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88" in current_action
-assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_action
-assert "No successor product milestone is selected or authorized by this closure" in current_action
-assert "SELECTED_NOT_AUTHORIZED" not in current_action
+assert "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 is canonically implemented and closed by PR #91" in current_action
+assert "PURSUE_TO_GOLD_PACKAGE_V1 is SELECTED_NOT_AUTHORIZED" in current_action
+assert "successor_implementation_authorized remains false" in current_action
+assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" not in current_action
 assert "first_point_of_divergence = A and first_causal_failure_point = B at two different points in the same run" in action
 assert "2026-09-27 — Career OS Personal V1 recovery/operator direction lock" in changelog
 assert "# Bora Employer Pipeline OS" in changelog
