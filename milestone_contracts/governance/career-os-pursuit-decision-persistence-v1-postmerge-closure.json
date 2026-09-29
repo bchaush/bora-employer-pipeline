@@ -1,0 +1,66 @@
+{
+  "milestone_id": "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1_POSTMERGE_CONTINUITY_CLOSURE",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Synchronize canonical recovery/routing surfaces with the already-merged CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 implementation from PR #91, preserve superseded PR #88 Manual Discovery routing only as historical audit evidence, and record PURSUE_TO_GOLD_PACKAGE_V1 as the next bounded candidate in SELECTED_NOT_AUTHORIZED status without authorizing any successor implementation.",
+  "baseline_sha": "9f337df09b154faca3bcbab871585820377d6490",
+  "allowed_paths": [
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "milestone_contracts/governance/career-os-pursuit-decision-persistence-v1-postmerge-closure.json",
+    "tests/career_os_execution_checkpoint_v1_test.py",
+    "tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "tests/career_os_recommendation_b_operator_completion_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "schemas/**",
+    "docs/**",
+    "golden-tests/**",
+    "resume/**",
+    "prompts/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    ".github/**"
+  ],
+  "required_tests": [
+    "python tests/career_os_execution_checkpoint_v1_test.py",
+    "python tests/career_os_supervised_production_v1_continuity_sync_test.py",
+    "python tests/career_os_phase_h_timing_acceptance_recommendation_b_authorization_v1_test.py",
+    "python tests/career_os_recommendation_b_acceptance_v1_test.py",
+    "python tests/career_os_recommendation_b_operator_completion_v1_test.py",
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py"
+  ],
+  "acceptance_conditions": [
+    "PR #91 is recorded as canonically merged at 9f337df09b154faca3bcbab871585820377d6490 with parents 211027fb6a4820c810a2872d36f3d0051a98ee97 and 88a6f2b983c7777a690840167346e855acb9f81a.",
+    "PR #91 reviewed implementation head is recorded as 88a6f2b983c7777a690840167346e855acb9f81a with frozen reviewed implementation fingerprint d389b385101f5d0ceadf26d49e8ccac65b79384f15efcf99b2e9592c55e69a7e.",
+    "Implementation contract SHA-256 is recorded as b18112f1c7e721b51f0fab0b7fc5f3399f58c2bfe75736143d397d9dffaee365.",
+    "Canonical merge tree is recorded as 3c020a94e6330fa9e9ec4034959cd8ae6282f47f.",
+    "PR-head hosted Assurance Baseline #184 (run 36492038989) is recorded as SUCCESS on exact head 88a6f2b983c7777a690840167346e855acb9f81a.",
+    "Post-merge hosted Assurance Baseline #185 (run 36492245015) is recorded as SUCCESS on exact canonical main SHA 9f337df09b154faca3bcbab871585820377d6490.",
+    "Current recovery routing records CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 as CANONICALLY_IMPLEMENTED / CLOSED_PR_91.",
+    "Durable Pursuit Truth is recorded as: exact canonical Job_ID binding; PURSUE/WATCH/REJECT only; append-only history; explicit supersession; reviewed-context stale-intent protection; deterministic idempotency; JOBS.Bora_Decision display-only semantics; authorization derived only from current JOBS context plus append-only PURSUIT_DECISION LOG history.",
+    "Permanent invariants are recorded: Match Truth != Pursuit Truth != Application Truth; System recommendation != Bora authorization; PURSUE != SUBMIT; Manual SUBMIT remains permanently Bora-controlled.",
+    "PURSUE_TO_GOLD_PACKAGE_V1 is recorded as the next bounded candidate in SELECTED_NOT_AUTHORIZED status with successor_implementation_authorized false.",
+    "Historical PR #88 Manual Discovery routing and all earlier routing remain preserved as superseded audit evidence.",
+    "No runtime, schema, Gold package, application-history, Drive, Gmail, identity, Match Truth, qualification, UI, CI, or submission implementation changes.",
+    "git diff --check passes.",
+    "Focused continuity regressions pass.",
+    "Canonical full Assurance passes on the exact candidate."
+  ],
+  "stop_conditions": [
+    "Any PR #91 merge, parent, tree, or Assurance fact cannot be re-verified.",
+    "The closure requires modifying any runtime, product, or schema path.",
+    "The closure would authorize PURSUE_TO_GOLD_PACKAGE_V1 implementation, Gold package generation, application-history mutation, UI, scheduled ingestion, automatic submission, or any other successor product milestone.",
+    "Historical audit evidence would need to be rewritten rather than clearly superseded by current routing.",
+    "An additional continuity path beyond the allowed paths is strictly required.",
+    "Focused validation or canonical Assurance regresses."
+  ],
+  "review_requirements": "Normal independent reviewer discipline remains unchanged. Freeze an exact candidate fingerprint first. Cursor is the normal adversarial reviewer of this uncommitted diff before commit/push. No prior Claude authorization carries forward.",
+  "human_approval_requirements": "Bora authorized this narrow governance/state continuity closure only. It records already-verified canonical PR #91 facts and grants no successor product/runtime authority. successor_implementation_authorized remains false. Promotion must follow the established exact-byte review and release discipline."
+}

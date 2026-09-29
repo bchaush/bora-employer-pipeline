@@ -56,11 +56,11 @@ assert s1["github_assurance"] == "RUN_151_SUCCESS"
 assert s1["independent_review"] == "SAFE"
 assert s1["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
 
-# Manual Discovery V1 is now the latest completed canonical seam.
-assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE"
-assert cp["canonical_basis_sha"] == "4380edad4399279b250eac7b18b704be3d7b0e03"
+# Pursuit Decision Persistence V1 is now the latest completed canonical seam.
+assert cp["checkpoint_id"] == "CAREER_OS_CHECKPOINT_2026-09-28_PURSUIT_DECISION_PERSISTENCE_V1_POSTMERGE_CLOSURE"
+assert cp["canonical_basis_sha"] == "9f337df09b154faca3bcbab871585820377d6490"
 assert cp["recorded_at"] == "2026-09-28"
-assert cp["operator_status"] == "MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88"
+assert cp["operator_status"] == "PURSUIT_DECISION_PERSISTENCE_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR91"
 s2 = cp["slice_2_completion"]
 assert s2["milestone_id"] == SLICE2
 assert s2["operator_status"] == "COMPLETED_BY_OPERATOR"
@@ -95,29 +95,51 @@ assert manual["post_merge_assurance"] == "RUN_36377625749_SUCCESS"
 assert manual["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
 assert manual["next_operating_action"] == "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY"
 assert manual["successor_product_milestone_authorized"] is False
+assert manual["next_operating_action_status"] == "HISTORICAL_SUPERSEDED_BY_PR91_CLOSURE"
+
+pursuit = cp["pursuit_decision_persistence_v1_completion"]
+assert pursuit["milestone_id"] == "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1"
+assert pursuit["operator_status"] == "CANONICALLY_IMPLEMENTED"
+assert pursuit["closure_status"] == "CLOSED_PR_91"
+assert pursuit["pr_number"] == 91
+assert pursuit["reviewed_head_sha"] == "88a6f2b983c7777a690840167346e855acb9f81a"
+assert pursuit["canonical_merge_sha"] == "9f337df09b154faca3bcbab871585820377d6490"
+assert pursuit["merge_tree_sha"] == "3c020a94e6330fa9e9ec4034959cd8ae6282f47f"
+assert pursuit["post_merge_assurance"] == "ASSURANCE_BASELINE_185_RUN_36492245015_SUCCESS"
+assert pursuit["implementation_authority_status"] == "EXHAUSTED_BY_COMPLETION"
+assert pursuit["next_bounded_candidate"] == "PURSUE_TO_GOLD_PACKAGE_V1"
+assert pursuit["next_bounded_candidate_status"] == "SELECTED_NOT_AUTHORIZED"
+assert pursuit["successor_implementation_authorized"] is False
+
 current_phase = ps["current_phase"].split(
     " -- HISTORICAL_SUPERSEDED_ROUTING:", 1
 )[0]
-assert "MANUAL_DISCOVERY_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR88" in current_phase
-assert "NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_phase
-assert "NO_SUCCESSOR_PRODUCT_MILESTONE_AUTHORIZED" in current_phase
-assert "SELECTED_NOT_AUTHORIZED" not in current_phase
-assert ps["latest_closed_milestone_id"] == "MANUAL_DISCOVERY_V1"
-assert ps["latest_closed_milestone_pr"] == 88
+assert "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR91" in current_phase
+assert "NEXT_BOUNDED_CANDIDATE PURSUE_TO_GOLD_PACKAGE_V1 SELECTED_NOT_AUTHORIZED" in current_phase
+assert "SUCCESSOR_IMPLEMENTATION_AUTHORIZED_FALSE" in current_phase
+assert "NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" not in current_phase
+# Superseded PR #88 routing stays preserved verbatim in the historical tail.
+historical_phase = ps["current_phase"].split(" -- HISTORICAL_SUPERSEDED_ROUTING:", 1)[1]
+assert "MANUAL_DISCOVERY_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR88" in historical_phase
+assert "NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in historical_phase
+assert ps["latest_closed_milestone_id"] == "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1"
+assert ps["latest_closed_milestone_pr"] == 91
 assert "Global implementation_authorized remains false" in ps["next_authorized_action"]
 checkpoint_action_parts = cp["exact_next_allowed_action"].split(
     " HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:", 1
 )
 assert len(checkpoint_action_parts) == 2
 current_checkpoint_action, historical_checkpoint_action = checkpoint_action_parts
-assert "MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88" in current_checkpoint_action
-assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_checkpoint_action
-assert "SELECTED_NOT_AUTHORIZED" not in current_checkpoint_action
-assert "Do not launch another product milestone from this closure" in current_checkpoint_action
-assert "durable PURSUE/WATCH/REJECT persistence" in current_checkpoint_action
+assert "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 is canonically implemented and closed by PR #91" in current_checkpoint_action
+assert "PURSUE_TO_GOLD_PACKAGE_V1 is SELECTED_NOT_AUTHORIZED" in current_checkpoint_action
+assert "successor_implementation_authorized remains false" in current_checkpoint_action
+assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" not in current_checkpoint_action
 assert "Gold package generation" in current_checkpoint_action
-assert "scheduled Gmail" in current_checkpoint_action
-assert "automatic submission" in current_checkpoint_action
+assert "application-history mutation" in current_checkpoint_action
+assert "scheduled ingestion" in current_checkpoint_action
+assert "explicit Bora authorization" in current_checkpoint_action
+assert "MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88" in historical_checkpoint_action
+assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in historical_checkpoint_action
 assert "SUPERVISED_PRODUCTION_V1_FIRST_PARTY_IDENTITY_RESOLUTION_V1" in historical_checkpoint_action
 assert "Historical Recommendation-B implementation authority was SCOPED_TO_THIS_MILESTONE_ONLY_NOT_GLOBAL and is exhausted/closed; never a blanket/global implementation grant." in historical_checkpoint_action
 assert " ? " not in cp["exact_next_allowed_action"]
@@ -126,13 +148,16 @@ assert " ? " not in cp["continuity_rule"]
 # Human-readable recovery pointers agree with the machine-readable CURRENT routing.
 for recovery_text in (milestone, state):
     current_recovery = recovery_text.split("\n---\n", 1)[0]
-    assert "MANUAL_DISCOVERY_V1" in current_recovery
-    assert "CANONICALLY_IMPLEMENTED / CLOSED_PR_88" in current_recovery
-    assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in current_recovery
-    assert "SELECTED_NOT_AUTHORIZED" not in current_recovery
-    assert "No successor product milestone" in current_recovery
+    assert "CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1" in current_recovery
+    assert "CANONICALLY_IMPLEMENTED / CLOSED_PR_91" in current_recovery
+    assert "`PURSUE_TO_GOLD_PACKAGE_V1` — **SELECTED_NOT_AUTHORIZED**" in current_recovery
+    assert "`successor_implementation_authorized` remains **false**" in current_recovery
+    assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" not in current_recovery
 
-# Superseded status language remains preserved below the current-routing header as audit history.
+    # Superseded PR #88 routing remains preserved below the current-routing header as audit history.
+    historical_recovery = recovery_text.split("\n---\n", 1)[1]
+    assert "CANONICALLY_IMPLEMENTED / CLOSED_PR_88" in historical_recovery
+    assert "DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY" in historical_recovery
 assert "SELECTED_NOT_AUTHORIZED" in milestone
 assert "SELECTED_NOT_AUTHORIZED" in state
 

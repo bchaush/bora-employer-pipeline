@@ -1,3 +1,21 @@
+# Current State Update — CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 Canonically Implemented / Closed PR #91 (2026-09-28)
+
+Verified canonical main: `9f337df09b154faca3bcbab871585820377d6490` (PR #91; parents `211027fb6a4820c810a2872d36f3d0051a98ee97` and `88a6f2b983c7777a690840167346e855acb9f81a`).
+
+Reviewed implementation head: `88a6f2b983c7777a690840167346e855acb9f81a`. Frozen reviewed implementation fingerprint: `d389b385101f5d0ceadf26d49e8ccac65b79384f15efcf99b2e9592c55e69a7e`. Implementation contract SHA-256: `b18112f1c7e721b51f0fab0b7fc5f3399f58c2bfe75736143d397d9dffaee365`. Merge tree: `3c020a94e6330fa9e9ec4034959cd8ae6282f47f`.
+
+PR-head Assurance Baseline #184 (run `36492038989`): SUCCESS on exact head `88a6f2b983c7777a690840167346e855acb9f81a`. Post-merge Assurance Baseline #185 (run `36492245015`): SUCCESS on exact canonical main `9f337df09b154faca3bcbab871585820377d6490`.
+
+`CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1` is now **CANONICALLY_IMPLEMENTED / CLOSED_PR_91**. Durable Pursuit Truth exists with exact canonical `Job_ID` binding, `PURSUE / WATCH / REJECT` only, append-only history, explicit supersession, reviewed-context stale-intent protection, deterministic idempotency, `JOBS.Bora_Decision` display-only semantics, and authorization derived only from current `JOBS` context plus append-only `PURSUIT_DECISION` `LOG` history.
+
+Permanent invariants: Match Truth != Pursuit Truth != Application Truth. System recommendation != Bora authorization. `PURSUE` != `SUBMIT`. Manual `SUBMIT` remains permanently Bora-controlled.
+
+Next bounded candidate: `PURSUE_TO_GOLD_PACKAGE_V1` — **SELECTED_NOT_AUTHORIZED**. `successor_implementation_authorized` remains **false**. This closure does not authorize Gold package implementation, application-history mutation, Drive/Gmail implementation, UI, scheduled ingestion, or submission.
+
+Historical PR #88 Manual Discovery routing and all earlier routing below are superseded audit history, not current routing.
+
+---
+
 # Current State Update — MANUAL_DISCOVERY_V1 Canonically Implemented / Closed PR #88 (2026-09-28)
 
 Verified canonical main: `4380edad4399279b250eac7b18b704be3d7b0e03`.

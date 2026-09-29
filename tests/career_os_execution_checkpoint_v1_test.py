@@ -25,13 +25,13 @@ assert cp['schema_version'] == '1.0'
 # Checkpoint lineage convention: checkpoint_ids track the live phase event.
 # Phase H's checkpoint_id must now reflect its own substantive 2026-09-15
 # acceptance event and Recommendation B's scoped authorization.
-assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-28_MANUAL_DISCOVERY_V1_POSTMERGE_CLOSURE'
-assert cp['canonical_basis_sha'] == '4380edad4399279b250eac7b18b704be3d7b0e03'
+assert cp['checkpoint_id'] == 'CAREER_OS_CHECKPOINT_2026-09-28_PURSUIT_DECISION_PERSISTENCE_V1_POSTMERGE_CLOSURE'
+assert cp['canonical_basis_sha'] == '9f337df09b154faca3bcbab871585820377d6490'
 assert cp['recorded_at'] == '2026-09-28'
 assert cp['phase_id'] == 'SUPERVISED_PRODUCTION_V1'
 assert cp['authorization_status'] == 'BORA_ACCEPTED'
 assert cp['selection_status'] == 'ACTIVE_PRODUCTION_DOCTRINE'
-assert cp['operator_status'] == 'MANUAL_DISCOVERY_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR88'
+assert cp['operator_status'] == 'PURSUIT_DECISION_PERSISTENCE_V1_CANONICALLY_IMPLEMENTED_CLOSED_PR91'
 assert cp['human_acceptance_status'] == 'BORA_ACCEPTED'
 assert cp['accepted_at'] == '2026-09-24'
 assert cp['implementation_authorized'] is False
@@ -71,6 +71,33 @@ assert manual['post_merge_assurance'] == 'RUN_36377625749_SUCCESS'
 assert manual['implementation_authority_status'] == 'EXHAUSTED_BY_COMPLETION'
 assert manual['next_operating_action'] == 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY'
 assert manual['successor_product_milestone_authorized'] is False
+assert manual['next_operating_action_status'] == 'HISTORICAL_SUPERSEDED_BY_PR91_CLOSURE'
+
+pursuit = cp['pursuit_decision_persistence_v1_completion']
+assert pursuit['milestone_id'] == 'CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1'
+assert pursuit['operator_status'] == 'CANONICALLY_IMPLEMENTED'
+assert pursuit['closure_status'] == 'CLOSED_PR_91'
+assert pursuit['pr_number'] == 91
+assert pursuit['reviewed_head_sha'] == '88a6f2b983c7777a690840167346e855acb9f81a'
+assert pursuit['reviewed_candidate_fingerprint'] == 'd389b385101f5d0ceadf26d49e8ccac65b79384f15efcf99b2e9592c55e69a7e'
+assert pursuit['implementation_contract_sha256'] == 'b18112f1c7e721b51f0fab0b7fc5f3399f58c2bfe75736143d397d9dffaee365'
+assert pursuit['canonical_merge_sha'] == '9f337df09b154faca3bcbab871585820377d6490'
+assert pursuit['merge_parents'] == [
+    '211027fb6a4820c810a2872d36f3d0051a98ee97',
+    '88a6f2b983c7777a690840167346e855acb9f81a',
+]
+assert pursuit['merge_tree_sha'] == '3c020a94e6330fa9e9ec4034959cd8ae6282f47f'
+assert pursuit['pr_head_assurance'] == 'ASSURANCE_BASELINE_184_RUN_36492038989_SUCCESS'
+assert pursuit['post_merge_assurance'] == 'ASSURANCE_BASELINE_185_RUN_36492245015_SUCCESS'
+assert pursuit['implementation_authority_status'] == 'EXHAUSTED_BY_COMPLETION'
+assert 'PURSUE_WATCH_REJECT_ONLY' in pursuit['pursuit_truth_semantics']
+assert 'JOBS_BORA_DECISION_DISPLAY_ONLY' in pursuit['pursuit_truth_semantics']
+assert 'PURSUE != SUBMIT' in pursuit['permanent_invariants']
+assert 'Manual SUBMIT remains permanently Bora-controlled' in pursuit['permanent_invariants']
+assert pursuit['next_bounded_candidate'] == 'PURSUE_TO_GOLD_PACKAGE_V1'
+assert pursuit['next_bounded_candidate_status'] == 'SELECTED_NOT_AUTHORIZED'
+assert pursuit['successor_implementation_authorized'] is False
+assert pursuit['closure_contract_path'] == 'milestone_contracts/governance/career-os-pursuit-decision-persistence-v1-postmerge-closure.json'
 
 phase_h = cp['phase_h_acceptance']
 assert phase_h['phase_id'] == 'CAREER_OS_ASSURANCE_TIMING_OBSERVABILITY_V1'
@@ -127,14 +154,25 @@ assert isinstance(cp['exact_next_allowed_action'], str) and cp['exact_next_allow
 current_next_action = cp['exact_next_allowed_action'].split(
     ' HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:', 1
 )[0]
-assert 'MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88' in current_next_action
-assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in current_next_action
-assert 'SELECTED_NOT_AUTHORIZED' not in current_next_action
-assert 'Do not launch another product milestone from this closure' in current_next_action
-assert 'durable PURSUE/WATCH/REJECT persistence' in current_next_action
+assert 'CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 is canonically implemented and closed by PR #91' in current_next_action
+assert 'PURSUE_TO_GOLD_PACKAGE_V1 is SELECTED_NOT_AUTHORIZED' in current_next_action
+assert 'successor_implementation_authorized remains false' in current_next_action
+assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' not in current_next_action
 assert 'Gold package generation' in current_next_action
-assert 'scheduled Gmail' in current_next_action
-assert 'automatic submission' in current_next_action
+assert 'application-history mutation' in current_next_action
+assert 'scheduled ingestion' in current_next_action
+assert 'submission' in current_next_action
+assert 'explicit Bora authorization' in current_next_action
+# The superseded PR #88 routing is preserved verbatim as historical audit evidence.
+historical_next_action = cp['exact_next_allowed_action'].split(
+    ' HISTORICAL_SUPERSEDED_ROUTING_FOLLOWS:', 1
+)[1]
+assert 'MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88' in historical_next_action
+assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in historical_next_action
+current_terminal = cp['terminal_adjudication'].split(' HISTORICAL_RECORD_FOLLOWS:', 1)[0]
+assert 'PR #91 canonically merged CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1' in current_terminal
+assert 'PURSUE_TO_GOLD_PACKAGE_V1 SELECTED_NOT_AUTHORIZED' in current_terminal
+assert 'PR #88 canonically merged MANUAL_DISCOVERY_V1' in cp['terminal_adjudication']
 
 # terminal_adjudication must reflect the prior GOVERNING policy, Phase D/E/F/G's
 # preserved acceptance, AND Phase H's acceptance plus Recommendation B's scoped
@@ -292,18 +330,22 @@ current_phase = PROJECT_STATE['current_phase'].split(
     ' -- HISTORICAL_SUPERSEDED_ROUTING:', 1
 )[0]
 assert 'MANUAL_DISCOVERY_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR88' in current_phase
-assert 'NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in current_phase
-assert 'NO_SUCCESSOR_PRODUCT_MILESTONE_AUTHORIZED' in current_phase
-assert 'SELECTED_NOT_AUTHORIZED' not in current_phase
+assert 'CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 CANONICALLY_IMPLEMENTED_CLOSED_PR91' in current_phase
+assert 'NEXT_BOUNDED_CANDIDATE PURSUE_TO_GOLD_PACKAGE_V1 SELECTED_NOT_AUTHORIZED' in current_phase
+assert 'SUCCESSOR_IMPLEMENTATION_AUTHORIZED_FALSE' in current_phase
+assert 'NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' not in current_phase
+# The superseded PR #88 routing is preserved verbatim as historical audit evidence.
+historical_phase = PROJECT_STATE['current_phase'].split(' -- HISTORICAL_SUPERSEDED_ROUTING:', 1)[1]
+assert 'NEXT_OPERATING_ACTION DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in historical_phase
 
-assert PROJECT_STATE['latest_closed_milestone_id'] == 'MANUAL_DISCOVERY_V1'
-assert PROJECT_STATE['latest_closed_milestone_pr'] == 88
+assert PROJECT_STATE['latest_closed_milestone_id'] == 'CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1'
+assert PROJECT_STATE['latest_closed_milestone_pr'] == 91
 assert 'Global implementation_authorized remains false' in PROJECT_STATE['next_authorized_action']
 current_action = PROJECT_STATE['next_authorized_action'].split(' HISTORICAL_ACCEPTED_CONTEXT_ONLY_NOT_CURRENT_AUTHORITY:', 1)[0]
-assert 'MANUAL_DISCOVERY_V1 is canonically implemented and closed by PR #88' in current_action
-assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' in current_action
-assert 'No successor product milestone is selected or authorized by this closure' in current_action
-assert 'SELECTED_NOT_AUTHORIZED' not in current_action
+assert 'CAREER_OS_PURSUIT_DECISION_PERSISTENCE_V1 is canonically implemented and closed by PR #91' in current_action
+assert 'PURSUE_TO_GOLD_PACKAGE_V1 is SELECTED_NOT_AUTHORIZED' in current_action
+assert 'successor_implementation_authorized remains false' in current_action
+assert 'DOGFOOD_MANUAL_DISCOVERY_ON_REAL_OPPORTUNITY' not in current_action
 assert 'Recommendation C remains NOT_AUTHORIZED' in current_action
 assert 'Phase I and every later roadmap phase remain PROPOSED_NOT_AUTHORIZED' in current_action
 assert 'OPERATE FIRST / BUILD SECOND' not in current_action
