@@ -518,3 +518,170 @@ matrix. No `.gitattributes` addition absent a reproduced need. No packaging-
 tool adoption (Poetry/uv/Hatch/PDM/pip-tools) absent a reproduced necessity.
 No `pyproject.toml` `[project]` conversion. No `pylock.toml`. No
 hash-enforced dependency installation in V1.
+
+## Amendment A1 — Bounded reconciliation for `CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1` hash-enforced dependency lock (`ADR_RECONCILIATION_V1`)
+
+Status: **BOUNDED AMENDMENT — EFFECTIVE ONLY AS CANONICALLY RECORDED.** This
+section has effect only while it is present on canonical `main` after
+independent review, Bora's separate release authorization, merge,
+post-merge Assurance and canonical recovery. Its presence on any other
+branch, candidate, review bundle or relay has no effect.
+Date: 2026-09-30
+Authoring authorized by: Bora — one bounded governance-reconciliation pass
+from canonical `main` `d83aff47ee3c30813239accaa78f9ad17112e87a`, authoring
+only. Approval of this amendment's content: pending independent review and
+Bora's separate release authorization.
+Mechanism: bounded ADR amendment (append-only), the path named first among
+the options of `ADR_RECONCILIATION_V1` in
+`milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json`
+(the "rendering contract", identified in A1.7).
+
+### A1.1 The original decision is preserved
+
+Every line of this ADR above this amendment is byte-for-byte unchanged. The
+original V1 decision — including §3 "Explicitly not selected for V1: …
+hash-enforced dependency installation (deferred until clean cross-platform
+environment reconstruction is first proven)" and the Non-Goals sentence "No
+hash-enforced dependency installation in V1." — remains the historically
+correct record of what `REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1`
+selected and implemented. This amendment does not claim that V1 selected
+hash enforcement, does not rewrite §3 or the Non-Goals, and does not declare
+the deferral's precondition satisfied or unsatisfied.
+
+The rest of §3 stays in force for every milestone, the rendering capability
+included: `requirements.in` holds human-maintained direct dependencies only;
+`requirements-lock.txt` is the complete resolved transitive environment at
+exact versions; no packaging tool, `pyproject.toml` `[project]` conversion
+or `pylock.toml` is adopted.
+
+### A1.2 The single governed exception
+
+The deferral of hash-enforced dependency installation in §3 and in the
+Non-Goals does not bar `CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1` from
+using the following, exactly and only as defined by the rendering contract:
+
+1. the hash-listed `requirements-lock.txt` of `DEPENDENCY_MODEL_V1`
+   (`FULL_LOCK` = `BASELINE_ENTRIES` ∪ `RENDERING_CLOSURE`, every line
+   carrying the `--hash=sha256:` values of its `lock_artifacts` wheels);
+2. the per-target wheel-artifact model of `DEPENDENCY_MODEL_V1`
+   (`artifact_targets` `OPERATOR` and `HOSTED_CI`, `lock_artifacts`,
+   `TAG_MODEL_V1`);
+3. installation under `--require-hashes` semantics
+   (`require_hashes_application`), only in the domains and only under the
+   gates of `INSTALLATION_DOMAINS_V1`.
+
+No other milestone, dependency, lock form or installation mechanism is
+covered.
+
+### A1.3 Consequence for the shared lock, stated honestly
+
+pip's hash-checking mode applies to a whole install. `FULL_LOCK` therefore
+makes every line of the shared `requirements-lock.txt` hash-listed,
+including the pre-existing baseline entries, and the unchanged hosted
+Assurance command `python -m pip install -r requirements-lock.txt` then runs
+in hash-checking mode, as the rendering contract's
+`require_hashes_application` states. This amendment accepts that
+consequence as part of the exception, and only that consequence:
+
+- it does not make hash enforcement a repository-wide policy, requirement or
+  preference for any other milestone;
+- it changes no baseline entry version (the rendering contract rejects that
+  as `BASELINE_ENTRY_CHANGED`);
+- it changes no workflow, CI command, `.github/**` file or
+  `scripts/verify_assurance_baseline.py`;
+- it gives no other milestone authority to add, remove or change any line of
+  `requirements.in` or `requirements-lock.txt`, and does not decide whether a
+  later milestone that must change `requirements-lock.txt` has to keep or may
+  remove the hash-listed form; that change requires its own governance under
+  its own contract and this ADR.
+
+### A1.4 Why the exception exists
+
+The rendering capability carries consequential reproducibility and
+supply-chain requirements the assurance baseline did not: `FORBIDDEN_ENGINE`
+screening over the whole approved installed set, per-member declared-license
+review preserving Bora's proprietary/commercial optionality, content binding
+and installed-set equality in the operator environment, and a `PLAN_DIGEST`
+that Bora approves over an exact artifact set. Each needs the exact identity
+of every installed artifact, which exact-version pins alone do not provide.
+That dependency model is separately governed by `DEPENDENCY_LOCK_REVIEW_V1`
+in the rendering contract, which is canonically recorded on `main`.
+
+### A1.5 What this amendment does not authorize
+
+Nothing. In particular it authorizes no dependency addition, no
+`requirements.in` or `requirements-lock.txt` mutation, no candidate lock, no
+wheel fetch (the `QUARANTINE` fetch included), no installation into any
+domain (`BUILDER_DEV`, `HOSTED_CI`, `QUARANTINE` or `OPERATOR`), no operator
+provisioning, no implementation, no release, no commit, push, pull request or
+merge, no persistence, no submission, no workflow change and no change to any
+other ADR. The rendering capability's dependency model remains governed,
+unchanged, by `DEPENDENCY_MODEL_V1`, `DEPENDENCY_LOCK_REVIEW_V1`,
+`PLAN_DIGEST`, `INSTALLATION_DOMAINS_V1`, `ADR_RECONCILIATION_V1` and the
+rendering contract's separate human gates (1)–(5).
+
+### A1.6 Sequence after canonical recording
+
+1. Only after this amendment is canonically recorded as stated in its
+   Status may Bora issue a fresh gate (1) implementation authorization under
+   the rendering contract that explicitly names "Amendment A1 of
+   `docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md`"
+   as the reconciliation path chosen under `ADR_RECONCILIATION_V1`.
+2. Only after that fresh authorization may authoring of `requirements.in`,
+   `requirements-lock.txt` or a candidate hash-listed lock begin, within the
+   rendering contract's bounds. This amendment makes no earlier
+   authorization effective for those files.
+3. Once canonically recorded, this amendment is the canonical reconciliation
+   record that `ADR_RECONCILIATION_V1` rule (b) requires before release. It
+   does not itself authorize gate (2) plan approval, gate (3) operator
+   provisioning, gate (5) release or any merge.
+4. Implementation ≠ provisioning ≠ release ≠ merge ≠ submission.
+   PURSUE != SUBMIT. Human rendered-artifact review and manual SUBMIT remain
+   permanently Bora-controlled.
+
+### A1.7 Bounds, conflict and drift
+
+- Scope: milestone `CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1` only. Every
+  other milestone remains under the original text of this ADR unless
+  separately amended.
+- Binding: the rendering contract as present on canonical `main`
+  `d83aff47ee3c30813239accaa78f9ad17112e87a` (Git blob
+  `8e67aeb13798103dc7caa622cf8fd59a36522850`, SHA-256 of the blob bytes
+  `5c2af9d1f0f967d7a06dab7e3801f36a174c35a4b2033e92f0fdf3ff9fae4627`). If a
+  later canonical amendment of that contract changes its direct
+  distributions (`pdfminer.six`, `pypdf`), the `FULL_LOCK` definition, the
+  hash representation, `require_hashes_application` or
+  `INSTALLATION_DOMAINS_V1`, this exception does not extend to the changed
+  model unless that amendment's own governance expressly reconciles it
+  against this ADR.
+- Conflict: if this amendment and the rendering contract conflict or appear
+  to, the more restrictive reading applies, work stops, and the matter
+  returns to Bora/G. This amendment never loosens the rendering contract.
+
+### A1.8 Alternatives considered
+
+- **Bounded supersession of this ADR.** Rejected: it replaces the ADR as the
+  canonical authority for §1–§12, although the conflict is one clause of §3
+  and one Non-Goals sentence.
+- **A separate standalone reconciliation ADR.** Rejected as weaker
+  authority clarity: this ADR would still say "No hash-enforced dependency
+  installation in V1." with no in-file record of the exception, so recovery
+  under §12 from this ADR would find an unreconciled conflict; the rendering
+  contract names this file as the governing ADR; and this repository amends
+  ADRs in place.
+- **Editing §3 or the Non-Goals in place.** Rejected: it would rewrite the
+  historical record of what V1 selected.
+- **Declaring the deferral's precondition met and lifting it generally.**
+  Rejected: that is a repository-wide policy change the rendering capability
+  does not need and the canonical record does not evidence.
+
+### A1.9 Verification and rollback
+
+- The pre-amendment bytes of this file (Git blob SHA-256
+  `05ebde970a9eacea8ed6f4b730e1fc41cff37be5d833cf811d2b0c2d013e4f01` at
+  `d83aff47ee3c30813239accaa78f9ad17112e87a`) are an exact byte prefix of
+  the amended blob; only this section is added.
+- Rollback: remove this section. §3's deferral then applies to the
+  rendering capability again, and under `ADR_RECONCILIATION_V1` a
+  hash-listed `requirements-lock.txt` could not be authored or released
+  without a new reconciliation. Nothing else depends on this section.
