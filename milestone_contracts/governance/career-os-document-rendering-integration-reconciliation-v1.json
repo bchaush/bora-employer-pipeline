@@ -1,0 +1,61 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_INTEGRATION_RECONCILIATION_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One bounded governance-reconciliation pass from canonical main d83aff47ee3c30813239accaa78f9ad17112e87a, authorized by Bora for authoring only: (1) author the branch-scoped implementation contract milestone_contracts/implementation/career-os-document-rendering-capability-v1.json required by canonical milestone-state validation for implementation/career-os-document-rendering-capability-v1, without weakening the validator; (2) record the minimum canonical reconciliation required by ADR_RECONCILIATION_V1 of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json as an append-only bounded amendment (Amendment A1 of docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md); (3) author this branch contract. No implementation, dependency, installation, provisioning, release or submission authority is created.",
+  "baseline_sha": "d83aff47ee3c30813239accaa78f9ad17112e87a",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "milestone_contracts/implementation/career-os-document-rendering-capability-v1.json",
+    "docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "docs/rendering/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against d83aff47ee3c30813239accaa78f9ad17112e87a is exactly these three paths: milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json, milestone_contracts/implementation/career-os-document-rendering-capability-v1.json and docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md.",
+    "docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md changes append-only: its pre-amendment blob (SHA-256 05ebde970a9eacea8ed6f4b730e1fc41cff37be5d833cf811d2b0c2d013e4f01) is an exact byte prefix of the amended blob, and the only added text is Amendment A1.",
+    "Amendment A1 preserves the original V1 decision as historically correct, scopes the exception to CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1 and the dependency model of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json only, states the shared-lock consequence honestly, and authorizes no dependency mutation, fetch, installation, provisioning, implementation, release or merge.",
+    "milestone_contracts/implementation/career-os-document-rendering-capability-v1.json conforms to schemas/milestone_contract.schema.json, has baseline_sha d83aff47ee3c30813239accaa78f9ad17112e87a, carries allowed_paths no broader than those of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (minus its own governance contract path, plus itself exactly), carries the required_tests of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json verbatim, and names milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json as the controlling specification.",
+    "This contract conforms to schemas/milestone_contract.schema.json and has baseline_sha d83aff47ee3c30813239accaa78f9ad17112e87a.",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json, requirements.in, requirements-lock.txt, src/career_os_state.py, scripts/verify_milestone_state.py and scripts/verify_assurance_baseline.py are byte-identical to d83aff47ee3c30813239accaa78f9ad17112e87a.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check passes.",
+    "No file of the implementation worktree or of implementation branch checkpoints is modified, staged, reset, stashed or otherwise mutated by this pass.",
+    "Merging this candidate does not by itself unlock requirements.in or requirements-lock.txt: that requires canonical recording of Amendment A1 and then a fresh Bora gate (1) authorization naming it."
+  ],
+  "stop_conditions": [
+    "The branch-scoped implementation contract cannot reference milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json without duplicating or weakening it.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "The implementation contract would need paths broader than those of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json.",
+    "The assurance ADR cannot be reconciled without changing unrelated architecture, or only wholesale supersession would work.",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json itself would have to change.",
+    "Any implementation worktree mutation, requirements.in or requirements-lock.txt mutation, dependency fetch, installation or provisioning would be required.",
+    "Any protected surface outside the three allowed paths would have to change."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring only. Commit, push, pull request, release and merge each require separate explicit Bora authorization. Canonical recording of this candidate does not authorize dependency mutation, installation, provisioning, implementation, release of any implementation candidate, or submission; a fresh gate (1) authorization naming Amendment A1 is still required before requirements.in or requirements-lock.txt authoring. Manual SUBMIT remains Bora-controlled."
+}
