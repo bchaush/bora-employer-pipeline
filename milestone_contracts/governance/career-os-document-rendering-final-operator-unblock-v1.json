@@ -1,0 +1,62 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_FINAL_OPERATOR_UNBLOCK_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance correction from canonical main 53dbd95b159f026f84d801e8d1bcd571a462447f recording three explicit Bora governance decisions in milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json: (1) CANONICAL_FONT_AUTHORITY_V1: the unavailable historical Spy Pond FINAL_REFERENCE_STYLE DOCX (SHA-256 330b600e8cc18bd4edd4aa75422df903cdf8a230a6e97192094c89a254851d43) is provenance only and no longer a prerequisite; docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json is the renderer font-plan authority (Liberation Sans primary, Arial approved metric-compatible fallback/substitution, no other family); (2) NO_DEBSIG_EXACT_ADMISSION_V1: dpkg no-debsig is admitted only by exact approved path, file SHA-256, normalized option and position with SOURCE_EXPANSION_V1, keyring, CONFIG_CHECK_V1 and UPDATE_SEMANTICS_V1 passing, adding no per-package .deb signature claim; (3) HOST_PRECONDITIONS_V1: every force-* dpkg option and every third-party apt source stay forbidden, and the OPERATOR files /etc/dpkg/dpkg.cfg.d/docker-apt-speedup and /etc/apt/sources.list.d/microsoft.list are separate human host preconditions before plan capture, never performed by the provisioning script. No implementation, dependency, installation, provisioning, release, merge or submission authority is created.",
+  "baseline_sha": "53dbd95b159f026f84d801e8d1bcd571a462447f",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/implementation/**",
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against 53dbd95b159f026f84d801e8d1bcd571a462447f is exactly these two paths: milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json (added) and milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (modified from pre-amendment blob SHA-256 5c2af9d1f0f967d7a06dab7e3801f36a174c35a4b2033e92f0fdf3ff9fae4627).",
+    "In the capability contract only these fields change: acceptance_conditions[1] (provisioning.font_requirement; apt_trust_model.source_check, what_bora_approves and dpkg_config_check.never_approvable and proof), acceptance_conditions[8] (hermetic vector R1, its operator evidence entry and the REAL Gold-family font check), acceptance_conditions[9] (why_separate), stop_conditions[4], stop_conditions[28], review_requirements and human_approval_requirements; every other field, every embedded acceptance-condition JSON object outside those members, the top-level key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged, and every embedded acceptance-condition JSON object still parses.",
+    "CANONICAL_FONT_AUTHORITY_V1 distinguishes historical exemplar provenance (unavailable binary), canonical extracted doctrine (authoritative) and renderer font-plan authority (the doctrine record docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json, blob SHA-256 9fa9c30a5df6006dce336b55547768c2989a28280be2771696a5eda7f158c680 at baseline, unchanged by this pass); it governs exactly Liberation Sans as primary and Arial as approved metric-compatible fallback/substitution, invents no other family, keeps runtime DOCX family inspection fail-closed, and treats a future contradicting recovery of the historical DOCX as a new governance decision that does not block this milestone.",
+    "NO_DEBSIG_EXACT_ADMISSION_V1 admits no-debsig only under all of: exact gate-(2)-approved DPKG_CONFIG_RECORD_V1 presence, exact file path, exact file SHA-256, exact normalized option and position, SOURCE_EXPANSION_V1, approved Signed-By keyring paths and hashes, CONFIG_CHECK_V1 and UPDATE_SEMANTICS_V1 passing, with insecure and unauthenticated apt modes still never approvable; it states that it adds no per-package .deb signature verification and does not weaken signed-archive verification; the planted-hook proof and hermetic vector R1 carry matching admission and rejection vectors.",
+    "Every force-* dpkg option (including force-unsafe-io) remains DPKG_CONFIG_NEVER_APPROVABLE, SOURCE_EXPANSION_V1 exact-source equality and the third-party-repository prohibition are unchanged, the provisioning script keeps zero authority to edit apt sources or dpkg configuration, and HOST_PRECONDITIONS_V1 records the disabling of /etc/apt/sources.list.d/microsoft.list and the removal of /etc/dpkg/dpkg.cfg.d/docker-apt-speedup on the selected OPERATOR as separate human preconditions before plan capture that grant no provisioning authority.",
+    "Parser architecture, dependency versions and hashes, FULL_LOCK, LibreOffice architecture, the sandbox model, the extraction architecture, the Python target model, review independence, release gates and manual SUBMIT control are not reopened or changed.",
+    "This contract conforms to schemas/milestone_contract.schema.json and has baseline_sha 53dbd95b159f026f84d801e8d1bcd571a462447f.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check and git diff --cached --check pass.",
+    "No file of the implementation worktree or of the implementation branch is modified, staged, reset, stashed or otherwise mutated, and no OPERATOR host state is changed by this pass."
+  ],
+  "stop_conditions": [
+    "The correction would require relaxing any force-* dpkg option, the third-party apt source prohibition or SOURCE_EXPANSION_V1 exact equality.",
+    "Admitting no-debsig would require weakening signed-archive verification, admitting insecure or unauthenticated apt modes, or claiming per-package .deb signature verification.",
+    "The font authority would require inferring or inventing a font family beyond Liberation Sans and Arial, or treating the unavailable historical DOCX as found or substituting another DOCX for it.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "Any path outside the two allowed paths, any implementation worktree file, requirements.in, requirements-lock.txt or OPERATOR host state would have to change.",
+    "Consistency would require reopening parser architecture, dependency versions or hashes, FULL_LOCK, LibreOffice architecture, the sandbox model, the extraction architecture, the Python target model, review independence, release gates or manual SUBMIT control."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, release and merge each require separate explicit Bora authorization. Canonical recording of this candidate does not perform or authorize the HOST_PRECONDITIONS_V1 human actions, OPERATOR provisioning, implementation, dependency mutation, release of any implementation candidate, or submission; gates (1) to (5) of the capability contract are unchanged. Manual SUBMIT remains Bora-controlled."
+}
