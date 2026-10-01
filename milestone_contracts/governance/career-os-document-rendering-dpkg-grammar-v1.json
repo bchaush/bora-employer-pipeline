@@ -1,0 +1,64 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_DPKG_GRAMMAR_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance correction from canonical main b9557d50d81b811b15bee3b96097a8f1423d6f36 in milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json extending the DPKG_CONFIG_CHECK_V1 parsing grammar (DPKG_OPTION_SYNTAX_V1) with only the unquoted whitespace-separated value form required by the observed stock Ubuntu 24.04 dpkg configuration, specifically the line `log /var/log/dpkg.log`. The prior grammar admitted only `<dashes><name>` and `<dashes><name>=<value>`, so the stock Ubuntu 24.04 /etc/dpkg/dpkg.cfg line `log /var/log/dpkg.log` (an unquoted value separated by whitespace) was DPKG_CONFIG_MALFORMED and the OPERATOR-class dpkg record could not be captured. The correction adds the whitespace-separated value form with one unambiguous normalization (the `=` form and the separator form normalize identically) and changes no other rule. The parser remains intentionally stricter than dpkg itself and fail-closed: it does not claim to recognize every syntax dpkg accepts, and quoted option values stay outside the admitted subset and fail closed (a deliberate restriction, not a claim that dpkg rejects them). The host dpkg configuration is not modified to fit the grammar. No implementation, dependency, installation, provisioning, release, merge or submission authority is created.",
+  "baseline_sha": "b9557d50d81b811b15bee3b96097a8f1423d6f36",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-dpkg-grammar-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/implementation/**",
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v1.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against b9557d50d81b811b15bee3b96097a8f1423d6f36 is exactly these two paths: milestone_contracts/governance/career-os-document-rendering-dpkg-grammar-v1.json (added) and milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (modified from pre-amendment blob 59be8bf5e2522977bccbe610b4d94c5b45e0cd48, SHA-256 d85b0d2d5b361f5858c9374a91bcbfba06810a251f6a62a3dc20e678c23e3ecf).",
+    "In the capability contract only these members change: acceptance_conditions[1] (provisioning.apt_trust_model.dpkg_config_check.parsing and dpkg_config_check.proof) and acceptance_conditions[8] (hermetic vector R1); every other field, every other embedded acceptance-condition JSON object, the top-level key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged, and every embedded acceptance-condition JSON object still parses.",
+    "DPKG_OPTION_SYNTAX_V1: a non-ignored dpkg configuration line is exactly one of `<dashes><name>`, `<dashes><name>=<value>` or `<dashes><name><SEP><value>`, the form being decided by the first byte after <name> (end of line, `=`, or space/tab); the `=` form is unchanged byte for byte; the separator form takes the remaining bytes with trailing spaces and tabs removed, non-empty, not beginning with `=`, a space, a tab, a double quote or a single quote; the `=` form and the separator form normalize identically (so `log /var/log/dpkg.log` normalizes to [log, /var/log/dpkg.log]); every other shape, including quoted values, remains DPKG_CONFIG_MALFORMED and fails closed by deliberate restriction of this check.",
+    "Unchanged and not weakened: dpkg file discovery, type, ownership and mode checks; exact file SHA-256 recording; ordered option recording; exact approved-record comparison; every DPKG_CONFIG_NEVER_APPROVABLE rule and all force-* and hook prohibitions (decided by the normalized name regardless of separator syntax); NO_DEBSIG_EXACT_ADMISSION_V1; diversion, statoverride and policy-rc.d checks; SOURCE_EXPANSION_V1, CONFIG_CHECK_V1 and UPDATE_SEMANTICS_V1; HOST_PRECONDITIONS_V1; and the separation of gates (1) to (5).",
+    "The proof vectors establish: (1) the stock `log /var/log/dpkg.log` form parses to [log, /var/log/dpkg.log]; (2) `name=value` behavior remains; (3) valueless options remain; (4) malformed lines remain rejected; (5) never-approvable options remain rejected regardless of separator syntax.",
+    "The host /etc/dpkg/dpkg.cfg is not modified, the provisioning script and verifier keep zero authority to edit dpkg configuration, and updating the verifier and provisioning-script parsers to this grammar and refreshing the implementation contract identity are separate later passes.",
+    "Parser architecture, dependency versions and hashes, FULL_LOCK, LibreOffice architecture, the sandbox model, the extraction architecture, the Python target model, font authority, host preconditions, review independence, release gates and manual SUBMIT control are not reopened or changed.",
+    "This contract conforms to schemas/milestone_contract.schema.json and has baseline_sha b9557d50d81b811b15bee3b96097a8f1423d6f36.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check and git diff --cached --check pass.",
+    "No file of the implementation worktree or of the implementation branch is modified, staged, reset, stashed or otherwise mutated, and no OPERATOR host state is changed by this pass."
+  ],
+  "stop_conditions": [
+    "The correction would require relaxing any force-* dpkg option, any hook option, any DPKG_CONFIG_NEVER_APPROVABLE rule or NO_DEBSIG_EXACT_ADMISSION_V1.",
+    "The correction would require modifying the host /etc/dpkg/dpkg.cfg, weakening the dpkg file type, ownership or mode checks, the exact approved-record comparison, SOURCE_EXPANSION_V1, CONFIG_CHECK_V1 or UPDATE_SEMANTICS_V1.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "Any path outside the two allowed paths, any implementation worktree file, requirements.in, requirements-lock.txt or OPERATOR host state would have to change.",
+    "Consistency would require reopening parser architecture, dependency versions or hashes, FULL_LOCK, LibreOffice architecture, the sandbox model, the extraction architecture, the Python target model, font authority, host preconditions, review independence, release gates or manual SUBMIT control."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, release and merge each require separate explicit Bora authorization. Canonical recording of this candidate does not authorize implementation, verifier or provisioning-script changes, implementation-contract identity reconciliation, OPERATOR provisioning, dependency mutation, release of any implementation candidate, or submission; gates (1) to (5) of the capability contract are unchanged. Manual SUBMIT remains Bora-controlled."
+}
