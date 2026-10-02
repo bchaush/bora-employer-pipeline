@@ -1,0 +1,68 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_E2_HELPER_CHAIN_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance correction from canonical main c7e9ab44df4806756c43b894d5a45326cf966497 in milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json. The disposable proof-prefix run of PROCESS_CREATION_PROOF_V1 on the pinned interpreter (/usr/local/python/3.14.2/bin/python3.14) and the pinned installer pip 26.2.1 showed that the canonical E2 pip install performs exactly two Python-level child-process creations while building its network session (pip's vendored distro module runs `lsb_release -a` and then `uname -rs`), which the zero-exception rule of PROCESS_CREATION_DENY_V1 denies, so provisioning as approved would abort at E2. This pass keeps X0 and E1 at zero child processes, keeps deny-by-default in E2, and admits in E2 only the exact, finitely bound E2_HELPER_CHAIN_V1 sequence under a deterministic PROCESS_CREATION_RECORD_V2: bound to exact argv, exact multiplicity, E2 only, hash-first verification of every admitted executable and of the data file the helper sources, inclusion in HOST_TOOL_RECORD_V1 and TOOL_RECHECK_V1 and the identity-critical package rule, and a success condition that requires the observed allowed sequence to equal the approved sequence exactly. It adds no generic subprocess exception, permits no monkeypatching of pip, changes neither the pip version nor the installer architecture, and introduces no new top-level manifest key (the chain is the new PRE_PROVISION_PLAN member operator_base_interpreter.e2_helper_chain). No implementation, dependency, installation, provisioning, release, merge or submission authority is created.",
+  "baseline_sha": "c7e9ab44df4806756c43b894d5a45326cf966497",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-e2-helper-chain-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/implementation/**",
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v2.json",
+    "milestone_contracts/governance/career-os-document-rendering-dpkg-grammar-v1.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against c7e9ab44df4806756c43b894d5a45326cf966497 is exactly these two paths: milestone_contracts/governance/career-os-document-rendering-e2-helper-chain-v1.json (added) and milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (modified from pre-amendment Git blob 3323c6dd4fe417f29e9cacf9112ea1b05084d177, SHA-256 fc85fb1ff8eea269251f269859d8b9a1acc98a27b005d0648274c8a089317113).",
+    "In the capability contract only these members change: acceptance_conditions[1] (provisioning.provisioning_execution_environment.interpreter_startup_control.process_creation_denial: the zero-exception sentence, the hook decision sentence, FINAL_DENIED_CHECK and its success lines, the proof-prefix sentence and the stated claim, plus the new sibling member e2_helper_chain; provisioning.provisioning_execution_environment.closed_executable_list: HOST_TOOL_RECORD_V1 coverage and the identity-critical owning-package sentence; provisioning.operator_python_install.steps[7]; provisioning.operator_base_interpreter.key), acceptance_conditions[8] (hermetic vector R3 and the two operator-verifier evidence entries naming the disposable proof prefix run), stop_conditions[33], review_requirements and human_approval_requirements; every other field, every other embedded acceptance-condition JSON object, the top-level key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged, and every embedded acceptance-condition JSON object still parses.",
+    "E2_HELPER_CHAIN_V1 admits in E2 only APPROVED_SEQUENCE_V1: the four audit events subprocess.Popen and _posixsubprocess.fork_exec for `lsb_release -a`, then subprocess.Popen and _posixsubprocess.fork_exec for `uname -rs`, each exactly once, in that order, with cwd None, env None and the executable lists derived from the closed PATH; X0 and E1 keep an EMPTY approved sequence; every other process creation, a repeated, missing, reordered or different event, a different argv, path, cwd or env is a denied event and a hard failure; the success condition is DENIED_EVENTS empty AND ALLOWED_EVENTS equal to the approved sequence, evidenced by the lines `DENIED_EVENTS=0` and `ALLOWED_EVENTS=<SHA-256 of the canonical record>`.",
+    "The chain is bound by the PRE_PROVISION_PLAN member operator_base_interpreter.e2_helper_chain (sequence; resolved path, SHA-256, owning package and version of each helper; the shell named by the lsb_release script; the descendant commands of that hash-bound script with exact multiplicities as an order-insensitive multiset; the sourced data file os-release and the link string; the absent closed-PATH candidates), captured read-only from the OPERATOR host before gate (2); every member is added to HOST_TOOL_RECORD_V1, verified hash-first by TOOL_RECHECK_V1 at steps 4 and 6, at F0 and at every later recheck, and its owning package is identity-critical; the chain members are not members of the script's closed executable list because the script never executes them.",
+    "The honest limit is stated in the contract: CPython cannot observe grandchildren, so the hook binds only the top-level sequence and the descendants are bound by content (hash-first verification of every member plus the closed environment), not by runtime observation; shared libraries and the loader of the helper binaries are covered only by the identity-critical package rule; a change between hash and execution by a root-only writer is outside the model.",
+    "PROCESS_CREATION_PROOF_V1 keeps its entire fixed vector list unchanged under an EMPTY approved sequence; the disposable proof-prefix E2 run additionally records an ALLOWED_EVENTS record equal to the approved sequence after the hash-first check of every chain member; the hermetic vectors cover the exact sequence and every named negative (missing, additional, repeated, reordered, different argv, different executable or list, cwd or env set, any other process, the same sequence in X0 or E1, hash mismatch, owner change, present earlier PATH candidate).",
+    "The correction forbids and does not introduce: a generic subprocess.Popen exception, arbitrary pip subprocesses, monkeypatching of pip or pip._vendor.distro, a change of pip version or installer architecture, PATH-only executable selection without resolved-path and hash binding, and any run-time widening of the hook.",
+    "Amendment effect, recorded and not performed here: a new PRE_PROVISION_PLAN member and changed hook, script and verifier bytes change provisioning_script_sha256, verifier_sha256 and PLAN_DIGEST, so a later implementation pass, a fresh read-only OPERATOR capture of the chain, a fresh gate (2) approval and a fresh independent instrument review are required, and the implementation contract identity (blob and SHA-256 of the capability contract) must be reconciled by a further governance pass as with PR #99 and PR #101. The previously approved PLAN_DIGEST does not authorize that later candidate.",
+    "Parser architecture, dependency versions and hashes, FULL_LOCK, LibreOffice architecture, the sandbox model, the extraction architecture, the Python target model, font authority, DPKG_OPTION_SYNTAX_V1, NO_DEBSIG_EXACT_ADMISSION_V1, HOST_PRECONDITIONS_V1, APT_TRUST_MODEL_V1, review independence, release gates and manual SUBMIT control are not reopened or changed.",
+    "This contract conforms to schemas/milestone_contract.schema.json and has baseline_sha c7e9ab44df4806756c43b894d5a45326cf966497.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check and git diff --cached --check pass.",
+    "No file of the implementation worktree or of the implementation branch is modified, staged, reset, stashed or otherwise mutated, and no OPERATOR host state is changed by this pass."
+  ],
+  "stop_conditions": [
+    "The correction would require a generic subprocess exception, an exception in X0 or E1, any process creation beyond the exact two-command sequence, monkeypatching of pip, a different pip or installer, or run-time widening of the hook.",
+    "The helper chain cannot be finitely and exactly bound (a helper, shell, descendant command or sourced data file cannot be resolved to a hashable absolute path with an owning package, or the descendant derivation differs from an observation).",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "Any path outside the two allowed paths, any implementation worktree file, requirements.in, requirements-lock.txt or OPERATOR host state would have to change.",
+    "Consistency would require reopening parser architecture, dependency versions or hashes, FULL_LOCK, LibreOffice, bubblewrap, extraction or Python target architecture, font authority, dpkg or apt policy, host preconditions, review independence, release gates or manual SUBMIT control."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, release and merge each require separate explicit Bora authorization. Canonical recording of this candidate authorizes no implementation change, no OPERATOR plan capture, no provisioning and no release; gates (1) to (5) of the capability contract are otherwise unchanged. Manual SUBMIT remains Bora-controlled."
+}
