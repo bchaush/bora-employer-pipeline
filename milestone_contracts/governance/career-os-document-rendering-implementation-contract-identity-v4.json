@@ -1,0 +1,69 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_IMPLEMENTATION_CONTRACT_IDENTITY_V4",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance reconciliation from canonical main 0a6fb2fe3694c89873c9a8883d067d5c62b5f6a0. CAREER_OS_DOCUMENT_RENDERING_TAG_SEQUENCE_GENERATOR_V1_CORRECTION changed the canonical rendering governance contract milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json to Git blob f306b56503fd200f2a166a6208ea09a75dada51b (SHA-256 a1810becfe609245935cfb9a41a06295e2ea09a2ef44ef4eaad109ed0edde463), so the canonical branch-scoped implementation contract milestone_contracts/implementation/career-os-document-rendering-capability-v1.json still names the superseded governing identity (Git blob 09b3143dd5ab32af887d406a5a07b610eb3e7099, SHA-256 82b7a0c69890b4217037311afee04923f8bd9ad013ce4d373f422c2fb33d31ca, canonical main cd0e626f22687d14549725a6ace24903db651ef9) and its governing-specification stop condition has fired. This pass replaces only that governing-specification identity in the canonical copy of milestone_contracts/implementation/career-os-document-rendering-capability-v1.json and updates its BASELINE provenance sentence to name this recording, so that the implementation branch implementation/career-os-document-rendering-capability-v1 can later carry byte-identical bytes without rebase or merge of main. It keeps baseline_sha d83aff47ee3c30813239accaa78f9ad17112e87a (the historical implementation baseline is never changed to canonical main) and changes no path model, required test, dependency rule, authority, review or human-gate text, and no implementation semantics. No implementation, dependency, installation, provisioning, release, merge or submission authority is created.",
+  "baseline_sha": "0a6fb2fe3694c89873c9a8883d067d5c62b5f6a0",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v4.json",
+    "milestone_contracts/implementation/career-os-document-rendering-capability-v1.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json",
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v2.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v3.json",
+    "milestone_contracts/governance/career-os-document-rendering-dpkg-grammar-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-e2-helper-chain-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-tag-sequence-generator-v1-correction.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against 0a6fb2fe3694c89873c9a8883d067d5c62b5f6a0 is exactly these two paths: milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v4.json (added) and milestone_contracts/implementation/career-os-document-rendering-capability-v1.json (modified from Git blob 2d2b102062b29adcc56542b9239984d2bdd4be95, blob SHA-256 59f0434759333e768993aa591ae4b7b3a80882beb2edfb5b3d06499c79be64a8).",
+    "In milestone_contracts/implementation/career-os-document-rendering-capability-v1.json exactly four text spans change: the governing identity in goal (Git blob 09b3143dd5ab32af887d406a5a07b610eb3e7099 to f306b56503fd200f2a166a6208ea09a75dada51b, SHA-256 82b7a0c69890b4217037311afee04923f8bd9ad013ce4d373f422c2fb33d31ca to a1810becfe609245935cfb9a41a06295e2ea09a2ef44ef4eaad109ed0edde463, canonical main cd0e626f22687d14549725a6ace24903db651ef9 to 0a6fb2fe3694c89873c9a8883d067d5c62b5f6a0); the Git blob and SHA-256 in the GOVERNING SPECIFICATION acceptance condition; the SHA-256 in the governing-specification stop condition; and the BASELINE acceptance condition's provenance sentence, which now names this candidate as the recording of the canonical copy. baseline_sha stays d83aff47ee3c30813239accaa78f9ad17112e87a and is never changed to canonical main; allowed_paths, forbidden_paths, required_tests, every other acceptance and stop condition, review_requirements, human_approval_requirements, the key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged.",
+    "The named identity is exactly that of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json on canonical main 0a6fb2fe3694c89873c9a8883d067d5c62b5f6a0: Git blob f306b56503fd200f2a166a6208ea09a75dada51b, SHA-256 of the blob bytes a1810becfe609245935cfb9a41a06295e2ea09a2ef44ef4eaad109ed0edde463. Between Git blob 09b3143dd5ab32af887d406a5a07b610eb3e7099 and Git blob f306b56503fd200f2a166a6208ea09a75dada51b that governance contract's allowed_paths, forbidden_paths and required_tests are unchanged (only acceptance_conditions[1] and acceptance_conditions[8] changed, by the TAG_SEQUENCE_GENERATOR_V1 correction), so the PATH MODEL and REQUIRED TESTS conditions of milestone_contracts/implementation/career-os-document-rendering-capability-v1.json remain exact without any path or test change.",
+    "milestone_contracts/implementation/career-os-document-rendering-capability-v1.json still states in substance that the canonical rendering governance contract controls, that it adds no technical requirement and relaxes none, that REQUIRED TEST CONTENT applies in full, that Amendment A1 of docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md is the reconciliation path for the hash-enforced dependency model, that implementation, provisioning, release, merge and submission remain separate authorities, and that manual SUBMIT remains Bora-controlled.",
+    "No implementation semantics change: the implementation-branch parser fix of _manifest_string_list, the TAG_SEQUENCE_GENERATOR_V1 implementation changes to the X0 and E2 embedded derive_tags code and to the verifier generator, the manifest and PLAN_DIGEST consequences, a fresh gate (2) approval and a fresh independent instrument review remain a later, separate implementation pass; this contract changes none of the verifier, the provisioning script, the manifest, requirements.in, requirements-lock.txt, FULL_LOCK, dependency versions or hashes, the tests, the allowed implementation paths, the gate semantics or the review requirements.",
+    "The implementation branch implementation/career-os-document-rendering-capability-v1 and its worktree are not modified, staged, rebased, merged or otherwise mutated by this pass. Carrying the canonical bytes onto that branch after canonical recovery is a separate step that requires separate Bora authorization and no rebase or merge of main.",
+    "TAG_SEQUENCE_GENERATOR_V1 as corrected, E2_HELPER_CHAIN_V1, PROCESS_CREATION_RECORD_V2, DPKG_OPTION_SYNTAX_V1, CANONICAL_FONT_AUTHORITY_V1, NO_DEBSIG_EXACT_ADMISSION_V1, HOST_PRECONDITIONS_V1, the apt-source and force-option policies, dependency versions and hashes, FULL_LOCK, parser architecture, LibreOffice architecture, the bubblewrap sandbox, the extraction architecture, the Python target model, review independence, release gates, manual SUBMIT and downstream Gold Package work are not reopened or changed.",
+    "This contract conforms to schemas/milestone_contract.schema.json and has baseline_sha 0a6fb2fe3694c89873c9a8883d067d5c62b5f6a0.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check and git diff --cached --check pass.",
+    "No OPERATOR host state is changed by this pass, no provisioning is performed and no release authority is created."
+  ],
+  "stop_conditions": [
+    "The reconciliation would require any change to milestone_contracts/implementation/career-os-document-rendering-capability-v1.json beyond the four governing-identity and provenance spans, including any change to baseline_sha, allowed_paths, forbidden_paths or required_tests.",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json on canonical main is not Git blob f306b56503fd200f2a166a6208ea09a75dada51b with SHA-256 a1810becfe609245935cfb9a41a06295e2ea09a2ef44ef4eaad109ed0edde463.",
+    "Any path outside the two allowed paths, any file of the implementation branch or worktree, or OPERATOR host state would have to change.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "Consistency would require reopening fonts, no-debsig, dpkg option syntax, the E2 helper chain, the tag sequence generator, apt-source or force-option policy, dependency versions or hashes, FULL_LOCK, parser, LibreOffice, bubblewrap, extraction or Python target architecture, review independence, release gates, manual SUBMIT control or downstream Gold Package work."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, release and merge each require separate explicit Bora authorization, and so does carrying the resulting canonical bytes onto implementation/career-os-document-rendering-capability-v1. Canonical recording of this candidate does not authorize implementation, dependency mutation, OPERATOR plan capture, provisioning, release of any implementation candidate or submission. Gates (1) to (5) of the canonical rendering governance contract are unaffected. Manual SUBMIT remains Bora-controlled."
+}
