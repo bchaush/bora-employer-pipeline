@@ -1,0 +1,73 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_NATIVE_CLOSURE_POST_APT_CACHE_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance correction (PLAN_AMENDMENT_LOOP_V1) from canonical main c45494590f17e2838577dd4094e9ca2fff486e2e in milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json. The real Gate-(3) provisioning run stopped at BASE_INTERPRETER_MISMATCH / NATIVE_CLOSURE / STEP4: the post-apt NATIVE_CLOSURE_V1 digest of /usr/local/python/3.14.2/bin/python3.14 differed from the PRE_APT digest only because the approved apt transaction, through the libc-bin trigger (ldconfig), regenerated the generated loader input /etc/ld.so.cache, while the contract simultaneously required every native-closure member, that file included, to be PRE_APT-identical at IDENTITY_RECHECK_V1. This pass keeps PRE_APT binding of the complete NATIVE_CLOSURE_V1 (including /etc/ld.so.cache) and adds exactly one fail-closed exception, POST_APT_LD_SO_CACHE_V1: after the apt phase, and only at the post-apt IDENTITY_RECHECK_V1 rechecks (step 4 and step 6), a native-closure difference is permitted only when the complete difference is the SHA-256 of /etc/ld.so.cache and thirteen equality and provenance conditions hold. It adds no approved-origin exception, no package-origin exception, no arbitrary generated-file exception and no arbitrary loader-input exception, and changes no other contract semantics. No implementation, dependency, installation, provisioning, OPERATOR, release, merge or submission authority is created.",
+  "baseline_sha": "c45494590f17e2838577dd4094e9ca2fff486e2e",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-native-closure-post-apt-cache-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/implementation/**",
+    "milestone_contracts/governance/career-os-document-rendering-dpkg-grammar-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-e2-helper-chain-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v2.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v3.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v4.json",
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-tag-sequence-generator-v1-correction.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check",
+    "git diff --cached --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against c45494590f17e2838577dd4094e9ca2fff486e2e is exactly these two paths: milestone_contracts/governance/career-os-document-rendering-native-closure-post-apt-cache-v1.json (added) and milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (modified from pre-amendment Git blob f306b56503fd200f2a166a6208ea09a75dada51b, SHA-256 a1810becfe609245935cfb9a41a06295e2ea09a2ef44ef4eaad109ed0edde463 of the LF-normalized Git blob).",
+    "In the capability contract only these members change: acceptance_conditions[1] (provisioning.operator_python_install.steps[4] (step 4) gains the clause naming POST_APT_LD_SO_CACHE_V1; provisioning.operator_base_interpreter.identity_verification.phase_FINAL item (c) is reworded to admit exactly the POST_APT_LD_SO_CACHE_V1 difference; the new sibling member identity_verification.post_apt_ld_so_cache is inserted directly after phase_FINAL), acceptance_conditions[8] (the hermetic vector item 1 gains the POST_APT_LD_SO_CACHE_V1 vectors; the IDENTITY-RECHECK, APT AND TARGET-TAG OPERATOR EVIDENCE entry gains the POST_APT_LD_SO_CACHE_RECORD) and stop_conditions[30] (the post-apt IDENTITY_RECHECK_V1 stop names the single admitted difference); every other field, every other embedded acceptance-condition JSON object, the top-level key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged, and every embedded acceptance-condition JSON object still parses.",
+    "FAILED GATE-(3) EVENT (recorded, evidence only): the real Gate-(3) run (output SHA-256 31cd1fe96352508d49a5ba76391b003a586a98843aab03b43b17a2a1c6bba6f2, provisioning script SHA-256 e48d26a87e76f27e82c52fdabab44169b1e3eb8df866cadf7e438671dcfe8ab7, verifier SHA-256 0d1d8e43d973d03a53bae9daca824e791c3381ffa12a5d3423006f82d88f917d, approved PLAN_DIGEST 4466134623473f09eaad13714517bcd20f23e016de5b050b27f4559ca1df04aa) passed PRE_APT and the whole apt phase and stopped at the first post-apt IDENTITY_RECHECK_V1 (STEP4) with PROVISIONING_ABORT status=BASE_INTERPRETER_MISMATCH reason=NATIVE_CLOSURE detail=STEP4. E1 and E2 were not run, /opt/career-os-render was not created, and nothing was installed in an operator prefix.",
+    "DIGEST EVIDENCE: PRE_APT native_closure_digest f483afe8d926de16e244745b734dffc65f0bbb60b7bf361d41efa88034c6203d (IDENTITY_DIGEST_V1 b8fc104628e2a8007f0d240bcf12cb1b4252ebd5cc65ec5a64337f4f9ef7bbd4); STEP4 native_closure_digest ce66666eb1bc9aa277e656c2bc1d1e19fa37cbaf1945537900546cf493a4e748 (IDENTITY_DIGEST_V1 597baaa070c21dd5f1018337ed873db88db961a3342628095af1e5d545434e21). The interpreter SHA-256 4c275e98e459979b46ff33a08ab0e317db9267fecaffa01d3c70fd0a34711601, the stdlib tree digest 5cb3a54beeb5e0fecb3a659d535365d97ab643c805a65a44a893e50eb839996c and the installer pip tree digest 32070a204ad335943e829674cce980a48198b989526a66cf64146fcb027c6f70 are identical at PRE_APT and STEP4.",
+    "CACHE-ONLY EVIDENCE: exactly one native-closure member changed, the loader input /etc/ld.so.cache, from SHA-256 cbed8b18f0660daec23b95d729ba5826c2b0d938772c67a2a1b6700235e1b1d7 (PRE_APT, op_capture3.json) to 1fc877df6ae2e17a21b052ee7de03ab3f6f0fdb01df1a9d3df85805804417048 (post-apt, read-only capture of the unmodified post-apt OPERATOR host with the verifier of SHA-256 0d1d8e43d973d03a53bae9daca824e791c3381ffa12a5d3423006f82d88f917d). The post-apt closure recomputed to ce66666eb1bc9aa277e656c2bc1d1e19fa37cbaf1945537900546cf493a4e748, equal to the STEP4 digest. Substituting only the post-apt /etc/ld.so.cache SHA-256 into the PRE_APT closure object reproduces that digest exactly.",
+    "MEMBER-COUNT EVIDENCE: both closures have 150 members: 115 file members, 29 link members, 5 loader inputs and 1 absent member (/etc/ld.so.preload). All 115 file members and the loader (/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2) are identical; all 29 links are identical; system_dirs (/lib/x86_64-linux-gnu, /usr/lib/x86_64-linux-gnu, /lib, /usr/lib) are identical; /etc/ld.so.conf (d4b198c463418b493208485def26a6f4c57279467b9dfa491b70433cedb602e8) and the three /etc/ld.so.conf.d members (libc.conf, x86_64-linux-gnu.conf, zz_i386-biarch-compat.conf) are identical in path set and SHA-256; /etc/ld.so.preload remained absent.",
+    "PROVENANCE EVIDENCE: the approved apt-get install (history.log 2026-10-02 04:28:25 to 04:28:52, arguments --yes --no-install-recommends --no-remove) produced 51 apt_installed_delta entries (50 ADDED, 1 UPGRADED: bubblewrap 0.9.0-1ubuntu0.1 to 0.9.0-1ubuntu0.3) and no entry for an identity_critical package; libc-bin 2.39-0ubuntu8.8 and libc6 were not changed and dpkg -V libc-bin libc6 is clean. The Gate-(3) output records Processing triggers for libc-bin (2.39-0ubuntu8.8) during the transaction; dpkg.log records status triggers-pending libc-bin at 04:28:26 and trigproc libc-bin at 04:28:42; /etc/ld.so.cache is owned by no dpkg package (it is generated) and has mtime 2026-10-02 04:28:48 UTC, inside the transaction window. The cache change is temporally and causally consistent with the libc-bin ldconfig trigger; no unrelated drift was found.",
+    "ADJUDICATION: GATE3_STOP_ADJUDICATION=B. The pre-amendment contract required the complete NATIVE_CLOSURE_V1, /etc/ld.so.cache included, to remain PRE_APT-identical at the post-apt IDENTITY_RECHECK_V1, while the approved apt phase deterministically regenerates /etc/ld.so.cache through the libc-bin trigger; the contract contradicted itself and the implementation did not deviate from it.",
+    "THE EXACT NARROW EXCEPTION, POST_APT_LD_SO_CACHE_V1 (identity_verification.post_apt_ld_so_cache), applies only at the post-apt IDENTITY_RECHECK_V1 of step 4 and step 6, compares against the PRE_APT member-level closure, and permits a native-closure difference ONLY when the complete difference is exactly the SHA-256 of /etc/ld.so.cache and ALL thirteen conditions hold: (1) every other file member path and SHA-256 is identical; (2) every link member and target is identical; (3) the loader path and SHA-256 are identical; (4) system_dirs are identical; (5) /etc/ld.so.conf and every /etc/ld.so.conf.d member path and hash are identical; (6) the absent-member set is identical; (7) the interpreter executable SHA-256 is identical; (8) the stdlib tree digest is identical; (9) the installer pip tree digest is identical; (10) no identity_critical package appears in the apt delta; (11) the apt transaction is exactly the approved plan; (12) evidence establishes libc-bin / ldconfig processing during that exact approved apt transaction; (13) the post-apt closure resolves to the identical non-cache file and link member set. Any other difference, or any unmet condition, remains BASE_INTERPRETER_MISMATCH / NATIVE_CLOSURE.",
+    "DENIED EXCEPTIONS: the amendment contains no general approved-origin exception, no package-origin exception, no arbitrary generated-file exception and no arbitrary loader-input exception; the exemption is exactly the content hash of the generated /etc/ld.so.cache across the approved apt phase under every condition above. At step 6 the cache hash must in addition equal the value accepted at step 4. In the admitted case the IDENTITY_DIGEST_V1 comparison uses the PRE_APT native_closure_digest, and the live post-apt digests are recorded as evidence only.",
+    "PRESERVED UNCHANGED: the PRE_APT native-closure requirements (phase_PRE_APT), the identity-critical package rule, the interpreter identity, the stdlib and pip tree rules, the apt pins, the apt package plan, the dependency lock, FULL_LOCK, E1, E2, the process-creation policy, the tag-generator model, the parser architecture, the renderer and sandbox architecture, the human gates, review independence, the release controls and the PURSUE/SUBMIT boundary. No manifest key is added.",
+    "SEQUENCING AND AUTHORITY: implementation changes (the provisioning script, the verifier, the tests and the manifest) happen only after this amendment is canonical on main and under a separate authorization. The current post-apt OPERATOR state is evidence only. This governance pass authorizes no OPERATOR action, no apt, no ldconfig, no cleanup of the post-apt state, no rerun of Gate-(3), no E1 or E2, and no implementation change."
+  ],
+  "stop_conditions": [
+    "The correction would admit any native-closure difference after the apt phase other than the content hash of /etc/ld.so.cache, would admit an approved-origin, package-origin, generated-file or other loader-input exception, or would weaken the PRE_APT native-closure binding or the identity-critical package rule.",
+    "The exception cannot be stated so that every one of its thirteen conditions is externally checkable by non-interpreter tools against the PRE_APT member-level closure and the captured evidence of the exact approved apt transaction.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "Any path outside the two allowed paths, any implementation worktree file, requirements.in, requirements-lock.txt, any manifest or OPERATOR host state would have to change.",
+    "Consistency would require reopening the apt plan or pins, dependency versions or hashes, FULL_LOCK, E1, E2, the process-creation policy, the tag-generator model, parser architecture, renderer or sandbox architecture, review independence, release gates or manual SUBMIT control."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, release and merge each require separate explicit Bora authorization. Canonical recording of this candidate authorizes no implementation change, no OPERATOR action, no provisioning, no Gate-(3) rerun and no release; gates (1) to (5) of the capability contract are otherwise unchanged. Manual SUBMIT remains Bora-controlled."
+}
