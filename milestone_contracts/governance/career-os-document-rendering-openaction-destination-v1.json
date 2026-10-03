@@ -1,0 +1,72 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_OPENACTION_DESTINATION_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance amendment from canonical main 14f7477d4938d2b2286fd12097bcdc7bb4cd4cc0. The frozen rendering implementation, run through the complete real operator verification on the provisioned OPERATOR environment, passes every verification step except one: at S5.03 DOCUMENT_STATE_V1 the pinned LibreOffice 24.2.7.2 420(Build:2) exporter writes, under the approved export options, the catalog entry /OpenAction as the plain destination array [<page> /XYZ null null 0], and the governing contract denies every /OpenAction by presence. This pass amends milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json so that exactly that destination array shape is admitted at S5.03 under the new rule OPEN_ACTION_DESTINATION_V1 (ten conjunctive conditions) and every other /OpenAction (every action dictionary, JavaScript, URI, Launch, GoToR or other action, every other destination shape) remains denied with reason OPEN_ACTION_PRESENT. The amendment changes only text of acceptance_conditions[1] (the DOCUMENT_STATE_V1 specification: catalog_keys, principle, expected_export and the new member open_action_destination), acceptance_conditions[5] (one clause of the document-level-state proof statement) and acceptance_conditions[8] (the document-state required test content). It does not change any PDF document-state rule other than /OpenAction, the parser architecture, the sandbox or network rules, POST_PROVISION_BINDING, any PRE_PROVISION_PLAN value, any status or reason set, any stop condition, allowed_paths, forbidden_paths, required_tests, review or human-approval text. The implementation entry change (src/rendered_pdf_inspection.py), the implementation tests, the implementation-contract identity reconciliation and any fresh review of those remain a later, separate pass under separate authorization. No implementation mutation, dependency mutation, OPERATOR action, provisioning, Gate-(3) retry, release, commit, push, pull request or merge, final governed render, or submission authority is created.",
+  "baseline_sha": "14f7477d4938d2b2286fd12097bcdc7bb4cd4cc0",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-openaction-destination-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/implementation/**",
+    "milestone_contracts/governance/career-os-document-rendering-dpkg-grammar-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-e2-helper-chain-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-final-operator-unblock-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v2.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v3.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v4.json",
+    "milestone_contracts/governance/career-os-document-rendering-integration-reconciliation-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-tag-sequence-generator-v1-correction.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md",
+    "milestone_contracts/governance/career-os-document-rendering-native-closure-post-apt-cache-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-implementation-contract-identity-v5.json"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check",
+    "git diff --cached --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against 14f7477d4938d2b2286fd12097bcdc7bb4cd4cc0 is exactly these two paths: milestone_contracts/governance/career-os-document-rendering-openaction-destination-v1.json (added) and milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (modified from Git blob 095c7d69318f7b120443261948c6904e3aab5693, blob SHA-256 301391ce09d38b18e1676dc010bdfc47dbf11ee1e4274bafdd16518dfd9c766f to Git blob 70c96cb0182c4c4b94458a2767cd64344030c305, blob SHA-256 1923debfb51af7d1b3eef4dab3cf05f96137d39279f4c197b32ac5b3bb063822).",
+    "OLD S5.03 BEHAVIOR: catalog_keys denies every catalog /OpenAction with a non-null value, reason OPEN_ACTION_PRESENT, with no exception, and DOCUMENT_STATE_V1 never traverses or interprets the value of a denied key.",
+    "NEW S5.03 BEHAVIOR (OPEN_ACTION_DESTINATION_V1): a catalog /OpenAction is admitted if and only if ALL hold: (1) it is a PDF destination ARRAY and not an action dictionary; (2) its length is exactly 5; (3) element 0 resolves to a valid page of the same document; (4) element 1 is exactly the name /XYZ; (5) element 2 is the PDF null; (6) element 3 is the PDF null; (7) element 4 is numeric zero; (8) there is no additional element; (9) resolving any indirect element does not raise; (10) no /S, /JS, /URI, /Launch, /GoToR, /SubmitForm, /ImportData, /Named or any action-dictionary semantics is admitted. Every other /OpenAction (dictionary, JavaScript, URI, Launch, external GoTo, malformed array, non-page destination, any other destination shape) remains RENDER_DOCUMENT_STATE_UNSUPPORTED reason OPEN_ACTION_PRESENT; a raised read remains RENDER_PDF_INSPECTION_FAILED reason DOCUMENT_STATE_READ. The rule is not generalized to other destinations or arrays and no other catalog key acquires an exception.",
+    "The amendment changes exactly six text spans, all inside acceptance_conditions: in acceptance_conditions[1] (E1) the OPEN_ACTION_PRESENT entry of catalog_keys, (E2) the new member open_action_destination of DOCUMENT_STATE_V1, (E3) the principle sentence on traversal, (E4) the expected_export sentence; in acceptance_conditions[5] (E5) the denied-catalog-keys clause; in acceptance_conditions[8] (E6) the document-state required test content, which adds the admitted vector and the negative vectors and never weakens an existing vector. No other text of the contract changes: allowed_paths, forbidden_paths, required_tests, stop_conditions, review_requirements, human_approval_requirements, every status and reason set (OPEN_ACTION_PRESENT remains in the S5.03 reason set), every spec outside DOCUMENT_STATE_V1, the unrelated PDF document-state rules (the other catalog keys, the page /AA rule, PDF_INFO_RECORDED), the parser architecture, the sandbox and network rules, POST_PROVISION_BINDING and every PRE_PROVISION_PLAN value are byte-identical.",
+    "NEGATIVE GOVERNANCE VECTORS required of the later implementation tests (each is a stdlib-built PDF, none admitted): dictionary /OpenAction; /JavaScript action; /URI action; /Launch action; /GoToR action; /SubmitForm; /ImportData; /Named; destination of the wrong mode (/Fit, /FitH, /FitV, /FitR, /FitB, /FitBH, /FitBV); wrong array length (4 and 6); first element a page not belonging to the document, a non-page object, a null or an integer; a non-null coordinate where null is required (element 2 and element 3 separately); a final zoom that is not zero; a broken indirect reference (a missing object, and a raising read, which is DOCUMENT_STATE_READ); plus the admitted vector [page /XYZ null null 0] with an integer and a real zero. These are recorded in acceptance_conditions[8] of the amended contract as required test content.",
+    "EMPIRICAL BASIS (governance evidence, pinned and non-authorizing): pinned LibreOffice 24.2.7.2 420(Build:2) in the OPERATOR sandbox; observed catalog /OpenAction shape [<page> /XYZ null null 0]; REAL GOVERNED FAILURE before this amendment: OPERATOR_VERIFICATION_V1 evidence digest 63551442fbe250010dd9a74238a5ecaa2c3298730c0f592c0eaa12adc8574d85 (evidence file SHA-256 c490288e6f2a033090991dd71d4a864883d05d16d5f18f3f46e45695c4398cc3), result FAIL at step executability_fixture_and_determinism with the frozen entry; NON-GOVERNED SCRATCH RESULT (the single OPEN_ACTION_PRESENT rejection line removed in a scratch copy of the inspection entry, never governed, never delivered): OPERATOR_VERIFICATION_V1 evidence digest 84e513dd0e619eeccc2167afbf0c9b663fa83bc4e38831d31f6f92df71b4adb5 (evidence file SHA-256 4f8839c0679eec25e2194a5aa9ef5fcab23be6149534eaac3a5006c215e8023d), result PASS for all 10 steps, which shows /OpenAction is the only remaining blocker; deterministic three fresh renders with identical render_semantic_fingerprint f1efe0ad33b781d781cf1bdfa983033a688d0a7c419f8d2c433ddf0ed29b71e5; no approved export-filter option removes the entry (the approved options ExportBookmarks false, ExportFormFields false and ExportNotes false are already applied and the entry is still written, as established by the operator finding recorded with this task). The frozen runtime candidate identities (contract a41ea097..., script 006ecaa0..., verifier 64977180..., adapter 2c9523c1..., inspection 1279450d..., runtime manifest 9b951c9c..., PLAN_DIGEST 973edaa6..., PRE_PROVISION_PLAN 45754e63...) are not changed by this pass.",
+    "The implementation contract milestone_contracts/implementation/career-os-document-rendering-capability-v1.json names the governing contract identity Git blob 095c7d69318f7b120443261948c6904e3aab5693 and therefore becomes stale after this candidate is canonical; its reconciliation to the new identity is a later, separate governance pass (as for identity-v1 to v5) and is not part of this pass.",
+    "This amendment grants NO implementation mutation, NO dependency mutation, NO OPERATOR action, NO provisioning, NO Gate-(3) retry, NO release, NO commit, push, pull request or merge, NO final governed render and NO submission authority.",
+    "This contract conforms to schemas/milestone_contract.schema.json and has baseline_sha 14f7477d4938d2b2286fd12097bcdc7bb4cd4cc0.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check and git diff --cached --check pass."
+  ],
+  "stop_conditions": [
+    "The amendment would admit any /OpenAction other than the exact five-element [page /XYZ null null 0] destination array of the same document, would generalize to other destinations or arrays, or would admit any action dictionary, JavaScript, URI, Launch, GoToR, SubmitForm, ImportData or Named action.",
+    "Any text of the governing contract outside the six named spans, any other PDF document-state rule, the parser architecture, the sandbox or network rules, POST_PROVISION_BINDING or any PRE_PROVISION_PLAN value would have to change.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py.",
+    "Any path outside the two allowed paths, any implementation worktree file, requirements.in, requirements-lock.txt, any manifest or OPERATOR host state would have to change."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, release and merge each require separate explicit Bora authorization. Canonical recording of this candidate authorizes no implementation change, no OPERATOR action, no provisioning, no Gate-(3) rerun, no final governed render and no release; gates (1) to (5) of the capability contract are otherwise unchanged. Manual SUBMIT remains Bora-controlled."
+}
