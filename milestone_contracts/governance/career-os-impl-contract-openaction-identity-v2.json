@@ -1,0 +1,53 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_IMPLEMENTATION_CONTRACT_OPENACTION_IDENTITY_V2",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow canonical recording from canonical main 32df438726d2ef33856b4f665e9532220149d270. The independently reviewed implementation-contract bytes of milestone_contracts/implementation/career-os-document-rendering-capability-v1.json (Git blob 9bef29150491c865efc06d3aee07bbcb3cce730d, SHA-256 8977ce5cd14264dff63e538f13901f1809de680f5d9aeb98b03b8ee60d4b3df7) replace the canonical copy (Git blob ecef73a54c28fbeb574f0930ae15a4122e4dfbbc) so the canonical implementation contract names the canonical rendering governance contract after OPEN_ACTION_DESTINATION_V1 (Git blob 70c96cb0182c4c4b94458a2767cd64344030c305, SHA-256 1923debfb51af7d1b3eef4dab3cf05f96137d39279f4c197b32ac5b3bb063822). No implementation, dependency, installation, provisioning, release, merge or submission authority is created by this file.",
+  "baseline_sha": "32df438726d2ef33856b4f665e9532220149d270",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-impl-contract-openaction-identity-v2.json",
+    "milestone_contracts/implementation/career-os-document-rendering-capability-v1.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json",
+    "docs/resume/**",
+    "docs/decisions/**",
+    "docs/rendering/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against 32df438726d2ef33856b4f665e9532220149d270 is exactly these two paths: milestone_contracts/governance/career-os-impl-contract-openaction-identity-v2.json (added) and milestone_contracts/implementation/career-os-document-rendering-capability-v1.json (modified from Git blob ecef73a54c28fbeb574f0930ae15a4122e4dfbbc to Git blob 9bef29150491c865efc06d3aee07bbcb3cce730d, blob SHA-256 8977ce5cd14264dff63e538f13901f1809de680f5d9aeb98b03b8ee60d4b3df7).",
+    "The implementation-contract change is limited to the governing-contract identity in goal, the governing identity in acceptance condition 0, the historical provenance sentence of acceptance condition 5, and the expected governing-contract identity in stop condition 1; allowed_paths, forbidden_paths, required_tests, architecture, dependencies, provisioning, plan semantics, technical requirements and every human gate are unchanged.",
+    "python scripts/verify_milestone_state.py, full canonical Assurance and git diff --check pass.",
+    "No OPERATOR host state is changed by this pass."
+  ],
+  "stop_conditions": [
+    "The resulting implementation-contract file does not have Git blob 9bef29150491c865efc06d3aee07bbcb3cce730d and SHA-256 8977ce5cd14264dff63e538f13901f1809de680f5d9aeb98b03b8ee60d4b3df7.",
+    "Any path outside the two allowed paths would have to change.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py."
+  ],
+  "review_requirements": "The implementation-contract bytes were independently reviewed by G (REVIEW OUTCOME SAFE, FINDINGS NONE); this file adds no reviewer or review requirement.",
+  "human_approval_requirements": "Bora explicitly approved canonical recording of the exact reviewed implementation-contract replacement. This authorizes nothing else. Manual SUBMIT remains Bora-controlled."
+}
