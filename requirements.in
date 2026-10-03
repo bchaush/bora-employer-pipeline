@@ -8,6 +8,15 @@
 # is added. The complete resolved transitive environment (including
 # jsonschema's and referencing's own dependencies) is pinned separately in
 # requirements-lock.txt; this file is not itself installed directly by CI.
+#
+# CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1 (DEPENDENCY_MODEL_V1 of
+# milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json,
+# under Amendment A1 of the ADR above) adds ONLY the two direct inspection
+# distributions pdfminer.six and pypdf, default no-extras selection. Their
+# exact versions belong to docs/rendering/RENDERING_ENVIRONMENT_V1.json and
+# the hash-listed requirements-lock.txt (FULL_LOCK); none is pinned here.
 
 jsonschema
 referencing
+pdfminer.six
+pypdf

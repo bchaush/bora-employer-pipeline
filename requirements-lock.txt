@@ -3,22 +3,40 @@
 # REPRODUCIBLE_CONSEQUENTIAL_ASSURANCE_BASELINE_V1, per
 # docs/decisions/ADR-REPRODUCIBLE-CONSEQUENTIAL-ASSURANCE-BASELINE-V1.md §3.
 #
-# Resolved from requirements.in (jsonschema, referencing) against the
-# verified development environment. This is the COMPLETE set -- direct
-# dependencies plus every transitive dependency they require -- not merely
-# the two direct pins; a partially pinned dependency set must never be
-# labeled reproducible. Confirmed complete by direct `pip show` inspection
-# of each package's own `Requires:` line at ADR-authoring time:
+# Resolved from requirements.in (jsonschema, referencing, pdfminer.six,
+# pypdf). This is the COMPLETE set -- direct dependencies plus every
+# transitive dependency they require -- not merely the direct pins; a
+# partially pinned dependency set must never be labeled reproducible.
 #   jsonschema requires: attrs, jsonschema-specifications, referencing, rpds-py
 #   referencing requires: attrs, rpds-py
 #   jsonschema-specifications requires: referencing
 #   attrs requires: (none)
 #   rpds-py requires: (none)
-# No hash enforcement in V1 (deferred until clean cross-platform
-# environment reconstruction is first proven).
+#   pdfminer.six requires: charset-normalizer, cryptography
+#   pypdf requires: (none)
+#   cryptography requires: cffi
+#   cffi requires: pycparser
+#   charset-normalizer requires: (none)
+#   pycparser requires: (none)
+# (default no-extras selection; markers evaluated for the OPERATOR and
+# HOSTED_CI artifact targets, cp314 manylinux glibc 2.39 x86_64.)
+#
+# Hash enforcement: FULL_LOCK of DEPENDENCY_MODEL_V1 in
+# milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json,
+# under the single governed exception of Amendment A1 of the ADR above. Every
+# line carries the --hash=sha256: values of its lock_artifacts wheels in
+# docs/rendering/RENDERING_ENVIRONMENT_V1.json (one value per line here: each
+# chosen wheel serves both targets). pip therefore installs this file in
+# hash-checking mode; baseline entry versions are unchanged.
 
-attrs==26.1.0
-jsonschema==4.26.0
-jsonschema-specifications==2025.9.1
-referencing==0.37.0
-rpds-py==2026.6.3
+attrs==26.1.0 --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
+cffi==2.1.1 --hash=sha256:b0431303acaea1089ad4b3e9ce4e6518193def1118d4073ca848635ee4ea2e96
+charset-normalizer==3.5.2 --hash=sha256:34276fd796040bf0993ab33a369aa572e6979c7aab225a88893667ad8eac8f7a
+cryptography==50.0.2 --hash=sha256:9dab55f57c74c3cad24c323bacbbd04be4705ba6eb0d92e920b1fc4837ed5079
+jsonschema==4.26.0 --hash=sha256:d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce
+jsonschema-specifications==2025.9.1 --hash=sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe
+pdfminer-six==20260107 --hash=sha256:366585ba97e80dffa8f00cebe303d2f381884d8637af4ce422f1df3ef38111a9
+pycparser==3.0 --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
+pypdf==6.19.0 --hash=sha256:7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14
+referencing==0.37.0 --hash=sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231
+rpds-py==2026.6.3 --hash=sha256:dc319e5a1de4b6913aac94bf6a2f9e847371e0a140a43dd4991db1a09bc2d504

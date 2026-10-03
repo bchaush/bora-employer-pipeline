@@ -1,0 +1,5067 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/rendered_document_evidence.schema.json",
+  "title": "RENDERED_DOCUMENT_EVIDENCE_V1",
+  "description": "Runtime evidence schema of CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1. The root validates one evidence record; $defs.child_frame validates one CHILD_PROTOCOL_V1 frame. Every check is labelled AUTOMATED or HUMAN_REQUIRED and human review can never be waived. Integers are JSON integers (a number with a fraction part, including 1.0, is not an integer for this schema). Stream-level rules (seq order, stage order, FINAL binding, line lengths, strictly ascending fd_state, start classification) are enforced by the parent stream validator, not by this schema.",
+  "$ref": "#/$defs/evidence_record",
+  "$defs": {
+    "hex64": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "not": {
+        "pattern": "\n"
+      }
+    },
+    "hex64_or_null": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/hex64"
+        }
+      ]
+    },
+    "fail_string": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^(?:[\\x20-\\x21\\x23-\\x24\\x26-\\x5b\\x5d-\\x7e]|%[0-9A-F]{2})*(?:%~)?$",
+      "not": {
+        "pattern": "\n"
+      }
+    },
+    "fail_string_or_null": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/fail_string"
+        }
+      ]
+    },
+    "exception_class": {
+      "anyOf": [
+        {
+          "const": "<UNREPRESENTABLE>"
+        },
+        {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "not": {
+            "pattern": "\n"
+          }
+        }
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99999999999999999999
+    },
+    "flag": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "quantized": {
+      "type": "integer",
+      "minimum": -9007199254740992,
+      "maximum": 9007199254740992
+    },
+    "number": {
+      "type": "number",
+      "minimum": -1000000000000000.0,
+      "maximum": 1000000000000000.0
+    },
+    "rect": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/number"
+      }
+    },
+    "page_index": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 49
+    },
+    "text_chunks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1024
+      }
+    },
+    "form_path": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/fail_string"
+      }
+    },
+    "start_attestation": {
+      "type": "object",
+      "required": [
+        "inspection_entry_sha256",
+        "received_pdf_sha256",
+        "fd_state",
+        "tmpdir_entries",
+        "pycache_state",
+        "pycache_prefix_matches"
+      ],
+      "properties": {
+        "inspection_entry_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "received_pdf_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "fd_state": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "prefixItems": [
+              {
+                "$ref": "#/$defs/count"
+              },
+              {
+                "$ref": "#/$defs/fail_string"
+              }
+            ]
+          }
+        },
+        "tmpdir_entries": {
+          "$ref": "#/$defs/count"
+        },
+        "pycache_state": {
+          "enum": [
+            "ABSENT",
+            "PRESENT"
+          ]
+        },
+        "pycache_prefix_matches": {
+          "$ref": "#/$defs/flag"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pass_S5.02": {
+      "type": "object",
+      "required": [
+        "start_attestation"
+      ],
+      "properties": {
+        "start_attestation": {
+          "$ref": "#/$defs/start_attestation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pass_S5.03": {
+      "type": "object",
+      "required": [
+        "catalog_keys",
+        "info_keys",
+        "metadata_present"
+      ],
+      "properties": {
+        "catalog_keys": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/fail_string"
+          }
+        },
+        "info_keys": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "$ref": "#/$defs/fail_string"
+              }
+            }
+          ]
+        },
+        "metadata_present": {
+          "$ref": "#/$defs/flag"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pass_S6": {
+      "type": "object",
+      "required": [
+        "page_count",
+        "pages",
+        "prescan_font_entries"
+      ],
+      "properties": {
+        "page_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "pages": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "required": [
+              "index",
+              "width_pt",
+              "height_pt",
+              "width_q",
+              "height_q",
+              "rotation",
+              "non_text_content"
+            ],
+            "properties": {
+              "index": {
+                "$ref": "#/$defs/page_index"
+              },
+              "width_pt": {
+                "$ref": "#/$defs/number"
+              },
+              "height_pt": {
+                "$ref": "#/$defs/number"
+              },
+              "width_q": {
+                "$ref": "#/$defs/quantized"
+              },
+              "height_q": {
+                "$ref": "#/$defs/quantized"
+              },
+              "rotation": {
+                "type": "integer",
+                "const": 0
+              },
+              "non_text_content": {
+                "$ref": "#/$defs/flag"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "prescan_font_entries": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "span": {
+      "type": "object",
+      "required": [
+        "font",
+        "size_q",
+        "color",
+        "text",
+        "gap_before"
+      ],
+      "properties": {
+        "font": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "size_q": {
+          "$ref": "#/$defs/quantized"
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "$ref": "#/$defs/number"
+              }
+            },
+            {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "$ref": "#/$defs/number"
+              }
+            }
+          ]
+        },
+        "text": {
+          "$ref": "#/$defs/text_chunks"
+        },
+        "gap_before": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pass_S7": {
+      "type": "object",
+      "required": [
+        "pages"
+      ],
+      "properties": {
+        "pages": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "required": [
+              "index",
+              "lines"
+            ],
+            "properties": {
+              "index": {
+                "$ref": "#/$defs/page_index"
+              },
+              "lines": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "bbox",
+                    "spans"
+                  ],
+                  "properties": {
+                    "bbox": {
+                      "$ref": "#/$defs/rect"
+                    },
+                    "spans": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/$defs/span"
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "pass_S9": {
+      "type": "object",
+      "required": [
+        "font_entries",
+        "assertion"
+      ],
+      "properties": {
+        "font_entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "page_index",
+              "source",
+              "form_path",
+              "resource_name",
+              "object_id",
+              "subtype",
+              "basefont",
+              "descendant_basefont",
+              "descriptor_present",
+              "descriptor_fontname",
+              "embedded",
+              "embed_key"
+            ],
+            "properties": {
+              "page_index": {
+                "$ref": "#/$defs/page_index"
+              },
+              "source": {
+                "enum": [
+                  "PAGE",
+                  "FORM"
+                ]
+              },
+              "form_path": {
+                "$ref": "#/$defs/form_path"
+              },
+              "resource_name": {
+                "$ref": "#/$defs/fail_string"
+              },
+              "object_id": {
+                "$ref": "#/$defs/fail_string_or_null"
+              },
+              "subtype": {
+                "$ref": "#/$defs/fail_string_or_null"
+              },
+              "basefont": {
+                "$ref": "#/$defs/fail_string_or_null"
+              },
+              "descendant_basefont": {
+                "$ref": "#/$defs/fail_string_or_null"
+              },
+              "descriptor_present": {
+                "$ref": "#/$defs/flag"
+              },
+              "descriptor_fontname": {
+                "$ref": "#/$defs/fail_string_or_null"
+              },
+              "embedded": {
+                "type": "boolean"
+              },
+              "embed_key": {
+                "enum": [
+                  null,
+                  "FontFile",
+                  "FontFile2",
+                  "FontFile3"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "assertion": {
+          "type": "object",
+          "required": [
+            "prescan_font_entries",
+            "inventory_entries"
+          ],
+          "properties": {
+            "prescan_font_entries": {
+              "$ref": "#/$defs/count"
+            },
+            "inventory_entries": {
+              "$ref": "#/$defs/count"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "pass_S10": {
+      "type": "object",
+      "required": [
+        "annotations",
+        "duplicates"
+      ],
+      "properties": {
+        "annotations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "page_index",
+              "annot_index",
+              "subtype",
+              "rect_ccs",
+              "kind",
+              "uri",
+              "goto_page",
+              "words_text"
+            ],
+            "properties": {
+              "page_index": {
+                "$ref": "#/$defs/page_index"
+              },
+              "annot_index": {
+                "$ref": "#/$defs/count"
+              },
+              "subtype": {
+                "const": "Link"
+              },
+              "rect_ccs": {
+                "$ref": "#/$defs/rect"
+              },
+              "kind": {
+                "enum": [
+                  "LINK_URI",
+                  "LINK_GOTO"
+                ]
+              },
+              "uri": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 4096
+                  }
+                ]
+              },
+              "goto_page": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/$defs/page_index"
+                  }
+                ]
+              },
+              "words_text": {
+                "$ref": "#/$defs/text_chunks"
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "LINK_URI"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "goto_page": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "uri": {
+                      "type": "null"
+                    },
+                    "goto_page": {
+                      "$ref": "#/$defs/page_index"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "duplicates": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "final_evidence": {
+      "type": "object",
+      "required": [
+        "pdf_sha256",
+        "inspection_entry_sha256",
+        "evidence_bytes"
+      ],
+      "properties": {
+        "pdf_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "inspection_entry_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "evidence_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 33554432
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S5.02": {
+      "type": "object",
+      "required": [
+        "slot",
+        "start_attestation"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S5.02"
+          ]
+        },
+        "start_attestation": {
+          "$ref": "#/$defs/start_attestation"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S5.03": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S5.03"
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S6": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S6.01",
+            "S6.01a",
+            "S6.01b",
+            "S6.02",
+            "S6.03",
+            "S6.04",
+            "S6.05",
+            "S6.06",
+            "S6.06a",
+            "S6.07",
+            "S6.08",
+            "S6.09",
+            "S6.09a",
+            "S6.10"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "source": {
+          "enum": [
+            "PAGE",
+            "FORM"
+          ]
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "category": {
+          "enum": [
+            null,
+            "ExtGState",
+            "ColorSpace",
+            "Pattern",
+            "Shading",
+            "XObject",
+            "Font",
+            "Properties"
+          ]
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S6.01b": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S6.01b"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "source": {
+          "enum": [
+            "PAGE",
+            "FORM"
+          ]
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "category": {
+          "enum": [
+            null,
+            "ExtGState",
+            "ColorSpace",
+            "Pattern",
+            "Shading",
+            "XObject",
+            "Font",
+            "Properties"
+          ]
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S6.01": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S6.01"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "source": {
+          "enum": [
+            "PAGE",
+            "FORM"
+          ]
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "category": {
+          "enum": [
+            null,
+            "ExtGState",
+            "ColorSpace",
+            "Pattern",
+            "Shading",
+            "XObject",
+            "Font",
+            "Properties"
+          ]
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S6.02_S6.03_S6.04_S6.05_S6.06_S6.07_S6.08": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S6.02",
+            "S6.03",
+            "S6.04",
+            "S6.05",
+            "S6.06",
+            "S6.07",
+            "S6.08"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "source": {
+          "enum": [
+            "PAGE",
+            "FORM"
+          ]
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "category": {
+          "enum": [
+            null,
+            "ExtGState",
+            "ColorSpace",
+            "Pattern",
+            "Shading",
+            "XObject",
+            "Font",
+            "Properties"
+          ]
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S6.06a": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S6.06a"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "source": {
+          "enum": [
+            "PAGE",
+            "FORM"
+          ]
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "category": {
+          "enum": [
+            null,
+            "ExtGState",
+            "ColorSpace",
+            "Pattern",
+            "Shading",
+            "XObject",
+            "Font",
+            "Properties"
+          ]
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S7": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S7.00",
+            "S7.01",
+            "S7.02",
+            "S7.03",
+            "S7.04"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S9": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S9.00",
+            "S9.01",
+            "S9.01a",
+            "S9.02"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "source": {
+          "enum": [
+            "PAGE",
+            "FORM"
+          ]
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        },
+        "form_path": {
+          "$ref": "#/$defs/form_path"
+        },
+        "resource_name": {
+          "$ref": "#/$defs/fail_string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fail_S10": {
+      "type": "object",
+      "required": [
+        "slot"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "S10.00",
+            "S10.01",
+            "S10.02",
+            "S10.03",
+            "S10.04",
+            "S10.05"
+          ]
+        },
+        "page_index": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/page_index"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/count"
+        },
+        "limit": {
+          "$ref": "#/$defs/count"
+        },
+        "exception_class": {
+          "$ref": "#/$defs/exception_class"
+        },
+        "exception_message": {
+          "$ref": "#/$defs/fail_string"
+        },
+        "object_id": {
+          "$ref": "#/$defs/fail_string_or_null"
+        }
+      },
+      "additionalProperties": false
+    },
+    "child_frame": {
+      "type": "object",
+      "required": [
+        "protocol",
+        "seq",
+        "kind",
+        "stage",
+        "outcome",
+        "status",
+        "reason",
+        "detail",
+        "evidence"
+      ],
+      "properties": {
+        "protocol": {
+          "const": "CHILD_PROTOCOL_V1"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        },
+        "kind": {
+          "enum": [
+            "STAGE",
+            "FINAL"
+          ]
+        },
+        "stage": {
+          "enum": [
+            null,
+            "S5.02",
+            "S5.03",
+            "S6",
+            "S7",
+            "S9",
+            "S10"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "FINAL"
+            },
+            "stage": {
+              "type": "null"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/final_evidence"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "FINAL"
+            },
+            "stage": {
+              "type": "null"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "evidence": {
+              "$ref": "#/$defs/final_evidence"
+            }
+          },
+          "anyOf": [
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_SANDBOX_RUNTIME_INCOMPLETE"
+                },
+                "reason": {
+                  "enum": [
+                    "OUTPUT_INVALID"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "ENCRYPTED",
+                    "PYPDF_OPEN",
+                    "PDFMINER_OPEN"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_SANDBOX_RUNTIME_INCOMPLETE"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_RUNTIME_INCOMPLETE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "START_STATE"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_LIMIT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "MEMORY"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+                },
+                "reason": {
+                  "enum": [
+                    "CATALOG_MALFORMED",
+                    "ACROFORM_PRESENT",
+                    "OPEN_ACTION_PRESENT",
+                    "CATALOG_AA_PRESENT",
+                    "NAMES_PRESENT",
+                    "AF_PRESENT",
+                    "COLLECTION_PRESENT",
+                    "PERMS_PRESENT",
+                    "REQUIREMENTS_PRESENT",
+                    "OUTLINES_PRESENT",
+                    "URI_BASE_PRESENT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_LIMIT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "CATALOG_KEYS",
+                    "INFO_KEYS",
+                    "MEMORY",
+                    "EVIDENCE_BYTES"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "DOCUMENT_STATE_READ"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_COORDINATE_SPACE_UNVERIFIED"
+                },
+                "reason": {
+                  "enum": [
+                    "STACK_PAGE_COUNT",
+                    "STACK_PAGE_SIZE",
+                    "STACK_TEXT_GEOMETRY"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_LIMIT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "PAGE_COUNT",
+                    "FORM_DEPTH",
+                    "FORM_EXECUTIONS",
+                    "RESOURCE_ENTRIES",
+                    "FONT_COUNT",
+                    "CONTENT_FILTER",
+                    "DECODED_CONTENT_BYTES",
+                    "DECODED_OTHER_BYTES",
+                    "CONTENT_OPERATORS_PAGE",
+                    "CONTENT_OPERATORS_DOCUMENT",
+                    "INDIRECT_RESOLUTIONS",
+                    "CHAR_COUNT",
+                    "MEMORY",
+                    "EVIDENCE_BYTES"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "PRE_SCAN_READ"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "ZLIB_ERROR",
+                    "FLATE_INCOMPLETE",
+                    "OBJECT_READ",
+                    "RAW_BYTES_READ",
+                    "CONTENT_PARSE"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "PAGE_ENUMERATION",
+                    "PAGE_FACTS",
+                    "DOCUMENT_STATE_READ",
+                    "CHAR_EXTRACTION"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PAGE_ROTATION_DENIED"
+                },
+                "reason": {
+                  "enum": [
+                    null
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PAGEBOX_MISMATCH"
+                },
+                "reason": {
+                  "enum": [
+                    "BOX_MALFORMED"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null,
+                    "MEDIABOX_ABSENT"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PAGEBOX_MISMATCH"
+                },
+                "reason": {
+                  "enum": [
+                    "BOX_REVERSED",
+                    "NONZERO_ORIGIN",
+                    "CROPBOX_DIFFERS",
+                    "USER_UNIT",
+                    "VISIBLE_RECT_SIZE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+                },
+                "reason": {
+                  "enum": [
+                    "PAGE_AA_PRESENT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PAGE_SIZE_UNSUPPORTED"
+                },
+                "reason": {
+                  "enum": [
+                    null
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "PARSER_AMBIGUITY"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "STRICT_REREAD",
+                    "NULL_RESOURCES",
+                    "NAME_DOMAIN",
+                    "STREAM_MISMATCH"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_LIMIT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "CONTENT_STREAMS",
+                    "INDIRECT_RESOLUTIONS",
+                    "MEMORY",
+                    "EVIDENCE_BYTES"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+                },
+                "reason": {
+                  "enum": [
+                    "TRACKER_FAILURE",
+                    "STACK_UNBALANCED",
+                    "MISSING_RESOURCE",
+                    "BAD_OPERAND",
+                    "FORM_LIMIT",
+                    "ANNOTATION_APPEARANCE",
+                    "PATTERN_FILL",
+                    "VISUAL_STATE_UNPROVABLE",
+                    "NO_CORRESPONDENCE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+                },
+                "reason": {
+                  "enum": [
+                    "COLOR_UNOBSERVABLE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "CS_UNSUPPORTED",
+                    "CS_WITHOUT_COLOR",
+                    "NCOLOR_MISSING",
+                    "NCOLOR_INCONSISTENT"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_HIDDEN_TEXT_DETECTED"
+                },
+                "reason": {
+                  "enum": [
+                    "RENDER_MODE_INVISIBLE",
+                    "ZERO_OPACITY"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_TEXT_POLICY_SUSPECT"
+                },
+                "reason": {
+                  "enum": [
+                    "RENDER_MODE_NOT_FILL_ONLY",
+                    "LOW_OPACITY",
+                    "SMALL_TEXT",
+                    "NEAR_WHITE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_ATTRIBUTION_INCOMPLETE"
+                },
+                "reason": {
+                  "enum": [
+                    "CHAR_UNOBSERVABLE",
+                    "NON_HORIZONTAL_TEXT",
+                    "EMPTY_TOKEN_LINE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "CHAR_EXTRACTION"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_FONT_SUBSTITUTION_UNAPPROVED"
+                },
+                "reason": {
+                  "enum": [
+                    "FONT_STRUCTURE_MALFORMED"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "RESOURCES_MALFORMED",
+                    "FONT_DICT_MALFORMED",
+                    "FONT_REF_UNRESOLVED",
+                    "FONT_ENTRY_NOT_DICT",
+                    "SUBTYPE_INVALID",
+                    "DESCENDANTS_INVALID",
+                    "DESCENDANT_ENTRY_INVALID",
+                    "DESCRIPTOR_MALFORMED",
+                    "FONTNAME_MALFORMED"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_FONT_TYPE3_DENIED"
+                },
+                "reason": {
+                  "enum": [
+                    null
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_FONT_NOT_EMBEDDED"
+                },
+                "reason": {
+                  "enum": [
+                    null,
+                    "DESCRIPTOR_INCOMPLETE"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_LIMIT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "INDIRECT_RESOLUTIONS",
+                    "MEMORY",
+                    "EVIDENCE_BYTES"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "FONT_TRAVERSAL"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "INSPECTION_LIMIT"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    "ANNOTS_ARRAY_LENGTH",
+                    "ANNOT_COUNT",
+                    "DEST_LENGTH",
+                    "URI_LENGTH",
+                    "INDIRECT_RESOLUTIONS",
+                    "MEMORY",
+                    "EVIDENCE_BYTES"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_ANNOTATION_UNSUPPORTED"
+                },
+                "reason": {
+                  "enum": [
+                    "ANNOTS_NOT_ARRAY",
+                    "ENTRY_NOT_DICT",
+                    "SUBTYPE_MISSING",
+                    "NON_LINK",
+                    "RECT_MALFORMED"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_COORDINATE_SPACE_UNVERIFIED"
+                },
+                "reason": {
+                  "enum": [
+                    "STACK_ANNOTATION"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_LINK_KIND_UNSUPPORTED"
+                },
+                "reason": {
+                  "enum": [
+                    "ADDITIONAL_ACTIONS",
+                    "DEST_AND_ACTION",
+                    "NO_DESTINATION",
+                    "ACTION_MALFORMED",
+                    "ACTION_CHAIN",
+                    "ACTION_TYPE_UNSUPPORTED",
+                    "DEST_UNSUPPORTED"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_LINK_URI_UNSUPPORTED"
+                },
+                "reason": {
+                  "enum": [
+                    null,
+                    "URI_BYTES_UNAVAILABLE",
+                    "URI_NON_ASCII"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_LINK_ATTRIBUTION_AMBIGUOUS"
+                },
+                "reason": {
+                  "enum": [
+                    null
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "status": {
+                  "const": "RENDER_PDF_INSPECTION_FAILED"
+                },
+                "reason": {
+                  "enum": [
+                    "ANNOTATION_READ"
+                  ]
+                },
+                "detail": {
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.02"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/pass_S5.02"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.02"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_SANDBOX_RUNTIME_INCOMPLETE"
+            },
+            "reason": {
+              "const": "OUTPUT_INVALID"
+            },
+            "detail": {
+              "enum": [
+                "ENCRYPTED",
+                "PYPDF_OPEN",
+                "PDFMINER_OPEN"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.02"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.02"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_SANDBOX_RUNTIME_INCOMPLETE"
+            },
+            "reason": {
+              "const": "INSPECTION_RUNTIME_INCOMPLETE"
+            },
+            "detail": {
+              "enum": [
+                "START_STATE"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.02"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.02"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                "MEMORY"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.02"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/pass_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "CATALOG_MALFORMED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ACROFORM_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "OPEN_ACTION_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "CATALOG_AA_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "NAMES_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "AF_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "COLLECTION_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "PERMS_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "REQUIREMENTS_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "OUTLINES_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "URI_BASE_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "const": "EVIDENCE_BYTES"
+            },
+            "evidence": {
+              "type": "object",
+              "maxProperties": 0
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                "CATALOG_KEYS",
+                "INFO_KEYS",
+                "MEMORY"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S5.03"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "DOCUMENT_STATE_READ"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S5.03"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/pass_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_COORDINATE_SPACE_UNVERIFIED"
+            },
+            "reason": {
+              "const": "STACK_PAGE_COUNT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_COORDINATE_SPACE_UNVERIFIED"
+            },
+            "reason": {
+              "const": "STACK_PAGE_SIZE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_COORDINATE_SPACE_UNVERIFIED"
+            },
+            "reason": {
+              "const": "STACK_TEXT_GEOMETRY"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "const": "EVIDENCE_BYTES"
+            },
+            "evidence": {
+              "type": "object",
+              "maxProperties": 0
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                "PAGE_COUNT",
+                "FORM_DEPTH",
+                "FORM_EXECUTIONS",
+                "RESOURCE_ENTRIES",
+                "FONT_COUNT",
+                "CONTENT_FILTER",
+                "DECODED_CONTENT_BYTES",
+                "DECODED_OTHER_BYTES",
+                "CONTENT_OPERATORS_PAGE",
+                "CONTENT_OPERATORS_DOCUMENT",
+                "INDIRECT_RESOLUTIONS",
+                "CHAR_COUNT",
+                "MEMORY"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "PRE_SCAN_READ"
+            },
+            "detail": {
+              "enum": [
+                "ZLIB_ERROR",
+                "FLATE_INCOMPLETE",
+                "OBJECT_READ",
+                "RAW_BYTES_READ",
+                "CONTENT_PARSE"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6.01b"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "PAGE_ENUMERATION"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6.01"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "PAGE_FACTS"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6.02_S6.03_S6.04_S6.05_S6.06_S6.07_S6.08"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "DOCUMENT_STATE_READ"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6.06a"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "CHAR_EXTRACTION"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGE_ROTATION_DENIED"
+            },
+            "reason": {
+              "const": null
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGEBOX_MISMATCH"
+            },
+            "reason": {
+              "const": "BOX_MALFORMED"
+            },
+            "detail": {
+              "enum": [
+                null,
+                "MEDIABOX_ABSENT"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGEBOX_MISMATCH"
+            },
+            "reason": {
+              "const": "BOX_REVERSED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGEBOX_MISMATCH"
+            },
+            "reason": {
+              "const": "NONZERO_ORIGIN"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGEBOX_MISMATCH"
+            },
+            "reason": {
+              "const": "CROPBOX_DIFFERS"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGEBOX_MISMATCH"
+            },
+            "reason": {
+              "const": "USER_UNIT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGEBOX_MISMATCH"
+            },
+            "reason": {
+              "const": "VISIBLE_RECT_SIZE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_DOCUMENT_STATE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "PAGE_AA_PRESENT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PAGE_SIZE_UNSUPPORTED"
+            },
+            "reason": {
+              "const": null
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S6"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "PARSER_AMBIGUITY"
+            },
+            "detail": {
+              "enum": [
+                "STRICT_REREAD",
+                "NULL_RESOURCES",
+                "NAME_DOMAIN",
+                "STREAM_MISMATCH"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S6.01b"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/pass_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "const": "EVIDENCE_BYTES"
+            },
+            "evidence": {
+              "type": "object",
+              "maxProperties": 0
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                "CONTENT_STREAMS",
+                "INDIRECT_RESOLUTIONS",
+                "MEMORY"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "TRACKER_FAILURE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "STACK_UNBALANCED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "MISSING_RESOURCE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "BAD_OPERAND"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "FORM_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "ANNOTATION_APPEARANCE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "PATTERN_FILL"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "VISUAL_STATE_UNPROVABLE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "NO_CORRESPONDENCE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_STATE_UNOBSERVABLE"
+            },
+            "reason": {
+              "const": "COLOR_UNOBSERVABLE"
+            },
+            "detail": {
+              "enum": [
+                "CS_UNSUPPORTED",
+                "CS_WITHOUT_COLOR",
+                "NCOLOR_MISSING",
+                "NCOLOR_INCONSISTENT"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_HIDDEN_TEXT_DETECTED"
+            },
+            "reason": {
+              "const": "RENDER_MODE_INVISIBLE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_HIDDEN_TEXT_DETECTED"
+            },
+            "reason": {
+              "const": "ZERO_OPACITY"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_POLICY_SUSPECT"
+            },
+            "reason": {
+              "const": "RENDER_MODE_NOT_FILL_ONLY"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_POLICY_SUSPECT"
+            },
+            "reason": {
+              "const": "LOW_OPACITY"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_POLICY_SUSPECT"
+            },
+            "reason": {
+              "const": "SMALL_TEXT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_TEXT_POLICY_SUSPECT"
+            },
+            "reason": {
+              "const": "NEAR_WHITE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ATTRIBUTION_INCOMPLETE"
+            },
+            "reason": {
+              "const": "CHAR_UNOBSERVABLE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ATTRIBUTION_INCOMPLETE"
+            },
+            "reason": {
+              "const": "NON_HORIZONTAL_TEXT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ATTRIBUTION_INCOMPLETE"
+            },
+            "reason": {
+              "const": "EMPTY_TOKEN_LINE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S7"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "CHAR_EXTRACTION"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S7"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/pass_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_FONT_SUBSTITUTION_UNAPPROVED"
+            },
+            "reason": {
+              "const": "FONT_STRUCTURE_MALFORMED"
+            },
+            "detail": {
+              "enum": [
+                "RESOURCES_MALFORMED",
+                "FONT_DICT_MALFORMED",
+                "FONT_REF_UNRESOLVED",
+                "FONT_ENTRY_NOT_DICT",
+                "SUBTYPE_INVALID",
+                "DESCENDANTS_INVALID",
+                "DESCENDANT_ENTRY_INVALID",
+                "DESCRIPTOR_MALFORMED",
+                "FONTNAME_MALFORMED"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_FONT_TYPE3_DENIED"
+            },
+            "reason": {
+              "const": null
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_FONT_NOT_EMBEDDED"
+            },
+            "reason": {
+              "const": null
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_FONT_NOT_EMBEDDED"
+            },
+            "reason": {
+              "const": "DESCRIPTOR_INCOMPLETE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "const": "EVIDENCE_BYTES"
+            },
+            "evidence": {
+              "type": "object",
+              "maxProperties": 0
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                "INDIRECT_RESOLUTIONS",
+                "MEMORY"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S9"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "FONT_TRAVERSAL"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S9"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "PASS"
+            },
+            "status": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "null"
+            },
+            "detail": {
+              "type": "null"
+            },
+            "evidence": {
+              "$ref": "#/$defs/pass_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "const": "EVIDENCE_BYTES"
+            },
+            "evidence": {
+              "type": "object",
+              "maxProperties": 0
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "INSPECTION_LIMIT"
+            },
+            "detail": {
+              "enum": [
+                "ANNOTS_ARRAY_LENGTH",
+                "ANNOT_COUNT",
+                "DEST_LENGTH",
+                "URI_LENGTH",
+                "INDIRECT_RESOLUTIONS",
+                "MEMORY"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ANNOTATION_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ANNOTS_NOT_ARRAY"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ANNOTATION_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ENTRY_NOT_DICT"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ANNOTATION_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "SUBTYPE_MISSING"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ANNOTATION_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "NON_LINK"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_ANNOTATION_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "RECT_MALFORMED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_COORDINATE_SPACE_UNVERIFIED"
+            },
+            "reason": {
+              "const": "STACK_ANNOTATION"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ADDITIONAL_ACTIONS"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "DEST_AND_ACTION"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "NO_DESTINATION"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ACTION_MALFORMED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ACTION_CHAIN"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "ACTION_TYPE_UNSUPPORTED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_KIND_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "DEST_UNSUPPORTED"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_URI_UNSUPPORTED"
+            },
+            "reason": {
+              "const": null
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_URI_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "URI_BYTES_UNAVAILABLE"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_URI_UNSUPPORTED"
+            },
+            "reason": {
+              "const": "URI_NON_ASCII"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_LINK_ATTRIBUTION_AMBIGUOUS"
+            },
+            "reason": {
+              "const": null
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "STAGE"
+            },
+            "stage": {
+              "const": "S10"
+            },
+            "outcome": {
+              "const": "FAIL"
+            },
+            "status": {
+              "const": "RENDER_PDF_INSPECTION_FAILED"
+            },
+            "reason": {
+              "const": "ANNOTATION_READ"
+            },
+            "detail": {
+              "enum": [
+                null
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/fail_S10"
+            }
+          }
+        }
+      ]
+    },
+    "evidence_record": {
+      "type": "object",
+      "required": [
+        "spec",
+        "run_status",
+        "reason",
+        "detail",
+        "slot",
+        "failure_evidence",
+        "docx_sha256",
+        "pdf_sha256",
+        "manifest_digest",
+        "content_binding_digest",
+        "runtime_manifest_digest",
+        "sandbox_profile_digest",
+        "inspection_profile_digest",
+        "inspection_entry_sha256",
+        "entry_fd_evidence",
+        "render_semantic_fingerprint",
+        "attribution_digest",
+        "utilization",
+        "findings",
+        "informational",
+        "child_protocol_notes",
+        "orphan_relationships",
+        "auto_hyphenation",
+        "delivered",
+        "temp_root_removed",
+        "automated_checks",
+        "human_required",
+        "human_review_waived"
+      ],
+      "properties": {
+        "spec": {
+          "const": "RENDERED_DOCUMENT_EVIDENCE_V1"
+        },
+        "run_status": {
+          "enum": [
+            "RENDER_DOCX_LIMIT_EXCEEDED",
+            "RENDER_DOCX_PACKAGE_INVALID",
+            "RENDER_EMBEDDED_FONT_DENIED",
+            "RENDER_EXTERNAL_REFERENCE_DENIED",
+            "RENDER_MEDIA_TYPE_MISMATCH",
+            "RENDER_EMBEDDED_VECTOR_DENIED",
+            "RENDER_MEDIA_TYPE_UNSUPPORTED",
+            "RENDER_ENVIRONMENT_UNVERIFIED",
+            "RENDER_CONTENT_BINDING_INCOMPLETE",
+            "RENDER_CONTENT_BINDING_UNSUPPORTED_ENTRY",
+            "RENDER_CONTENT_BINDING_MISMATCH",
+            "RENDER_TRACKED_CHANGES_PRESENT",
+            "RENDER_TEXT_CONSTRUCT_UNSUPPORTED",
+            "RENDER_ALTERNATE_CONTENT_UNSUPPORTED",
+            "RENDER_FIELD_UNSUPPORTED",
+            "RENDER_HIDDEN_TEXT_DETECTED",
+            "RENDER_STYLE_CHAIN_UNSUPPORTED",
+            "RENDER_LIST_RESOLUTION_UNSUPPORTED",
+            "RENDER_LIST_NUMFMT_UNSUPPORTED",
+            "RENDER_LIST_MARKER_UNSUPPORTED",
+            "RENDER_LIST_MARKER_UNMAPPED",
+            "RENDER_CASE_TRANSFORM_UNSUPPORTED",
+            "RENDER_FONT_DECLARATION_UNMAPPED",
+            "RENDER_LINK_SOURCE_CONSTRUCT_UNSUPPORTED",
+            "RENDER_LINK_SOURCE_UNSUPPORTED",
+            "RENDER_LINK_SOURCE_UNRESOLVED",
+            "RENDER_LINK_URI_UNSUPPORTED",
+            "RENDER_STRUCTURE_MAP_REQUIRED",
+            "RENDER_STRUCTURE_MAP_INVALID",
+            "RENDER_STRUCTURE_MAP_TEXT_MISMATCH",
+            "RENDER_LIST_SEMANTICS_MISMATCH",
+            "RENDER_STRUCTURE_MAP_INCOMPLETE",
+            "RENDER_ISOLATION_UNAVAILABLE",
+            "RENDER_TIMEOUT",
+            "RENDER_SANDBOX_RUNTIME_INCOMPLETE",
+            "RENDER_DOCUMENT_STATE_UNSUPPORTED",
+            "RENDER_PDF_INSPECTION_FAILED",
+            "RENDER_COORDINATE_SPACE_UNVERIFIED",
+            "RENDER_PAGE_ROTATION_DENIED",
+            "RENDER_PAGEBOX_MISMATCH",
+            "RENDER_PAGE_SIZE_UNSUPPORTED",
+            "RENDER_TEXT_STATE_UNOBSERVABLE",
+            "RENDER_TEXT_POLICY_SUSPECT",
+            "RENDER_ATTRIBUTION_INCOMPLETE",
+            "RENDER_LIST_MARKER_MISMATCH",
+            "RENDER_TEXT_LOSS_DETECTED",
+            "RENDER_FONT_SUBSTITUTION_UNAPPROVED",
+            "RENDER_FONT_TYPE3_DENIED",
+            "RENDER_FONT_NOT_EMBEDDED",
+            "RENDER_FONT_INVENTORY_MISMATCH",
+            "RENDER_LIST_MARKER_FONT_UNAPPROVED",
+            "RENDER_FONT_FACE_MISMATCH",
+            "RENDER_ANNOTATION_UNSUPPORTED",
+            "RENDER_LINK_KIND_UNSUPPORTED",
+            "RENDER_LINK_ATTRIBUTION_AMBIGUOUS",
+            "RENDER_LINK_DESTINATION_SUBSTITUTED",
+            "RENDER_LINK_ORDER_MISMATCH",
+            "RENDER_LINK_MISSING",
+            "RENDER_LINK_FABRICATED",
+            "RENDER_QA_AUTOMATED_PASS_HUMAN_REVIEW_REQUIRED",
+            "RENDER_QA_AUTOMATED_FAILED",
+            "RENDER_DELIVERY_BYTES_MISMATCH",
+            "RENDER_NONDETERMINISTIC",
+            "RENDER_FONT_MANIFEST_INCOMPLETE",
+            "RENDER_FONT_VARIABLE_DENIED",
+            "RENDER_DEPENDENCY_LOCK_REJECTED"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "slot": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "failure_evidence": {
+          "type": "object"
+        },
+        "docx_sha256": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "pdf_sha256": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "content_binding_digest": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "runtime_manifest_digest": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "sandbox_profile_digest": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "inspection_profile_digest": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "inspection_entry_sha256": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "entry_fd_evidence": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "render_semantic_fingerprint": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "attribution_digest": {
+          "$ref": "#/$defs/hex64_or_null"
+        },
+        "utilization": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "informational": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "child_protocol_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "orphan_relationships": {
+          "type": "array"
+        },
+        "auto_hyphenation": {
+          "$ref": "#/$defs/flag"
+        },
+        "delivered": {
+          "$ref": "#/$defs/flag"
+        },
+        "temp_root_removed": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/flag"
+            }
+          ]
+        },
+        "automated_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "check",
+              "label"
+            ],
+            "properties": {
+              "check": {
+                "type": "string"
+              },
+              "label": {
+                "const": "AUTOMATED"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "human_required": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "check",
+              "label"
+            ],
+            "properties": {
+              "check": {
+                "type": "string"
+              },
+              "label": {
+                "const": "HUMAN_REQUIRED"
+              }
+            },
+            "additionalProperties": false
+          },
+          "prefixItems": [
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "VISUAL_REVIEW_OF_RAW_PDF_AND_DOCX"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "ARTIFACT_IS_THE_SUBMITTED_ONE"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "HYPERLINK_DESTINATIONS_LIVE_AND_CORRECT"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "VISIBLE_MEANINGFUL_OCCUPANCY"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "INTERNAL_ANCHOR_POSITION_AND_AMBIGUOUS_LINKS"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "BORDERLINE_UTILIZATION"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "APPROVED_FONT_SUBSTITUTION_VISUAL"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "CONTENT_TYPE_MAP_HONESTY"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "FINAL_BORA_APPROVAL_AND_MANUAL_SUBMIT"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "GLYPH_LEVEL_FONT_FALLBACK"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "LIST_MARKER_APPEARANCE"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "NON_TEXT_GEOMETRY"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "check",
+                    "label"
+                  ],
+                  "properties": {
+                    "check": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "const": "HUMAN_REQUIRED"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "check": {
+                      "const": "PDF_METADATA_AND_UNINSPECTED_CONSTRUCTS"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "minItems": 13,
+          "maxItems": 13
+        },
+        "human_review_waived": {
+          "type": "integer",
+          "const": 0
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "run_status": {
+                "const": "RENDER_QA_AUTOMATED_PASS_HUMAN_REVIEW_REQUIRED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "render_semantic_fingerprint": {
+                "$ref": "#/$defs/hex64"
+              },
+              "utilization": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "render_semantic_fingerprint": {
+                "$ref": "#/$defs/hex64"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "run_status": {
+                "enum": [
+                  "RENDER_QA_AUTOMATED_PASS_HUMAN_REVIEW_REQUIRED",
+                  "RENDER_QA_AUTOMATED_FAILED"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
