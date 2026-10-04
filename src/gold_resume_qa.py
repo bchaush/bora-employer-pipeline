@@ -56,7 +56,7 @@ DATE_RANGE = re.compile(r"^[A-Z][a-z]{2} \d{4} - ([A-Z][a-z]{2} \d{4}|Present)$"
 # independently job-relevant (at minimum the BORA_PACKAGE_SPAWN_GATE_V1 terms).
 JARGON_TERMS = ("human approval", "operating system", "fail-closed", "fail closed", "queue-level eligibility",
                 "deterministic boundary", "candidate truth", "evidencematch", "evidence match", "claim_id", "evidence_id",
-                "career os", "evidence system", "governance", "claim lineage", "kill switch", "guardrail")
+                "career os", "evidence system", "governance", "claim lineage", "kill switch")
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 REL = "{http://schemas.openxmlformats.org/package/2006/relationships}"

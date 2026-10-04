@@ -125,4 +125,13 @@ schema = build_draft202012_validator(ROOT / "schemas" / "gold_approved_display.s
 assert_true(not list(schema.iter_errors(OVERLAY)), "the overlay validates against its schema")
 assert_true(MASTER["version"] == "8", "the protected master is unchanged by this canonicalization")
 print("PASS 4: the identity provider cross-checks every overlay binding and fails closed or omits when one breaks.")
+# 5. The doctrine roster is matched in approved display names, and approved Gold wording is not mistaken for internal jargon.
+roster = ptg.display_roster(__import__("gold_resume_docx_builder").load_doctrine_roster(ROOT), resolved)
+assert_true(roster == ["Winter Walk", "TELUS Digital", "D Commerce Bank", "MarketMind"], f"doctrine roster in approved display names: {roster}")
+import gold_resume_qa as qa  # noqa: E402
+assert_true(qa.jargon_hits("Clarified scope, requirements, and operating guardrails for an internal Google Workspace tool before implementation.") == [],
+            "the approved Gold wording 'operating guardrails' is recruiter-natural, not internal jargon")
+assert_true(qa.jargon_hits("Built an operating system with human approval and fail-closed controls") == ["fail-closed", "human approval", "operating system"],
+            "genuine internal vocabulary is still rejected")
+print("PASS 5: the doctrine roster resolves to the approved display names and approved Gold wording passes the jargon scan while internal vocabulary is still rejected.")
 print("PASS: gold_truth_display_v1_test")
