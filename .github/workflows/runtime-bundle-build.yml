@@ -1,0 +1,60 @@
+name: Career OS Runtime Bundle Build
+
+on:
+  push:
+    branches:
+      - ops/cloud-render-probe-v1
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact canonical main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: c28314c49cb608db801059dd82b210bb7205d475
+          fetch-depth: 1
+
+      - name: Build hash-bound runtime bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          CANONICAL_SHA="c28314c49cb608db801059dd82b210bb7205d475"
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          test "$ACTUAL_SHA" = "$CANONICAL_SHA"
+          TREE_SHA="$(git rev-parse HEAD^{tree})"
+          mkdir -p runtime_bundle
+          git archive "$CANONICAL_SHA" | tar -x -C runtime_bundle
+          python - "$CANONICAL_SHA" "$TREE_SHA" <<'PY'
+          import json, sys
+          from pathlib import Path
+          out = Path("runtime_bundle/RUNTIME_MANIFEST.json")
+          payload = {
+              "spec": "CAREER_OS_RUNTIME_BUNDLE_V1",
+              "canonical_main_sha": sys.argv[1],
+              "canonical_tree_sha": sys.argv[2],
+              "purpose": "Fresh-chat Career OS operate-mode runtime; source is exact canonical Git tree.",
+              "desktop_required_for_normal_operation": False,
+              "submission_authority": "BORA_ONLY",
+          }
+          out.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+          PY
+          (
+            cd runtime_bundle
+            find . -type f ! -name runtime_files.sha256 -print0 |
+              sort -z |
+              xargs -0 sha256sum > runtime_files.sha256
+          )
+          sha256sum runtime_bundle/RUNTIME_MANIFEST.json runtime_bundle/runtime_files.sha256
+          find runtime_bundle -type f | wc -l
+
+      - name: Upload runtime bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: career-os-runtime-c28314c
+          path: runtime_bundle
+          if-no-files-found: error
+          retention-days: 90
