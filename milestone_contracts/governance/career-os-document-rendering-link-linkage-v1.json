@@ -1,0 +1,56 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_LINK_LINKAGE_AMENDMENT_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance amendment to the canonical rendering governance contract milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json from canonical main 28619e5b42bc5c1b3f622546848a3d3bbec1631c. It replaces only the source-order PDF-annotation linkage assumption of HYPERLINK_OCCURRENCE_MODEL_V1 with deterministic, fail-closed ORDER_INDEPENDENT_LINKAGE_V1 (matching on link kind, exact destination, exact normalized visible tokens and exact cardinality), because the pinned LibreOffice 24.2.7 reorders PDF link annotations of a four-link resume while preserving labels and destinations. It authorizes no implementation, release, merge, provisioning or submission, creates no new milestone and changes no renderer code.",
+  "baseline_sha": "28619e5b42bc5c1b3f622546848a3d3bbec1631c",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-link-linkage-v1.json",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/implementation/**",
+    "milestone_contracts/governance/career-os-pursue-to-gold-package-v1-contract.json",
+    "docs/resume/**",
+    "docs/rendering/**",
+    "docs/gold/**",
+    "docs/decisions/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against 28619e5b42bc5c1b3f622546848a3d3bbec1631c is exactly two paths: milestone_contracts/governance/career-os-document-rendering-link-linkage-v1.json (added) and milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json (modified from Git blob 70c96cb0182c4c4b94458a2767cd64344030c305, SHA-256 1923debfb51af7d1b3eef4dab3cf05f96137d39279f4c197b32ac5b3bb063822).",
+    "In the governing contract exactly these spans change: acceptance condition 2 (the page_rects ordering of the semantic-fingerprint hyperlinks field), acceptance condition 3 (the S10.06 slot sentence), acceptance condition 4 (the linkage_algorithm value of HYPERLINK_OCCURRENCE_MODEL_V1), acceptance condition 8 (the hyperlink required-test fixtures (b) and (f)), plus one new final acceptance condition recording the amendment, its empirical basis, its twelve required link tests, its operator-gated regression and its authority boundary. allowed_paths, forbidden_paths, required_tests, stop_conditions, review_requirements, human_approval_requirements, the key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged.",
+    "No other renderer rule changes: URI validation, URI_CANONICALIZATION_V1, annotation parsing, duplicate normalization, word assignment and link-token attribution, S10 evidence, fabricated-link detection, internal_anchor_rule, source-DOCX hyperlink validation, dependencies, provisioning, PLAN_DIGEST, PRE_PROVISION_PLAN and IDENTITY_DIGEST are not reopened.",
+    "The implementation contract milestone_contracts/implementation/career-os-document-rendering-capability-v1.json, the released implementation on canonical main and the OPERATOR are not modified; carrying the new governing identity into the implementation contract is a separate governed step after canonical recording.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check and git diff --cached --check pass."
+  ],
+  "stop_conditions": [
+    "Order-independent linkage cannot be expressed without weakening URI validation, annotation parsing, link-token attribution, S10 evidence or fabricated-link detection.",
+    "Any path outside the two allowed paths, any released implementation file or OPERATOR state would have to change.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, merge, any implementation of the amended linkage, and carrying the new governing identity into the implementation contract each require separate explicit Bora authorization. Manual SUBMIT remains Bora-controlled."
+}
