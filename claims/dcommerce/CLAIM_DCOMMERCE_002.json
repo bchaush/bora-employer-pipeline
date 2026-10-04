@@ -1,0 +1,18 @@
+{
+  "claim_id": "CLAIM_DCOMMERCE_002",
+  "wording": "Extracted and processed data and prepared daily, weekly, and monthly reports to Bulgarian National Bank requirements.",
+  "evidence_ids": ["DCOMMERCE_REFERENCE_001"],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": ["resume", "interview", "networking", "Data Operations", "Business Systems", "Finance"],
+  "forbidden_contexts": [
+    "U.S. regulatory reporting experience",
+    "U.S. GAAP expertise",
+    "audit ownership",
+    "risk-management ownership",
+    "Microsoft Excel expertise claim",
+    "transaction volume claim"
+  ],
+  "human_approval": true,
+  "date": "2026-10-03",
+  "version": "1"
+}

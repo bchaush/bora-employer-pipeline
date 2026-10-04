@@ -52,7 +52,7 @@ assert_true(ev_result["valid"] is True, "evidence repository invalid")
 assert_true(len(ev_result["index"]) == 43, "Evidence count must be 43 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records: undergraduate identity, D Commerce Excel, Bulmarma Excel + 2 human-source-resolution records: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001 + 1 Brandeis MSBA awarded attestation record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 16, "Claim count must be 16 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims: undergraduate, D Commerce, Bulmarma) -- Brandeis education itself adds no Claims")
+assert_true(claim_result["records_checked"] == 17, "Claim count must be 17 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval: undergraduate, D Commerce, Bulmarma) -- Brandeis education itself adds no Claims")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]

@@ -82,19 +82,21 @@ assert_true(
     f"REQ_C_DEGREE_EXPERIENCE must normalize to MANDATORY/HIGH, got {req_degree_exp['importance']}/{req_degree_exp['relevance']}",
 )
 match_degree_exp = next(m for m in analysis_mit["evidence_matches"] if m["requirement_id"] == "REQ_C_DEGREE_EXPERIENCE")
+# 2026-10-03: CLAIM_EDU_UNWE_001 is Bora-approved, so the degree half of the conjunction resolves PARTIAL through that claim only; PARTIAL never
+# triggers Gate 0, so the row is no longer a hard blocker (MIT stays LANE_0_REJECT through its other, unchanged blockers).
 assert_true(
-    match_degree_exp["result"] == "NONE",
-    f"REQ_C_DEGREE_EXPERIENCE must resolve NONE (no candidate evidence), got {match_degree_exp['result']}",
+    match_degree_exp["result"] == "PARTIAL" and match_degree_exp["claim_ids"] == ["CLAIM_EDU_UNWE_001"],
+    f"REQ_C_DEGREE_EXPERIENCE must resolve PARTIAL via the approved UNWE claim only, got {match_degree_exp['result']} {match_degree_exp['claim_ids']}",
 )
 assert_true(
-    any("REQ_C_DEGREE_EXPERIENCE" in b for b in result_mit["hard_blockers"]),
-    f"REQ_C_DEGREE_EXPERIENCE must now appear as a hard blocker; got {result_mit['hard_blockers']}",
+    not any("REQ_C_DEGREE_EXPERIENCE" in b for b in result_mit["hard_blockers"]),
+    f"REQ_C_DEGREE_EXPERIENCE is no longer a hard blocker once PARTIAL; got {result_mit['hard_blockers']}",
 )
 assert_true(
     analysis_mit["lane"] == "LANE_0_REJECT" and analysis_mit["decision"] == "REJECT",
     f"MIT overall routing must remain LANE_0_REJECT/REJECT, got {analysis_mit['lane']}/{analysis_mit['decision']}",
 )
-print("PASS B: frozen MIT REQ_C_DEGREE_EXPERIENCE now correctly normalizes MANDATORY/HIGH and appears as a real hard blocker; MIT overall remains LANE_0_REJECT/REJECT.")
+print("PASS B: frozen MIT REQ_C_DEGREE_EXPERIENCE normalizes MANDATORY/HIGH and resolves PARTIAL via the approved UNWE claim (no longer a hard blocker); MIT overall remains LANE_0_REJECT/REJECT.")
 
 
 # ======================================================================
@@ -128,20 +130,18 @@ for req_id in ("REQ_A_INDUSTRY_EXP_PLUS", "REQ_A_SQL_API_PLUS"):
 # REQ_A_CONFIG_IMPLEMENTATION and REQ_A_QA_TROUBLESHOOTING are
 # responsibility-sourced and no longer independently hard-block; updated
 # to the current adjudicated baseline.
-expected_blockers = {
-    "REQ_A_DEGREE",
-    "REQ_A_EXCEL_DATA",
-}
+# 2026-10-03: REQ_A_DEGREE and REQ_A_EXCEL_DATA resolve PARTIAL via the Bora-approved UNWE and D Commerce claims (unchanged matcher): no blocker remains.
+expected_blockers = set()
 actual_blocked_ids = {b.rsplit(": ", 1)[-1] for b in result_atominvest["hard_blockers"]}
 assert_true(
     actual_blocked_ids == expected_blockers,
     f"Atominvest hard blockers must remain exactly {expected_blockers}, got {actual_blocked_ids}",
 )
 assert_true(
-    analysis_a["lane"] == "LANE_0_REJECT" and analysis_a["decision"] == "REJECT",
-    "Atominvest overall routing must remain LANE_0_REJECT/REJECT",
+    analysis_a["lane"] == "WATCH" and analysis_a["decision"] == "WATCH",
+    "Atominvest overall routing is WATCH/WATCH after the 2026-10-03 approvals",
 )
-print("PASS D: real Atominvest 'a plus, not a requirement' wording remains PREFERRED; Atominvest blockers and overall routing are unchanged.")
+print("PASS D: real Atominvest 'a plus, not a requirement' wording remains PREFERRED; the former blockers clear via the approved claims and routing is WATCH.")
 
 
 # ======================================================================

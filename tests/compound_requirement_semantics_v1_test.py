@@ -244,7 +244,8 @@ print("PASS G: no existing Claim capability set carries customer_platform_onboar
 #    create a new hard blocker (Gate 0 fires only on exact NONE).
 # ======================================================================
 match_excel = next(m for m in analysis["evidence_matches"] if m["requirement_id"] == "REQ_A_EXCEL_DATA")
-assert_true(match_excel["result"] == "NONE", f"REQ_A_EXCEL_DATA must remain NONE, unaffected by this milestone; got {match_excel['result']}")
+# 2026-10-03: CLAIM_DCOMMERCE_001 (Microsoft Excel) is Bora-approved, so the Excel/data requirement resolves PARTIAL through that claim only.
+assert_true(match_excel["result"] == "PARTIAL" and match_excel["claim_ids"] == ["CLAIM_DCOMMERCE_001"], f"REQ_A_EXCEL_DATA resolves PARTIAL via the approved D Commerce claim only; got {match_excel['result']} {match_excel['claim_ids']}")
 # SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (post-dates this milestone):
 # REQ_A_CONFIG_IMPLEMENTATION and REQ_A_QA_TROUBLESHOOTING are
 # responsibility-sourced (source_location="What You'll Be Doing") and no
@@ -252,19 +253,18 @@ assert_true(match_excel["result"] == "NONE", f"REQ_A_EXCEL_DATA must remain NONE
 # Requirements-section blockers remain. This assertion is about THIS
 # milestone (compound requirement semantics) not changing the blocker set
 # any further -- updated to the current adjudicated baseline.
-expected_blockers = {
-    "REQ_A_DEGREE",
-    "REQ_A_EXCEL_DATA",
-}
+# 2026-10-03: Bora approved CLAIM_EDU_UNWE_001 and CLAIM_DCOMMERCE_001, so REQ_A_DEGREE and REQ_A_EXCEL_DATA (exactly the two former
+# hard blockers) resolve PARTIAL under the unchanged matcher and Gate 0 no longer fires on them; no new blocker appears.
+expected_blockers = set()
 actual_blocked_ids = {b.rsplit(": ", 1)[-1] for b in result["hard_blockers"]}
 assert_true(
     actual_blocked_ids == expected_blockers,
     f"Atominvest hard blockers must remain exactly {expected_blockers} (PARTIAL never creates a new blocker), got {actual_blocked_ids}",
 )
 assert_true(
-    analysis["lane"] == "LANE_0_REJECT" and analysis["decision"] == "REJECT",
-    f"Atominvest overall routing must remain LANE_0_REJECT/REJECT, got {analysis['lane']}/{analysis['decision']}",
+    analysis["lane"] == "WATCH" and analysis["decision"] == "WATCH",
+    f"Atominvest overall routing is WATCH/WATCH once its two former hard blockers resolve PARTIAL (2026-10-03 approvals), got {analysis['lane']}/{analysis['decision']}",
 )
-print("PASS H: REQ_A_EXCEL_DATA is unaffected; Atominvest's hard-blocker set and overall LANE_0_REJECT/REJECT routing are unchanged.")
+print("PASS H: REQ_A_EXCEL_DATA resolves PARTIAL via the approved D Commerce claim; the former Atominvest blockers clear and routing is WATCH under unchanged decision logic.")
 
 print("ALL compound_requirement_semantics_v1_test CHECKS PASSED")

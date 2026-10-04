@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/gold_approved_display.schema.json",
+  "title": "Career OS Gold Approved Display Overlay",
+  "description": "Bora-approved candidate-facing display choices and canonical link destinations for the Gold resume. An overlay only: every underlying fact stays in claims, evidence, experiences and the protected master; each entry names the canonical record it is bound to and the runtime cross-checks that binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "kind",
+    "locked_date",
+    "authority_scope",
+    "approval",
+    "contact_links",
+    "education_display",
+    "experience_display",
+    "project_display"
+  ],
+  "properties": {
+    "record_id": {
+      "const": "BORA_GOLD_APPROVED_DISPLAY_V1"
+    },
+    "kind": {
+      "const": "APPROVED_DISPLAY_OVERLAY_DATA_RECORD"
+    },
+    "locked_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "authority_scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approved",
+        "approved_by",
+        "approved_on",
+        "approval_note"
+      ],
+      "properties": {
+        "approved": {
+          "const": true
+        },
+        "approved_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approved_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "approval_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "contact_links": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "url",
+          "bound_master_contact_field"
+        ],
+        "properties": {
+          "label": {
+            "enum": [
+              "LinkedIn",
+              "GitHub"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://[^\\s]+$"
+          },
+          "bound_master_contact_field": {
+            "enum": [
+              "linkedin",
+              "github_via_project_evidence"
+            ]
+          },
+          "bound_evidence_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "education_display": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "experience_id",
+          "school",
+          "date_range",
+          "degree_display",
+          "date_basis",
+          "required_claim_ids"
+        ],
+        "properties": {
+          "experience_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "school": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date_range": {
+            "type": "string",
+            "pattern": "^[A-Z][a-z]{2} \\d{4} - ([A-Z][a-z]{2} \\d{4}|Present)$"
+          },
+          "date_basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "degree_display": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "gpa": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "truth_value",
+              "truth_evidence_id",
+              "display_value",
+              "rounding"
+            ],
+            "properties": {
+              "truth_value": {
+                "type": "string",
+                "pattern": "^\\d\\.\\d+$"
+              },
+              "truth_evidence_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "display_value": {
+                "type": "string",
+                "pattern": "^\\d\\.\\d{2}$"
+              },
+              "rounding": {
+                "const": "HALF_UP_2DP"
+              }
+            }
+          }
+        }
+      }
+    },
+    "experience_display": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "experience_id",
+          "employer",
+          "organization_truth",
+          "title",
+          "title_basis",
+          "date_range",
+          "date_basis"
+        ],
+        "properties": {
+          "experience_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "employer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "organization_truth": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title_basis": {
+            "enum": [
+              "MASTER_DISPLAY_TITLE_APPROVAL",
+              "EMPLOYER_FORMAL_POSITION_CASE_NORMALIZED"
+            ]
+          },
+          "formal_title_evidence_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date_range": {
+            "type": "string",
+            "pattern": "^[A-Z][a-z]{2} \\d{4} - ([A-Z][a-z]{2} \\d{4}|Present)$"
+          },
+          "date_basis": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "project_display": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "experience_id",
+          "name",
+          "tech_label",
+          "link"
+        ],
+        "properties": {
+          "experience_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tech_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "link": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "url",
+              "bound_evidence_id"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^https://[^\\s]+$"
+              },
+              "bound_evidence_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

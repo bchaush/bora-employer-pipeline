@@ -95,13 +95,13 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
         == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
     ):
         fail(f"Evidence regression failed: {ev}")
-    if not (cl.get("valid") is True and cl.get("records_checked") == 16):
+    if not (cl.get("valid") is True and cl.get("records_checked") == 17):  # 16 + CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval
         fail(f"Claim regression failed: {cl}")
     reusable_count = sum(
         1 for claim in cl["index"].values() if claim.get("human_approval") is True
     )
-    if reusable_count != 13:
-        fail(f"expected 13 reusable claims, got {reusable_count}")
+    if reusable_count != 16:  # 13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03
+        fail(f"expected 16 reusable claims, got {reusable_count}")
     for claim in cl["index"].values():
         claim_id = claim.get("claim_id", "")
         if isinstance(claim_id, str) and (

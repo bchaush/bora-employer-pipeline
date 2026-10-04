@@ -178,10 +178,11 @@ print("PASS E: 'Bachelor's degree required for candidates from top-tier universi
 # in this file.
 # ======================================================================
 cl_after = validate_claim_repository()
-for claim_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_BULMARMA_001"):
+# Bora approved UNWE and D Commerce on 2026-10-03; the simulation must leave the on-disk approval state exactly as recorded.
+for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_BULMARMA_001", False)):
     assert_true(
-        cl_after["index"][claim_id]["human_approval"] is False,
-        f"{claim_id} must remain human_approval=false on disk after simulation",
+        cl_after["index"][claim_id]["human_approval"] is approved,
+        f"{claim_id} on-disk human_approval must remain {approved} after simulation",
     )
 print("PASS F: real claim repository on disk is unaffected by in-memory simulation.")
 

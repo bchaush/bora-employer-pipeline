@@ -92,7 +92,7 @@ assert_true(ev_result["valid"] is True, "evidence repository invalid")
 assert_true(len(ev_result["index"]) == 43, "Evidence count must be 43 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records + 1 Brandeis MSBA awarded attestation record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 16, "Claim count must be 16 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims)")
+assert_true(claim_result["records_checked"] == 17, "Claim count must be 17 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval)")
 
 EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]
@@ -222,7 +222,7 @@ print("PASS H: Winter Walk claims and MarketMind claims unchanged.")
 
 # I. Repository counts unchanged (claim drafting created no new Claim/Evidence/Experience)
 reusable = [cid for cid, rec in CLAIM_INDEX.items() if rec.get("human_approval") is True]
-assert_true(len(reusable) == 13, f"I: reusable claim count must be 13, got {len(reusable)}")
+assert_true(len(reusable) == 16, f"I: reusable claim count must be 16 (13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03), got {len(reusable)}")
 print("PASS I: repository counts as expected (4 Experience / 36 Evidence / 13 Claims / 13 reusable).")
 
 

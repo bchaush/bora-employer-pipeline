@@ -394,9 +394,11 @@ assert_true(
     "REQ_D_BUSINESS_RULES" not in [b.rsplit(": ", 1)[-1] for b in direct_result["hard_blockers"]],
     "REQ_D_BUSINESS_RULES must no longer appear as a hard blocker (PARTIAL never triggers detect_hard_blockers)",
 )
+# 2026-10-03: Bora approved CLAIM_EDU_UNWE_001 and CLAIM_DCOMMERCE_001; the degree and MS Office rows now resolve through them under the
+# unchanged matcher and CASE_D's decision is UNDECIDED (REJECT before the approvals). REQ_D_BUSINESS_RULES is unaffected (PARTIAL via CLAIM_WW_001).
 assert_true(
-    direct_analysis["decision"] == "REJECT",
-    f"CASE_D final decision must remain REJECT (independent blockers persist), got {direct_analysis['decision']}",
+    direct_analysis["decision"] == "UNDECIDED",
+    f"CASE_D final decision is UNDECIDED after the 2026-10-03 UNWE and D Commerce approvals, got {direct_analysis['decision']}",
 )
 direct_blockers = sorted(b.rsplit(": ", 1)[-1] for b in direct_result["hard_blockers"])
 # ALTERNATIVE_QUALIFICATION_BRANCH_REPRESENTATION_V1 (post-dates and

@@ -49,6 +49,7 @@ SCHEMAS = ROOT / "schemas"
 REQUEST_SCHEMA = SCHEMAS / "gold_package_request.schema.json"
 MANIFEST_SCHEMA = SCHEMAS / "gold_package_manifest.schema.json"
 MODEL_SCHEMA = SCHEMAS / "gold_resume_model.schema.json"
+DISPLAY_SCHEMA = SCHEMAS / "gold_approved_display.schema.json"
 REQUIREMENT_SCHEMA = SCHEMAS / "requirement.schema.json"
 EVIDENCE_MATCH_SCHEMA = SCHEMAS / "evidence_match.schema.json"
 PACKAGE_CAPABILITY_BLOCKED = "PACKAGE_CAPABILITY_BLOCKED"
@@ -294,21 +295,99 @@ def _write(path: Path, data: bytes) -> None:
 
 # Production wiring ------------------------------------------------------------------------------
 
-def default_identity_from_master(root: Path) -> dict:
-    """The approved identity currently held by canonical records: the protected resume master. It carries no approved
-    GitHub link and no Gold-grammar education display strings, so a Gold model built from it fails identity QA until
-    Bora approves those records; nothing is invented here."""
-    master = json.loads((Path(root) / "resume" / "master" / "RESUME_MASTER_WW_V1.json").read_text(encoding="utf-8"))
+def approved_identity_from_canonical_records(root: Path, *, overlay: Optional[Mapping[str, Any]] = None, master: Optional[Mapping[str, Any]] = None,
+                                             claims: Optional[Mapping[str, Any]] = None, experiences: Optional[Mapping[str, Any]] = None,
+                                             evidence: Optional[Mapping[str, Any]] = None) -> dict:
+    """The approved candidate-facing identity, read from canonical records and cross-checked against canonical truth.
+
+    Facts come from the protected resume master (name, email, phone, location, LinkedIn text, approved display titles and month
+    ranges), the experience and evidence registries and the claim bank. The Bora-approved display overlay
+    docs/resume/BORA_GOLD_APPROVED_DISPLAY_V1.json supplies only presentation choices and link destinations, and every overlay entry
+    is verified against the canonical record it names: organization truth, evidence-held GPA with presentation rounding, display
+    titles, dates, repository URLs and required claim approvals. An education entry whose required claim is not human-approved is
+    omitted from the identity, so a model that uses it fails Gold QA. Nothing is hard-coded here."""
+    from claim_repository import load_validated_claim_repository
+    from decimal import ROUND_HALF_UP, Decimal
+    from evidence_repository import load_validated_evidence_repository
+    from experience_repository import load_validated_experience_repository
+
+    root = Path(root)
+    master = master if master is not None else json.loads((root / "resume" / "master" / "RESUME_MASTER_WW_V1.json").read_text(encoding="utf-8"))
+    overlay = overlay if overlay is not None else json.loads((root / "docs" / "resume" / "BORA_GOLD_APPROVED_DISPLAY_V1.json").read_text(encoding="utf-8"))
+    errors = _schema_errors(DISPLAY_SCHEMA, overlay)
+    if errors:
+        raise PackageError("APPROVED_DISPLAY_INVALID", errors[0])
+    if claims is None:
+        claims = load_validated_claim_repository(root / "claims")["index"]
+    if experiences is None:
+        experiences = load_validated_experience_repository(root / "experiences").index
+    if evidence is None:
+        evidence = load_validated_evidence_repository(root / "evidence")["index"]
+    problems = []
     contact = master["contact"]
-    links = []
-    linkedin = contact.get("linkedin") or ""
-    if linkedin.startswith(("https://", "http://")):
-        links.append({"label": "LinkedIn", "url": linkedin})
-    return {"contact": {"name": contact["name"], "location": contact.get("location"), "phone": contact.get("phone"),
-                        "email": contact["email"], "profile_links": links},
-            "education": [{"school": item["school_name"], "date_range": item["date_range"], "degree_line": item["degree_name"]}
-                          for item in master["education"]],
-            "experiences": {}, "project_links": {}}
+
+    def fact(evidence_id: str) -> str:
+        record = evidence.get(evidence_id)
+        return json.dumps(record, ensure_ascii=False) if record is not None else ""
+
+    profile_links = []
+    for link in overlay["contact_links"]:
+        if link["bound_master_contact_field"] == "linkedin":
+            if not contact.get("linkedin") or not link["url"].endswith(contact["linkedin"]):
+                problems.append("LinkedIn destination does not match the protected master contact text")
+        profile_links.append({"label": link["label"], "url": link["url"]})
+    project_urls = {item["experience_id"]: item["link"]["url"] for item in overlay["project_display"]}
+    for link in overlay["contact_links"]:
+        if link["bound_master_contact_field"] == "github_via_project_evidence":
+            bound = fact(link.get("bound_evidence_id", ""))
+            if not any(url.startswith(link["url"] + "/") and url.split("://", 1)[1] in bound for url in project_urls.values()):
+                problems.append("GitHub profile is not the owner of an evidence-held project repository")
+    education = []
+    for entry in overlay["education_display"]:
+        if entry["experience_id"] not in experiences:
+            problems.append("education experience %s is not in the experience registry" % entry["experience_id"])
+            continue
+        line = entry["degree_display"]
+        if "gpa" in entry:
+            gpa = entry["gpa"]
+            if gpa["truth_value"] not in fact(gpa["truth_evidence_id"]):
+                problems.append("GPA truth value %s is not held by %s" % (gpa["truth_value"], gpa["truth_evidence_id"]))
+            if Decimal(gpa["truth_value"]).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) != Decimal(gpa["display_value"]):
+                problems.append("GPA display value is not the HALF_UP_2DP presentation of the truth value")
+            line += " | GPA: " + gpa["display_value"]
+        if all(claims.get(claim_id, {}).get("human_approval") is True for claim_id in entry["required_claim_ids"]):
+            education.append({"school": entry["school"], "date_range": entry["date_range"], "degree_line": line})
+    sections = {section["experience_id"]: section for section in master["experience_sections"]}
+    experience_identity = {}
+    for entry in overlay["experience_display"]:
+        record = experiences.get(entry["experience_id"])
+        if record is None or record.get("organization") != entry["organization_truth"]:
+            problems.append("organization truth of %s does not match the experience registry" % entry["experience_id"])
+            continue
+        if entry["title_basis"] == "MASTER_DISPLAY_TITLE_APPROVAL":
+            section = sections.get(entry["experience_id"])
+            approval = (section or {}).get("display_title_approval", {})
+            if section is None or section.get("display_title") != entry["title"] or approval.get("approved") is not True \
+                    or section.get("date_range", "").replace(" – ", " - ") != entry["date_range"]:
+                problems.append("title or dates of %s differ from the protected master approval" % entry["experience_id"])
+        elif entry["title"].lower() not in fact(entry.get("formal_title_evidence_id", "")).lower():
+            problems.append("title of %s is not the employer-issued formal position" % entry["experience_id"])
+        experience_identity[entry["experience_id"]] = {"title": entry["title"], "employer": entry["employer"], "date_range": entry["date_range"]}
+    project_links = {}
+    for item in overlay["project_display"]:
+        record = experiences.get(item["experience_id"])
+        bound = fact(item["link"]["bound_evidence_id"])
+        if record is None or not str(record.get("experience_name", "")).startswith(item["name"]):
+            problems.append("project %s does not match the experience registry" % item["experience_id"])
+        if item["link"]["url"].split("://", 1)[1] not in bound:
+            problems.append("project repository URL is not held by %s" % item["link"]["bound_evidence_id"])
+        experience_identity[item["experience_id"]] = {"project_name": item["name"], "project_tech_label": item["tech_label"]}
+        project_links[item["experience_id"]] = {"label": item["link"]["label"], "url": item["link"]["url"]}
+    if problems:
+        raise PackageError("APPROVED_DISPLAY_BINDING_FAILED", "; ".join(problems))
+    return {"contact": {"name": contact["name"], "location": contact.get("location"), "phone": contact.get("phone"), "email": contact["email"],
+                        "profile_links": profile_links},
+            "education": education, "experiences": experience_identity, "project_links": project_links}
 
 
 def governed_render_function(root: Path, *, verification_record: Mapping[str, Any], work_dir: str) -> Callable[[bytes, list, str], tuple]:
@@ -358,7 +437,7 @@ def make_governed_deps(root: Path, *, verification_record: Mapping[str, Any], wo
     render = governed_render_function(root, verification_record=verification_record, work_dir=work_dir)
 
     return PackageDeps(load_claims=lambda: claims_result["index"], validate_lineage=lineage,
-                       identity_provider=lambda: default_identity_from_master(root), fonts=fonts, render=render,
+                       identity_provider=lambda: approved_identity_from_canonical_records(root, claims=claims_result["index"], evidence=evidence_result["index"]), fonts=fonts, render=render,
                        renderer_identity=lambda: {"adapter_sha256": adapter_sha,
                                                   "operator_verification_evidence_digest": verification_record["evidence_digest"]},
                        current_state=current_state, doctrine_root=root)
