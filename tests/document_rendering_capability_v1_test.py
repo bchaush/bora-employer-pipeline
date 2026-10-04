@@ -4827,6 +4827,147 @@ def test_open_action_destination_v1_vectors() -> None:
                     and triple[1] != "OPEN_ACTION_PRESENT", f"other catalog key still denied: {key}: {triple}")
 
 
+# ORDER_INDEPENDENT_LINKAGE_V1 vectors --------------------------------------------
+
+LINK_URLS = {
+    "email": "mailto:person@example.org",
+    "linkedin": "https://www.linkedin.com/in/example-person",
+    "github": "https://github.com/example-person",
+    "project": "https://github.com/example-person/example-project",
+}
+LINK_LABELS = {"email": "person@example.org", "linkedin": "LinkedIn", "github": "GitHub", "project": "GitHub"}
+
+
+def link_occurrence(key, label=None, dest=None):
+    text = label if label is not None else LINK_LABELS[key]
+    return {"dest_kind": "EXTERNAL_URI", "dest": dest or LINK_URLS[key], "tokens": adapter.tokenize(text), "paragraph_index": 0}
+
+
+def link_annotation(key, y, x=100.0, page=0, label=None, uri=None):
+    text = label if label is not None else LINK_LABELS[key]
+    return {"annot_index": 0, "page_index": page, "kind": "LINK_URI", "uri": uri or LINK_URLS[key], "goto_page": None,
+            "words_text": text.split(), "rect_ccs": [x, y, x + 40.0, y + 10.0]}
+
+
+def goto_annotation(page_target, y, label, page=0, x=100.0):
+    return {"annot_index": 0, "page_index": page, "kind": "LINK_GOTO", "uri": None, "goto_page": page_target,
+            "words_text": label.split(), "rect_ccs": [x, y, x + 40.0, y + 10.0]}
+
+
+def run_linkage(occurrences, annotations, bookmarks=None, lines=None):
+    model = types.SimpleNamespace(occurrences=occurrences, bookmark_paragraph=bookmarks or {})
+    line_objects = lines or []
+    try:
+        return ("PASS", adapter.link_linkage(model, {"annotations": annotations}, line_objects))
+    except adapter.StageFailure as failure:
+        return ("FAIL", failure.outcome.status)
+
+
+def former_source_order_matcher(occurrences, annotations):
+    """A retained copy of the former source-order pointer matcher, used only to prove that the reordered vector is
+    sensitive to the removed assumption (it returns the status the former algorithm produced)."""
+    pending = [dict(item, tokens=adapter.tokenize(" ".join(item["words_text"]))) for item in annotations]
+    pointer = 0
+    for occurrence in occurrences:
+        def dest_match(annotation, uri=occurrence["dest"]):
+            return annotation["kind"] == "LINK_URI" and annotation["uri"] == uri
+        found = None
+        for count in range(1, len(pending) - pointer + 1):
+            candidate = pending[pointer + count - 1]
+            if not dest_match(candidate):
+                break
+            collected = [token for entry in pending[pointer:pointer + count] for token in entry["tokens"]]
+            if collected == occurrence["tokens"]:
+                found = count
+                break
+        if found is None:
+            if any(dest_match(annotation) for annotation in pending[pointer + 1:]):
+                return "RENDER_LINK_ORDER_MISMATCH"
+            return "RENDER_LINK_MISSING"
+        pointer += found
+    return "PASS" if pointer == len(pending) else "RENDER_LINK_FABRICATED"
+
+
+def test_order_independent_link_linkage() -> None:
+    keys = ("email", "linkedin", "github", "project")
+    source = [link_occurrence(key) for key in keys]
+    # Reading order on one page: contact links on the top line (left to right), the project link lower on the page.
+    placed = {"email": link_annotation("email", 700.0, 100.0), "linkedin": link_annotation("linkedin", 700.0, 200.0),
+              "github": link_annotation("github", 700.0, 300.0), "project": link_annotation("project", 200.0, 400.0)}
+
+    def hyperlinks_of(result):
+        assert_true(result[0] == "PASS", f"expected PASS: {result}")
+        return result[1]
+
+    # (1) four links whose PDF order equals the source order.
+    same_order = hyperlinks_of(run_linkage(source, [placed[key] for key in keys]))
+    assert_true([item["dest"] for item in same_order] == [LINK_URLS[key] for key in keys], "(1) source-occurrence order")
+    # (2) the LibreOffice-observed order: the first source link, then the remaining links in reverse source order.
+    observed = [placed["email"], placed["project"], placed["github"], placed["linkedin"]]
+    assert_true(hyperlinks_of(run_linkage(source, observed)) == same_order, "(2) reordered annotations give the identical logical list")
+    assert_true(former_source_order_matcher(source, observed) == "RENDER_LINK_ORDER_MISMATCH",
+                "(12) the former source-order matcher fails the reordered vector")
+    assert_true(former_source_order_matcher(source, [placed[key] for key in keys]) == "PASS",
+                "(12) the former matcher still accepts the source-ordered vector, so the regression is not vacuous")
+    # (3) all annotations reversed.
+    assert_true(hyperlinks_of(run_linkage(source, [placed[key] for key in reversed(keys)])) == same_order, "(3) fully reversed order")
+    # (4) a correct label with a wrong URI.
+    wrong_uri = [dict(placed[key]) for key in keys]
+    wrong_uri[2] = link_annotation("github", 700.0, 300.0, uri="https://github.com/someone-else")
+    assert_true(run_linkage(source, wrong_uri) == ("FAIL", "RENDER_LINK_DESTINATION_SUBSTITUTED"), "(4) wrong URI with correct text")
+    # (5) a correct URI with a wrong visible label.
+    wrong_label = [dict(placed[key]) for key in keys]
+    wrong_label[1] = link_annotation("linkedin", 700.0, 200.0, label="Profile")
+    assert_true(run_linkage(source, wrong_label) == ("FAIL", "RENDER_LINK_ATTRIBUTION_AMBIGUOUS"), "(5) correct URI with wrong text")
+    # (6) a missing link; (7) an extra link.
+    assert_true(run_linkage(source, [placed[key] for key in keys[:-1]]) == ("FAIL", "RENDER_LINK_MISSING"), "(6) missing link")
+    extra = [placed[key] for key in keys] + [link_annotation("github", 600.0, 100.0, uri="https://example.org/extra", label="Extra")]
+    assert_true(run_linkage(source, extra) == ("FAIL", "RENDER_LINK_FABRICATED"), "(7) extra link is fabricated")
+    # (8) identical duplicate source occurrences: exact cardinality and the ordinal rule.
+    twin_source = [link_occurrence("github"), link_occurrence("github")]
+    upper, lower = link_annotation("github", 700.0, 100.0), link_annotation("github", 300.0, 100.0)
+    for order in ([upper, lower], [lower, upper]):
+        result = hyperlinks_of(run_linkage(twin_source, order))
+        assert_true(result[0]["page_rects"] != result[1]["page_rects"] and result[0]["page_rects"][0][2] > result[1]["page_rects"][0][2],
+                    "(8) the first source occurrence takes the first group in reading order whatever the array order")
+    assert_true(run_linkage(twin_source, [upper]) == ("FAIL", "RENDER_LINK_MISSING"), "(8) cardinality shortfall fails")
+    # (9) an additional identical annotation (not an exact-rect duplicate) is ambiguous, never an arbitrary choice.
+    assert_true(run_linkage([link_occurrence("github")], [upper, lower]) == ("FAIL", "RENDER_LINK_ATTRIBUTION_AMBIGUOUS"),
+                "(9) ambiguous duplicate annotations")
+    # A partial-token run is never a candidate group.
+    partial_source = [link_occurrence("github", label="Open GitHub profile")]
+    partial = [link_annotation("github", 700.0, 100.0, label="Open GitHub")]
+    assert_true(run_linkage(partial_source, partial) == ("FAIL", "RENDER_LINK_ATTRIBUTION_AMBIGUOUS"), "partial-token match fails")
+    # A wrapped hyperlink: two rects on two lines form one candidate group in reading order, whatever the array order.
+    wrapped_source = [link_occurrence("github", label="Open GitHub profile")]
+    first_rect = link_annotation("github", 700.0, 100.0, label="Open GitHub")
+    second_rect = link_annotation("github", 688.0, 100.0, label="profile")
+    for order in ([first_rect, second_rect], [second_rect, first_rect]):
+        result = hyperlinks_of(run_linkage(wrapped_source, order))
+        assert_true(len(result[0]["page_rects"]) == 2 and result[0]["page_rects"][0][2] > result[0]["page_rects"][1][2],
+                    "a wrapped hyperlink is one logical link with page_rects in reading order")
+    # An annotation is never reused by two occurrences with different labels at one destination.
+    one_annotation = [link_occurrence("github", label="GitHub"), link_occurrence("github", label="Source")]
+    assert_true(run_linkage(one_annotation, [link_annotation("github", 700.0, 100.0)])[0] == "FAIL", "one annotation is never reused")
+    # (10) internal GoTo links remain matched by page; a substituted internal destination fails.
+    line = types.SimpleNamespace(paragraph_index=3, page_index=1)
+    internal = [{"dest_kind": "INTERNAL_ANCHOR", "dest": "_Ref1", "tokens": adapter.tokenize("See below"), "paragraph_index": 0}]
+    ok = run_linkage(internal, [goto_annotation(1, 500.0, "See below")], bookmarks={"_Ref1": 3}, lines=[line])
+    assert_true(ok[0] == "PASS" and ok[1][0]["goto_page"] == 1, "(10) internal GoTo matched by page")
+    wrong_page = run_linkage(internal, [goto_annotation(0, 500.0, "See below")], bookmarks={"_Ref1": 3}, lines=[line])
+    assert_true(wrong_page == ("FAIL", "RENDER_LINK_DESTINATION_SUBSTITUTED") or wrong_page == ("FAIL", "RENDER_LINK_ATTRIBUTION_AMBIGUOUS"),
+                f"a substituted internal destination fails: {wrong_page}")
+    # (11) mixed external and internal links in a reordered PDF.
+    mixed_source = [link_occurrence("github"), internal[0], link_occurrence("email")]
+    mixed = [link_annotation("email", 700.0, 300.0), goto_annotation(1, 500.0, "See below"), link_annotation("github", 700.0, 100.0)]
+    mixed_result = run_linkage(mixed_source, mixed, bookmarks={"_Ref1": 3}, lines=[line])
+    assert_true(mixed_result[0] == "PASS" and [item["dest_kind"] for item in mixed_result[1]] ==
+                ["EXTERNAL_URI", "INTERNAL_ANCHOR", "EXTERNAL_URI"], "(11) mixed external and internal links")
+    # RENDER_LINK_ORDER_MISMATCH is reserved: the adapter never emits it.
+    source_text = (ROOT / "src" / "document_render_adapter.py").read_text(encoding="utf-8")
+    assert_true(source_text.count("RENDER_LINK_ORDER_MISMATCH") == 1, "RENDER_LINK_ORDER_MISMATCH stays a reserved name only")
+
+
 DEPENDENCY_FREE_TESTS = (
     test_operator_font_tables_and_probe_vectors,
     test_operator_apt_records_and_post_manifest_assembly,
@@ -4870,6 +5011,7 @@ DEPENDENCY_FREE_TESTS = (
     test_child_emitter_and_start_attestation,
     test_orchestration_with_fakes,
     test_adapter_static_rules,
+    test_order_independent_link_linkage,
 )
 
 DEPENDENCY_TESTS = (
@@ -4888,7 +5030,62 @@ DEPENDENCY_TESTS = (
 )
 
 
+def operator_link_regression(argv: list) -> int:
+    """OPERATOR-gated regression of ORDER_INDEPENDENT_LINKAGE_V1: a four-link Gold-style DOCX (email, LinkedIn, GitHub profile and
+    project GitHub) goes through the pinned LibreOffice build and the real inspection, whose PDF link annotations are not in source
+    order. Usage (governed interpreter): --operator-link-regression --verification-evidence PATH --work-dir DIR."""
+    options = dict(zip(argv[1::2], argv[2::2]))
+    verification = json.loads(Path(options["--verification-evidence"]).read_text(encoding="utf-8"))
+    work = Path(options["--work-dir"])
+    work.mkdir(parents=True, exist_ok=True)
+    manifest_bytes = (ROOT / "docs" / "rendering" / "RENDERING_ENVIRONMENT_V1.json").read_bytes()
+    adapter.add_governed_site_path(adapter.operator_site_packages(adapter.verify_manifest(manifest_bytes)))
+    links = [("person@example.org", "mailto:person@example.org"), ("LinkedIn", "https://www.linkedin.com/in/example-person"),
+             ("GitHub", "https://github.com/example-person"), ("GitHub", "https://github.com/example-person/example-project")]
+    family = '<w:rFonts w:ascii="Liberation Sans" w:hAnsi="Liberation Sans"/>'
+
+    def run(text):
+        return '<w:r><w:rPr>%s</w:rPr><w:t xml:space="preserve">%s</w:t></w:r>' % (family, text)
+
+    def link(index):
+        return '<w:hyperlink r:id="rId%d">%s</w:hyperlink>' % (10 + index, run(links[index][0]))
+
+    first = run("Contact: ") + link(0) + run(" | ") + link(1) + run(" | ") + link(2)
+    second = run("Project: ") + link(3)
+    document = ('%s<w:document %s xmlns:r="%s"><w:body><w:p>%s</w:p><w:p>%s</w:p></w:body></w:document>'
+                % (_XML, _W, "http://schemas.openxmlformats.org/officeDocument/2006/relationships", first, second))
+    rels = "".join('<Relationship Id="rId%d" Type="%shyperlink" Target="%s" TargetMode="External"/>' % (10 + i, _OFFICE_REL, url)
+                   for i, (_label, url) in enumerate(links))
+    docx_bytes = docx_fixture(document_xml=document, extra_doc_rels=rels)
+    structure_map = [{"paragraph_index": 0, "content_type": "CONTACT_LINE", "list_semantics": None,
+                      "paragraph_text": "Contact: person@example.org | LinkedIn | GitHub"},
+                     {"paragraph_index": 1, "content_type": "PROJECT_HEADER", "list_semantics": None, "paragraph_text": "Project: GitHub"}]
+    docx_path, map_path = work / "four_links.docx", work / "four_links.structure_map.json"
+    docx_path.write_bytes(docx_bytes)
+    map_path.write_text(json.dumps(structure_map), encoding="utf-8")
+    outcome = adapter.run_first_render(ROOT, manifest_bytes, str(docx_path), hashlib.sha256(docx_bytes).hexdigest(), str(work / "render"),
+                                       str(map_path), verification_record=verification)
+    record = outcome["record"]
+    print(json.dumps({"run_status": record["run_status"], "reason": record["reason"], "delivered": record["delivered"],
+                      "fingerprint": record.get("render_semantic_fingerprint")}, sort_keys=True))
+    assert_true(record["reason"] is None and record["delivered"] == 1 and record["run_status"] in (adapter.STATUS_PASS, adapter.STATUS_QA_FAILED),
+                f"the real renderer delivered a four-link PDF without a link status: {record['run_status']} {record['reason']}")
+    from pypdf import PdfReader
+    reader = PdfReader(outcome["pdf_path"])
+    pdf_links = []
+    for annotation in reader.pages[0].get("/Annots", []):
+        pdf_links.append(str(annotation.get_object()["/A"]["/URI"]))
+    expected = [url for _label, url in links]
+    print(json.dumps({"source_order": expected, "pdf_annotation_order": pdf_links}))
+    assert_true(sorted(pdf_links) == sorted(expected), "all four genuine URI annotations are present with exact destinations")
+    assert_true(pdf_links != expected, "the pinned LibreOffice build emits the annotations out of source order and the renderer still accepts them")
+    print(json.dumps({"operator_link_regression": "PASS"}))
+    return 0
+
+
 def main() -> None:
+    if "--operator-link-regression" in sys.argv:
+        raise SystemExit(operator_link_regression(sys.argv[1:]))
     for test in DEPENDENCY_FREE_TESTS:
         test()
     print(f"PASS: {len(DEPENDENCY_FREE_TESTS)} dependency-free vector groups")

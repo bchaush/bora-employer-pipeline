@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/package_actionability_attestation.schema.json",
+  "title": "Career OS Package-Time Actionability Attestation",
+  "description": "Operator-supplied package-time first-party reopen and revalidation attestation (BORA_PACKAGE_SPAWN_GATE_V1). It is bound to the exact Job_ID, latest pursuit event_id, decision_context_fingerprint and application destination. It carries no freshness TTL; staleness is detected only through those bindings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "job_id",
+    "latest_event_id",
+    "decision_context_fingerprint",
+    "role_requisition_identity",
+    "application_destination_url",
+    "semantic_quorum",
+    "dead_state_veto",
+    "rechecked_at",
+    "recheck_provenance",
+    "role_status",
+    "source_verification_status"
+  ],
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "latest_event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_context_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "role_requisition_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "application_destination_url": {
+      "type": "string",
+      "pattern": "^https?://[^\\s]+$"
+    },
+    "semantic_quorum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matching_role_title_identity",
+        "matching_requisition_identity",
+        "substantive_current_jd_content",
+        "current_actionable_application_route"
+      ],
+      "properties": {
+        "matching_role_title_identity": {
+          "type": "boolean"
+        },
+        "matching_requisition_identity": {
+          "type": "boolean"
+        },
+        "substantive_current_jd_content": {
+          "type": "boolean"
+        },
+        "current_actionable_application_route": {
+          "type": "boolean"
+        }
+      }
+    },
+    "dead_state_veto": {
+      "type": "boolean"
+    },
+    "rechecked_at": {
+      "type": "string",
+      "minLength": 20
+    },
+    "recheck_provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role_status": {
+      "enum": [
+        "VERIFIED_LIVE",
+        "LIKELY_LIVE",
+        "UNCLEAR",
+        "POSSIBLY_STALE",
+        "CONFIRMED_CLOSED"
+      ]
+    },
+    "source_verification_status": {
+      "enum": [
+        "VERIFIED_DIRECT",
+        "SOURCE_VERIFICATION_REQUIRED",
+        "DIRECT_SOURCE_UNAVAILABLE",
+        "UNKNOWN"
+      ]
+    }
+  }
+}

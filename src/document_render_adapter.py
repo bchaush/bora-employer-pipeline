@@ -4237,69 +4237,160 @@ def check_span_identities(manifest: dict, model: SourceModel, lines: list) -> No
 
 # S10.06 and S10.07 --------------------------------------------------------------
 
+def _annotation_identity(annotation: dict) -> tuple:
+    """Destination identity of one PDF annotation (ORDER_INDEPENDENT_LINKAGE_V1)."""
+    if annotation["kind"] == "LINK_URI":
+        return ("EXTERNAL_URI", annotation["uri"])
+    return ("INTERNAL_ANCHOR", annotation["goto_page"])
+
+
+def _annotation_reading_key(annotation: dict) -> tuple:
+    """READING ORDER of ORDER_INDEPENDENT_LINKAGE_V1: ascending page index, then descending quantized y1_q, then
+    ascending quantized x0_q, with the annotation array position used only as the final tie-break."""
+    rect = annotation["rect_ccs"]
+    return (annotation["page_index"], -quantize(rect[3]), quantize(rect[0]), annotation["array_index"])
+
+
+def _candidate_runs(group: list, token_sets: set) -> list:
+    """Every non-empty run of the reading-ordered annotations of one destination class whose token concatenation
+    equals one of the occurrence token sequences; returned as (start, end, tokens) ascending by (start, end)."""
+    runs = []
+    for start in range(len(group)):
+        collected = []
+        for end in range(start, len(group)):
+            collected = collected + group[end]["tokens"]
+            if tuple(collected) in token_sets:
+                runs.append((start, end + 1, tuple(collected)))
+    return runs
+
+
+def _count_matchings(runs: list, need: dict, limit: int = 2) -> tuple:
+    """Count (capped at LIMIT) the sets of pairwise-disjoint runs whose token multiset equals NEED; returns
+    (count, first_matching). Runs are intervals, so ordering a set by start enumerates each set exactly once."""
+    found = []
+    remaining = dict(need)
+
+    def search(index: int, floor: int, chosen: list) -> None:
+        if len(found) >= limit:
+            return
+        if all(value == 0 for value in remaining.values()):
+            found.append(list(chosen))
+            return
+        for position in range(index, len(runs)):
+            start, end, tokens = runs[position]
+            if start < floor or remaining.get(tokens, 0) == 0:
+                continue
+            remaining[tokens] -= 1
+            chosen.append(runs[position])
+            search(position + 1, end, chosen)
+            chosen.pop()
+            remaining[tokens] += 1
+            if len(found) >= limit:
+                return
+
+    search(0, 0, [])
+    return len(found), (found[0] if found else None)
+
+
 def link_linkage(model: SourceModel, s10_evidence: dict, lines: list) -> list:
-    """HYPERLINK_OCCURRENCE_MODEL_V1 linkage_algorithm and
-    internal_anchor_rule; returns the logical hyperlink list."""
+    """ORDER_INDEPENDENT_LINKAGE_V1 (HYPERLINK_OCCURRENCE_MODEL_V1 linkage_algorithm and internal_anchor_rule);
+    returns the logical hyperlink list in SOURCE OCCURRENCE order. The order of the PDF /Annots array is never used
+    to match: annotations are partitioned into destination classes, ordered by reading order inside a class, and an
+    occurrence is satisfied only by a unique matching of disjoint contiguous candidate groups with exact tokens and
+    exact cardinality."""
     annotations = []
-    for record in s10_evidence["annotations"]:
-        annotations.append(dict(record, tokens=tokenize(" ".join(record["words_text"]))))
+    for index, record in enumerate(s10_evidence["annotations"]):
+        annotations.append(dict(record, tokens=tokenize(" ".join(record["words_text"])), array_index=index))
     first_page = {}
     for line in lines:
         if line.paragraph_index is not None:
             first_page.setdefault(line.paragraph_index, line.page_index)
-    hyperlinks = []
-    pointer = 0
+    # Destination identity of every source occurrence, in document order.
+    occurrences = []
     for occurrence in model.occurrences:
-        expected_tokens = occurrence["tokens"]
         if occurrence["dest_kind"] == "EXTERNAL_URI":
-            def dest_match(annotation, uri=occurrence["dest"]):
-                return annotation["kind"] == "LINK_URI" and annotation["uri"] == uri
-            goto_page = None
+            identity, goto_page = ("EXTERNAL_URI", occurrence["dest"]), None
         else:
             paragraph_index = model.bookmark_paragraph.get(occurrence["dest"])
             goto_page = first_page.get(paragraph_index)
             if goto_page is None:
                 fail("RENDER_LINK_ATTRIBUTION_AMBIGUOUS", "ANCHOR_UNATTRIBUTED", None, "S10.06")
+            identity = ("INTERNAL_ANCHOR", goto_page)
+        occurrences.append({"occurrence": occurrence, "identity": identity, "goto_page": goto_page,
+                            "tokens": tuple(occurrence["tokens"])})
+    classes = {}
+    for annotation in annotations:
+        classes.setdefault(_annotation_identity(annotation), []).append(annotation)
+    for identity in classes:
+        classes[identity].sort(key=_annotation_reading_key)
 
-            def dest_match(annotation, page=goto_page):
-                return annotation["kind"] == "LINK_GOTO" and annotation["goto_page"] == page
+    def has_run_with_tokens(group: list, tokens: tuple) -> bool:
+        return any(run[2] == tokens for run in _candidate_runs(group, {tokens}))
 
-        def match_from(start):
-            collected = []
-            for count in range(1, len(annotations) - start + 1):
-                candidate = annotations[start + count - 1]
-                if not dest_match(candidate):
-                    return None
-                collected = collected + candidate["tokens"]
-                if collected == expected_tokens:
-                    return count
-                if collected != expected_tokens[: len(collected)]:
-                    return None
-            return None
-
-        count = match_from(pointer) if pointer < len(annotations) else None
-        if count is None:
-            if pointer >= len(annotations):
-                fail("RENDER_LINK_MISSING", None, None, "S10.06")
-            head = annotations[pointer]
-            if head["tokens"] == expected_tokens and not dest_match(head):
+    # Pass 1: every destination class is matched independently (a class passes with exactly one matching).
+    results = {}
+    for item in occurrences:
+        identity = item["identity"]
+        if identity in results:
+            continue
+        group = classes.get(identity, [])
+        members = [other for other in occurrences if other["identity"] == identity]
+        need = {}
+        for other in members:
+            need[other["tokens"]] = need.get(other["tokens"], 0) + 1
+        count, chosen = _count_matchings(_candidate_runs(group, set(need)), need)
+        results[identity] = {"count": count, "runs": chosen, "group": group, "members": members}
+    consumed = set()
+    for record in results.values():
+        if record["count"] == 1:
+            for start, end, _tokens in record["runs"]:
+                for annotation in record["group"][start:end]:
+                    consumed.add(annotation["array_index"])
+    # Pass 2: classification for the first source occurrence, in document order, whose class does not pass; only
+    # annotations not consumed by a passing class are available to a substitution finding.
+    available = {identity: [annotation for annotation in group if annotation["array_index"] not in consumed]
+                 for identity, group in classes.items()}
+    for item in occurrences:
+        record = results[item["identity"]]
+        if record["count"] == 1:
+            continue
+        if record["count"] >= 2:
+            fail("RENDER_LINK_ATTRIBUTION_AMBIGUOUS", None, None, "S10.06")
+        group = available.get(item["identity"], [])
+        for other in record["members"]:
+            if has_run_with_tokens(record["group"], other["tokens"]):
+                continue
+            if any(has_run_with_tokens(other_group, other["tokens"])
+                   for other_identity, other_group in available.items() if other_identity != item["identity"]):
                 fail("RENDER_LINK_DESTINATION_SUBSTITUTED", None, None, "S10.06")
-            if dest_match(head) and head["tokens"] != expected_tokens:
+            if group:
                 fail("RENDER_LINK_ATTRIBUTION_AMBIGUOUS", None, None, "S10.06")
-            if any(match_from(later) is not None for later in range(pointer + 1, len(annotations))):
-                fail("RENDER_LINK_ORDER_MISMATCH", None, None, "S10.06")
             fail("RENDER_LINK_MISSING", None, None, "S10.06")
-        consumed = annotations[pointer:pointer + count]
-        pointer += count
+        fail("RENDER_LINK_MISSING", None, None, "S10.06")
+    matched = results
+    leftover = [annotation for annotation in annotations if annotation["array_index"] not in consumed]
+    if leftover:
+        fail("RENDER_LINK_FABRICATED", None, None, "S10.07", count=len(leftover))
+    # Ordinal rule: the i-th occurrence of an identical (destination, tokens) takes the i-th such group in reading order.
+    taken = {}
+    hyperlinks = []
+    for item in occurrences:
+        record = matched[item["identity"]]
+        key = (item["identity"], item["tokens"])
+        ordinal = taken.get(key, 0)
+        taken[key] = ordinal + 1
+        same = [run for run in record["runs"] if run[2] == item["tokens"]]
+        start, end, _tokens = same[ordinal]
+        consumed_group = record["group"][start:end]
+        occurrence = item["occurrence"]
         hyperlinks.append({
             "dest_kind": occurrence["dest_kind"],
             "dest": occurrence["dest"],
-            "goto_page": goto_page,
-            "page_rects": [[item["page_index"]] + [quantize(value) for value in item["rect_ccs"]] for item in consumed],
-            "tokens": expected_tokens,
+            "goto_page": item["goto_page"],
+            "page_rects": [[entry["page_index"]] + [quantize(value) for value in entry["rect_ccs"]]
+                           for entry in consumed_group],
+            "tokens": occurrence["tokens"],
         })
-    if pointer < len(annotations):
-        fail("RENDER_LINK_FABRICATED", None, None, "S10.07", count=len(annotations) - pointer)
     return hyperlinks
 
 

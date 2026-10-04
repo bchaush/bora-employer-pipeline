@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/gold_package_manifest.schema.json",
+  "title": "Career OS Gold Package Manifest",
+  "description": "Deterministic provenance manifest of one local Gold resume stage run. Identity and provenance live here, never in filenames. It creates no submission authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spec",
+    "package_generation_id",
+    "package_run_id",
+    "job_id",
+    "latest_event_id",
+    "decision_context_fingerprint",
+    "gold_doctrine_digests",
+    "gold_doctrine_digest",
+    "resume_model_digest",
+    "structure_map_digest",
+    "expected_links_digest",
+    "jd_requirements_digest",
+    "evidence_match_digest",
+    "crosswalk_digest",
+    "attestation_digest",
+    "cover_letter_gold_sha256",
+    "cover_letter_opt_out_digest",
+    "renderer",
+    "artifacts",
+    "pre_render_qa_digest",
+    "post_render_qa_digest",
+    "package_status",
+    "human_review",
+    "submission_authority"
+  ],
+  "properties": {
+    "spec": {
+      "const": "GOLD_PACKAGE_MANIFEST_V1"
+    },
+    "package_generation_id": {
+      "type": "string",
+      "pattern": "^PGP_V1::[0-9a-f]{64}$"
+    },
+    "package_run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "latest_event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_context_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gold_doctrine_digests": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "minProperties": 2
+    },
+    "gold_doctrine_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "resume_model_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "structure_map_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "expected_links_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "jd_requirements_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_match_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "crosswalk_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "attestation_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "cover_letter_gold_sha256": {
+      "type": "null"
+    },
+    "cover_letter_opt_out_digest": {
+      "type": "null"
+    },
+    "renderer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter_sha256",
+        "operator_verification_evidence_digest"
+      ],
+      "properties": {
+        "adapter_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operator_verification_evidence_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "format",
+          "sha256",
+          "byte_size"
+        ],
+        "properties": {
+          "role": {
+            "enum": [
+              "resume_docx",
+              "resume_pdf"
+            ]
+          },
+          "format": {
+            "enum": [
+              "DOCX",
+              "PDF"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "byte_size": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "pre_render_qa_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "post_render_qa_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "package_status": {
+      "const": "GOLD_RESUME_STAGE_READY_COVER_LETTER_PAIR_NOT_PRODUCED"
+    },
+    "human_review": {
+      "const": "REQUIRED_PENDING"
+    },
+    "submission_authority": {
+      "const": "NONE"
+    }
+  }
+}
