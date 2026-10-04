@@ -156,5 +156,41 @@
       "a new persisted job/actionability enum",
       "an autonomous or unsupervised package-generation runtime -- the recheck and spawn gate locked here remain human-operated operating discipline, not a validator implementation"
     ]
+  },
+  "model_built_gold_generation_reconciliation": {
+    "rule": "GENERATE_DETERMINISTICALLY_FROM_CANONICAL_GOLD_DOCTRINE_PLUS_APPROVED_CANDIDATE_TRUTH",
+    "scope": "The deterministic PURSUE_TO_GOLD_PACKAGE_V1 resume runtime only. gold_artifact_spawn_gate and its reconstruction_prohibition continue unchanged to bind every manual, chat or agent spawn and any generation not performed under the executable Gold QA below.",
+    "replaces_for_scope": "clone of the exact Gold resume binary followed by bounded edits",
+    "governing_contract": "milestone_contracts/governance/career-os-pursue-to-gold-package-v1-contract.json",
+    "gold_authority": [
+      "docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json",
+      "docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json",
+      "BLUEPRINT.md Sections 134, 137, 140 and 141",
+      ".cursor/rules/resume.mdc"
+    ],
+    "exemplar_role": "The historical Gold resume DOCX (sha256 ec3a9f9c6e2fc429e01892f61a074a71319ec6586566b6c1cf60808eba2f3f70) is a visual/presentation exemplar and regression reference only. It is never Candidate Truth, is no longer required to be cloned for production, and its legacy Word parts are not reproduced.",
+    "prevention_mechanism": "Executable Gold-model and Gold-DOCX QA (pre-render and post-render) enforced by the deterministic runtime, replacing literal copying of legacy Word baggage as the control against reconstruction drift.",
+    "reasons_preserved": [
+      "no reconstruction drift",
+      "no factual invention",
+      "no presentation drift",
+      "exact Gold grammar",
+      "deterministic artifact generation",
+      "real hyperlinks",
+      "rendered QA"
+    ],
+    "stop_condition": {
+      "code": "GOLD_DOCTRINE_RECORD_REQUIRED",
+      "when": "a canonical Gold doctrine record is unavailable or unreadable, or the generated model or DOCX fails Gold QA",
+      "action": "stop with no output rather than improvising a template"
+    },
+    "unchanged": [
+      "package-time first-party actionability recheck and positive semantic quorum",
+      "internal_jargon_translation_requirement",
+      "pre_delivery_package_qa_reject_conditions",
+      "92-percent meaningful-page-utilization floor",
+      "Candidate Truth, claim/evidence lineage and every human-review and manual SUBMIT gate"
+    ],
+    "non_goals_clarification": "The non_goals of this record state what this doctrine record itself authorizes; they do not prohibit a runtime that a separate canonical contract (PURSUE_TO_GOLD_PACKAGE_V1) authorizes under its own gates."
   }
 }

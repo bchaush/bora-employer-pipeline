@@ -1,0 +1,69 @@
+{
+  "milestone_id": "CAREER_OS_PURSUE_TO_GOLD_PACKAGE_MODEL_BUILT_RECONCILIATION_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow governance reconciliation of the existing owning milestone PURSUE_TO_GOLD_PACKAGE_V1 (milestone_contracts/governance/career-os-pursue-to-gold-package-v1-contract.json) from canonical main 048a5c159cc00b0b38ae8aa60adb43b1745c4b49. It replaces only three obsolete architectural assumptions for the RESUME artifact: exact Gold DOCX cloning, the prohibition on rebuilding from canonical Gold doctrine, and the capability hard stop that predates and bars the canonically released rendering capability. The resume becomes a deterministic model-built Gold DOCX with a structure map from the same model, rendered only through the released renderer and gated by executable Gold QA; BORA_PACKAGE_SPAWN_GATE_V1 gains a scoped additive reconciliation; known Candidate Truth and display gaps are recorded as blocked, not invented. It creates no new milestone, authorizes no implementation, release, merge or submission, and leaves the cover-letter path, every truth, pursuit, actionability and human-review gate, and the renderer unchanged.",
+  "baseline_sha": "048a5c159cc00b0b38ae8aa60adb43b1745c4b49",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-pursue-to-gold-package-model-built-v1.json",
+    "milestone_contracts/governance/career-os-pursue-to-gold-package-v1-contract.json",
+    "docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json",
+    "tests/gold_model_built_reconciliation_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json",
+    "milestone_contracts/implementation/**",
+    "docs/resume/BORA_GOLD_QUALITY_REFERENCE_V1.json",
+    "docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json",
+    "docs/resume/BORA_CABLE_ONE_FINAL_REFERENCE_V1.json",
+    "docs/resume/BORA_COVER_LETTER_GOLD_REFERENCE_V1.json",
+    "docs/rendering/**",
+    "docs/gold/**",
+    "docs/application/**",
+    "docs/decisions/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python tests/gold_model_built_reconciliation_v1_test.py",
+    "python tests/resume_package_spawn_gate_v1_test.py",
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against 048a5c159cc00b0b38ae8aa60adb43b1745c4b49 is exactly four paths: milestone_contracts/governance/career-os-pursue-to-gold-package-model-built-v1.json (added), milestone_contracts/governance/career-os-pursue-to-gold-package-v1-contract.json (modified), docs/resume/BORA_PACKAGE_SPAWN_GATE_V1.json (modified, additive) and tests/gold_model_built_reconciliation_v1_test.py (added). No existing test file is modified.",
+    "In the PURSUE_TO_GOLD_PACKAGE_V1 contract exactly these spans change: goal; allowed_paths (three exact Gold builder paths added: src/gold_resume_docx_builder.py, src/gold_resume_qa.py, schemas/gold_resume_model.schema.json; no wildcard); required_tests (the renderer test added); acceptance conditions PRE-PACKAGE ORDER, GOLD SOURCE INTEGRITY, CLAIM AND EVIDENCE LINEAGE, IMMUTABLE FIELDS, GOLD-FAMILY QUALITY, MANIFEST AND PROVENANCE, IDEMPOTENCY, CAPABILITY HARD STOP and the required-test clauses that named the Gold clone or barred the renderer; stop conditions 5 and 10; three appended stop conditions; and nine new acceptance conditions inserted before the final path/Assurance condition. forbidden_paths, the pursuit, actionability, truth-axis, opt-out, persistence and cover-letter conditions, review_requirements, human_approval_requirements and baseline_sha are unchanged.",
+    "BORA_PACKAGE_SPAWN_GATE_V1 gains one additive key model_built_gold_generation_reconciliation; gold_artifact_spawn_gate, reconstruction_prohibition, the actionability recheck, jargon requirement, reject conditions, non_goals and every existing key are unchanged, so tests/resume_package_spawn_gate_v1_test.py and BLUEPRINT, AGENTS and resume.mdc cross-references remain true for manual and agent spawning.",
+    "The numeric and structural Gold values written into the contract equal docs/resume/BORA_SPY_POND_GOLD_REFERENCE_V1.json and are proven so by the new test; no second Gold standard is created.",
+    "Candidate Truth gaps (GPA 3.635 without rounding, TELUS Digital Bulgaria, CLAIM_EDU_UNWE_001, CLAIM_DCOMMERCE_001 and the missing second D Commerce claim, GitHub profile and project link records) are recorded as blocked and no claim, evidence, experience or contact record is created or changed.",
+    "python tests/gold_model_built_reconciliation_v1_test.py, python scripts/verify_milestone_state.py and full canonical Assurance pass, and git diff --check and git diff --cached --check pass."
+  ],
+  "stop_conditions": [
+    "The reconciliation would require any change to the cover-letter path, the pursuit, actionability, opt-out or persistence conditions, a human-review gate, Candidate Truth, Match Truth or the renderer.",
+    "Any path outside the four allowed paths, any existing test, any other Gold doctrine record, or OPERATOR state would have to change.",
+    "Existing tests of the spawn-gate or Gold doctrine records would have to be edited or weakened to pass.",
+    "Passing scripts/verify_milestone_state.py would require weakening src/career_os_state.py or scripts/verify_milestone_state.py."
+  ],
+  "review_requirements": "MANDATORY_INDEPENDENT_ADVERSARIAL_REVIEW_OF_IMMUTABLE_STAGED_BYTES_AFTER_FULL_ASSURANCE; the builder does not review its own candidate; any mutation after review invalidates it.",
+  "human_approval_requirements": "Bora authorized authoring this governance candidate only. Commit, push, pull request, merge, implementation of PURSUE_TO_GOLD_PACKAGE_V1 and every Candidate Truth approval each require separate explicit Bora authorization. Merging this candidate leaves PURSUE_TO_GOLD_PACKAGE_V1 SELECTED_NOT_AUTHORIZED. Manual SUBMIT remains Bora-controlled."
+}
