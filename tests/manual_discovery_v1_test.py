@@ -17,6 +17,7 @@ from manual_discovery import (  # noqa: E402
     process_manual_nomination,
 )
 from production_ledger import empty_state, state_from_ledger_rows  # noqa: E402
+from first_party_identity_resolution import evaluate_first_party_identity_request  # noqa: E402
 from supervised_ingestion import process_batch  # noqa: E402
 
 
@@ -249,4 +250,46 @@ else:
     raise AssertionError("screenshot without stable source_reference must fail explicitly")
 
 print("PASS 8: malformed adapter inputs fail explicitly.")
+
+# 9. A lawful MANUAL_URL hold must be consumable by the canonical first-party
+# identity resolver. This is the downstream conveyor promised by MANUAL_DISCOVERY_V1;
+# the identity schema must not hard-code Gmail as the only lawful Slice-1 source.
+yc_url = "https://www.ycombinator.com/companies/example/jobs/abc123-example-role"
+manual_hold = process_manual_nomination(
+    existing_state=empty_state(),
+    run_id="MANUAL_V1_FPIR_001",
+    processed_at="2026-10-03T23:42:00-04:00",
+    source="MANUAL_URL",
+    observed_at="2026-10-03T23:42:00-04:00",
+    discovery_url=yc_url,
+    employer_text="Example",
+    role_text="Example Role",
+    source_claims={"source_provider": "Y_COMBINATOR"},
+)
+check(len(manual_hold["log_mutations"]) == 1, "manual hold must emit one durable LOG row")
+fp_outcome = evaluate_first_party_identity_request(
+    {
+        "discovery_log_record": manual_hold["log_mutations"][0],
+        "first_party_observation": {
+            "observed_at": "2026-10-03T23:42:00-04:00",
+            "source_kind": "FIRST_PARTY_DIRECT",
+            "official_url": yc_url,
+            "observed_employer_name": "Example",
+            "observed_role_title": "Example Role",
+            "employer_binding_status": "VERIFIED",
+            "employer_binding_basis": "Company-specific live posting.",
+            "exact_employer_identity": "EXAMPLE",
+            "requisition_status": "EXACT",
+            "requisition_authority": "EMPLOYER_OR_ATS_FIRST_PARTY",
+            "exact_requisition_id": "abc123",
+            "requisition_evidence": "Live posting URL contains exact opportunity identifier abc123.",
+        },
+    }
+)
+check(
+    fp_outcome["outcome"] == "RESOLVED"
+    and fp_outcome["operational_job_id"] == "EXAMPLE::ABC123",
+    f"lawful MANUAL_URL must reach first-party identity resolution, got {fp_outcome}",
+)
+print("PASS 9: MANUAL_URL discovery flows into first-party identity resolution.")
 print("ALL MANUAL_DISCOVERY_V1 CHECKS PASSED")
