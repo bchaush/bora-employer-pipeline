@@ -1,5 +1,10 @@
 # Bora Employer Pipeline OS — Change Log
 
+## 2026-10-03 — Gold résumé production released and operationally ready
+
+- Released ORDER_INDEPENDENT_LINKAGE_V1 (PR #111), the model-built Gold résumé reconciliation (PR #112), the Gold résumé implementation (PR #114), Bora's truth/display approvals (PR #115) and production smoke fixes (PR #116).
+- Cover-letter runtime remains NOT_YET_IMPLEMENTED; nothing was submitted; manual SUBMIT remains Bora-controlled.
+
 ## 2026-09-27 — CANONICAL_GOLD_SOURCES_V1 PR #85 canonical closure
 
 - Merged reviewed Gold-source candidate head `82b3cda83bb5750602f87d2f154e9c9273fdd7f2` as PR #85 at canonical main `a7f94f23f0ac446077a175cab510349bd414cd6b`.

@@ -1,0 +1,50 @@
+{
+  "milestone_id": "CAREER_OS_OPERATIONAL_READINESS_CONTINUITY_V1",
+  "kind": "GOVERNANCE_SYNC",
+  "goal": "Release hygiene only: record in CURRENT_STATE.md (additive addendum) and CHANGELOG.md that live canonical main 0340bbf4bc356cf9f04aaa6357067a8e4bb1afc5 has the Gold resume production path released and operationally ready, without rewriting the older routing prose. No code, truth, doctrine or test change.",
+  "baseline_sha": "0340bbf4bc356cf9f04aaa6357067a8e4bb1afc5",
+  "allowed_paths": [
+    "CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "milestone_contracts/governance/career-os-operational-readiness-continuity-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "schemas/**",
+    "tests/**",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "resume/**",
+    "docs/**",
+    "golden-tests/**",
+    "fixtures/**",
+    "scripts/**",
+    "project_state.json",
+    "CURRENT_MILESTONE.md",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".github/**",
+    ".cursor/**",
+    "requirements.in",
+    "requirements-lock.txt"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "Only CURRENT_STATE.md (append) and CHANGELOG.md (new top entry) change besides this contract; older prose is untouched.",
+    "Full canonical Assurance, milestone-state and git diff --check pass."
+  ],
+  "stop_conditions": [
+    "Any file outside the three allowed paths would have to change.",
+    "Any existing continuity-pinned test would have to change."
+  ],
+  "review_requirements": "Hosted Assurance on the exact head and post-merge Assurance are required.",
+  "human_approval_requirements": "Ordinary release hygiene within Bora's authorization. Manual SUBMIT remains Bora-controlled."
+}
