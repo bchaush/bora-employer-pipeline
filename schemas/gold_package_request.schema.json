@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bora-employer-pipeline.local/schemas/gold_package_request.schema.json",
+  "title": "Career OS Gold Package Request",
+  "description": "Request shape of the PURSUE_TO_GOLD_PACKAGE_V1 local runtime. Schema validity establishes structure only; authority comes from the derived pursuit state, the validated attestation and approved Candidate Truth. A cover-letter opt-out is represented as an object and is never authority by itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "job_id",
+    "jobs_rows",
+    "decision_log_rows",
+    "attestation",
+    "requirements",
+    "evidence_matches",
+    "resume_model",
+    "package_run_id",
+    "output_root"
+  ],
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jobs_rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object"
+      }
+    },
+    "decision_log_rows": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "attestation": {
+      "$ref": "https://bora-employer-pipeline.local/schemas/package_actionability_attestation.schema.json"
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object"
+      }
+    },
+    "evidence_matches": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "resume_model": {
+      "$ref": "https://bora-employer-pipeline.local/schemas/gold_resume_model.schema.json"
+    },
+    "package_run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "output_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "job_relevant_terms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "cover_letter_opt_out": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "job_id",
+        "latest_event_id",
+        "decision_context_fingerprint",
+        "approval_record_id"
+      ],
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "latest_event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_context_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "approval_record_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
