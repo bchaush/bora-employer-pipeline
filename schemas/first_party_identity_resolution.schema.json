@@ -37,7 +37,11 @@
           "const": "IDENTITY_RESOLUTION"
         },
         "Source": {
-          "const": "GMAIL"
+          "enum": [
+            "GMAIL",
+            "MANUAL_URL",
+            "MANUAL_SCREENSHOT"
+          ]
         },
         "Job_ID": {
           "type": "null"
