@@ -1,7 +1,7 @@
 {
   "milestone_id": "CAREER_OS_FINAL_HYGIENE_V1_IMPLEMENTATION_BRANCH_CONTRACT",
   "kind": "IMPLEMENTATION",
-  "goal": "Branch-scoped implementation contract for the one bounded final production-hygiene pass on canonical main c28314c49cb608db801059dd82b210bb7205d475: (1) center the Gold summary paragraph and verify it in Gold QA; (2) canonicalize the recovered live cloud adapter career_os_cloud_operate_v1.py byte-for-byte (SHA-256 f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc); (3) canonicalize RESUME_CONTENT_STANDARD_V1 and RESUME_FORMAT_STANDARD_V1 verbatim; (4) fix the exact future package-persistence inventory and add a deterministic claim-wording review artifact; (5) add one small current recovery pointer. No Candidate Truth, Match Truth, Pursuit Truth, identity, immigration or submission-authority semantics change.",
+  "goal": "Branch-scoped implementation contract for the one bounded final production-hygiene pass on canonical main c28314c49cb608db801059dd82b210bb7205d475: (1) center the Gold summary paragraph and verify it in Gold QA; (2) canonicalize the recovered live cloud adapter career_os_cloud_operate_v1.py: the live Drive adapter was recovered with SHA-256 f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc, retained as provenance only; the canonical adapter preserves the recovered operational behavior except one bounded runtime-identity correction (the expected canonical main SHA is a required invocation input, not a hard-coded source constant; fail-closed manifest/source binding is preserved); (3) canonicalize RESUME_CONTENT_STANDARD_V1 and RESUME_FORMAT_STANDARD_V1 verbatim; (4) fix the exact future package-persistence inventory and add a deterministic claim-wording review artifact; (5) add one small current recovery pointer. No Candidate Truth, Match Truth, Pursuit Truth, identity, immigration or submission-authority semantics change.",
   "baseline_sha": "c28314c49cb608db801059dd82b210bb7205d475",
   "allowed_paths": [
     "src/gold_resume_docx_builder.py",
@@ -75,7 +75,7 @@
   ],
   "acceptance_conditions": [
     "SUMMARY: the generated Gold summary paragraph is centered and Gold pre-render QA fails a summary that is not centered; every existing Gold layout invariant is preserved.",
-    "ADAPTER: src/career_os_cloud_operate_v1.py is byte-identical to the recovered live Drive adapter (SHA-256 f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc); operator_equivalent remains False; human visual review remains required; SUBMIT remains Bora-only.",
+    "ADAPTER: the recovered production adapter SHA-256 f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc is retained as provenance only; src/career_os_cloud_operate_v1.py differs from it only by the bounded explicit expected-canonical-SHA runtime-binding change; no hard-coded canonical main SHA remains in the source; a runtime identity mismatch still fails closed; operator_equivalent remains False; human visual review remains required; SUBMIT remains Bora-only.",
     "STANDARDS: the two live resume standards are canonicalized verbatim in docs/resume/BORA_RESUME_STANDARDS_V1.json; no new rule is added.",
     "PERSISTENCE AND REVIEW: the future package output inventory and the claim-wording review are deterministic, pure and non-authoritative; no historical application artifact or Ledger state is created, rewritten or back-filled.",
     "Full canonical Assurance passes, milestone-state passes, and no path outside allowed_paths changes."
