@@ -1,0 +1,33 @@
+{
+  "record_id": "BORA_RESUME_STANDARDS_V1",
+  "kind": "DOCTRINE_LOCK_DATA_RECORD",
+  "status": "CURRENT_APPROVED",
+  "canonicalized_by": "CAREER_OS_FINAL_HYGIENE_V1",
+  "note": "Canonical Git-controlled copy of the two live resume standards, verbatim. This record adds no new rule and no new architecture; it names the exact standard versions the normal operating lane uses. It never changes Candidate Truth, Match Truth, Pursuit Truth, identity semantics, immigration logic or submission authority.",
+  "consumed_by": {
+    "operating_profile": "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1",
+    "package_generator": "src/pursue_to_gold_package.py",
+    "cloud_adapter": "src/career_os_cloud_operate_v1.py"
+  },
+  "standards": {
+    "RESUME_CONTENT_STANDARD_V1": {
+      "text": "Every experience section must prioritize recruiter-readable business/process impact over internal implementation detail; where verified evidence supports it, at least one bullet should state the outcome, risk reduced, time/quality/process improvement, or decision value created by the work.",
+      "truth_clause": "Preserve truth. Never invent impact metrics or unsupported outcomes.",
+      "enforcement": "Candidate Truth claim lineage and number-grounding in src/gold_resume_qa.py (check_lineage) plus HUMAN_REQUIRED review, assisted by the claim_wording_review.json artifact. Impact emphasis is a model/authoring standard, not an automated gate."
+    },
+    "RESUME_FORMAT_STANDARD_V1": {
+      "intro": "Use the approved Gold presentation mechanics:",
+      "mechanics": [
+        "BORA CHAUSH centered;",
+        "contact line centered;",
+        "candidate summary centered;",
+        "Education school + right-aligned date on the same paragraph using a right tab stop;",
+        "degree on the next line;",
+        "Work Experience Title | Employer + right-aligned date using a right tab stop;",
+        "no tables for Education/Work alignment;",
+        "preserve one-page Gold section order, typography hierarchy, rules, hyperlinks and ≥92% utilization floor."
+      ],
+      "enforcement": "src/gold_resume_docx_builder.py (generation) and src/gold_resume_qa.py (pre-render grammar checks NAME_CENTERED_BOLD_SIZE, CONTACT_LINE_GRAMMAR, SUMMARY_PRESENT_NO_HEADING incl. centered summary, EDUCATION_GRAMMAR, WORK_HEADER_TITLE_PIPE_EMPLOYER_RIGHT_DATE; post-render one-page Letter, link parity and the 0.92 floor)."
+    }
+  }
+}

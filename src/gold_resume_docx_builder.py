@@ -381,7 +381,7 @@ def build_gold_docx(model: Mapping[str, Any], metrics: GoldMetrics, fonts: FontM
     paras.append(_Para(CT_CONTACT, runs, map_text, align="center", after=30, size_pt=body_pt, left_text=map_text))
     # Summary: no heading
     summary = model["summary"]["text"]
-    paras.append(_Para(CT_SUMMARY, [(summary, False, None, None)], summary, after=22, size_pt=body_pt, wrap_text=summary, body_line=True))
+    paras.append(_Para(CT_SUMMARY, [(summary, False, None, None)], summary, align="center", after=22, size_pt=body_pt, wrap_text=summary, body_line=True))
 
     def heading(text: str) -> None:
         paras.append(_Para(CT_HEADING, [(text, True, metrics.heading_half_points, None)], text, heading_rule=True, keep_next=True,

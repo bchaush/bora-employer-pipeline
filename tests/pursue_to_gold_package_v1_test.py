@@ -358,6 +358,7 @@ def test_gold_grammar_pre_render_pass() -> None:
     assert_true(paragraphs[1]["text"] == "Springfield, IL | +1 555 010 0199 | jordan@example.org | LinkedIn | GitHub" and paragraphs[1]["centered"],
                 "centered contact line grammar with human-readable labels")
     assert_true(paragraphs[2]["text"].startswith("Early-career business analyst"), "summary directly below the contact line with no heading")
+    assert_true(paragraphs[2]["centered"], "candidate summary is centered (RESUME_FORMAT_STANDARD_V1)")
     headings = [p["text"] for p in paragraphs if p["border_bottom"]]
     assert_true(headings == ["EDUCATION", "SKILLS", "WORK EXPERIENCE", "RELEVANT PROJECT"], f"exact section order: {headings}")
     headers = [p for p in paragraphs if p["tab_right"] is not None]
@@ -386,6 +387,9 @@ def test_pre_render_negative_mutations() -> None:
     fails("heading text changed", lambda x: x.replace(">SKILLS<", ">TECHNICAL SKILLS<"), "SECTION_ORDER_EXACT")
     fails("heading rule removed", lambda x: re.sub(r"<w:pBdr>.*?</w:pBdr>", "", x), "HEADING_GRAMMAR_BOLD_RULE_SIZE")
     fails("name not centered", lambda x: x.replace("<w:jc w:val=\"center\"/>", "", 1), "NAME_CENTERED_BOLD_SIZE")
+    centered = "<w:jc w:val=\"center\"/>"
+    # Name, contact and summary are the first three centered paragraphs; drop only the third (the summary).
+    fails("summary not centered", lambda x: centered.join(x.split(centered, 3)[:3]) + x.split(centered, 3)[3], "SUMMARY_PRESENT_NO_HEADING")
     fails("date no longer right-aligned", lambda x: x.replace("<w:tabs><w:tab w:val=\"right\" w:pos=\"10166\"/></w:tabs>", "", 1), "EDUCATION_GRAMMAR")
     fails("font changed", lambda x: x.replace("Liberation Sans", "Calibri", 2), "FONT_RULES_LIBERATION_SANS")
     fails("theme font attribute", lambda x: x.replace('w:ascii="Liberation Sans"', 'w:asciiTheme="minorHAnsi" w:ascii="Liberation Sans"', 1), "FONT_RULES_LIBERATION_SANS")
@@ -761,7 +765,7 @@ def test_stage_success_idempotency_and_no_mutation() -> None:
         assert_true(not list(build_draft202012_validator(ROOT / "schemas" / "gold_package_manifest.schema.json").iter_errors(manifest)), "manifest validates")
         listing = tree_listing(root)
         assert_true(sorted(Path(p).name for p in listing if Path(root, p).is_file()) == sorted(
-            ["crosswalk.json", "layout_report.json", "manifest.json", "post_render_qa.json", "pre_render_qa.json", "rendered_document_evidence.json",
+            ["claim_wording_review.json", "crosswalk.json", "layout_report.json", "manifest.json", "post_render_qa.json", "pre_render_qa.json", "rendered_document_evidence.json",
              "resume.docx", "resume.pdf", "resume_model.json", "structure_map.json"]), f"outputs are local files only: {listing}")
         out = Path(result["output_dir"])
         assert_true(hashlib.sha256((out / "resume.docx").read_bytes()).hexdigest() == manifest["artifacts"][0]["sha256"], "artifact hashes are bound in the manifest")
