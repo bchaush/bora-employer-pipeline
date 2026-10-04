@@ -1,6 +1,6 @@
 """Regression tests for CAREER_OS_FINAL_HYGIENE_V1.
 
-Dependency-free. Covers: the canonicalized cloud adapter (exact recovered bytes, profile, honesty fields, canonical reuse, fail-closed
+Dependency-free. Covers: the canonicalized cloud adapter (profile, honesty fields, canonical reuse, fail-closed
 runtime verification, sidecar), the two canonical resume standards, the claim-wording review and its advisory meaning-shift flags,
 the future-package persistence inventory, and the recovery pointer. The summary-centering regression lives with the other Gold
 grammar checks in pursue_to_gold_package_v1_test.py.
@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -26,7 +27,7 @@ sys.dont_write_bytecode = True
 import gold_package_handoff as handoff  # noqa: E402
 
 ADAPTER_PATH = ROOT / "src" / "career_os_cloud_operate_v1.py"
-# SHA-256 of the exact bytes recovered from the live Drive adapter (Drive ID 19l9MNv7eF_PsFaFStiD9ZLFB45qf4rSd). Line endings are
+# Recovered-production provenance: SHA-256 of the exact bytes recovered from the live Drive adapter (Drive ID 19l9MNv7eF_PsFaFStiD9ZLFB45qf4rSd). Line endings are
 # normalized to LF before hashing so a Windows autocrlf checkout does not change the identity.
 RECOVERED_ADAPTER_SHA256 = "f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc"
 POINTER_PATH = ROOT / "docs" / "CAREER_OS_RECOVERY_POINTER_V1.md"
@@ -44,10 +45,33 @@ def adapter_source() -> str:
     return ADAPTER_PATH.read_bytes().replace(b"\r\n", b"\n").decode("utf-8")
 
 
-def test_adapter_exact_recovered_bytes() -> None:
-    digest = hashlib.sha256(ADAPTER_PATH.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
-    assert_true(digest == RECOVERED_ADAPTER_SHA256, "the canonical adapter is byte-identical to the recovered live adapter: %s" % digest)
-    print("PASS: the canonical cloud adapter is byte-identical to the recovered live Drive adapter.")
+# The ONLY deviations of the canonical adapter from the recovered live Drive adapter: the canonical-main identity is explicit caller input
+# instead of a hard-coded constant. Each pair is (canonical text, recovered text); undoing them must reproduce the recovered bytes exactly.
+RUNTIME_BINDING_DEVIATIONS = (
+    ('PROFILE_ID = "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1"\n\n\ndef _sha',
+     'PROFILE_ID = "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1"\nEXPECTED_MAIN_SHA = "c28314c49cb608db801059dd82b210bb7205d475"\n\n\ndef _sha'),
+    ('def verify_runtime(root: Path, expected_main_sha: str) -> dict:\n    # The expected canonical identity is explicit caller input (the live canonical main the operator just read); there is no default.\n'
+     '    if not re.fullmatch(r"[0-9a-f]{40}", str(expected_main_sha or "")):\n        raise RuntimeError("RUNTIME_EXPECTED_CANONICAL_SHA_INVALID")\n    root = Path(root)\n',
+     'def verify_runtime(root: Path, expected_main_sha: str = EXPECTED_MAIN_SHA) -> dict:\n    root = Path(root)\n'),
+    ("work_dir: Path, expected_main_sha: str, current_state: Optional", "work_dir: Path, current_state: Optional"),
+    ("    verify_runtime(root, expected_main_sha)\n", "    verify_runtime(root)\n"),
+    ("output_root: str, expected_main_sha: str) -> dict:", "output_root: str) -> dict:"),
+    ("work_dir=out,expected_main_sha=expected_main_sha)", "work_dir=out)"),
+    ('"canonical_main_sha":expected_main_sha', '"canonical_main_sha":EXPECTED_MAIN_SHA'),
+    ("len(sys.argv) != 6", "len(sys.argv) != 5"),
+    ("OUTPUT_ROOT EXPECTED_CANONICAL_MAIN_SHA'", "OUTPUT_ROOT'"),
+)
+
+
+def test_adapter_recovered_provenance() -> None:
+    source = adapter_source()
+    for canonical, recovered in RUNTIME_BINDING_DEVIATIONS:
+        assert_true(source.count(canonical) == 1, "documented runtime-binding deviation is present exactly once: %s" % canonical[:60])
+        source = source.replace(canonical, recovered)
+    digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    assert_true(digest == RECOVERED_ADAPTER_SHA256, "undoing exactly the documented runtime-binding deviations reproduces the recovered live adapter: %s" % digest)
+    assert_true(hashlib.sha256(adapter_source().encode("utf-8")).hexdigest() != RECOVERED_ADAPTER_SHA256, "the canonical adapter is honestly not claimed byte-identical to the recovered one")
+    print("PASS: the canonical adapter differs from the recovered live adapter (f10513d6...) only by the documented runtime-binding change.")
 
 
 def test_adapter_profile_and_honesty() -> None:
@@ -70,27 +94,35 @@ def test_adapter_profile_and_honesty() -> None:
 
 def test_adapter_runtime_verification_fails_closed() -> None:
     adapter = importlib.import_module("career_os_cloud_operate_v1")
+    assert_true(not hasattr(adapter, "EXPECTED_MAIN_SHA"), "no hard-coded canonical SHA constant remains in the adapter source")
+    assert_true(not re.search(r"\b[0-9a-f]{40}\b", adapter_source()), "no 40-hex canonical SHA is embedded in the adapter source")
     root = Path(tempfile.mkdtemp(prefix="cloud-adapter-test-"))
     try:
         (root / "runtime_files.sha256").write_text("", encoding="utf-8")
 
-        def attempt(manifest: dict) -> str:
+        def attempt(manifest: dict, expected) -> str:
             (root / "RUNTIME_MANIFEST.json").write_text(json.dumps(manifest), encoding="utf-8")
             try:
-                adapter.verify_runtime(root)
+                adapter.verify_runtime(root, expected)
             except RuntimeError as error:
                 return str(error)
             return "NO_ERROR"
 
-        assert_true(attempt({"spec": "WRONG"}) == "RUNTIME_MANIFEST_SPEC_MISMATCH", "wrong runtime spec fails closed")
-        assert_true(attempt({"spec": "CAREER_OS_RUNTIME_BUNDLE_V1", "canonical_main_sha": "0" * 40}) == "RUNTIME_CANONICAL_SHA_MISMATCH", "wrong canonical SHA fails closed")
-        good = {"spec": "CAREER_OS_RUNTIME_BUNDLE_V1", "canonical_main_sha": adapter.EXPECTED_MAIN_SHA}
-        assert_true(attempt(good) == "NO_ERROR", "an empty-file-list bundle with matching identity verifies")
+        # Two different canonical operating states: advancing canonical Git needs only a different caller-supplied value, never a source edit.
+        for state in ("a" * 40, "b" * 40):
+            bound = {"spec": "CAREER_OS_RUNTIME_BUNDLE_V1", "canonical_main_sha": state}
+            assert_true(attempt(bound, state) == "NO_ERROR", "a runtime bound to the explicitly expected canonical state passes")
+        other = {"spec": "CAREER_OS_RUNTIME_BUNDLE_V1", "canonical_main_sha": "a" * 40}
+        assert_true(attempt(other, "b" * 40) == "RUNTIME_CANONICAL_SHA_MISMATCH", "a runtime with a mismatched canonical identity fails closed")
+        assert_true(attempt({"spec": "CAREER_OS_RUNTIME_BUNDLE_V1"}, "a" * 40) == "RUNTIME_CANONICAL_SHA_MISMATCH", "a runtime with no canonical identity fails closed")
+        for bad in (None, "", "abc", "A" * 40):
+            assert_true(attempt(other, bad) == "RUNTIME_EXPECTED_CANONICAL_SHA_INVALID", "a missing or malformed expected identity is refused: %r" % (bad,))
+        assert_true(attempt({"spec": "WRONG"}, "a" * 40) == "RUNTIME_MANIFEST_SPEC_MISMATCH", "wrong runtime spec fails closed")
         (root / "runtime_files.sha256").write_text("%s  missing.txt\n" % ("0" * 64), encoding="utf-8")
-        assert_true(attempt(good).startswith("RUNTIME_FILE_DIGEST_MISMATCH:missing.txt"), "a missing or altered runtime file fails closed")
+        assert_true(attempt(other, "a" * 40).startswith("RUNTIME_FILE_DIGEST_MISMATCH:missing.txt"), "a missing or altered runtime file fails closed")
     finally:
         shutil.rmtree(root, ignore_errors=True)
-    print("PASS: runtime bundle verification fails closed on spec, canonical SHA and file digest.")
+    print("PASS: runtime verification binds to the caller-supplied canonical SHA, fails closed on mismatch, and needs no source edit when canonical Git advances.")
 
 
 def test_adapter_run_request_sidecar() -> None:
@@ -103,7 +135,7 @@ def test_adapter_run_request_sidecar() -> None:
     try:
         request_path = out / "request.json"
         request_path.write_text(json.dumps({"job_id": "FIXTURE::JOB"}), encoding="utf-8")
-        adapter.make_cloud_operate_deps = lambda root, fonts, *, work_dir: "DEPS"
+        adapter.make_cloud_operate_deps = lambda root, fonts, *, work_dir, expected_main_sha: seen.setdefault("expected", expected_main_sha) and "DEPS"
 
         def fake_stage(request, deps):
             seen["request"], seen["deps"] = request, deps
@@ -113,10 +145,11 @@ def test_adapter_run_request_sidecar() -> None:
                     "post_render_qa": {"passed": True}}
 
         ptg.generate_gold_resume_stage = fake_stage
-        adapter.run_request(str(request_path), str(out / "runtime"), str(out / "fonts"), str(out / "output"))
+        adapter.run_request(str(request_path), str(out / "runtime"), str(out / "fonts"), str(out / "output"), "c" * 40)
         assert_true(seen["deps"] == "DEPS" and seen["request"]["output_root"] == str(out / "output"), "run_request calls the canonical Gold resume stage with the cloud deps")
         sidecar = json.loads((out / "package" / "cloud_operate_manifest.json").read_text(encoding="utf-8"))
         assert_true(sidecar["profile"] == "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1", "sidecar profile")
+        assert_true(sidecar["canonical_main_sha"] == "c" * 40 and seen["expected"] == "c" * 40, "the caller-supplied canonical identity is passed through and recorded")
         assert_true(sidecar["operator_equivalent"] is False, "sidecar never claims OPERATOR equivalence")
         assert_true(sidecar["human_review"] == "REQUIRED_PENDING", "human visual review stays required")
         assert_true(sidecar["submission_authority"] == "BORA_ONLY", "submission stays Bora-only")
@@ -152,29 +185,27 @@ def test_standards_record() -> None:
     print("PASS: the two live resume standards are canonical, verbatim and enforced by the generator.")
 
 
-def test_claim_wording_review_and_flags() -> None:
+def test_claim_wording_review() -> None:
     import pursue_to_gold_package_v1_test as gold
 
     model, claims = gold.fixture_model(), gold.fixture_claims()
     review = handoff.claim_wording_review(model, claims)
+    assert_true(set(review) == {"spec", "job_id", "human_review", "rows"}, "review has no verdict or flag fields: %s" % sorted(review))
     assert_true(review["spec"] == "GOLD_CLAIM_WORDING_REVIEW_V1" and review["human_review"] == "REQUIRED_PENDING", "review spec and pending human review")
     first = next(row for row in review["rows"] if row["location"] == "work:SYN_EXP_A:0")
+    assert_true(set(first) == {"location", "candidate_text", "cited_claims"}, "each row is only text plus cited claims")
     assert_true(first["candidate_text"] == gold.BULLETS["A1"], "candidate-facing text is shown verbatim")
-    assert_true(first["cited_claims"] == [{"claim_id": "SYN_CLAIM_A1", "approved_claim_wording": claims["SYN_CLAIM_A1"]["wording"]}], "exact cited claim wording is shown beside it")
-    assert_true(review["flagged_rows"] == 0, "faithful fixture bullets raise no advisory flag: %s" % [r for r in review["rows"] if r["advisory_flags"]])
-    # Known failure class: still claim-linked, but the meaning is inverted.
-    claim = {"claim_id": "C1", "wording": "Reduced manual reconciliation effort before month-end reporting."}
-    assert_true(handoff.meaning_shift_flags("Increased manual reconciliation effort before month-end reporting.", claim["wording"]),
-                "an inverted direction is flagged")
-    assert_true(handoff.meaning_shift_flags("Automated reconciliation before month-end reporting.", claim["wording"]), "manual-to-automated inversion is flagged")
-    assert_true(handoff.meaning_shift_flags("Reconciled transactions without errors.", "Reconciled transactions with documented errors."), "negation/with-without difference is flagged")
-    assert_true(not handoff.meaning_shift_flags(claim["wording"], claim["wording"]), "identical wording is never flagged")
+    assert_true(first["cited_claims"] == [{"claim_id": "SYN_CLAIM_A1", "approved_claim_wording": claims["SYN_CLAIM_A1"]["wording"]}], "exact cited claim ID and wording are shown beside it")
+    assert_true(not hasattr(handoff, "meaning_shift_flags"), "no automatic semantic heuristic exists")
+    # Fortress-type failure class: still claim-linked, but the line's meaning is inverted. The human sees both side by side.
+    claims["SYN_CLAIM_A1"]["wording"] = "Reduced manual reconciliation effort before month-end reporting."
     inverted = json.loads(json.dumps(model))
     inverted["work"][0]["bullets"][0]["text"] = "Increased manual reconciliation effort before month-end reporting."
-    claims["SYN_CLAIM_A1"]["wording"] = claim["wording"]
-    flagged = handoff.claim_wording_review(inverted, claims)
-    assert_true(flagged["flagged_rows"] == 1 and flagged["rows"][[r["location"] for r in flagged["rows"]].index("work:SYN_EXP_A:0")]["advisory_flags"], "the inverted bullet is surfaced in the review artifact")
-    print("PASS: the claim-wording review pairs each bullet with its exact approved claim wording and flags the known inversion class.")
+    row = next(r for r in handoff.claim_wording_review(inverted, claims)["rows"] if r["location"] == "work:SYN_EXP_A:0")
+    assert_true(row["candidate_text"] == "Increased manual reconciliation effort before month-end reporting."
+                and row["cited_claims"] == [{"claim_id": "SYN_CLAIM_A1", "approved_claim_wording": "Reduced manual reconciliation effort before month-end reporting."}],
+                "the inverted line appears verbatim beside the exact approved wording it cites")
+    print("PASS: the claim-wording review shows each line beside its exact cited approved claim wording, with no semantic heuristic.")
 
 
 def test_package_persistence_inventory() -> None:
@@ -225,8 +256,8 @@ def test_recovery_pointer() -> None:
     print("PASS: the recovery pointer states the current operating facts and marks stale routing historical.")
 
 
-TESTS = (test_adapter_exact_recovered_bytes, test_adapter_profile_and_honesty, test_adapter_runtime_verification_fails_closed,
-         test_adapter_run_request_sidecar, test_standards_record, test_claim_wording_review_and_flags, test_package_persistence_inventory,
+TESTS = (test_adapter_recovered_provenance, test_adapter_profile_and_honesty, test_adapter_runtime_verification_fails_closed,
+         test_adapter_run_request_sidecar, test_standards_record, test_claim_wording_review, test_package_persistence_inventory,
          test_recovery_pointer)
 
 

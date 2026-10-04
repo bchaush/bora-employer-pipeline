@@ -3,10 +3,9 @@
 Two small, pure, dependency-free helpers; neither judges semantics, calls a model, performs I/O beyond reading a package
 directory, or creates any approval or submission authority.
 
-1. claim_wording_review: the side-by-side human review artifact. For every candidate-facing text it lists the exact text next to the
-   exact approved claim wording it cites, so Bora can see whether a claim-linked bullet still means what the claim means. It also
-   raises advisory, deterministic flags for the known meaning-shift class (a direction or negation that differs between the bullet and
-   its cited claim wording). Flags never fail a package; they point the human reviewer at the line. Written as claim_wording_review.json.
+1. claim_wording_review: the side-by-side human review artifact. For every candidate-facing text it lists the exact text, the cited claim
+   ID(s) and the exact approved claim wording, so Bora can see whether a claim-linked bullet still means what the claim means. It makes
+   no semantic judgment of any kind: the visible side-by-side is the control. Written as claim_wording_review.json.
 
 2. package_persistence_inventory / verify_persisted: the exact artifact inventory a normal operating run must persist to the role's
    Drive application folder, with exact SHA-256 hashes. The bytes are transferred by the ChatGPT Drive connector, not by repository
@@ -18,7 +17,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 from pathlib import Path
 from typing import Any, Mapping, Optional
 
@@ -43,37 +41,6 @@ PACKAGE_FILES = (
 CLOUD_LANE_FILES = ("cloud_operate_manifest.json",)
 UNSUPPORTED_BY_CONNECTOR = "UNSUPPORTED_BY_CONNECTOR"
 
-# Opposite-direction word pairs (stems). A flag is raised when the claim wording carries one side and the bullet carries only the other.
-_OPPOSITE_STEMS = (
-    ("increas", "decreas"), ("increas", "reduc"), ("increas", "lower"), ("rais", "lower"), ("improv", "worsen"),
-    ("before", "after"), ("manual", "automat"), ("approv", "reject"), ("internal", "external"), ("with", "without"),
-)
-_NEGATIONS = ("no", "not", "never", "without", "cannot", "unable")
-
-
-def _words(text: str) -> list:
-    return re.findall(r"[a-z]+", text.lower())
-
-
-def _has_stem(words: list, stem: str) -> bool:
-    return any(word == stem if stem in ("with", "no", "not") else word.startswith(stem) for word in words)
-
-
-def meaning_shift_flags(text: str, wording: str) -> list:
-    """Advisory, deterministic flags: opposite-direction terms or negation present on one side only. Never a verdict."""
-    bullet_words, claim_words = _words(text), _words(wording)
-    flags = []
-    for first, second in _OPPOSITE_STEMS:
-        for claim_side, bullet_side in ((first, second), (second, first)):
-            if _has_stem(claim_words, claim_side) and _has_stem(bullet_words, bullet_side) \
-                    and not _has_stem(bullet_words, claim_side) and not _has_stem(claim_words, bullet_side):
-                flags.append("DIRECTION_DIFFERS:claim=%s,bullet=%s" % (claim_side, bullet_side))
-    bullet_negated = any(word in _NEGATIONS for word in bullet_words)
-    claim_negated = any(word in _NEGATIONS for word in claim_words)
-    if bullet_negated != claim_negated:
-        flags.append("NEGATION_DIFFERS:claim=%s,bullet=%s" % (claim_negated, bullet_negated))
-    return sorted(set(flags))
-
 
 def claim_wording_review(model: Mapping[str, Any], claims: Mapping[str, Any]) -> dict:
     """Candidate-facing text -> exact cited approved claim wording, derived only from the resume model and the claim bank."""
@@ -82,16 +49,12 @@ def claim_wording_review(model: Mapping[str, Any], claims: Mapping[str, Any]) ->
     rows = []
     for location, text, claim_ids in candidate_facing_texts(model):
         cited = []
-        flags: list = []
         for claim_id in claim_ids:
             claim = claims.get(claim_id) or {}
             wording = claim.get("wording")
             cited.append({"claim_id": claim_id, "approved_claim_wording": wording})
-            if wording is not None:
-                flags += ["%s:%s" % (claim_id, flag) for flag in meaning_shift_flags(text, wording)]
-        rows.append({"location": location, "candidate_text": text, "cited_claims": cited, "advisory_flags": sorted(flags)})
-    return {"spec": REVIEW_SPEC, "job_id": model.get("job_id"), "human_review": "REQUIRED_PENDING",
-            "flagged_rows": sum(1 for row in rows if row["advisory_flags"]), "rows": rows}
+        rows.append({"location": location, "candidate_text": text, "cited_claims": cited})
+    return {"spec": REVIEW_SPEC, "job_id": model.get("job_id"), "human_review": "REQUIRED_PENDING", "rows": rows}
 
 
 def _sha(data: bytes) -> str:

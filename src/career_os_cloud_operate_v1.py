@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
 PROFILE_ID = "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1"
-EXPECTED_MAIN_SHA = "c28314c49cb608db801059dd82b210bb7205d475"
 
 
 def _sha(data: bytes) -> str:
@@ -24,7 +23,10 @@ def _canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
 
 
-def verify_runtime(root: Path, expected_main_sha: str = EXPECTED_MAIN_SHA) -> dict:
+def verify_runtime(root: Path, expected_main_sha: str) -> dict:
+    # The expected canonical identity is explicit caller input (the live canonical main the operator just read); there is no default.
+    if not re.fullmatch(r"[0-9a-f]{40}", str(expected_main_sha or "")):
+        raise RuntimeError("RUNTIME_EXPECTED_CANONICAL_SHA_INVALID")
     root = Path(root)
     manifest_path = root / "RUNTIME_MANIFEST.json"
     sums_path = root / "runtime_files.sha256"
@@ -229,7 +231,7 @@ def make_cloud_renderer(root: Path, font_dir: Path, *, work_dir: Path):
     return render
 
 
-def make_cloud_operate_deps(root: Path, font_dir: Path, *, work_dir: Path, current_state: Optional[Callable[[str], tuple]] = None):
+def make_cloud_operate_deps(root: Path, font_dir: Path, *, work_dir: Path, expected_main_sha: str, current_state: Optional[Callable[[str], tuple]] = None):
     root, font_dir = Path(root), Path(font_dir)
     sys.path.insert(0, str(root / "src"))
     import pursue_to_gold_package as ptg
@@ -238,7 +240,7 @@ def make_cloud_operate_deps(root: Path, font_dir: Path, *, work_dir: Path, curre
     from claim_repository import load_validated_claim_repository
     from evidence_repository import load_validated_evidence_repository
 
-    verify_runtime(root)
+    verify_runtime(root, expected_main_sha)
     manifest = json.loads((root / "docs" / "rendering" / "RENDERING_ENVIRONMENT_V1.json").read_text(encoding="utf-8"))
     claims_result = load_validated_claim_repository(root / "claims")
     evidence_result = load_validated_evidence_repository(root / "evidence")
@@ -265,21 +267,21 @@ def make_cloud_operate_deps(root: Path, font_dir: Path, *, work_dir: Path, curre
     )
 
 
-def run_request(request_path: str, runtime_root: str, font_dir: str, output_root: str) -> dict:
+def run_request(request_path: str, runtime_root: str, font_dir: str, output_root: str, expected_main_sha: str) -> dict:
     root=Path(runtime_root); fonts=Path(font_dir); out=Path(output_root); out.mkdir(parents=True,exist_ok=True)
     sys.path.insert(0,str(root/'src'))
     import pursue_to_gold_package as ptg
     request=json.loads(Path(request_path).read_text(encoding='utf-8'))
     request['output_root']=str(out)
-    deps=make_cloud_operate_deps(root,fonts,work_dir=out)
+    deps=make_cloud_operate_deps(root,fonts,work_dir=out,expected_main_sha=expected_main_sha)
     result=ptg.generate_gold_resume_stage(request,deps)
-    sidecar={"spec":"CAREER_OS_CLOUD_OPERATE_RESULT_V1","profile":PROFILE_ID,"canonical_main_sha":EXPECTED_MAIN_SHA,"package_generation_id":result['manifest']['package_generation_id'],"human_review":result['manifest']['human_review'],"submission_authority":"BORA_ONLY","operator_equivalent":False,"note":"Operational cloud render; canonical Gold logic and governed font bytes, but not byte-identical to the historical OPERATOR environment."}
+    sidecar={"spec":"CAREER_OS_CLOUD_OPERATE_RESULT_V1","profile":PROFILE_ID,"canonical_main_sha":expected_main_sha,"package_generation_id":result['manifest']['package_generation_id'],"human_review":result['manifest']['human_review'],"submission_authority":"BORA_ONLY","operator_equivalent":False,"note":"Operational cloud render; canonical Gold logic and governed font bytes, but not byte-identical to the historical OPERATOR environment."}
     Path(result['output_dir'],'cloud_operate_manifest.json').write_bytes(_canonical_bytes(sidecar)+b'\n')
     return result
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
-        raise SystemExit('usage: career_os_cloud_operate_v1.py REQUEST.json RUNTIME_ROOT FONT_DIR OUTPUT_ROOT')
+    if len(sys.argv) != 6:
+        raise SystemExit('usage: career_os_cloud_operate_v1.py REQUEST.json RUNTIME_ROOT FONT_DIR OUTPUT_ROOT EXPECTED_CANONICAL_MAIN_SHA')
     result=run_request(*sys.argv[1:])
     print(json.dumps({"output_dir":result['output_dir'],"manifest":result['manifest'],"post_render_qa":result['post_render_qa']},indent=2,sort_keys=True))

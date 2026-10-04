@@ -11,10 +11,10 @@ A fresh operator starts here. **Live Git plus the live Production Ledger and Dri
 - **Mode:** `OPERATE`. Operate first; engineer only a reproduced consequential failure or repeated material friction.
 - **Production Ledger:** Google Sheet `Career OS — Production Ledger V1`, spreadsheet ID `1hublU84-xrWYKc8faO965oJVrdhyCL7stzug1C0GTNI`. The `SETTINGS` tab is the live operating authority.
 - **Operate Mode runbook:** `CAREER_OS_OPERATE_MODE_V1` (`.md` and `.json`) in the Drive runtime folder `1SA0Z6OPak1FGorwUu0tm-71LkAGlwftd`. Applications folder: `1YBc2u8x3BQX3wG4oJ-oOWnCLstL9c5D1`.
-- **Normal profile:** `CHATGPT_CLOUD_OPERATIONAL_RENDER_V1` (`src/career_os_cloud_operate_v1.py`; `operator_equivalent = False`; `HUMAN_REQUIRED` visual review). Desktop and Codespaces are **engineering fallback only**, never normal operation.
+- **Normal profile:** `CHATGPT_CLOUD_OPERATIONAL_RENDER_V1` (`src/career_os_cloud_operate_v1.py`; `operator_equivalent = False`; `HUMAN_REQUIRED` visual review). The adapter takes the expected canonical main SHA as an explicit invocation argument (the live `origin/main` just read) and fails closed unless the runtime bundle's `RUNTIME_MANIFEST.json` names exactly that SHA; no source edit is needed when main advances. Recovered-production provenance: the pre-hygiene Drive adapter was sha256 `f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc`; the canonical file differs only by that runtime-binding change (proved in `tests/career_os_final_hygiene_v1_test.py`). Desktop and Codespaces are **engineering fallback only**, never normal operation.
 - **Resume standards:** `docs/resume/BORA_RESUME_STANDARDS_V1.json` (`RESUME_CONTENT_STANDARD_V1`, `RESUME_FORMAT_STANDARD_V1`).
 - **Package persistence:** every generated package file is persisted to the role's Drive folder with exact SHA-256; inventory and verification are `src/gold_package_handoff.py`. A byte type the Drive connector cannot upload is recorded as `UNSUPPORTED_BY_CONNECTOR` with a reason, never worked around.
-- **Human review aid:** each package carries `claim_wording_review.json` (candidate text beside the exact approved claim wording, with advisory flags).
+- **Human review aid:** each package carries `claim_wording_review.json` (candidate line, cited claim ID(s) and exact approved claim wording side by side; `human_review = REQUIRED_PENDING`; no automated semantic judgment).
 
 ## Deferred seams (not blocking resume-only applications)
 
