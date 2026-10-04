@@ -1,0 +1,36 @@
+name: Career OS Governed Font Assets Build
+
+on:
+  push:
+    branches:
+      - ops/cloud-render-probe-v1
+
+permissions:
+  contents: read
+
+jobs:
+  fonts:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Capture exact governed Liberation Sans assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(dpkg-query -W -f='\${Version}' fonts-liberation)" = "1:2.1.5-3"
+          mkdir -p font_assets
+          for f in LiberationSans-Regular.ttf LiberationSans-Bold.ttf LiberationSans-Italic.ttf LiberationSans-BoldItalic.ttf; do
+            cp "/usr/share/fonts/truetype/liberation/$f" "font_assets/$f"
+          done
+          (
+            cd font_assets
+            sha256sum *.ttf | sort > font_assets.sha256
+          )
+          cat font_assets/font_assets.sha256
+
+      - name: Upload font assets
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: career-os-governed-fonts-v1
+          path: font_assets
+          if-no-files-found: error
+          retention-days: 90
