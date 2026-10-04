@@ -2343,3 +2343,15 @@ Ingest MarketMind AI as an evidence-controlled project using only facts supporte
 **Status**
 
 `MARKETMIND_EVIDENCE_EXTRACTION_V1_IMPLEMENTED_PENDING_HUMAN_REVIEW` (superseded by closure entry above)
+
+
+## 2026-10-03 — Operational readiness addendum (live canonical Git outranks the older routing above)
+
+The routing above is historical audit prose. Current canonical main at this addendum's baseline is `0340bbf4bc356cf9f04aaa6357067a8e4bb1afc5`.
+
+- `CAREER_OS_DOCUMENT_RENDERING_CAPABILITY_V1` is released (PR #110) and amended with `ORDER_INDEPENDENT_LINKAGE_V1` (PR #111).
+- `PURSUE_TO_GOLD_PACKAGE_V1` is reconciled to deterministic model-built Gold résumé generation (PR #112) and its résumé stage is implemented and released (PR #114): Gold DOCX builder, executable pre- and post-render Gold QA, and the pursuit-gated orchestrator, rendered through the canonical renderer.
+- Bora's approved truth and display choices are canonicalized (PR #115): UNWE and D Commerce claims approved, `CLAIM_DCOMMERCE_002` added from verified evidence, GPA displayed 3.64 over truth 3.635, TELUS Digital Bulgaria displayed as TELUS Digital, and the approved candidate-facing links. Production smoke fixes landed in PR #116.
+- Operationally ready for applications that do not require a cover letter: discovery, exact identity, gates, Match Truth, Bora PURSUE, Gold résumé DOCX and PDF, QA, then Bora review and manual application.
+- `GOLD_COVER_LETTER_RUNTIME_CAPABILITY` is NOT_YET_IMPLEMENTED (source and doctrine are available); build it only when a genuinely desired application requires it. Exact package persistence in Drive/application history and one complete real application loop remain for Personal V1 completion.
+- Permanent invariants are unchanged: Match Truth != Pursuit Truth != Application Truth; PURSUE != SUBMIT; manual SUBMIT remains Bora-controlled.
