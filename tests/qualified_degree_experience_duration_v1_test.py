@@ -234,8 +234,8 @@ assert_true(
 
 cl_after = validate_claim_repository()
 assert_true(
-    cl_after["index"]["CLAIM_EDU_UNWE_001"]["human_approval"] is False,
-    "real claim repository on disk must remain unaffected by the in-memory simulation",
+    cl_after["index"]["CLAIM_EDU_UNWE_001"]["human_approval"] is True,
+    "real claim repository on disk must remain unaffected by the in-memory simulation (UNWE is Bora-approved on disk since 2026-10-03)",
 )
 print("PASS D: MBTA-diagnostic 'Bachelor's degree AND 3 years of system analysis experience' now resolves PARTIAL (not fabricated SUPPORTED); no candidate-duration claim fabricated; disk state unaffected.")
 

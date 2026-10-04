@@ -47,6 +47,7 @@ EXPECTED_TELUS_CLAIM_IDS = [
 EXPECTED_CANDIDATE_SOURCE_CLAIM_IDS = [
     "CLAIM_EDU_UNWE_001",
     "CLAIM_DCOMMERCE_001",
+    "CLAIM_DCOMMERCE_002",
     "CLAIM_BULMARMA_001",
 ]
 
@@ -96,17 +97,17 @@ def write_json(path: Path, payload) -> None:
 # ---------------------------------------------------------------------------
 real = validate_claim_repository(CLAIMS_ROOT)
 assert_true(real["valid"] is True, f"real claim repository failed: {real['errors']}")
-assert_true(real["records_checked"] == 16, f"expected 16 claims, got {real['records_checked']}")
+assert_true(real["records_checked"] == 17, f"expected 17 claims, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_ALL_CLAIM_IDS,
     f"unexpected Claim_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
-    len(discover_claim_files(CLAIMS_ROOT)) == 16,
-    "discover_claim_files should find 16 claim files",
+    len(discover_claim_files(CLAIMS_ROOT)) == 17,
+    "discover_claim_files should find 17 claim files",
 )
-print("PASS 1: valid real claim repository (16 records: 6 Winter Walk + 5 MarketMind + 2 TELUS + 3 CANDIDATE_SOURCE_INGESTION_V1) passed.")
+print("PASS 1: valid real claim repository (17 records: 6 Winter Walk + 5 MarketMind + 2 TELUS + 3 CANDIDATE_SOURCE_INGESTION_V1 + CLAIM_DCOMMERCE_002) passed.")
 
 
 # ---------------------------------------------------------------------------

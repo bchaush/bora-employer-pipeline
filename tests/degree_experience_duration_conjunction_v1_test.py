@@ -116,11 +116,13 @@ assert_true(
 result_real = analyze_job(job_input_c)
 assert_true(result_real["valid"] is True, f"MIT analysis must be valid: {result_real['errors']}")
 match_real = next(m for m in result_real["analysis"]["evidence_matches"] if m["requirement_id"] == "REQ_C_DEGREE_EXPERIENCE")
+# 2026-10-03: CLAIM_EDU_UNWE_001 is Bora-approved, so the real production result is PARTIAL through that claim only (the duration half of the
+# conjunction stays unestablished); the matcher is unchanged.
 assert_true(
-    match_real["result"] == "NONE",
-    f"real (unapproved-claim) production result must remain NONE, got {match_real['result']}",
+    match_real["result"] == "PARTIAL" and match_real["claim_ids"] == ["CLAIM_EDU_UNWE_001"],
+    f"real production result is PARTIAL via the Bora-approved UNWE claim only, got {match_real['result']} {match_real['claim_ids']}",
 )
-print("PASS A: frozen MIT REQ_C_DEGREE_EXPERIENCE infers bachelors_degree_credential + degree_experience_duration_conjunction additively; real production result remains NONE (claims unapproved).")
+print("PASS A: frozen MIT REQ_C_DEGREE_EXPERIENCE infers bachelors_degree_credential + degree_experience_duration_conjunction additively; real production result is PARTIAL via the approved UNWE claim.")
 
 
 # ======================================================================
@@ -164,8 +166,8 @@ assert_true(
 
 cl_after = validate_claim_repository()
 assert_true(
-    cl_after["index"]["CLAIM_EDU_UNWE_001"]["human_approval"] is False,
-    "real claim repository on disk must remain unaffected by the in-memory simulation",
+    cl_after["index"]["CLAIM_EDU_UNWE_001"]["human_approval"] is True,
+    "real claim repository on disk must remain unaffected by the in-memory simulation (UNWE is Bora-approved on disk since 2026-10-03)",
 )
 print("PASS B: hypothetical bachelor's-only claim approval on the frozen MIT requirement now resolves PARTIAL (not fabricated SUPPORTED); disk state unaffected.")
 
@@ -319,20 +321,19 @@ assert_true(
 # responsibility-sourced and no longer independently hard-block; updated
 # to the current adjudicated baseline -- this assertion is about THIS
 # milestone not changing the blocker set any further.
-expected_blockers = {
-    "REQ_A_DEGREE",
-    "REQ_A_EXCEL_DATA",
-}
+# 2026-10-03: Bora approved CLAIM_EDU_UNWE_001 and CLAIM_DCOMMERCE_001; REQ_A_DEGREE and REQ_A_EXCEL_DATA (the two former hard blockers) resolve
+# PARTIAL under the unchanged matcher, so Gate 0 no longer fires on them. REQ_A_EXPERIENCE_LEVEL is unaffected (still UNKNOWN).
+expected_blockers = set()
 actual_blocked_ids = {b.rsplit(": ", 1)[-1] for b in result_a["hard_blockers"]}
 assert_true(
     actual_blocked_ids == expected_blockers,
     f"Atominvest hard blockers must remain exactly {expected_blockers}, got {actual_blocked_ids}",
 )
 assert_true(
-    analysis_a["lane"] == "LANE_0_REJECT" and analysis_a["decision"] == "REJECT",
-    "Atominvest overall routing must remain LANE_0_REJECT/REJECT",
+    analysis_a["lane"] == "WATCH" and analysis_a["decision"] == "WATCH",
+    "Atominvest overall routing is WATCH/WATCH once the two former hard blockers resolve PARTIAL (2026-10-03 approvals)",
 )
-print("PASS H: Atominvest REQ_A_EXPERIENCE_LEVEL remains UNKNOWN; Atominvest's hard-blocker set and overall routing are unchanged.")
+print("PASS H: Atominvest REQ_A_EXPERIENCE_LEVEL remains UNKNOWN; the two former hard blockers clear via the approved claims and routing is WATCH under unchanged decision logic.")
 
 
 # ======================================================================

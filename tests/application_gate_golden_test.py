@@ -335,12 +335,12 @@ print("PASS: GT_APP_GATE_REEVALUATION_NO_SOURCE_MUTATION -- ApplicationQuestion 
 degree_question = {
     "application_question_id": "AQ_DEGREE",
     "application_attempt_id": "ATT_CLEAN_001",
-    "question_text": "Do you have a Bachelor's degree?",
+    "question_text": "Do you hold an active U.S. security clearance?",
     "question_type": "YES_NO",
     "required": True,
     "captured_at": "2026-08-30",
     "clauses": [
-        {"clause_id": "C1", "clause_text": "Bachelor's degree", "mapped_requirement_id": None},
+        {"clause_id": "C1", "clause_text": "active U.S. security clearance", "mapped_requirement_id": None},
     ],
     "logic_expression": None,
     "answer_policy": "SAFE_REUSABLE",
@@ -351,11 +351,23 @@ degree_question = {
 degree_evaluation = evaluate_application_question(
     degree_question, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30",
 )
-assert_true(degree_evaluation["clause_evaluations"][0]["result"] == "NONE", "no capability tag exists for a Bachelor's-degree fact; clause result must be NONE (no support found)")
+# The golden's NONE scenario originally used a Bachelor's-degree clause because no approved degree claim existed. Bora approved
+# CLAIM_EDU_UNWE_001 on 2026-10-03, so that clause is now genuinely supported; the NONE -> UNCERTAIN protection is preserved on a clause
+# for which Candidate Truth still holds no evidence, and the new truthful degree result is asserted separately below.
+assert_true(degree_evaluation["clause_evaluations"][0]["result"] == "NONE", "no capability tag exists for a security-clearance fact; clause result must be NONE (no support found)")
 assert_true(degree_evaluation["predicate_result"] == "UNCERTAIN", "GT_APP_GATE_NONE_NOT_FALSE: NONE coverage must produce UNCERTAIN, never FALSE")
 assert_true(degree_evaluation["safe_boolean_answer"] == "UNKNOWN", "GT_APP_GATE_NONE_NOT_FALSE: safe_boolean_answer must be UNKNOWN, never a confident NO")
 assert_true(degree_evaluation["manual_review_required"] is True, "GT_APP_GATE_NONE_NOT_FALSE: manual_review_required must be true -- the prior defect was returning False here")
-print("PASS: GT_APP_GATE_NONE_NOT_FALSE -- 'Bachelor's degree?' with no matching evidence domain produces UNCERTAIN/UNKNOWN/manual-review-required, never a confident false NO.")
+print("PASS: GT_APP_GATE_NONE_NOT_FALSE -- 'active U.S. security clearance?' with no matching evidence domain produces UNCERTAIN/UNKNOWN/manual-review-required, never a confident false NO.")
+bachelor_question = {**degree_question, "question_text": "Do you have a Bachelor's degree?",
+                     "clauses": [{"clause_id": "C1", "clause_text": "Bachelor's degree", "mapped_requirement_id": None}]}
+bachelor_evaluation = evaluate_application_question(
+    bachelor_question, claim_index=CLAIM_INDEX, evidence_index=EVIDENCE_INDEX, evaluated_at="2026-08-30",
+)
+assert_true(bachelor_evaluation["clause_evaluations"][0]["result"] == "SUPPORTED" and bachelor_evaluation["clause_evaluations"][0].get("claim_ids") == ["CLAIM_EDU_UNWE_001"],
+            "Bachelor's degree is SUPPORTED by the Bora-approved (2026-10-03) CLAIM_EDU_UNWE_001 only")
+assert_true(bachelor_evaluation["predicate_result"] == "TRUE" and bachelor_evaluation["safe_boolean_answer"] == "YES", "an approved supported clause yields a TRUE predicate under unchanged gate logic")
+print("PASS: GT_APP_GATE_APPROVED_DEGREE -- the Bachelor's-degree clause is SUPPORTED via the Bora-approved UNWE claim; gate logic unchanged.")
 
 
 # ======================================================================

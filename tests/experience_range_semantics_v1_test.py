@@ -85,20 +85,19 @@ assert_true(
     not any("REQ_A_EXPERIENCE_LEVEL" in b for b in hard_blockers),
     f"REQ_A_EXPERIENCE_LEVEL must no longer appear as a hard blocker; got {hard_blockers}",
 )
-expected_remaining = {
-    "REQ_A_DEGREE",
-    "REQ_A_EXCEL_DATA",
-}
+# 2026-10-03: REQ_A_DEGREE and REQ_A_EXCEL_DATA now resolve PARTIAL through the Bora-approved UNWE and D Commerce claims (unchanged matcher),
+# so no hard blocker remains.
+expected_remaining = set()
 remaining_blocked_ids = {b.rsplit(": ", 1)[-1] for b in hard_blockers}
 assert_true(
     remaining_blocked_ids == expected_remaining,
     f"remaining blockers must be exactly {expected_remaining}, got {remaining_blocked_ids}",
 )
 assert_true(
-    analysis_a["lane"] == "LANE_0_REJECT" and analysis_a["decision"] == "REJECT",
-    f"Atominvest overall routing must remain LANE_0_REJECT/REJECT, got {analysis_a['lane']}/{analysis_a['decision']}",
+    analysis_a["lane"] == "WATCH" and analysis_a["decision"] == "WATCH",
+    f"Atominvest overall routing is WATCH/WATCH after the 2026-10-03 approvals, got {analysis_a['lane']}/{analysis_a['decision']}",
 )
-print("PASS A: frozen Atominvest REQ_A_EXPERIENCE_LEVEL resolves UNKNOWN (not NONE), no longer a hard blocker; the other 4 blockers and overall REJECT routing are unchanged.")
+print("PASS A: frozen Atominvest REQ_A_EXPERIENCE_LEVEL resolves UNKNOWN (not NONE), no longer a hard blocker; the former degree/Excel blockers clear via the approved claims and routing is WATCH.")
 
 
 # ======================================================================

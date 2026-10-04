@@ -329,8 +329,8 @@ assert_true(
     f"CASE_D REQ_D_PROCESS_MAPPING must resolve PARTIAL via CLAIM_WW_006, got {direct_pm}",
 )
 assert_true(
-    direct_analysis["decision"] == "REJECT",
-    f"CASE_D final decision must remain REJECT (independent blockers persist), got {direct_analysis['decision']}",
+    direct_analysis["decision"] == "UNDECIDED",
+    f"CASE_D final decision is UNDECIDED after Bora's 2026-10-03 UNWE and D Commerce approvals (REJECT before them; this milestone's own logic is unchanged), got {direct_analysis['decision']}",
 )
 direct_blockers = sorted(b.rsplit(": ", 1)[-1] for b in direct_result["hard_blockers"])
 assert_true(

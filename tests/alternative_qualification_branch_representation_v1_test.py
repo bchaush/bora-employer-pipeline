@@ -94,11 +94,13 @@ def _row(req_id: str, text: str, *, importance="MANDATORY", relevance="HIGH") ->
 result_d = analyze_job(_load_job_input(FIXTURE_D))
 assert_true(result_d["valid"], "CASE_D analyze_job() must be valid")
 analysis_d = result_d["analysis"]
+# CASE_D was REJECT before Bora approved CLAIM_EDU_UNWE_001 and CLAIM_DCOMMERCE_001 (2026-10-03); with those claims reusable the degree and
+# MS Office requirements resolve through them under the unchanged matcher and the decision is UNDECIDED.
 assert_true(
-    analysis_d["decision"] == "REJECT",
-    f"CASE_D pre-check: expected REJECT, got {analysis_d['decision']}",
+    analysis_d["decision"] == "UNDECIDED",
+    f"CASE_D pre-check: expected UNDECIDED (UNWE and D Commerce approved 2026-10-03), got {analysis_d['decision']}",
 )
-print("PASS A1: CASE_D pre-implementation baseline reproduced (REJECT).")
+print("PASS A1: CASE_D baseline reproduced (UNDECIDED after the 2026-10-03 approvals; REJECT before them).")
 
 # ======================================================================
 # B. qualification_leaf_support() -- the V1 leaf adapter.
@@ -387,9 +389,12 @@ assert_true(
     },
     "all 4 branches (8 leaves) represented",
 )
+# Bora approved CLAIM_EDU_UNWE_001 on 2026-10-03: the high-school-diploma branch leaf is now SUPPORTED through that claim (existing matcher,
+# unchanged); every other leaf and the gate itself stay UNRESOLVED on current evidence.
 assert_true(
-    all(state == UNRESOLVED for state in gate_d["leaf_support"].values()),
-    f"every CASE_D branch leaf must be UNRESOLVED on current evidence, got {gate_d['leaf_support']}",
+    gate_d["leaf_support"]["REQ_D_DEGREE_HS_BRANCH"] == "SUPPORTED"
+    and all(state == UNRESOLVED for leaf, state in gate_d["leaf_support"].items() if leaf != "REQ_D_DEGREE_HS_BRANCH"),
+    f"CASE_D: only the HS-diploma branch leaf is SUPPORTED (via the approved UNWE claim); all others UNRESOLVED, got {gate_d['leaf_support']}",
 )
 assert_true(gate_d["result"] == UNRESOLVED, f"CASE_D gate result must be UNRESOLVED, got {gate_d['result']}")
 # The gate is honestly UNRESOLVED (no longer a fabricated blocker); the

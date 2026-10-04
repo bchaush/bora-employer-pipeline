@@ -11,7 +11,7 @@
     "audit ownership",
     "risk-management ownership"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-08-31",
   "version": "1"
 }

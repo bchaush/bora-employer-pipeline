@@ -448,11 +448,12 @@ print("PASS L: Atominvest CONFIG/QA/DOCUMENTATION use exact bounded wording and 
 # ======================================================================
 # M. Real-fixture regression -- Atominvest (control).
 # ======================================================================
-expected_blockers_a = {"REQ_A_DEGREE", "REQ_A_EXCEL_DATA"}
+# 2026-10-03: REQ_A_DEGREE and REQ_A_EXCEL_DATA resolve PARTIAL via the Bora-approved UNWE and D Commerce claims (unchanged matcher): no blocker remains.
+expected_blockers_a = set()
 actual_blockers_a = {b.rsplit(": ", 1)[-1] for b in result_a["hard_blockers"]}
 assert_true(actual_blockers_a == expected_blockers_a, f"Atominvest hard blockers must remain exactly {expected_blockers_a}, got {actual_blockers_a}")
-assert_true(analysis_a["decision"] == "REJECT" and analysis_a["lane"] == "LANE_0_REJECT", "Atominvest decision must remain REJECT")
-print("PASS M: Atominvest remains REJECT with REQ_A_DEGREE/REQ_A_EXCEL_DATA as the only hard blockers.")
+assert_true(analysis_a["decision"] == "WATCH" and analysis_a["lane"] == "WATCH", "Atominvest decision is WATCH after the 2026-10-03 approvals")
+print("PASS M: Atominvest is WATCH with no hard blockers once REQ_A_DEGREE/REQ_A_EXCEL_DATA resolve PARTIAL via the approved claims.")
 
 
 # ======================================================================
@@ -463,8 +464,10 @@ assert_true(result_c["valid"] is True, f"MIT LL analysis must be valid: {result_
 analysis_c = result_c["analysis"]
 blockers_c = {b.rsplit(": ", 1)[-1] for b in result_c["hard_blockers"]}
 assert_true("REQ_C_REGRESSION_TESTING" not in blockers_c, f"MIT LL: REQ_C_REGRESSION_TESTING must not independently hard-block, got {blockers_c}")
-required_intact = {"Citizenship or clearance requirement present in JD", "REQ_C_DEGREE_EXPERIENCE", "REQ_C_SAP_ERP", "REQ_C_SAP_FICO"}
-assert_true(required_intact <= blockers_c, f"MIT LL: genuine citizenship/clearance, degree/experience and SAP blockers must remain intact, got {blockers_c}")
+# 2026-10-03: REQ_C_DEGREE_EXPERIENCE resolves PARTIAL via the Bora-approved UNWE claim and is no longer a hard blocker; the genuine
+# citizenship/clearance and SAP blockers remain intact and unchanged.
+required_intact = {"Citizenship or clearance requirement present in JD", "REQ_C_SAP_ERP", "REQ_C_SAP_FICO"}
+assert_true(required_intact <= blockers_c and "REQ_C_DEGREE_EXPERIENCE" not in blockers_c, f"MIT LL: genuine citizenship/clearance and SAP blockers must remain intact and the degree row clears, got {blockers_c}")
 assert_true(analysis_c["decision"] == "REJECT" and analysis_c["lane"] == "LANE_0_REJECT", "MIT LL decision must remain REJECT")
 gate_obs = {o["requirement_id"]: o for o in analysis_c["application_or_legal_gate_observations"]}
 assert_true(
@@ -507,7 +510,9 @@ assert_true(blockers_e == set(), f"MBTA contractor blockers must be exactly empt
 # unrelated MEDIUM-relevance NONE gaps) does not meet any REJECT threshold
 # in the existing, unmodified decision routing -- an honest consequence,
 # not manufactured.
-assert_true(result_d["analysis"]["decision"] == "REJECT", f"MBTA direct decision must remain REJECT (unrelated ungrouped gaps), got {result_d['analysis']['decision']}")
+# 2026-10-03: with the Bora-approved UNWE and D Commerce claims CASE_D's degree and MS Office rows resolve through them (unchanged matcher) and the
+# remaining ungrouped gaps no longer meet a REJECT threshold: UNDECIDED (REJECT before the approvals).
+assert_true(result_d["analysis"]["decision"] == "UNDECIDED", f"MBTA direct decision is UNDECIDED after the 2026-10-03 approvals, got {result_d['analysis']['decision']}")
 assert_true(result_e["analysis"]["decision"] == "UNDECIDED", f"MBTA contractor decision must be UNDECIDED (fabricated degree blocker removed), got {result_e['analysis']['decision']}")
 print("PASS O: BSA remains WATCH with its STRONG match intact; MBTA direct blockers/decision unchanged in kind; MBTA contractor degree no longer a fabricated blocker (decision now UNDECIDED, honest).")
 
@@ -537,13 +542,13 @@ evidence_result = validate_evidence_repository(None)
 experience_result = validate_experience_repository(None)
 assert_true(len(experience_result["index"]) == 7, f"Experiences must remain 7, got {len(experience_result['index'])}")
 assert_true(len(evidence_result["index"]) == 43, f"Evidence must remain 43, got {len(evidence_result['index'])}")
-assert_true(len(claim_result["index"]) == 16, f"Claims must remain 16, got {len(claim_result['index'])}")
+assert_true(len(claim_result["index"]) == 17, f"Claims are 17 (16 + CLAIM_DCOMMERCE_002 added 2026-10-03), got {len(claim_result['index'])}")
 reusable_count = sum(1 for c in claim_result["index"].values() if c.get("human_approval") is True)
-assert_true(reusable_count == 13, f"Reusable claims must remain 13, got {reusable_count}")
-for claim_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_BULMARMA_001"):
+assert_true(reusable_count == 16, f"Reusable claims are 16 (13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03), got {reusable_count}")
+for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_DCOMMERCE_002", True), ("CLAIM_BULMARMA_001", False)):
     assert_true(
-        claim_result["index"][claim_id]["human_approval"] is False,
-        f"{claim_id} must remain human_approval=False -- this milestone approves nothing",
+        claim_result["index"][claim_id]["human_approval"] is approved,
+        f"{claim_id} human_approval must be {approved} -- this milestone itself approves nothing; the on-disk state is Bora's 2026-10-03 approvals",
     )
 print("PASS Q: repository invariants (7/42/16/13 Experiences/Evidence/Claims/reusable) and the three intentionally-unapproved Claims are unaffected.")
 

@@ -1,0 +1,93 @@
+{
+  "record_id": "BORA_GOLD_APPROVED_DISPLAY_V1",
+  "kind": "APPROVED_DISPLAY_OVERLAY_DATA_RECORD",
+  "locked_date": "2026-10-03",
+  "authority_scope": "Candidate-facing Gold resume presentation overlay only. It is never Candidate Truth: GPA, organization names, titles, dates, claims and evidence stay exactly as recorded in evidence/, claims/, experiences/ and resume/master/. This record binds Bora's explicit approval of display choices and of the canonical candidate-facing link destinations, and every entry names the canonical record it is bound to. The Gold exemplar is not evidence for anything recorded here.",
+  "approval": {
+    "approved": true,
+    "approved_by": "Bora",
+    "approved_on": "2026-10-03",
+    "approval_note": "Explicit approval given in the Career OS completion conversation: GPA displayed as 3.64 while truth stays 3.635 (presentation rounding only); TELUS Digital Bulgaria displayed as TELUS Digital; D Commerce Bank displayed as Junior Expert; the email, LinkedIn, GitHub profile and MarketMind repository destinations as canonical candidate-facing links with the labels LinkedIn, GitHub and GitHub."
+  },
+  "contact_links": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/bora-chaush-msba",
+      "bound_master_contact_field": "linkedin"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/bchaush",
+      "bound_master_contact_field": "github_via_project_evidence",
+      "bound_evidence_id": "MM_AUTHOR_001"
+    }
+  ],
+  "education_display": [
+    {
+      "experience_id": "EXP_EDU_BRANDEIS_001",
+      "school": "Brandeis University",
+      "date_range": "Aug 2025 - Aug 2026",
+      "date_basis": "Bora-approved month-year presentation of the transcript academic periods Fall Semester 2025 through Summer Semester 2026 (EDU_BRANDEIS_IDENTITY_001).",
+      "degree_display": "Master of Science in Business Analytics",
+      "required_claim_ids": [],
+      "gpa": {
+        "truth_value": "3.635",
+        "truth_evidence_id": "EDU_BRANDEIS_GPA_001",
+        "display_value": "3.64",
+        "rounding": "HALF_UP_2DP"
+      }
+    },
+    {
+      "experience_id": "EXP_EDU_UNWE_001",
+      "school": "University of National and World Economy",
+      "date_range": "Sep 2021 - Jun 2025",
+      "date_basis": "EDU_UNWE_IDENTITY_001 states the enrollment and completion dates Sep 2021 - Jun 2025.",
+      "degree_display": "Bachelor of Science in Finance and Accounting",
+      "required_claim_ids": [
+        "CLAIM_EDU_UNWE_001"
+      ]
+    }
+  ],
+  "experience_display": [
+    {
+      "experience_id": "EXP_WW_001",
+      "employer": "Winter Walk",
+      "organization_truth": "Winter Walk",
+      "title": "AI Researcher & Developer Intern",
+      "title_basis": "MASTER_DISPLAY_TITLE_APPROVAL",
+      "date_range": "Jun 2026 - Aug 2026",
+      "date_basis": "Protected master section SEC_WW_001 date range, month-level (WW_OFFER_001)."
+    },
+    {
+      "experience_id": "EXP_TELUS_001",
+      "employer": "TELUS Digital",
+      "organization_truth": "TELUS Digital Bulgaria",
+      "title": "Digital Trust and Safety Analyst with English",
+      "title_basis": "MASTER_DISPLAY_TITLE_APPROVAL",
+      "date_range": "Nov 2024 - May 2025",
+      "date_basis": "Protected master section SEC_TELUS_001 date range (TELUS_OFFER_001 start 15.11.2024; TELUS_ENDDATE_001 last day 2025-05-01)."
+    },
+    {
+      "experience_id": "EXP_DCOMMERCE_001",
+      "employer": "D Commerce Bank",
+      "organization_truth": "D Commerce Bank",
+      "title": "Junior Expert",
+      "title_basis": "EMPLOYER_FORMAL_POSITION_CASE_NORMALIZED",
+      "formal_title_evidence_id": "DCOMMERCE_REFERENCE_001",
+      "date_range": "Aug 2021 - Sep 2022",
+      "date_basis": "DCOMMERCE_REFERENCE_001 (intern from 09.08.2021, employed until 19.09.2022); corroborated by DCOMMERCE_LINKEDIN_PERIOD_001 Aug 2021 - Sep 2022."
+    }
+  ],
+  "project_display": [
+    {
+      "experience_id": "EXP_MM_001",
+      "name": "MarketMind",
+      "tech_label": "Python / Streamlit Market-Screening Prototype",
+      "link": {
+        "label": "GitHub",
+        "url": "https://github.com/bchaush/marketmind-ai",
+        "bound_evidence_id": "MM_AUTHOR_001"
+      }
+    }
+  ]
+}

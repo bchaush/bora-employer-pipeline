@@ -127,6 +127,10 @@ def _load_real_job_input(fixture_dir_name: str) -> dict:
 QUALIFYING_BASE = _load_golden_job_input("GT_IMPL_FIT")
 
 ATOMINVEST_BASE = _load_real_job_input("CASE_A_ATOMINVEST_IMPLEMENTATION_ANALYST")
+# 2026-10-03: Bora approved CLAIM_EDU_UNWE_001 and CLAIM_DCOMMERCE_001, so Atominvest is no longer a qualification REJECT (its former degree and
+# Excel hard blockers resolve PARTIAL; baseline is WATCH). The REJECT-precedence control keeps its intent on a real fixture that is still a
+# qualification REJECT under the unchanged logic: the JPM junior project manager case.
+JPM_REJECT_CONTROL_BASE = _load_real_job_input("CASE_F_JD_SOFTWARE_JPM_JUNIOR_PROJECT_MANAGER")
 MIT_LL_BASE = _load_real_job_input("CASE_C_MIT_LL_BUSINESS_SYSTEMS_ANALYST")
 
 
@@ -374,7 +378,7 @@ _POSTING_SOURCE_COMBINATIONS = [
 ]
 
 for fixture_name, base_input in (
-    ("ATOMINVEST", ATOMINVEST_BASE),
+    ("JPM_JUNIOR_PM", JPM_REJECT_CONTROL_BASE),
     ("MIT_LL", MIT_LL_BASE),
 ):
     baseline_reject = _analyze(copy.deepcopy(base_input))
@@ -402,7 +406,7 @@ for fixture_name, base_input in (
             analysis_reject["evidence_matches"] == baseline_reject["analysis"]["evidence_matches"],
             f"{fixture_name} with role_status={role_status}/source_verification_status={source_verification_status} must not alter evidence_matches",
         )
-print("PASS F: Atominvest and MIT LL qualification REJECT is preserved under every role_status x source_verification_status combination (30 combinations each, including the new dual-axis VERIFIED_LIVE+VERIFIED_DIRECT gate); hard_blockers and evidence_matches are unchanged.")
+print("PASS F: JPM junior PM and MIT LL qualification REJECT is preserved under every role_status x source_verification_status combination (30 combinations each, including the new dual-axis VERIFIED_LIVE+VERIFIED_DIRECT gate); hard_blockers and evidence_matches are unchanged.")
 
 
 # ======================================================================

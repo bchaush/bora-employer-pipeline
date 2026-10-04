@@ -532,12 +532,14 @@ def _load_real_job_input(fixture_dir_name: str) -> dict:
     return job_input
 
 
-for fixture_name in ("CASE_A_ATOMINVEST_IMPLEMENTATION_ANALYST", "CASE_C_MIT_LL_BUSINESS_SYSTEMS_ANALYST"):
+# 2026-10-03: Bora approved CLAIM_EDU_UNWE_001 and CLAIM_DCOMMERCE_001, so Atominvest's baseline is WATCH (its former degree/Excel blockers resolve
+# PARTIAL under the unchanged matcher). Both fixtures remain non-APPLY-like controls, which is all this guard test needs.
+for fixture_name, expected_baseline in (("CASE_A_ATOMINVEST_IMPLEMENTATION_ANALYST", "WATCH"), ("CASE_C_MIT_LL_BUSINESS_SYSTEMS_ANALYST", "REJECT")):
     base_input = _load_real_job_input(fixture_name)
     baseline_reject = _analyze(copy.deepcopy(base_input))
     assert_true(
-        baseline_reject["analysis"]["decision"] == "REJECT",
-        f"{fixture_name} baseline must remain REJECT (regression control), got {baseline_reject['analysis']['decision']}",
+        baseline_reject["analysis"]["decision"] == expected_baseline,
+        f"{fixture_name} baseline must remain {expected_baseline} (regression control), got {baseline_reject['analysis']['decision']}",
     )
     injected_input = copy.deepcopy(base_input)
     injected_row = _threshold_row("REQ_INJECTED_YEARS", "2-4 years of work experience", domain=None)
@@ -545,10 +547,10 @@ for fixture_name in ("CASE_A_ATOMINVEST_IMPLEMENTATION_ANALYST", "CASE_C_MIT_LL_
     injected_input["structured_extraction"]["requirements"].append(injected_row)
     result_injected = _analyze(injected_input)
     assert_true(
-        result_injected["analysis"]["decision"] == "REJECT",
-        f"{fixture_name} + injected unresolved threshold must remain REJECT (guard never fires on non-APPLY-like decisions), got {result_injected['analysis']['decision']}",
+        result_injected["analysis"]["decision"] == expected_baseline,
+        f"{fixture_name} + injected unresolved threshold must remain {expected_baseline} (guard never fires on non-APPLY-like decisions), got {result_injected['analysis']['decision']}",
     )
-print("PASS H: Atominvest and MIT LL qualification REJECT is preserved even with an injected unresolved experience-threshold row -- the guard only ever touches PRIORITY_APPLY/APPLY.")
+print("PASS H: the Atominvest WATCH and MIT LL REJECT baselines are preserved even with an injected unresolved experience-threshold row -- the guard only ever touches PRIORITY_APPLY/APPLY.")
 
 
 # ======================================================================

@@ -241,8 +241,8 @@ assert_true(
     "REQ_D_PROCESS_MAPPING must no longer appear as a hard blocker (PARTIAL never triggers detect_hard_blockers)",
 )
 assert_true(
-    direct_analysis["decision"] == "REJECT",
-    f"CASE_D final decision must remain REJECT (other independent blockers persist -- this milestone must not weaken them), got {direct_analysis['decision']}",
+    direct_analysis["decision"] == "UNDECIDED",
+    f"CASE_D final decision is UNDECIDED after Bora's 2026-10-03 UNWE and D Commerce approvals (REJECT before them; this milestone's own logic is unchanged), got {direct_analysis['decision']}",
 )
 print("PASS G1: CASE_D (direct) REQ_D_PROCESS_MAPPING now correctly resolves PARTIAL via CLAIM_WW_006 (not a false STRONG); it is no longer a hard blocker; final decision remains REJECT via other independent blockers, unweakened.")
 

@@ -204,22 +204,25 @@ for claim_id, caps_map in _CLAIM_CAPABILITIES.items():
         f"{claim_id} must NOT carry {NEW_TAG} -- no current approved evidence establishes institutional accreditation; CLAIM_EDU_UNWE_001's own forbidden_contexts explicitly exclude this",
     )
 assert_true(
-    CLAIM_INDEX["CLAIM_EDU_UNWE_001"]["human_approval"] is False,
-    "CLAIM_EDU_UNWE_001 must remain human_approval=false on disk, untouched by this milestone",
+    CLAIM_INDEX["CLAIM_EDU_UNWE_001"]["human_approval"] is True,
+    "CLAIM_EDU_UNWE_001 is Bora-approved on disk (2026-10-03, after this milestone); this milestone itself leaves it untouched and it carries no accreditation qualifier",
 )
-print("PASS E: no Claim (including CLAIM_EDU_UNWE_001) carries the new qualifier; CLAIM_EDU_UNWE_001 remains unapproved and unmodified.")
+print("PASS E: no Claim (including CLAIM_EDU_UNWE_001) carries the new qualifier; CLAIM_EDU_UNWE_001 is Bora-approved (2026-10-03) and still carries no accreditation qualifier.")
 
 
 # ======================================================================
 # F. Isolated matcher result -- real MBTA degree text, unapproved current
-#    Claim state. Must remain NONE (no reusable claim at all today).
+#    Claim state. CLAIM_EDU_UNWE_001 was approved by Bora on 2026-10-03, so the
+#    result is now PARTIAL via that claim only (credential supported, institutional
+#    quality unestablished) -- exactly the outcome section G below proves for a
+#    hypothetically approved claim; the matcher itself is unchanged.
 # ======================================================================
 mbta_match_current = _match(MBTA_DEGREE_TEXT, REUSABLE_ACTUAL)
 assert_true(
-    mbta_match_current["result"] == "NONE",
-    f"real MBTA degree text with CURRENT (unapproved) claim state must remain NONE, got {mbta_match_current['result']}",
+    mbta_match_current["result"] == "PARTIAL" and mbta_match_current.get("claim_ids") == ["CLAIM_EDU_UNWE_001"],
+    f"real MBTA degree text with the CURRENT claim state (UNWE approved 2026-10-03) must resolve PARTIAL via CLAIM_EDU_UNWE_001 only, got {mbta_match_current['result']} {mbta_match_current.get('claim_ids')}",
 )
-print("PASS F: real MBTA degree requirement remains NONE under current (unapproved) claim state -- unaffected by this milestone.")
+print("PASS F: real MBTA degree requirement resolves PARTIAL via the Bora-approved UNWE claim only -- the matcher is unchanged and the result equals the section G counterfactual.")
 
 
 # ======================================================================
@@ -250,8 +253,8 @@ assert_true(
 
 cl_after = validate_claim_repository()
 assert_true(
-    cl_after["index"]["CLAIM_EDU_UNWE_001"]["human_approval"] is False,
-    "real claim repository on disk must remain unaffected by the in-memory simulation",
+    cl_after["index"]["CLAIM_EDU_UNWE_001"]["human_approval"] is True,
+    "real claim repository on disk must remain unaffected by the in-memory simulation (UNWE is Bora-approved on disk since 2026-10-03)",
 )
 print("PASS G: hypothetical (in-memory-only) bare-credential approval resolves the real MBTA degree text to PARTIAL, not SUPPORTED/STRONG; disk state unaffected.")
 
@@ -314,8 +317,10 @@ def _load_real_job_input(fixture_dir_name: str) -> dict:
 # MEDIUM-relevance NONE gaps) does not meet any REJECT threshold in the
 # existing, unmodified decision routing; this is an honest consequence,
 # not manufactured by this milestone.
+# 2026-10-03: Bora approved CLAIM_EDU_UNWE_001. Under the unchanged matcher the degree rows now resolve PARTIAL through that claim only, and
+# CASE_D's decision moves from REJECT to UNDECIDED (its degree-based NONE is gone; the remaining ungrouped gaps do not meet a REJECT threshold).
 for fixture_name, req_id, expected_blockers, expected_decision in (
-    ("CASE_D_MBTA_DIRECT_APPLICATION_ANALYST", "REQ_D_DEGREE", [], "REJECT"),
+    ("CASE_D_MBTA_DIRECT_APPLICATION_ANALYST", "REQ_D_DEGREE", [], "UNDECIDED"),
     ("CASE_E_MBTA_CONTRACTOR_APPLICATION_ANALYST", "REQ_E_DEGREE", [], "UNDECIDED"),
 ):
     result = analyze_job(_load_real_job_input(fixture_name))
@@ -323,8 +328,8 @@ for fixture_name, req_id, expected_blockers, expected_decision in (
     analysis = result["analysis"]
     degree_match = next(m for m in analysis["evidence_matches"] if m["requirement_id"] == req_id)
     assert_true(
-        degree_match["result"] == "NONE",
-        f"{fixture_name} {req_id} must remain NONE (current approved Claim state unchanged), got {degree_match['result']}",
+        degree_match["result"] == "PARTIAL" and degree_match["claim_ids"] == ["CLAIM_EDU_UNWE_001"],
+        f"{fixture_name} {req_id} must resolve PARTIAL via the Bora-approved CLAIM_EDU_UNWE_001 only, got {degree_match['result']} {degree_match['claim_ids']}",
     )
     assert_true(
         analysis["decision"] == expected_decision,

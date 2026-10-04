@@ -142,11 +142,11 @@ assert_true(
     ev["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
     "Evidence Experience integrity",
 )
-assert_true(cl["valid"] is True and cl["records_checked"] == 16, "Claim regression")
+assert_true(cl["valid"] is True and cl["records_checked"] == 17, "Claim regression")
 reusable_approved = [
     cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable_approved) == 13, f"expected 13 reusable claims, got {reusable_approved}")
+assert_true(len(reusable_approved) == 16, f"expected 16 reusable claims (13 prior + UNWE + two D Commerce claims approved 2026-10-03), got {reusable_approved}")
 for claim_id, claim in cl["index"].items():
     if claim_id.startswith("CLAIM_WW_") or claim_id.startswith("CLAIM_MM_"):
         assert_true(claim["human_approval"] is True, f"{claim['claim_id']} must be approved")

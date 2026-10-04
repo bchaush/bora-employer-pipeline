@@ -360,7 +360,9 @@ assert_true(blockers_e == set(), f"MBTA contractor blockers must be exactly empt
 # unrelated MEDIUM-relevance NONE gaps) does not meet any REJECT threshold
 # in the existing, unmodified decision routing -- an honest consequence,
 # not manufactured by either milestone.
-assert_true(analysis_d["decision"] == "REJECT" and analysis_d["lane"] == "LANE_0_REJECT", f"MBTA direct must remain REJECT (unrelated ungrouped gaps), got {analysis_d['decision']}")
+# 2026-10-03: with Bora's UNWE and D Commerce approvals, CASE_D's degree and MS Office rows resolve through those claims (unchanged matcher), the
+# ungrouped gaps no longer meet a REJECT threshold and the decision is UNDECIDED on lane UNASSIGNED (REJECT/LANE_0_REJECT before the approvals).
+assert_true(analysis_d["decision"] == "UNDECIDED" and analysis_d["lane"] == "UNASSIGNED", f"MBTA direct is UNDECIDED/UNASSIGNED after the 2026-10-03 approvals, got {analysis_d['decision']}/{analysis_d['lane']}")
 assert_true(analysis_e["decision"] == "UNDECIDED", f"MBTA contractor decision must be UNDECIDED (fabricated degree blocker removed), got {analysis_e['decision']}")
 for decision in (analysis_d["decision"], analysis_e["decision"]):
     assert_true(decision not in ("APPLY", "EFFICIENT_APPLY", "PRIORITY_APPLY"), f"no APPLY-like decision is expected from this milestone, got {decision}")
@@ -395,18 +397,21 @@ result_bsa = analyze_job(_load_job_input(FIXTURE_BSA))
 assert_true(result_a["valid"] and result_c["valid"] and result_bsa["valid"], "Atominvest/MIT/BSA analyses must remain valid")
 
 blockers_a = {b.rsplit(": ", 1)[-1] for b in result_a["hard_blockers"]}
-assert_true(blockers_a == {"REQ_A_DEGREE", "REQ_A_EXCEL_DATA"}, f"Atominvest hard blockers must be unaffected, got {blockers_a}")
-assert_true(result_a["analysis"]["decision"] == "REJECT", "Atominvest decision must be unaffected")
+# 2026-10-03: the two former Atominvest blockers (REQ_A_DEGREE, REQ_A_EXCEL_DATA) resolve PARTIAL through the Bora-approved UNWE and D Commerce
+# claims under the unchanged matcher; this milestone's own logic still does not interact with Atominvest (no domain-qualified-duration row).
+assert_true(blockers_a == set(), f"Atominvest hard blockers clear via the approved claims, got {blockers_a}")
+assert_true(result_a["analysis"]["decision"] == "WATCH", "Atominvest decision is WATCH after the 2026-10-03 approvals")
 
 blockers_c = {b.rsplit(": ", 1)[-1] for b in result_c["hard_blockers"]}
-required_intact = {"Citizenship or clearance requirement present in JD", "REQ_C_DEGREE_EXPERIENCE", "REQ_C_SAP_ERP", "REQ_C_SAP_FICO"}
+# REQ_C_DEGREE_EXPERIENCE now resolves PARTIAL via the approved UNWE claim (2026-10-03) and is no longer a hard blocker; the rest stay intact.
+required_intact = {"Citizenship or clearance requirement present in JD", "REQ_C_SAP_ERP", "REQ_C_SAP_FICO"}
 assert_true(required_intact <= blockers_c, f"MIT LL blockers must remain intact and unaffected, got {blockers_c}")
 assert_true(result_c["analysis"]["decision"] == "REJECT", "MIT LL decision must be unaffected")
 
 assert_true(result_bsa["analysis"]["decision"] == "PRIORITY_APPLY", f"BSA (synthetic, role_status supplied) decision must be unaffected, got {result_bsa['analysis']['decision']}")
 match_bsa_010 = next(m for m in result_bsa["analysis"]["evidence_matches"] if m["requirement_id"] == "REQ_BSA_010")
 assert_true(match_bsa_010["result"] == "STRONG", "BSA REQ_BSA_010 must remain STRONG, unaffected")
-print("PASS H: Atominvest, MIT LL, and BSA (synthetic) are byte-for-byte unaffected -- no domain-qualified-duration row exists in any of them.")
+print("PASS H: this milestone does not interact with Atominvest, MIT LL or BSA (no domain-qualified-duration row); their only changes are the 2026-10-03 approval consequences.")
 
 
 # ======================================================================

@@ -53,7 +53,7 @@ assert_true(ev_result["valid"] is True, "evidence repository must be valid")
 assert_true(ev_result["records_checked"] == 43, f"expected 43 Evidence records (37 prior + 3 initial + 2 human-source-resolution: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001 + 1 Brandeis MSBA awarded attestation record), got {ev_result['records_checked']}")
 cl_result = validate_claim_repository()
 assert_true(cl_result["valid"] is True, "claim repository must be valid")
-assert_true(cl_result["records_checked"] == 16, f"expected 16 Claim records (13 prior + 3 new), got {cl_result['records_checked']}")
+assert_true(cl_result["records_checked"] == 17, f"expected 17 Claim records (13 prior + 3 new), got {cl_result['records_checked']}")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]
@@ -78,7 +78,7 @@ print("PASS 1: undergraduate credential evidence exists independently of the Bra
 # 2. Bachelor's degree must never imply "top-tier university".
 # ======================================================================
 unwe_claim = CLAIM_INDEX["CLAIM_EDU_UNWE_001"]
-assert_true(unwe_claim["human_approval"] is False, "undergraduate claim must not be self-approved")
+assert_true(unwe_claim["human_approval"] is True and unwe_claim["evidence_state"] == "OBSERVED", "undergraduate claim is Bora-approved (2026-10-03) while its OBSERVED evidence state is unchanged")
 assert_true("top-tier university" in unwe_claim["forbidden_contexts"], "undergraduate claim must explicitly forbid a top-tier-university context")
 assert_true("top-tier" not in unwe_claim["wording"].lower(), "undergraduate claim wording must not assert institutional ranking")
 
@@ -169,9 +169,10 @@ print("PASS 4: Excel-verb usage ('excel in/at') does not false-positive as Excel
 # ======================================================================
 reusable = load_reusable_claims(CLAIM_INDEX, EVIDENCE_INDEX)
 reusable_ids = {c["claim_id"] for c in reusable}
-for draft_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_BULMARMA_001"):
-    assert_true(draft_id not in reusable_ids, f"{draft_id} must remain excluded from matching until explicitly approved (human_approval=false)")
-assert_true(len(reusable_ids) == 13, f"reusable claim count must remain 13 (unchanged) until these drafts are approved; got {len(reusable_ids)}")
+assert_true("CLAIM_BULMARMA_001" not in reusable_ids, "CLAIM_BULMARMA_001 must remain excluded from matching until explicitly approved (human_approval=false)")
+for approved_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_DCOMMERCE_002"):
+    assert_true(approved_id in reusable_ids, f"{approved_id} was explicitly approved by Bora on 2026-10-03 and is now reusable")
+assert_true(len(reusable_ids) == 16, f"reusable claim count is 16 (13 prior + UNWE + two D Commerce claims approved 2026-10-03); got {len(reusable_ids)}")
 
 degree_requirement = {
     "requirement_id": "REQ_TEST_DEGREE", "text": "Bachelor's Degree (or higher) from top-tier university",
@@ -179,8 +180,10 @@ degree_requirement = {
     "technology": [], "relevance": "HIGH", "importance": "MANDATORY",
 }
 degree_match = match_requirement(job_id="JOB_TEST", requirement=degree_requirement, reusable_claims=reusable, evidence_index=EVIDENCE_INDEX, match_index=0)
-assert_true(degree_match["result"] == "NONE", f"degree requirement must still be NONE while the claim is an unapproved draft; got {degree_match['result']}")
-print("PASS 5: newly ingested draft claims are traceable but correctly excluded from matching until approved -- current matcher behavior is unchanged by this ingestion.")
+# Bora approved CLAIM_EDU_UNWE_001 on 2026-10-03: the degree requirement resolves PARTIAL (credential supported, top-tier institution unestablished)
+# through that claim only; the matcher is unchanged and CLAIM_BULMARMA_001 stays excluded.
+assert_true(degree_match["result"] == "PARTIAL" and degree_match["claim_ids"] == ["CLAIM_EDU_UNWE_001"], f"degree requirement resolves PARTIAL via the approved UNWE claim only; got {degree_match['result']} {degree_match['claim_ids']}")
+print("PASS 5: Bulmarma stays excluded from matching; the Bora-approved UNWE claim now supports the degree requirement PARTIAL under unchanged matcher behavior.")
 
 
 # ======================================================================
@@ -252,14 +255,14 @@ print("PASS 8: Bulmarma human source resolution correctly updates the canonical 
 # 9. All three draft claims remain unapproved/non-reusable after the
 #    source-resolution correction -- claim wording itself was untouched.
 # ======================================================================
-for draft_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_BULMARMA_001"):
-    claim = CLAIM_INDEX[draft_id]
-    assert_true(claim["human_approval"] is False, f"{draft_id} must remain human_approval=false after source resolution")
+assert_true(CLAIM_INDEX["CLAIM_BULMARMA_001"]["human_approval"] is False, "CLAIM_BULMARMA_001 must remain human_approval=false after source resolution")
+for approved_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001"):
+    claim = CLAIM_INDEX[approved_id]
+    assert_true(claim["human_approval"] is True and claim["evidence_state"] == "OBSERVED", f"{approved_id} is Bora-approved (2026-10-03) with its OBSERVED state unchanged")
 reusable_after = load_reusable_claims(CLAIM_INDEX, EVIDENCE_INDEX)
 reusable_ids_after = {c["claim_id"] for c in reusable_after}
-for draft_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_BULMARMA_001"):
-    assert_true(draft_id not in reusable_ids_after, f"{draft_id} must still be excluded from matching after source resolution")
-assert_true(len(reusable_ids_after) == 13, f"reusable claim count must remain 13 after source resolution (no claim was approved); got {len(reusable_ids_after)}")
-print("PASS 9: all three draft claims remain unapproved and excluded from matching after the source-resolution correction.")
+assert_true("CLAIM_BULMARMA_001" not in reusable_ids_after, "CLAIM_BULMARMA_001 must still be excluded from matching after source resolution")
+assert_true(len(reusable_ids_after) == 16, f"reusable claim count is 16 after the 2026-10-03 approvals; got {len(reusable_ids_after)}")
+print("PASS 9: Bulmarma remains unapproved and excluded; UNWE and D Commerce are approved with their evidence states unchanged.")
 
 print("ALL candidate_source_ingestion_v1_test CHECKS PASSED")

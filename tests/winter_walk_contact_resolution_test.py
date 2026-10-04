@@ -79,9 +79,9 @@ assert_true(evidence_result["valid"] is True, "evidence repository invalid")
 assert_true(len(evidence_result["index"]) == 43, "Evidence count must be 43 after MarketMind, Brandeis education, TELUS, CANDIDATE_SOURCE_INGESTION_V1, and human-source-resolution ingestion")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 16, "claim repository must have 16 records")
+assert_true(claim_result["records_checked"] == 17, "claim repository must have 17 records")
 reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
-assert_true(len(reusable_claims) == 13, "reusable claim count must be 13 (6 Winter Walk + 5 Bora-approved MarketMind + 2 Bora-approved TELUS)")
+assert_true(len(reusable_claims) == 16, "reusable claim count must be 16 (6 Winter Walk + 5 Bora-approved MarketMind + 2 Bora-approved TELUS + UNWE + two D Commerce claims approved 2026-10-03)")
 
 identity_patch = {
     "patch_id": "PATCH_WW_CONTACT_NOOP",
