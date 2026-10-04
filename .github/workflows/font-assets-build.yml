@@ -16,7 +16,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(dpkg-query -W -f='\${Version}' fonts-liberation)" = "1:2.1.5-3"
+          test "$(dpkg-query -W fonts-liberation | awk '{print $2}')" = "1:2.1.5-3"
           mkdir -p font_assets
           for f in LiberationSans-Regular.ttf LiberationSans-Bold.ttf LiberationSans-Italic.ttf LiberationSans-BoldItalic.ttf; do
             cp "/usr/share/fonts/truetype/liberation/$f" "font_assets/$f"
