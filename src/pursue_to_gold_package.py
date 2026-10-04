@@ -40,6 +40,7 @@ from gold_resume_docx_builder import (
     load_gold_metrics,
     model_digest,
 )
+from gold_package_handoff import REVIEW_FILE, claim_wording_review
 from gold_resume_qa import post_render_qa, pre_render_qa, read_pdf_facts
 from pursuit_decision import PursuitDecisionError, compute_context_fingerprint, derive_current_pursuit_state
 from schema_validation import build_draft202012_validator
@@ -256,6 +257,7 @@ def generate_gold_resume_stage(request: Mapping[str, Any], deps: PackageDeps) ->
         _write(staging / "resume_model.json", canonical_json_bytes(model) + b"\n")
         _write(staging / "crosswalk.json", canonical_json_bytes(gates["crosswalk"]) + b"\n")
         _write(staging / "rendered_document_evidence.json", canonical_json_bytes(record) + b"\n")
+        _write(staging / REVIEW_FILE, canonical_json_bytes(claim_wording_review(model, claims)) + b"\n")
         _write(staging / "pre_render_qa.json", canonical_json_bytes(pre) + b"\n")
         _write(staging / "post_render_qa.json", canonical_json_bytes(post) + b"\n")
         _write(staging / "layout_report.json", canonical_json_bytes(build.layout) + b"\n")

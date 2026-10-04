@@ -285,7 +285,7 @@ def artifact_grammar_checks(parsed: Mapping[str, Any], types: Sequence[str], met
         and parsed["default_font"] == (metrics.font_family, metrics.font_family)
     checks.append(_check("FONT_RULES_LIBERATION_SANS", fonts_ok))
     # No summary heading; a natural summary directly below the contact line.
-    summary_ok = len(paragraphs) > 3 and types[2:3] == [CT_SUMMARY] and bool(paragraphs[2]["text"].strip()) \
+    summary_ok = len(paragraphs) > 3 and types[2:3] == [CT_SUMMARY] and bool(paragraphs[2]["text"].strip()) and paragraphs[2]["centered"] \
         and not any(paragraph["text"].strip().upper() in SUMMARY_HEADING_LABELS for paragraph in paragraphs)
     checks.append(_check("SUMMARY_PRESENT_NO_HEADING", summary_ok, "types[:4]=%s" % types[:4]))
     # Section order.

@@ -20,6 +20,8 @@ Never let chat memory override repository or live operating evidence.
 
 ## Fresh-Session Recovery
 
+> **Historical / superseded for current routing (2026-10-04):** start at `docs/CAREER_OS_RECOVERY_POINTER_V1.md`. The list below is retained as provenance; items 3-4 and 7 read stale continuity files.
+
 Before consequential work:
 1. Fetch `origin/main`.
 2. Verify local/canonical SHA and worktree state.
