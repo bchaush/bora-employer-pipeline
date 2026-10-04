@@ -1,0 +1,54 @@
+{
+  "milestone_id": "CAREER_OS_DOCUMENT_RENDERING_IMPLEMENTATION_CONTRACT_LINK_LINKAGE_IDENTITY_V1",
+  "kind": "DOCTRINE_LOCK",
+  "goal": "One narrow, identity-only canonical recording from canonical main e3bc8998eb31f3544ca18af681ddedaac32222c8. CAREER_OS_DOCUMENT_RENDERING_LINK_LINKAGE_V1 (pull request 111, canonical main 048a5c159cc00b0b38ae8aa60adb43b1745c4b49) changed the canonical rendering governance contract milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json to Git blob 7ef8692f07c9c92514cfaee5c048ba29f6bd64c7 (SHA-256 6d8933fe718a8bcf198cd0a44af27db1d137a23e4520709abcfeb53e93821377), so the canonical implementation contract milestone_contracts/implementation/career-os-document-rendering-capability-v1.json still names the superseded governing identity (Git blob 70c96cb0182c4c4b94458a2767cd64344030c305, SHA-256 1923debfb51af7d1b3eef4dab3cf05f96137d39279f4c197b32ac5b3bb063822) and its governing-specification stop condition has fired. This pass replaces only that governing identity and the corresponding canonical-main provenance wording. It changes no technical rendering semantics, allowed or forbidden path, required test, dependency, PLAN or PRE semantics, sandbox, provisioning or renderer architecture, and creates no implementation, release, merge or submission authority.",
+  "baseline_sha": "e3bc8998eb31f3544ca18af681ddedaac32222c8",
+  "allowed_paths": [
+    "milestone_contracts/governance/career-os-impl-contract-link-linkage-identity-v1.json",
+    "milestone_contracts/implementation/career-os-document-rendering-capability-v1.json"
+  ],
+  "forbidden_paths": [
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json",
+    "docs/resume/**",
+    "docs/rendering/**",
+    "docs/gold/**",
+    "docs/decisions/**",
+    "requirements.in",
+    "requirements-lock.txt",
+    "src/**",
+    "scripts/**",
+    "schemas/**",
+    "tests/**",
+    "golden-tests/**",
+    ".github/**",
+    ".cursor/**",
+    ".claude/**",
+    "BLUEPRINT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project_state.json",
+    "CURRENT_EXECUTION_CHECKPOINT.json",
+    "CURRENT_STATE.md",
+    "CURRENT_MILESTONE.md",
+    "CHANGELOG.md"
+  ],
+  "required_tests": [
+    "python scripts/verify_milestone_state.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "The diff against e3bc8998eb31f3544ca18af681ddedaac32222c8 is exactly these two paths: milestone_contracts/governance/career-os-impl-contract-link-linkage-identity-v1.json (added) and milestone_contracts/implementation/career-os-document-rendering-capability-v1.json (modified from Git blob 9bef29150491c865efc06d3aee07bbcb3cce730d, blob SHA-256 8977ce5cd14264dff63e538f13901f1809de680f5d9aeb98b03b8ee60d4b3df7, to Git blob 3fe8af480528486ad4e0400fe6dd735c5a22ec78, blob SHA-256 adf8824d9e400dc2dba968fd0b78a2dc31bc42a5456941a37a8aaaa91b1916e8).",
+    "In the implementation contract exactly four text spans change: the governing identity in goal (Git blob and SHA-256, and the canonical main reference), the Git blob and SHA-256 in the GOVERNING SPECIFICATION acceptance condition, the canonical-main reference and recording pull request in the BASELINE acceptance condition's provenance sentence, and the SHA-256 in the governing-specification stop condition. baseline_sha, allowed_paths, forbidden_paths, required_tests, every other acceptance and stop condition, review_requirements, human_approval_requirements, the key order and the canonical serialization (indent 2, ensure_ascii false, LF) are unchanged.",
+    "The named identity is exactly that of milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json on canonical main 048a5c159cc00b0b38ae8aa60adb43b1745c4b49: Git blob 7ef8692f07c9c92514cfaee5c048ba29f6bd64c7, SHA-256 6d8933fe718a8bcf198cd0a44af27db1d137a23e4520709abcfeb53e93821377.",
+    "python scripts/verify_milestone_state.py passes on this branch against this contract, full canonical Assurance passes, and git diff --check passes. No OPERATOR host state is changed."
+  ],
+  "stop_conditions": [
+    "The reconciliation would require any change beyond the four governing-identity and provenance spans, including any change to a technical rendering rule, path model, test, dependency, plan digest, sandbox or provisioning rule.",
+    "milestone_contracts/governance/career-os-document-rendering-capability-v1-contract.json on canonical main is not Git blob 7ef8692f07c9c92514cfaee5c048ba29f6bd64c7 with SHA-256 6d8933fe718a8bcf198cd0a44af27db1d137a23e4520709abcfeb53e93821377.",
+    "Any path outside the two allowed paths, or OPERATOR host state, would have to change."
+  ],
+  "review_requirements": "Mechanical identity reconciliation under the same discipline as prior identity-reconciliation pull requests; hosted Assurance on the exact head is required and no semantic change is permitted.",
+  "human_approval_requirements": "Bora authorized this identity-only reconciliation within the combined builder-side task. It creates no authority beyond the exact reconciliation. Manual SUBMIT remains Bora-controlled."
+}
