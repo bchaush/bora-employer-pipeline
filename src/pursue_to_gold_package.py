@@ -193,7 +193,7 @@ def generate_gold_resume_stage(request: Mapping[str, Any], deps: PackageDeps) ->
     except GoldBuildError as error:
         raise PackageError("GOLD_BUILD_FAILED_" + error.code, error.detail) from error
     pre = pre_render_qa(model, build, metrics=metrics, claims=claims, identity=identity,
-                        rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), roster=list(deps.roster) if deps.roster is not None else load_doctrine_roster(deps.doctrine_root),
+                        rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), roster=list(deps.roster) if deps.roster is not None else display_roster(load_doctrine_roster(deps.doctrine_root), identity),
                         job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])))
     if not pre["passed"]:
         raise PackageError("GOLD_PRE_RENDER_QA_FAILED", ",".join(pre["failed_checks"]), pre)
@@ -387,7 +387,16 @@ def approved_identity_from_canonical_records(root: Path, *, overlay: Optional[Ma
         raise PackageError("APPROVED_DISPLAY_BINDING_FAILED", "; ".join(problems))
     return {"contact": {"name": contact["name"], "location": contact.get("location"), "phone": contact.get("phone"), "email": contact["email"],
                         "profile_links": profile_links},
-            "education": education, "experiences": experience_identity, "project_links": project_links}
+            "education": education, "experiences": experience_identity, "project_links": project_links,
+            "organization_display": {entry["organization_truth"]: entry["employer"] for entry in overlay["experience_display"]
+                                     if entry["experience_id"] in experience_identity}}
+
+
+def display_roster(doctrine_roster: Sequence[str], identity: Mapping[str, Any]) -> list:
+    """The doctrine default roster expressed in the approved candidate-facing display names (for example the organization truth
+    TELUS Digital Bulgaria is shown as the approved alias TELUS Digital); an entry without an approved alias is unchanged."""
+    aliases = identity.get("organization_display", {})
+    return [aliases.get(name, name) for name in doctrine_roster]
 
 
 def governed_render_function(root: Path, *, verification_record: Mapping[str, Any], work_dir: str) -> Callable[[bytes, list, str], tuple]:
