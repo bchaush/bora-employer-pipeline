@@ -212,18 +212,20 @@ print("PASS 3: test claim avoids volatile exact-count wording.")
 # ---------------------------------------------------------------------------
 claim_result = validate_claim_repository(ROOT / "claims")
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 17, "expected 17 total claim records")
+assert_true(claim_result["records_checked"] == 21, "expected 21 total claim records")
 reusable = [
     cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable) == 16, f"reusable claim count must be 16 (13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03), got {len(reusable)}")
+assert_true(len(reusable) == 21, f"reusable claim count must be 21 after Bora's 2026-10-04 precision-cleanup approvals, got {len(reusable)}")
 assert_true(
     sorted(reusable)
     == sorted(
         [f"CLAIM_WW_{i:03d}" for i in range(1, 7)]
         + [f"CLAIM_MM_{i:03d}" for i in range(1, 6)]
         + ["CLAIM_TELUS_001", "CLAIM_TELUS_002"]
-        + ["CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_DCOMMERCE_002"]  # Bora-approved 2026-10-03
+        + ["CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_DCOMMERCE_002",
+           "CLAIM_BULMARMA_001", "CLAIM_EDU_BRANDEIS_001",
+           "CLAIM_LOANIQ_SQL_001", "CLAIM_LOANIQ_STACK_001", "CLAIM_MARKET_EMPIRE_001"]
     ),
     f"unexpected reusable claim set: {reusable}",
 )
@@ -233,7 +235,7 @@ for claim_id in MARKETMIND_CLAIM_IDS:
         f"{claim_id} must be Bora-approved",
     )
 
-print("PASS 4: 13 total claims; 13 reusable (Winter Walk + Bora-approved MarketMind + Bora-approved TELUS).")
+print("PASS 4: current claim repository and the full Bora-approved reusable set are exact.")
 
 
 # ---------------------------------------------------------------------------

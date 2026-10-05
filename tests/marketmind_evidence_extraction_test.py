@@ -164,13 +164,15 @@ print("PASS 9: fallback evidence uses retry + degraded stub truth.")
 # ---------------------------------------------------------------------------
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(exp_result["records_checked"] == 7, "expected 7 experience records")
+assert_true(exp_result["records_checked"] == 9, "expected 9 experience records")
 assert_true(
     sorted(exp_result["index"].keys()) == [
         "EXP_BULMARMA_001",
         "EXP_DCOMMERCE_001",
         "EXP_EDU_BRANDEIS_001",
         "EXP_EDU_UNWE_001",
+        "EXP_LOANIQ_001",
+        "EXP_MARKET_EMPIRE_001",
         "EXP_MM_001",
         "EXP_TELUS_001",
         "EXP_WW_001",
@@ -180,17 +182,17 @@ assert_true(
 
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(ev_result["records_checked"] == 43, "expected 43 evidence records")
+assert_true(ev_result["records_checked"] == 49, "expected 49 evidence records")
 for evidence_id in MARKETMIND_EVIDENCE_IDS:
     assert_true(evidence_id in ev_result["index"], f"{evidence_id} missing from trusted index")
 
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 17, "claim repository must have 17 records")
+assert_true(claim_result["records_checked"] == 21, "claim repository must have 21 records")
 reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
-assert_true(len(reusable_claims) == 16, "reusable claim count must be 16 (6 Winter Walk + 5 Bora-approved MarketMind + 2 Bora-approved TELUS + UNWE + two D Commerce claims approved 2026-10-03)")
+assert_true(len(reusable_claims) == 21, "reusable claim count must be 21 (6 Winter Walk + 5 Bora-approved MarketMind + 2 Bora-approved TELUS + UNWE + two D Commerce claims approved 2026-10-03)")
 
-print("PASS 10: repository integrity — 4 Experience, 36 Evidence, 6 Claims.")
+print("PASS 10: repository integrity reflects the current 9 Experience, 49 Evidence, and 21 Claim records.")
 
 
 # ---------------------------------------------------------------------------

@@ -178,7 +178,7 @@ assert_true(
     EXPERIENCE_REGISTRY_STATUS == EXPERIENCE_REFERENCE_STATUS,
     "status alias drifted",
 )
-print("PASS 1 [AUTHORITATIVE]: current real evidence repository (29 records) passed.")
+print("PASS 1 [AUTHORITATIVE]: current real evidence repository (49 records) passed.")
 
 
 # ---------------------------------------------------------------------------

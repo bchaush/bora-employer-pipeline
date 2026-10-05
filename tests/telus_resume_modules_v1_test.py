@@ -56,13 +56,13 @@ def assert_false(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 7, "Experience count must be 7 (4 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records) -- this milestone itself adds no new Experience")
+assert_true(len(exp_result["index"]) == 9, "Experience count must be 9 (4 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records) -- this milestone itself adds no new Experience")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 43, "Evidence count must be 43 (36 prior + 1 TELUS end-date record added in the subsequent master-integration milestone + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records + 1 Brandeis MSBA awarded attestation record)")
+assert_true(len(ev_result["index"]) == 49, "Evidence count must be 49 (36 prior + 1 TELUS end-date record added in the subsequent master-integration milestone + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records + 1 Brandeis MSBA awarded attestation record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 17, "Claim count must be 17 (11 prior + 2 new draft TELUS claims + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval)")
+assert_true(claim_result["records_checked"] == 21, "Claim count must be 17 (11 prior + 2 new draft TELUS claims + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval)")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]
@@ -156,7 +156,7 @@ print("PASS 5: historical formal title unmutated; LinkedIn display title never s
 
 # 6. Non-TELUS Claims remain byte-for-byte unchanged.
 NON_TELUS_CLAIM_COUNT = claim_result["records_checked"] - len(TELUS_CLAIM_IDS)
-assert_true(NON_TELUS_CLAIM_COUNT == 15, "exactly 15 non-TELUS claims must exist (11 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval), byte-unchanged")
+assert_true(NON_TELUS_CLAIM_COUNT == 19, "exactly 19 non-TELUS claims must exist after the authorized precision-cleanup additions")
 assert_true(
     CLAIM_INDEX["CLAIM_WW_001"]["wording"]
     == "Defined the Winter Walk OP Recommendation Adoption & Support System as an internal Google Workspace operating tool and documented explicit scope boundaries excluding CRM, public dashboard, partner ranking, AI auto-sending, and causal fundraising-impact modeling.",

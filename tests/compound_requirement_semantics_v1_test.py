@@ -245,7 +245,7 @@ print("PASS G: no existing Claim capability set carries customer_platform_onboar
 # ======================================================================
 match_excel = next(m for m in analysis["evidence_matches"] if m["requirement_id"] == "REQ_A_EXCEL_DATA")
 # 2026-10-03: CLAIM_DCOMMERCE_001 (Microsoft Excel) is Bora-approved, so the Excel/data requirement resolves PARTIAL through that claim only.
-assert_true(match_excel["result"] == "PARTIAL" and match_excel["claim_ids"] == ["CLAIM_DCOMMERCE_001"], f"REQ_A_EXCEL_DATA resolves PARTIAL via the approved D Commerce claim only; got {match_excel['result']} {match_excel['claim_ids']}")
+assert_true(match_excel["result"] == "PARTIAL" and match_excel["claim_ids"] == ["CLAIM_BULMARMA_001"], f"REQ_A_EXCEL_DATA resolves PARTIAL via the approved Bulmarma Excel claim; got {match_excel['result']} {match_excel['claim_ids']}")
 # SOURCE_SEMANTIC_ROLE_QUALIFICATION_VIEW_V1 (post-dates this milestone):
 # REQ_A_CONFIG_IMPLEMENTATION and REQ_A_QA_TROUBLESHOOTING are
 # responsibility-sourced (source_location="What You'll Be Doing") and no
@@ -265,6 +265,6 @@ assert_true(
     analysis["lane"] == "WATCH" and analysis["decision"] == "WATCH",
     f"Atominvest overall routing is WATCH/WATCH once its two former hard blockers resolve PARTIAL (2026-10-03 approvals), got {analysis['lane']}/{analysis['decision']}",
 )
-print("PASS H: REQ_A_EXCEL_DATA resolves PARTIAL via the approved D Commerce claim; the former Atominvest blockers clear and routing is WATCH under unchanged decision logic.")
+print("PASS H: REQ_A_EXCEL_DATA remains PARTIAL through an approved Excel claim; the Atominvest blocker kind/routing is unchanged.")
 
 print("ALL compound_requirement_semantics_v1_test CHECKS PASSED")

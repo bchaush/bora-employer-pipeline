@@ -7,9 +7,7 @@ Covers:
 - EXPLICIT_EXCEL / SPREADSHEET (Google Sheets) / CSV_OR_TABULAR_DATA remain
   distinct capability tiers -- generic evidence must not silently become
   explicit Excel evidence;
-- newly ingested draft claims (human_approval=false) are correctly excluded
-  from matching, exactly like every other unapproved claim in this
-  repository;
+- explicitly approved candidate/project claims are reusable only at their recorded evidence certainty, including Bulmarma and Brandeis remaining OBSERVED;
 - protected TELUS/Winter Walk identity is untouched by this milestone,
   proving profile-display wording ("Content Safety Analyst", "May 2026")
   never silently overwrote already-approved repository truth.
@@ -47,13 +45,13 @@ def assert_true(condition: bool, message: str) -> None:
 
 exp_result = validate_experience_repository()
 assert_true(exp_result["valid"] is True, "experience repository must be valid")
-assert_true(exp_result["records_checked"] == 7, f"expected 7 Experience records (4 prior + 3 new), got {exp_result['records_checked']}")
+assert_true(exp_result["records_checked"] == 9, f"expected 9 Experience records, got {exp_result['records_checked']}")
 ev_result = validate_evidence_repository()
 assert_true(ev_result["valid"] is True, "evidence repository must be valid")
-assert_true(ev_result["records_checked"] == 43, f"expected 43 Evidence records (37 prior + 3 initial + 2 human-source-resolution: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001 + 1 Brandeis MSBA awarded attestation record), got {ev_result['records_checked']}")
+assert_true(ev_result["records_checked"] == 49, f"expected 49 Evidence records, got {ev_result['records_checked']}")
 cl_result = validate_claim_repository()
 assert_true(cl_result["valid"] is True, "claim repository must be valid")
-assert_true(cl_result["records_checked"] == 17, f"expected 17 Claim records (13 prior + 3 new), got {cl_result['records_checked']}")
+assert_true(cl_result["records_checked"] == 21, f"expected 21 Claim records, got {cl_result['records_checked']}")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]
@@ -163,16 +161,15 @@ print("PASS 4: Excel-verb usage ('excel in/at') does not false-positive as Excel
 
 
 # ======================================================================
-# 5. Draft claims (human_approval=false) are correctly excluded from
-#    matching -- new evidence exists and is traceable, but is not yet
-#    usable by the matcher, exactly like every other unapproved claim.
+# 5. Explicit precision-cleanup approvals become reusable without upgrading
+#    the underlying evidence certainty.
 # ======================================================================
 reusable = load_reusable_claims(CLAIM_INDEX, EVIDENCE_INDEX)
 reusable_ids = {c["claim_id"] for c in reusable}
-assert_true("CLAIM_BULMARMA_001" not in reusable_ids, "CLAIM_BULMARMA_001 must remain excluded from matching until explicitly approved (human_approval=false)")
-for approved_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_DCOMMERCE_002"):
-    assert_true(approved_id in reusable_ids, f"{approved_id} was explicitly approved by Bora on 2026-10-03 and is now reusable")
-assert_true(len(reusable_ids) == 16, f"reusable claim count is 16 (13 prior + UNWE + two D Commerce claims approved 2026-10-03); got {len(reusable_ids)}")
+for approved_id in ("CLAIM_BULMARMA_001", "CLAIM_EDU_BRANDEIS_001", "CLAIM_LOANIQ_SQL_001", "CLAIM_LOANIQ_STACK_001", "CLAIM_MARKET_EMPIRE_001", "CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001", "CLAIM_DCOMMERCE_002"):
+    assert_true(approved_id in reusable_ids, f"{approved_id} must be reusable after Bora's explicit 2026-10-04 precision-cleanup approval")
+assert_true(CLAIM_INDEX["CLAIM_BULMARMA_001"]["evidence_state"] == "OBSERVED", "Bulmarma approval must not upgrade OBSERVED evidence")
+assert_true(CLAIM_INDEX["CLAIM_EDU_BRANDEIS_001"]["evidence_state"] == "OBSERVED", "Brandeis awarded-status claim must remain OBSERVED")
 
 degree_requirement = {
     "requirement_id": "REQ_TEST_DEGREE", "text": "Bachelor's Degree (or higher) from top-tier university",
@@ -181,9 +178,9 @@ degree_requirement = {
 }
 degree_match = match_requirement(job_id="JOB_TEST", requirement=degree_requirement, reusable_claims=reusable, evidence_index=EVIDENCE_INDEX, match_index=0)
 # Bora approved CLAIM_EDU_UNWE_001 on 2026-10-03: the degree requirement resolves PARTIAL (credential supported, top-tier institution unestablished)
-# through that claim only; the matcher is unchanged and CLAIM_BULMARMA_001 stays excluded.
+# through that claim only; the matcher is unchanged and unrelated approved claims do not contaminate this match.
 assert_true(degree_match["result"] == "PARTIAL" and degree_match["claim_ids"] == ["CLAIM_EDU_UNWE_001"], f"degree requirement resolves PARTIAL via the approved UNWE claim only; got {degree_match['result']} {degree_match['claim_ids']}")
-print("PASS 5: Bulmarma stays excluded from matching; the Bora-approved UNWE claim now supports the degree requirement PARTIAL under unchanged matcher behavior.")
+print("PASS 5: precision-cleanup approvals are reusable while Bulmarma/Brandeis certainty remains OBSERVED; degree matching semantics stay unchanged.")
 
 
 # ======================================================================
@@ -252,17 +249,14 @@ print("PASS 8: Bulmarma human source resolution correctly updates the canonical 
 
 
 # ======================================================================
-# 9. All three draft claims remain unapproved/non-reusable after the
-#    source-resolution correction -- claim wording itself was untouched.
+# 9. Bora's explicit Bulmarma approval is reusable while the evidence state
+#    remains OBSERVED.
 # ======================================================================
-assert_true(CLAIM_INDEX["CLAIM_BULMARMA_001"]["human_approval"] is False, "CLAIM_BULMARMA_001 must remain human_approval=false after source resolution")
-for approved_id in ("CLAIM_EDU_UNWE_001", "CLAIM_DCOMMERCE_001"):
-    claim = CLAIM_INDEX[approved_id]
-    assert_true(claim["human_approval"] is True and claim["evidence_state"] == "OBSERVED", f"{approved_id} is Bora-approved (2026-10-03) with its OBSERVED state unchanged")
+assert_true(CLAIM_INDEX["CLAIM_BULMARMA_001"]["human_approval"] is True, "CLAIM_BULMARMA_001 must reflect Bora's explicit 2026-10-04 approval")
+assert_true(CLAIM_INDEX["CLAIM_BULMARMA_001"]["evidence_state"] == "OBSERVED", "Bulmarma approval must preserve OBSERVED certainty")
 reusable_after = load_reusable_claims(CLAIM_INDEX, EVIDENCE_INDEX)
 reusable_ids_after = {c["claim_id"] for c in reusable_after}
-assert_true("CLAIM_BULMARMA_001" not in reusable_ids_after, "CLAIM_BULMARMA_001 must still be excluded from matching after source resolution")
-assert_true(len(reusable_ids_after) == 16, f"reusable claim count is 16 after the 2026-10-03 approvals; got {len(reusable_ids_after)}")
-print("PASS 9: Bulmarma remains unapproved and excluded; UNWE and D Commerce are approved with their evidence states unchanged.")
+assert_true("CLAIM_BULMARMA_001" in reusable_ids_after, "approved Bulmarma claim must now be reusable")
+print("PASS 9: Bulmarma is explicitly approved for reuse while its evidence remains OBSERVED-tier.")
 
 print("ALL candidate_source_ingestion_v1_test CHECKS PASSED")
