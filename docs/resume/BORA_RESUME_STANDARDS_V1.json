@@ -18,7 +18,7 @@
     "RESUME_FORMAT_STANDARD_V1": {
       "intro": "Use the approved Gold presentation mechanics:",
       "mechanics": [
-        "BORA CHAUSH centered;",
+        "Bora Chaush centered;",
         "contact line centered;",
         "candidate summary centered;",
         "Education school + right-aligned date on the same paragraph using a right tab stop;",
@@ -27,7 +27,7 @@
         "no tables for Education/Work alignment;",
         "preserve one-page Gold section order, typography hierarchy, rules, hyperlinks and ≥92% utilization floor."
       ],
-      "enforcement": "src/gold_resume_docx_builder.py (generation) and src/gold_resume_qa.py (pre-render grammar checks NAME_CENTERED_BOLD_SIZE, CONTACT_LINE_GRAMMAR, SUMMARY_PRESENT_NO_HEADING incl. centered summary, EDUCATION_GRAMMAR, WORK_HEADER_TITLE_PIPE_EMPLOYER_RIGHT_DATE; post-render one-page Letter, link parity and the 0.92 floor)."
+      "enforcement": "src/gold_resume_docx_builder.py (generation) and src/gold_resume_qa.py (pre-render grammar checks NAME_CENTERED_BOLD_SIZE (centering/bold/size; canonical title-case identity is enforced separately), CONTACT_LINE_GRAMMAR, SUMMARY_PRESENT_NO_HEADING incl. centered summary, EDUCATION_GRAMMAR, WORK_HEADER_TITLE_PIPE_EMPLOYER_RIGHT_DATE; post-render one-page Letter, link parity and the 0.92 floor)."
     }
   }
 }

@@ -201,7 +201,8 @@
           "title_basis": {
             "enum": [
               "MASTER_DISPLAY_TITLE_APPROVAL",
-              "EMPLOYER_FORMAL_POSITION_CASE_NORMALIZED"
+              "EMPLOYER_FORMAL_POSITION_CASE_NORMALIZED",
+              "CANDIDATE_ATTESTED_PROFILE_HISTORY"
             ]
           },
           "formal_title_evidence_id": {
@@ -213,6 +214,10 @@
             "pattern": "^[A-Z][a-z]{2} \\d{4} - ([A-Z][a-z]{2} \\d{4}|Present)$"
           },
           "date_basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "identity_evidence_id": {
             "type": "string",
             "minLength": 1
           }

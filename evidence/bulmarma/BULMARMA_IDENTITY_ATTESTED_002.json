@@ -1,0 +1,16 @@
+{
+  "evidence_id": "BULMARMA_IDENTITY_ATTESTED_002",
+  "experience_id": "EXP_BULMARMA_001",
+  "fact": "Bora attests on 2026-10-04 that the candidate-facing Bulmarma history is Financial & Business Analyst | Bulmarma 2008 Ltd, Sep 2022 - Nov 2023, consistent with his previously supplied professional-profile history.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "OBSERVED",
+  "original_source": "Bora attestation 2026-10-04 plus previously supplied professional-profile history",
+  "source_location": "Career OS precision-cleanup authorization and EXP_BULMARMA_001 provenance notes.",
+  "safe_for_external_use": true,
+  "notes": "Candidate-attested/profile-history identity evidence, not employer-issued verification. Supports candidate-facing title and date display only at OBSERVED certainty.",
+  "limitations": [
+    "Not independently verified by employer documentation.",
+    "Must not be represented as employer-issued title/date evidence."
+  ]
+}

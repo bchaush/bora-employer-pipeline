@@ -1,0 +1,26 @@
+{
+  "claim_id": "CLAIM_LOANIQ_STACK_001",
+  "wording": "Built LoanIQ, a Python/Pandas/SQLite/XGBoost research prototype for credit-risk scoring, with Streamlit delivery and explicit limits on production and regulatory use.",
+  "evidence_ids": [
+    "LOANIQ_REPO_001",
+    "LOANIQ_STACK_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Data Analyst",
+    "Applied AI / Automation",
+    "Data Operations"
+  ],
+  "forbidden_contexts": [
+    "production underwriting system",
+    "regulated adverse-action system",
+    "regulatory compliance expertise",
+    "production ML platform"
+  ],
+  "human_approval": true,
+  "date": "2026-10-04",
+  "version": "2"
+}

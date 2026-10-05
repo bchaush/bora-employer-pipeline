@@ -1,7 +1,7 @@
 """Regression tests for CAREER_OS_FINAL_HYGIENE_V1.
 
 Dependency-free. Covers: the canonicalized cloud adapter (profile, honesty fields, canonical reuse, fail-closed
-runtime verification, sidecar), the two canonical resume standards, the claim-wording review and its advisory meaning-shift flags,
+runtime verification, sidecar), the two canonical resume standards, the deterministic claim-wording human-review artifact,
 the future-package persistence inventory, and the recovery pointer. The summary-centering regression lives with the other Gold
 grammar checks in pursue_to_gold_package_v1_test.py.
 
@@ -30,6 +30,7 @@ ADAPTER_PATH = ROOT / "src" / "career_os_cloud_operate_v1.py"
 # Recovered-production provenance: SHA-256 of the exact bytes recovered from the live Drive adapter (Drive ID 19l9MNv7eF_PsFaFStiD9ZLFB45qf4rSd). Line endings are
 # normalized to LF before hashing so a Windows autocrlf checkout does not change the identity.
 RECOVERED_ADAPTER_SHA256 = "f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc"
+POST_HYGIENE_ADAPTER_SHA256 = "c6c5bc6741c31414d245d3a3f9a223659ddd1c6862019b8b088f2c059a3243ef"
 POINTER_PATH = ROOT / "docs" / "CAREER_OS_RECOVERY_POINTER_V1.md"
 STANDARDS_PATH = ROOT / "docs" / "resume" / "BORA_RESUME_STANDARDS_V1.json"
 
@@ -45,8 +46,17 @@ def adapter_source() -> str:
     return ADAPTER_PATH.read_bytes().replace(b"\r\n", b"\n").decode("utf-8")
 
 
-# The ONLY deviations of the canonical adapter from the recovered live Drive adapter: the canonical-main identity is explicit caller input
-# instead of a hard-coded constant. Each pair is (canonical text, recovered text); undoing them must reproduce the recovered bytes exactly.
+# Historical final-hygiene provenance. The post-hygiene adapter differed from the recovered Drive adapter only by the
+# explicit expected-main-SHA runtime binding below. CAREER_OS_PRECISION_CLEANUP_V1 intentionally adds a second,
+# separately enumerated delta for approved-language loading and package handoff. Reversing the precision delta must
+# reproduce the post-hygiene adapter; reversing the runtime-binding delta after that must reproduce the recovered bytes.
+PRECISION_ADAPTER_DEVIATIONS = (
+    ('    approved_language = json.loads((root / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))\n', ''),
+    ('        approved_language=lambda: approved_language,\n', ''),
+    ("    package_dir = Path(result['output_dir'])\n    package_dir.joinpath('cloud_operate_manifest.json').write_bytes(_canonical_bytes(sidecar)+b'\\n')\n    from gold_package_handoff import REVIEW_FILE, INVENTORY_FILE, format_claim_wording_review_table, package_persistence_inventory\n    review = json.loads(package_dir.joinpath(REVIEW_FILE).read_text(encoding='utf-8'))\n    print(format_claim_wording_review_table(review))\n    inventory = package_persistence_inventory(package_dir)\n    package_dir.joinpath(INVENTORY_FILE).write_bytes(_canonical_bytes(inventory)+b'\\n')\n    result['package_inventory'] = inventory\n",
+     "    Path(result['output_dir'],'cloud_operate_manifest.json').write_bytes(_canonical_bytes(sidecar)+b'\\n')\n"),
+)
+
 RUNTIME_BINDING_DEVIATIONS = (
     ('PROFILE_ID = "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1"\n\n\ndef _sha',
      'PROFILE_ID = "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1"\nEXPECTED_MAIN_SHA = "c28314c49cb608db801059dd82b210bb7205d475"\n\n\ndef _sha'),
@@ -65,13 +75,22 @@ RUNTIME_BINDING_DEVIATIONS = (
 
 def test_adapter_recovered_provenance() -> None:
     source = adapter_source()
+    for canonical, prior in PRECISION_ADAPTER_DEVIATIONS:
+        assert_true(source.count(canonical) == 1, "documented precision-cleanup adapter deviation is present exactly once: %s" % canonical[:60])
+        source = source.replace(canonical, prior)
+    post_hygiene_digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    assert_true(post_hygiene_digest == POST_HYGIENE_ADAPTER_SHA256,
+                "reversing the precision-cleanup adapter delta reproduces the post-hygiene canonical adapter: %s" % post_hygiene_digest)
     for canonical, recovered in RUNTIME_BINDING_DEVIATIONS:
         assert_true(source.count(canonical) == 1, "documented runtime-binding deviation is present exactly once: %s" % canonical[:60])
         source = source.replace(canonical, recovered)
-    digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
-    assert_true(digest == RECOVERED_ADAPTER_SHA256, "undoing exactly the documented runtime-binding deviations reproduces the recovered live adapter: %s" % digest)
-    assert_true(hashlib.sha256(adapter_source().encode("utf-8")).hexdigest() != RECOVERED_ADAPTER_SHA256, "the canonical adapter is honestly not claimed byte-identical to the recovered one")
-    print("PASS: the canonical adapter differs from the recovered live adapter (f10513d6...) only by the documented runtime-binding change.")
+    recovered_digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    assert_true(recovered_digest == RECOVERED_ADAPTER_SHA256,
+                "post-hygiene runtime-binding provenance still reconstructs the recovered live adapter: %s" % recovered_digest)
+    current_digest = hashlib.sha256(adapter_source().encode("utf-8")).hexdigest()
+    assert_true(current_digest not in (RECOVERED_ADAPTER_SHA256, POST_HYGIENE_ADAPTER_SHA256),
+                "the precision adapter has its own honest current identity")
+    print("PASS: recovered -> post-hygiene -> precision adapter provenance is explicit and mechanically reproducible.")
 
 
 def test_adapter_profile_and_honesty() -> None:
@@ -141,6 +160,7 @@ def test_adapter_run_request_sidecar() -> None:
             seen["request"], seen["deps"] = request, deps
             package = out / "package"
             package.mkdir()
+            (package / "claim_wording_review.json").write_text(json.dumps({"spec": "GOLD_CLAIM_WORDING_REVIEW_V1", "job_id": "FIXTURE::JOB", "human_review": "REQUIRED_PENDING", "rows": []}), encoding="utf-8")
             return {"manifest": {"package_generation_id": "PGP_V1::fixture", "human_review": "REQUIRED_PENDING"}, "output_dir": str(package),
                     "post_render_qa": {"passed": True}}
 
@@ -169,7 +189,7 @@ def test_standards_record() -> None:
                 "or decision value created by the work.", "content standard is verbatim")
     assert_true(content["truth_clause"] == "Preserve truth. Never invent impact metrics or unsupported outcomes.", "truth clause is verbatim")
     assert_true(fmt["mechanics"] == [
-        "BORA CHAUSH centered;", "contact line centered;", "candidate summary centered;",
+        "Bora Chaush centered;", "contact line centered;", "candidate summary centered;",
         "Education school + right-aligned date on the same paragraph using a right tab stop;", "degree on the next line;",
         "Work Experience Title | Employer + right-aligned date using a right tab stop;", "no tables for Education/Work alignment;",
         "preserve one-page Gold section order, typography hierarchy, rules, hyperlinks and ≥92% utilization floor."], "format mechanics are verbatim")

@@ -86,22 +86,22 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
     exp = validate_experience_repository()
     ev = validate_evidence_repository()
     cl = validate_claim_repository()
-    if not (exp.get("valid") is True and exp.get("records_checked") == 7):
+    if not (exp.get("valid") is True and exp.get("records_checked") == 9):
         fail(f"Experience regression failed: {exp}")
     if not (
         ev.get("valid") is True
-        and ev.get("records_checked") == 43
+        and ev.get("records_checked") == 49
         and ev.get("experience_registry_status")
         == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED"
     ):
         fail(f"Evidence regression failed: {ev}")
-    if not (cl.get("valid") is True and cl.get("records_checked") == 17):  # 16 + CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval
+    if not (cl.get("valid") is True and cl.get("records_checked") == 21):  # current canonical claim repository after precision-cleanup additions
         fail(f"Claim regression failed: {cl}")
     reusable_count = sum(
         1 for claim in cl["index"].values() if claim.get("human_approval") is True
     )
-    if reusable_count != 16:  # 13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03
-        fail(f"expected 16 reusable claims, got {reusable_count}")
+    if reusable_count != 21:  # current Bora-approved reusable set after 2026-10-04 precision cleanup
+        fail(f"expected 21 reusable claims, got {reusable_count}")
     for claim in cl["index"].values():
         claim_id = claim.get("claim_id", "")
         if isinstance(claim_id, str) and (
@@ -111,7 +111,7 @@ def assert_repository_regression() -> tuple[dict[str, Any], dict[str, Any]]:
                 fail(f"{claim_id} must be approved/reusable gate")
     print(
         "PASS 0: repository regression "
-        "(7 Experience / 43 Evidence / 16 Claims / 13 reusable)."
+        "(9 Experience / 49 Evidence / 21 Claims / 21 reusable)."
     )
     return ev["index"], cl["index"]
 

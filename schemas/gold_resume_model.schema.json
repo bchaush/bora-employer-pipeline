@@ -12,7 +12,8 @@
     "summary",
     "education",
     "skills",
-    "work"
+    "work",
+    "project"
   ],
   "properties": {
     "model_id": {

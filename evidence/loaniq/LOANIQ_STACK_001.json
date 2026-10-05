@@ -1,0 +1,26 @@
+{
+  "evidence_id": "LOANIQ_STACK_001",
+  "experience_id": "EXP_LOANIQ_001",
+  "fact": "LoanIQ documents a Python 3.12 research/portfolio credit-risk prototype using Pandas, SQLite, XGBoost and Streamlit, with held-out test metrics recorded in model metadata and a deterministic fact-bounded narrative layer.",
+  "capabilities": [
+    "python_data_analysis",
+    "tabular_machine_learning_prototype"
+  ],
+  "technologies": [
+    "Python",
+    "Pandas",
+    "SQLite",
+    "XGBoost",
+    "Streamlit"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "GitHub repository bchaush/loaniq-credit-risk",
+  "source_location": "commit 8778cbbd453cc654529c3bf1d70bfc2a848158a8; README.md blob ce918b0df6b7e54446525ad47e356db066371e95.",
+  "safe_for_external_use": true,
+  "notes": "Use only with the repository's prototype limits. Do not represent LoanIQ as production underwriting, regulated adverse-action tooling, or independently validated credit-decision infrastructure.",
+  "limitations": [
+    "Research/portfolio prototype only.",
+    "No production-underwriting or regulatory-compliance claim.",
+    "Global driver ranks are not applicant-level causal explanations."
+  ]
+}

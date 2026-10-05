@@ -540,17 +540,17 @@ print("PASS P: all 5 fixture files' Requirement rows carry all 5 migrated classi
 claim_result = validate_claim_repository(None)
 evidence_result = validate_evidence_repository(None)
 experience_result = validate_experience_repository(None)
-assert_true(len(experience_result["index"]) == 7, f"Experiences must remain 7, got {len(experience_result['index'])}")
-assert_true(len(evidence_result["index"]) == 43, f"Evidence must remain 43, got {len(evidence_result['index'])}")
-assert_true(len(claim_result["index"]) == 17, f"Claims are 17 (16 + CLAIM_DCOMMERCE_002 added 2026-10-03), got {len(claim_result['index'])}")
+assert_true(len(experience_result["index"]) == 9, f"Experiences must remain 9, got {len(experience_result['index'])}")
+assert_true(len(evidence_result["index"]) == 49, f"Evidence must remain 43, got {len(evidence_result['index'])}")
+assert_true(len(claim_result["index"]) == 21, f"Claims are 21 after the precision-cleanup additions, got {len(claim_result['index'])}")
 reusable_count = sum(1 for c in claim_result["index"].values() if c.get("human_approval") is True)
-assert_true(reusable_count == 16, f"Reusable claims are 16 (13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03), got {reusable_count}")
-for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_DCOMMERCE_002", True), ("CLAIM_BULMARMA_001", False)):
+assert_true(reusable_count == 21, f"Reusable claims are 21 after Bora's 2026-10-04 approvals, got {reusable_count}")
+for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_DCOMMERCE_002", True), ("CLAIM_BULMARMA_001", True)):
     assert_true(
         claim_result["index"][claim_id]["human_approval"] is approved,
         f"{claim_id} human_approval must be {approved} -- this milestone itself approves nothing; the on-disk state is Bora's 2026-10-03 approvals",
     )
-print("PASS Q: repository invariants (7/42/16/13 Experiences/Evidence/Claims/reusable) and the three intentionally-unapproved Claims are unaffected.")
+print("PASS Q: repository invariants reflect the authorized precision-cleanup additions and approvals.")
 
 
 # ======================================================================

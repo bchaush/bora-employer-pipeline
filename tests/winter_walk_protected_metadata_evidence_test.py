@@ -90,7 +90,7 @@ ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(ev_result["records_checked"] == 43, "expected 43 evidence records")
+assert_true(ev_result["records_checked"] == 49, "expected 49 evidence records")
 assert_true("WW_OFFER_001" in ev_result["index"], "WW_OFFER_001 missing from trusted index")
 
 
@@ -224,7 +224,7 @@ print("PASS J: wording approval record remains valid.")
 
 
 # K. Winter Walk reusable Claims remain unchanged (6 reusable, lineage untouched)
-assert_true(claim_result["records_checked"] == 17, "claim count must be 17 after MarketMind, TELUS, and CANDIDATE_SOURCE_INGESTION_V1 drafting")
+assert_true(claim_result["records_checked"] == 21, "claim count must be 17 after MarketMind, TELUS, and CANDIDATE_SOURCE_INGESTION_V1 drafting")
 ww_claim_ids = [f"CLAIM_WW_{i:03d}" for i in range(1, 7)]
 for claim_id in ww_claim_ids:
     claim = claim_result["index"][claim_id]

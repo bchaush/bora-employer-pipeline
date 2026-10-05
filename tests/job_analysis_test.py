@@ -136,17 +136,17 @@ def load_bsa_fixture() -> dict:
 exp = validate_experience_repository()
 ev = validate_evidence_repository()
 cl = validate_claim_repository()
-assert_true(exp["valid"] is True and exp["records_checked"] == 7, "Experience regression")
-assert_true(ev["valid"] is True and ev["records_checked"] == 43, "Evidence regression")
+assert_true(exp["valid"] is True and exp["records_checked"] == 9, "Experience regression")
+assert_true(ev["valid"] is True and ev["records_checked"] == 49, "Evidence regression")
 assert_true(
     ev["experience_registry_status"] == "EXPERIENCE_REFERENCE_INTEGRITY_ENFORCED",
     "Evidence Experience integrity",
 )
-assert_true(cl["valid"] is True and cl["records_checked"] == 17, "Claim regression")
+assert_true(cl["valid"] is True and cl["records_checked"] == 21, "Claim regression")
 reusable_approved = [
     cid for cid, rec in cl["index"].items() if rec.get("human_approval") is True
 ]
-assert_true(len(reusable_approved) == 16, f"expected 16 reusable claims (13 prior + UNWE + two D Commerce claims approved 2026-10-03), got {reusable_approved}")
+assert_true(len(reusable_approved) == 21, f"expected 21 reusable claims after Bora's 2026-10-04 precision-cleanup approvals, got {reusable_approved}")
 for claim_id, claim in cl["index"].items():
     if claim_id.startswith("CLAIM_WW_") or claim_id.startswith("CLAIM_MM_"):
         assert_true(claim["human_approval"] is True, f"{claim['claim_id']} must be approved")

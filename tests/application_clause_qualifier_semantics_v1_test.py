@@ -179,7 +179,7 @@ print("PASS E: 'Bachelor's degree required for candidates from top-tier universi
 # ======================================================================
 cl_after = validate_claim_repository()
 # Bora approved UNWE and D Commerce on 2026-10-03; the simulation must leave the on-disk approval state exactly as recorded.
-for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_BULMARMA_001", False)):
+for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_BULMARMA_001", True)):
     assert_true(
         cl_after["index"][claim_id]["human_approval"] is approved,
         f"{claim_id} on-disk human_approval must remain {approved} after simulation",

@@ -79,12 +79,21 @@ EXPECTED_CANDIDATE_SOURCE_IDS = [
     "EDU_UNWE_IDENTITY_001",
     "DCOMMERCE_EXCEL_001",
     "BULMARMA_EXCEL_001",
+    "BULMARMA_IDENTITY_ATTESTED_002",
     "DCOMMERCE_REFERENCE_001",
     "DCOMMERCE_LINKEDIN_PERIOD_001",
 ]
 
+EXPECTED_PROJECT_IDS = [
+    "LOANIQ_REPO_001",
+    "LOANIQ_SQL_001",
+    "LOANIQ_STACK_001",
+    "MARKET_EMPIRE_REPO_001",
+    "MARKET_EMPIRE_TECH_001",
+]
+
 EXPECTED_ALL_IDS = sorted(
-    EXPECTED_WW_IDS + EXPECTED_MM_IDS + EXPECTED_EDU_IDS + EXPECTED_TELUS_IDS + EXPECTED_CANDIDATE_SOURCE_IDS
+    EXPECTED_WW_IDS + EXPECTED_MM_IDS + EXPECTED_EDU_IDS + EXPECTED_TELUS_IDS + EXPECTED_CANDIDATE_SOURCE_IDS + EXPECTED_PROJECT_IDS
 )
 
 
@@ -146,9 +155,9 @@ exp = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(exp["valid"] is True, "real Experience Registry must be valid for REF PASS 1")
 evidence = validate_evidence_repository(EVIDENCE_ROOT, experience_root=EXPERIENCE_ROOT)
 assert_true(evidence["valid"] is True, "real Evidence Repository failed with Experience refs")
-assert_true(evidence["records_checked"] == 43, f"expected 43 evidence, got {evidence['records_checked']}")
+assert_true(evidence["records_checked"] == 49, f"expected 49 evidence, got {evidence['records_checked']}")
 assert_true(evidence["index"] is not None, "trusted Evidence index missing")
-assert_true(len(evidence["index"]) == 43, f"trusted Evidence index length {len(evidence['index'])}")
+assert_true(len(evidence["index"]) == 49, f"trusted Evidence index length {len(evidence['index'])}")
 assert_true(
     sorted(evidence["index"].keys()) == EXPECTED_ALL_IDS,
     f"unexpected Evidence_ID set: {sorted(evidence['index'].keys())}",

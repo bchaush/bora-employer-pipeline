@@ -1,0 +1,28 @@
+{
+  "evidence_id": "MARKET_EMPIRE_TECH_001",
+  "experience_id": "EXP_MARKET_EMPIRE_001",
+  "fact": "At commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4, Market Empire is a completed React/TypeScript seven-screen financial-education demo built with Vite, tested with Vitest and Playwright, and deployed to Vercel; the README records 32/32 unit/calculation tests and 6/6 browser tests for the completed version.",
+  "capabilities": [
+    "frontend_application_development",
+    "deterministic_business_logic",
+    "software_testing_and_validation",
+    "web_deployment"
+  ],
+  "technologies": [
+    "TypeScript",
+    "React",
+    "Vite",
+    "Vitest",
+    "Playwright",
+    "Vercel"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "GitHub repository bchaush/market-empire",
+  "source_location": "commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4; README.md blob c9138245f1b38bae132c911bab61495063c59cc0; package.json blob 6493d9f43371d9e8cfbe95d5a9f9e2937e3340e0.",
+  "safe_for_external_use": true,
+  "notes": "The README says the demo was reviewed by the project team and course professor. Repository history attributes all 72 commits to bchaush, with 3 Claude co-authored. 'Built' is supported; 'solely built' or 'independently built' is not.",
+  "limitations": [
+    "Do not claim sole or independent authorship.",
+    "Does not establish professional software-engineering employment, backend/API expertise, database expertise, or AI/ML expertise."
+  ]
+}

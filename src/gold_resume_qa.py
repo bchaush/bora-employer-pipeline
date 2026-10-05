@@ -15,6 +15,7 @@ import re
 import zipfile
 import io
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from gold_resume_docx_builder import (
@@ -194,6 +195,59 @@ def _numbers(text: str) -> set:
     return set(re.findall(r"\d[\d,]*(?:\.\d+)?%?\+?", text))
 
 
+def load_approved_language(path: Optional[Path] = None) -> dict:
+    path = Path(path) if path is not None else Path(__file__).resolve().parents[1] / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def approved_language_problems(model: Mapping[str, Any], approved: Mapping[str, Any]) -> list:
+    problems = []
+    if approved.get("status") != "CURRENT_APPROVED" or (approved.get("approval") or {}).get("approved") is not True:
+        return ["approved language library is not CURRENT_APPROVED"]
+    bullet_index = {(item["text"], tuple(item["claim_ids"])) for item in approved.get("bullets", [])}
+    summary_index = {(item["text"], tuple(item["claim_ids"])) for item in approved.get("summaries", [])}
+    skill_index = {(item["row"], item["text"]): set(item["claim_ids"]) for item in approved.get("skills", [])}
+    summary = model["summary"]
+    if (summary["text"], tuple(summary.get("claim_ids", []))) not in summary_index:
+        problems.append("summary is not an exact approved summary/claim binding")
+    for entry in model["work"]:
+        for number, bullet in enumerate(entry["bullets"]):
+            if (bullet["text"], tuple(bullet.get("claim_ids", []))) not in bullet_index:
+                problems.append("work:%s:%d is not exact approved bullet language" % (entry["experience_id"], number))
+    project = model.get("project")
+    if project:
+        for number, bullet in enumerate(project["bullets"]):
+            if (bullet["text"], tuple(bullet.get("claim_ids", []))) not in bullet_index:
+                problems.append("project:%s:%d is not exact approved bullet language" % (project["experience_id"], number))
+    for row in model["skills"]:
+        cited = set(row.get("claim_ids", []))
+        for item in row["items"]:
+            required = skill_index.get((row["label"], item))
+            if required is None:
+                problems.append("skill %r is not approved for row %s" % (item, row["label"]))
+            elif not required.issubset(cited):
+                problems.append("skill %r lacks required claim lineage %s" % (item, sorted(required)))
+    return problems
+
+
+def candidate_control_character_problems(model: Mapping[str, Any]) -> list:
+    problems = []
+    def walk(value: Any, path: str) -> None:
+        if isinstance(value, str):
+            for ch in value:
+                if ord(ch) in (0x2028, 0x2029) or ord(ch) < 32 or ord(ch) == 127:
+                    problems.append("%s contains prohibited control character U+%04X" % (path, ord(ch)))
+                    break
+        elif isinstance(value, Mapping):
+            for key, child in value.items():
+                walk(child, path + "." + str(key))
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                walk(child, "%s[%d]" % (path, index))
+    walk(model, "model")
+    return problems
+
+
 def check_lineage(model: Mapping[str, Any], claims: Mapping[str, Any]) -> list:
     """Every candidate-facing factual text binds to approved claims; numbers are grounded in the cited claim wording."""
     problems = []
@@ -355,7 +409,7 @@ def artifact_grammar_checks(parsed: Mapping[str, Any], types: Sequence[str], met
 
 def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMetrics, claims: Mapping[str, Any],
                   identity: Mapping[str, Any], rebuild: Callable[[], GoldBuild], roster: Sequence[str],
-                  job_relevant_terms: Sequence[str] = ()) -> dict:
+                  job_relevant_terms: Sequence[str] = (), approved_language: Mapping[str, Any]) -> dict:
     try:
         parsed = parse_docx(build.docx_bytes)
     except Exception as error:  # a package the QA cannot read is a failed package
@@ -382,6 +436,10 @@ def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMe
                          "unapproved=%s" % [pair for pair in expected_pairs if pair not in approved_pairs]))
     problems = check_lineage(model, claims)
     checks.append(_check("CANDIDATE_TRUTH_LINEAGE", not problems, "; ".join(problems[:6])))
+    language_problems = approved_language_problems(model, approved_language)
+    checks.append(_check("APPROVED_RESUME_LANGUAGE_EXACT", not language_problems, "; ".join(language_problems[:6])))
+    control_problems = candidate_control_character_problems(model)
+    checks.append(_check("CANDIDATE_TEXT_CONTROL_CHARACTERS", not control_problems, "; ".join(control_problems[:6])))
     identity_problems = check_identity(model, identity)
     checks.append(_check("APPROVED_IDENTITY_VALUES", not identity_problems, "; ".join(identity_problems[:6])))
     hits = jargon_hits(_all_visible_text(model), job_relevant_terms)

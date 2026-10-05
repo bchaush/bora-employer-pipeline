@@ -156,15 +156,15 @@ FORBIDDEN_INFLATION_PHRASES = [
 
 exp_result = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(exp_result["valid"] is True, "experience repository invalid")
-assert_true(len(exp_result["index"]) == 7, "Experience count must be 7 (4 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records)")
+assert_true(len(exp_result["index"]) == 9, "Experience count must be 9 (4 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records)")
 ev_result = validate_evidence_repository(EVIDENCE_ROOT, experience_root=EXPERIENCE_ROOT)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 43, "Evidence count must be 43 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records + 1 Brandeis MSBA awarded attestation record)")
+assert_true(len(ev_result["index"]) == 49, "Evidence count must be 49 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records + 2 human-source-resolution records + 1 Brandeis MSBA awarded attestation record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 17, "Claim count must be 17 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval)")
+assert_true(claim_result["records_checked"] == 21, "Claim count must be 21 after the 2026-10-04 precision-cleanup additions")
 reusable = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
-assert_true(len(reusable) == 16, f"reusable claim count must be 16 (13 prior + UNWE + two D Commerce claims approved by Bora 2026-10-03), got {len(reusable)}")
+assert_true(len(reusable) == 21, f"reusable claim count must be 21 after Bora's 2026-10-04 precision-cleanup approvals, got {len(reusable)}")
 
 EVIDENCE_INDEX = ev_result["index"]
 CLAIM_INDEX = claim_result["index"]

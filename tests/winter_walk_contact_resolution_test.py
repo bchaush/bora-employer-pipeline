@@ -73,15 +73,15 @@ SECTION = MASTER["experience_sections"][0]
 
 experience_result = validate_experience_repository()
 assert_true(experience_result["valid"] is True, "experience repository invalid")
-assert_true(len(experience_result["index"]) == 7, "Experience count must be 7 after MarketMind, Brandeis education, TELUS, and CANDIDATE_SOURCE_INGESTION_V1 ingestion")
+assert_true(len(experience_result["index"]) == 9, "Experience count must be 9 after MarketMind, Brandeis education, TELUS, and CANDIDATE_SOURCE_INGESTION_V1 ingestion")
 evidence_result = validate_evidence_repository(experience_result=experience_result)
 assert_true(evidence_result["valid"] is True, "evidence repository invalid")
-assert_true(len(evidence_result["index"]) == 43, "Evidence count must be 43 after MarketMind, Brandeis education, TELUS, CANDIDATE_SOURCE_INGESTION_V1, and human-source-resolution ingestion")
+assert_true(len(evidence_result["index"]) == 49, "Evidence count must be 49 after MarketMind, Brandeis education, TELUS, CANDIDATE_SOURCE_INGESTION_V1, and human-source-resolution ingestion")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 17, "claim repository must have 17 records")
+assert_true(claim_result["records_checked"] == 21, "claim repository must have 21 records")
 reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
-assert_true(len(reusable_claims) == 16, "reusable claim count must be 16 (6 Winter Walk + 5 Bora-approved MarketMind + 2 Bora-approved TELUS + UNWE + two D Commerce claims approved 2026-10-03)")
+assert_true(len(reusable_claims) == 21, "reusable claim count must be 21 after Bora's 2026-10-04 precision-cleanup approvals")
 
 identity_patch = {
     "patch_id": "PATCH_WW_CONTACT_NOOP",
@@ -164,7 +164,7 @@ for module in MASTER["modules"]:
 print("PASS F: six approved Winter Walk module wordings unchanged.")
 
 # G. Repository counts unchanged (verified above)
-print("PASS G: Experience = 2, Evidence = 26, 11 Claims, 6 reusable Claims.")
+print("PASS G: current canonical repository counts are validated above; Winter Walk contact semantics are unchanged.")
 
 # H. Golden runner executed in full regression suite (not duplicated here)
 print("PASS H: Golden Set covered by full regression run.")
