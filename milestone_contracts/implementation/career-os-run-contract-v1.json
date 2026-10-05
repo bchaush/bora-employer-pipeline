@@ -1,0 +1,53 @@
+{
+  "milestone_id": "CAREER_OS_RUN_CONTRACT_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Make a fresh ChatGPT run fail closed when visible-evidence integrity, persistence verification or closeout is skipped: add the CLAIM_OWNER_ON_PAGE and MANDATORY_EVIDENCE_ON_PAGE pre-render QA gates and a pure local run-contract operator CLI with a runbook.",
+  "baseline_sha": "04f600d5e1b8dc58acbd1ab2c171f37a5c91878a",
+  "allowed_paths": [
+    "src/gold_resume_qa.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_run_v1.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "tests/career_os_run_contract_qa_v1_test.py",
+    "tests/career_os_run_contract_cli_v1_test.py",
+    "tests/career_os_precision_cleanup_v1_test.py",
+    "tests/pursue_to_gold_package_v1_test.py",
+    "milestone_contracts/implementation/career-os-run-contract-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/requirement_match.py",
+    "src/job_analysis.py",
+    "src/pursuit_decision.py",
+    "src/qualification_gate.py",
+    "src/application_logic.py",
+    "src/career_os_cloud_operate_v1.py",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "pre_render_qa takes a required crosswalk keyword and emits CLAIM_OWNER_ON_PAGE and MANDATORY_EVIDENCE_ON_PAGE.",
+    "Fracto-style S001 without LoanIQ and J.Jill-style S003 with SQL/Pandas without LoanIQ fail CLAIM_OWNER_ON_PAGE.",
+    "A mandatory SQL requirement whose LoanIQ claim appears only in skills fails MANDATORY_EVIDENCE_ON_PAGE.",
+    "The corrected real-data fixture (LoanIQ single project, B017+B018, no MarketMind) passes and is one-page-capable.",
+    "B017 under Winter Walk still fails.",
+    "The run CLI is pure and local; package persists exactly three files and verify-persisted is exact on names, sizes and SHA-256.",
+    "record-submit requires exactly one of --bora-confirmed or --receipt-file; closeout ends with the exact CAREER_OS_RUN_CLOSEOUT status line."
+  ],
+  "review_requirements": "STOP after PR creation for independent review. Do not merge.",
+  "required_tests": [
+    "python tests/career_os_precision_cleanup_v1_test.py",
+    "python tests/pursue_to_gold_package_v1_test.py",
+    "python tests/career_os_final_hygiene_v1_test.py",
+    "python tests/career_os_run_contract_qa_v1_test.py",
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Out of scope; STOP rather than broaden: matcher, qualification-gate, pursuit-authority or submission semantic changes; automatic bullet selection, fit scoring, cover-letter runtime, auto-submit; multi-project resume schema redesign; Drive, Sheets, web or any other external platform work, including PDF backfill or Ledger edits; changes to the canonical cloud adapter bytes.",
+    "Any need to change matcher, gate, pursuit or submission semantics, the cloud adapter bytes, or the resume schema, or to touch Drive/Sheets."
+  ],
+  "human_approval_requirements": "Bora retains consequential approval; merge and every Ledger/Drive write remain with Bora and the ChatGPT connectors."
+}

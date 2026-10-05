@@ -150,7 +150,7 @@ def run_gates(request: Mapping[str, Any]) -> dict:
     crosswalk = []
     for requirement in requirements:
         entries = by_requirement.get(requirement["requirement_id"], [])
-        crosswalk.append({"requirement_id": requirement["requirement_id"],
+        crosswalk.append({"requirement_id": requirement["requirement_id"], "importance": requirement["importance"],
                           "results": sorted({entry["result"] for entry in entries}) or ["UNMATCHED"],
                           "claim_ids": sorted({claim for entry in entries for claim in entry["claim_ids"]}),
                           "evidence_ids": sorted({evidence for entry in entries for evidence in entry["evidence_ids"]})})
@@ -196,7 +196,7 @@ def generate_gold_resume_stage(request: Mapping[str, Any], deps: PackageDeps) ->
     except GoldBuildError as error:
         raise PackageError("GOLD_BUILD_FAILED_" + error.code, error.detail) from error
     pre = pre_render_qa(model, build, metrics=metrics, claims=claims, evidence=deps.load_evidence(), identity=identity,
-                        rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), roster=list(deps.roster) if deps.roster is not None else display_roster(load_doctrine_roster(deps.doctrine_root), identity),
+                        rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), crosswalk=gates["crosswalk"], roster=list(deps.roster) if deps.roster is not None else display_roster(load_doctrine_roster(deps.doctrine_root), identity),
                         job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])), approved_language=deps.approved_language())
     if not pre["passed"]:
         raise PackageError("GOLD_PRE_RENDER_QA_FAILED", ",".join(pre["failed_checks"]), pre)
@@ -347,6 +347,7 @@ def approved_identity_from_canonical_records(root: Path, *, overlay: Optional[Ma
             if not any(url.startswith(link["url"] + "/") and url.split("://", 1)[1] in bound for url in project_urls.values()):
                 problems.append("GitHub profile is not the owner of an evidence-held project repository")
     education = []
+    education_experience_ids = {}
     for entry in overlay["education_display"]:
         if entry["experience_id"] not in experiences:
             problems.append("education experience %s is not in the experience registry" % entry["experience_id"])
@@ -361,6 +362,7 @@ def approved_identity_from_canonical_records(root: Path, *, overlay: Optional[Ma
             line += " | GPA: " + gpa["display_value"]
         if all(claims.get(claim_id, {}).get("human_approval") is True for claim_id in entry["required_claim_ids"]):
             education.append({"school": entry["school"], "date_range": entry["date_range"], "degree_line": line})
+            education_experience_ids[entry["school"]] = entry["experience_id"]
     sections = {section["experience_id"]: section for section in master["experience_sections"]}
     experience_identity = {}
     for entry in overlay["experience_display"]:
@@ -398,7 +400,7 @@ def approved_identity_from_canonical_records(root: Path, *, overlay: Optional[Ma
         raise PackageError("APPROVED_DISPLAY_BINDING_FAILED", "; ".join(problems))
     return {"contact": {"name": contact["name"], "location": contact.get("location"), "phone": contact.get("phone"), "email": contact["email"],
                         "profile_links": profile_links},
-            "education": education, "experiences": experience_identity, "project_links": project_links,
+            "education": education, "education_experience_ids": education_experience_ids, "experiences": experience_identity, "project_links": project_links,
             "organization_display": {entry["organization_truth"]: entry["employer"] for entry in overlay["experience_display"]
                                      if entry["experience_id"] in experience_identity}}
 

@@ -41,7 +41,7 @@ model = {
     "model_id": "PRECISION_BULMARMA_V1",
     "job_id": "PRECISION::FIXTURE",
     "contact": copy.deepcopy(identity["contact"]),
-    "summary": {"text": summary["S004"]["text"], "claim_ids": summary["S004"]["claim_ids"]},
+    "summary": {"text": summary["S001"]["text"], "claim_ids": summary["S001"]["claim_ids"]},
     "education": copy.deepcopy(identity["education"]),
     "skills": [
         {"label": "Process & quality", "items": ["Data reconciliation", "Data validation", "Process mapping", "UAT documentation"],
@@ -77,18 +77,16 @@ model = {
          ]},
     ],
     "project": {
-        "experience_id": "EXP_MM_001",
-        "name": identity["experiences"]["EXP_MM_001"]["project_name"],
-        "tech_label": identity["experiences"]["EXP_MM_001"]["project_tech_label"],
-        "link": identity["project_links"]["EXP_MM_001"],
+        "experience_id": "EXP_LOANIQ_001",
+        "name": identity["experiences"]["EXP_LOANIQ_001"]["project_name"],
+        "tech_label": identity["experiences"]["EXP_LOANIQ_001"]["project_tech_label"],
+        "link": identity["project_links"]["EXP_LOANIQ_001"],
         "bullets": [
-            {"text": bullet["B003"]["text"], "claim_ids": bullet["B003"]["claim_ids"]},
-            {"text": bullet["B004"]["text"], "claim_ids": bullet["B004"]["claim_ids"]},
-            {"text": bullet["B005"]["text"], "claim_ids": bullet["B005"]["claim_ids"]},
-            {"text": bullet["B007"]["text"], "claim_ids": bullet["B007"]["claim_ids"]},
+            {"text": bullet["B017"]["text"], "claim_ids": bullet["B017"]["claim_ids"]},
+            {"text": bullet["B018"]["text"], "claim_ids": bullet["B018"]["claim_ids"]},
         ],
     },
-    "crosswalk_exception": {"bulmarma_requirement_ids": ["REQ_FINANCE"]},
+    "crosswalk_exception": {"bulmarma_requirement_ids": ["REQ_FINANCE"]}, "roster_omissions": [{"roster_entry": "MarketMind", "reason": "NOT_RELEVANT_PER_CROSSWALK"}],
 }
 ok(not qa.approved_language_problems(model, library, claims["index"], evidence["index"]), "full real model uses only approved language")
 
@@ -142,6 +140,7 @@ pre = qa.pre_render_qa(
     rebuild=lambda: builder.build_gold_docx(model, metrics, fonts),
     roster=ptg.display_roster(builder.load_doctrine_roster(ROOT), identity),
     approved_language=library,
+    crosswalk=[],
 )
 ok(pre["passed"], "Bulmarma + one project full resume passes pre-render QA: " + json.dumps([x for x in pre["checks"] if not x["passed"]]))
 ok(build.layout["estimated_bottom_fraction"] >= 0.92, "predicted page fill stays at or above 92 percent")
