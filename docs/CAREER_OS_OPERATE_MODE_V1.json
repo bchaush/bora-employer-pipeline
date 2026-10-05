@@ -1,7 +1,7 @@
 {
   "spec": "CAREER_OS_OPERATE_MODE_V1",
   "run_contract": {
-    "contract_id": "CAREER_OS_RUN_CONTRACT_V1",
+    "contract_id": "CAREER_OS_RUN_CONTRACT_V1_1",
     "cli": "src/career_os_run_v1.py",
     "runbook": "docs/CAREER_OS_OPERATE_MODE_V1.md",
     "state_machine": [
@@ -19,9 +19,32 @@
     ],
     "step_done_rule": "A step is done only when its receipt exists.",
     "final_reply_rule": "Every run's final reply ends with the closeout block.",
-    "closeout_final_lines": ["CAREER_OS_RUN_CLOSEOUT: COMPLETE", "CAREER_OS_RUN_CLOSEOUT: INCOMPLETE"],
+    "closeout_final_lines": [
+      "CAREER_OS_RUN_CLOSEOUT: COMPLETE",
+      "CAREER_OS_RUN_CLOSEOUT: INCOMPLETE"
+    ],
     "cloud_render_profile": "CHATGPT_CLOUD_OPERATIONAL_RENDER_V1",
     "persist_file_count": 3,
+    "upload_conversion": "FORBIDDEN",
+    "ledger_dedupe_keys": [
+      "Job_ID",
+      "Official_URL"
+    ],
+    "package_ledger_identity_keys": [
+      "Job_ID",
+      "Company",
+      "Role",
+      "Official_URL"
+    ],
+    "live_settings_keys": [
+      "CANONICAL_MAIN_SHA",
+      "RUNTIME_BUNDLE_SHA256",
+      "CLOUD_ADAPTER_SHA256",
+      "OPERATE_MODE_CONFIG_SHA256",
+      "OPERATE_MODE_RUNBOOK_SHA256",
+      "GOVERNED_FONTS_SHA256",
+      "CLOUD_RENDER_PROFILE"
+    ],
     "submission_authority": "BORA_ONLY",
     "auto_submit": false,
     "cover_letter_runtime": false

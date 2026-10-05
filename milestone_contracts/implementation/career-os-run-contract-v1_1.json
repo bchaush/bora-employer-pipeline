@@ -1,0 +1,56 @@
+{
+  "milestone_id": "CAREER_OS_RUN_CONTRACT_V1_1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Make the merged CAREER_OS_RUN_CONTRACT_V1 executable against the live Production Ledger/SETTINGS shapes: hash actual runtime/font ZIPs, use live SETTINGS keys and live JOBS/APPLICATIONS/LOG schemas, dedupe from Ledger, bind packages to Ledger identity, and make closeout slate-authoritative and plan-complete.",
+  "baseline_sha": "c5d499ddb71dade1f31dc173fb146e7d5188cf20",
+  "allowed_paths": [
+    "src/career_os_run_v1.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "tests/career_os_run_contract_cli_v1_test.py",
+    "milestone_contracts/implementation/career-os-run-contract-v1_1.json"
+  ],
+  "forbidden_paths": [
+    "src/gold_resume_qa.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/requirement_match.py",
+    "src/job_analysis.py",
+    "src/pursuit_decision.py",
+    "src/qualification_gate.py",
+    "src/application_logic.py",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "schemas/gold_resume_model.schema.json",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "preflight uses the live SETTINGS keys and hashes the actual downloaded runtime ZIP and governed-fonts ZIP.",
+    "record-submit emits exactly the live 10-column APPLICATIONS shape, exact 9-column LOG shape, and only Job_ID/Application_Status for JOBS.",
+    "closeout extracts sha256:<64hex> from Resume_Version and never silently skips a required plan for a newly processed submitted role.",
+    "slate consumes a live-shape Ledger readback, marks Job_ID/Official_URL duplicates ALREADY_TRACKED, and emits no duplicate JOBS row.",
+    "package consumes a live-shape Ledger readback and requires exact Job_ID/Company/Role/Official_URL identity; blank Official_URL fails closed.",
+    "closeout consumes the slate receipt rather than a hand-authored batch list.",
+    "A live-shape end-to-end fixture preflight->slate->package->verify-persisted->record-submit->closeout reaches COMPLETE.",
+    "Runbook contains exact command lines, minimal input examples, and forbids Google Docs conversion for persisted artifacts."
+  ],
+  "review_requirements": "STOP after one PR is opened. Do not merge until Bora obtains a fresh independent read-only SAFE review.",
+  "required_tests": [
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python tests/career_os_run_contract_qa_v1_test.py",
+    "python tests/career_os_precision_cleanup_v1_test.py",
+    "python tests/pursue_to_gold_package_v1_test.py",
+    "python tests/career_os_final_hygiene_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need to change the #122 resume QA gates, matcher, qualification, pursuit, Candidate Truth, approved resume language, renderer, cloud adapter, or external submission semantics.",
+    "Any request to write Drive/Sheets/application state from this engineering PR.",
+    "Any need for UI, database, service, scraper, scoring, cover-letter runtime, auto-submit, or automatic bullet selection."
+  ],
+  "human_approval_requirements": "Bora retains all consequential decisions, all Ledger/Drive writes, all application submission authority, merge authority, and the OpalAI/Liberty's Promise decisions."
+}
