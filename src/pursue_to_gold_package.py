@@ -78,6 +78,7 @@ class PackageDeps:
     fonts: FontMetrics
     render: Callable[[bytes, list, str], tuple]  # (docx_bytes, structure_map, out_dir) -> (record, pdf_bytes or None)
     renderer_identity: Callable[[], Mapping[str, str]]
+    approved_language: Optional[Callable[[], Mapping[str, Any]]] = None
     pdf_facts: Callable[[bytes], Mapping[str, Any]] = read_pdf_facts
     current_state: Optional[Callable[[str], tuple]] = None  # job_id -> (jobs_row, decision_log_rows) re-read at the end
     doctrine_root: Path = ROOT
@@ -195,7 +196,7 @@ def generate_gold_resume_stage(request: Mapping[str, Any], deps: PackageDeps) ->
         raise PackageError("GOLD_BUILD_FAILED_" + error.code, error.detail) from error
     pre = pre_render_qa(model, build, metrics=metrics, claims=claims, identity=identity,
                         rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), roster=list(deps.roster) if deps.roster is not None else display_roster(load_doctrine_roster(deps.doctrine_root), identity),
-                        job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])))
+                        job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])), approved_language=deps.approved_language() if deps.approved_language else None)
     if not pre["passed"]:
         raise PackageError("GOLD_PRE_RENDER_QA_FAILED", ",".join(pre["failed_checks"]), pre)
     staging = Path(tempfile.mkdtemp(prefix="gold-stage-", dir=_ensure_dir(frozen_request["output_root"])))
@@ -372,8 +373,15 @@ def approved_identity_from_canonical_records(root: Path, *, overlay: Optional[Ma
             if section is None or section.get("display_title") != entry["title"] or approval.get("approved") is not True \
                     or section.get("date_range", "").replace(" – ", " - ") != entry["date_range"]:
                 problems.append("title or dates of %s differ from the protected master approval" % entry["experience_id"])
-        elif entry["title"].lower() not in fact(entry.get("formal_title_evidence_id", "")).lower():
-            problems.append("title of %s is not the employer-issued formal position" % entry["experience_id"])
+        elif entry["title_basis"] == "EMPLOYER_FORMAL_POSITION_CASE_NORMALIZED":
+            if entry["title"].lower() not in fact(entry.get("formal_title_evidence_id", "")).lower():
+                problems.append("title of %s is not the employer-issued formal position" % entry["experience_id"])
+        elif entry["title_basis"] == "CANDIDATE_ATTESTED_PROFILE_HISTORY":
+            evidence_id = entry.get("identity_evidence_id", "")
+            identity_evidence = evidence.get(evidence_id) or {}
+            observed = fact(evidence_id)
+            if identity_evidence.get("evidence_state") != "OBSERVED" or entry["title"] not in observed or entry["date_range"] not in observed:
+                problems.append("candidate-attested title or dates of %s are not held by the OBSERVED identity evidence" % entry["experience_id"])
         experience_identity[entry["experience_id"]] = {"title": entry["title"], "employer": entry["employer"], "date_range": entry["date_range"]}
     project_links = {}
     for item in overlay["project_display"]:
@@ -447,7 +455,8 @@ def make_governed_deps(root: Path, *, verification_record: Mapping[str, Any], wo
 
     render = governed_render_function(root, verification_record=verification_record, work_dir=work_dir)
 
-    return PackageDeps(load_claims=lambda: claims_result["index"], validate_lineage=lineage,
+    approved_language = json.loads((root / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))
+    return PackageDeps(load_claims=lambda: claims_result["index"], approved_language=lambda: approved_language, validate_lineage=lineage,
                        identity_provider=lambda: approved_identity_from_canonical_records(root, claims=claims_result["index"], evidence=evidence_result["index"]), fonts=fonts, render=render,
                        renderer_identity=lambda: {"adapter_sha256": adapter_sha,
                                                   "operator_verification_evidence_digest": verification_record["evidence_digest"]},

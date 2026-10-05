@@ -20,7 +20,7 @@
     "regulatory compliance expertise",
     "production ML platform"
   ],
-  "human_approval": false,
+  "human_approval": true,
   "date": "2026-10-04",
-  "version": "1"
+  "version": "2"
 }

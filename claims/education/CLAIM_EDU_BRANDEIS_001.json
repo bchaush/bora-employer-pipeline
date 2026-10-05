@@ -1,0 +1,24 @@
+{
+  "claim_id": "CLAIM_EDU_BRANDEIS_001",
+  "wording": "Holds a Master of Science in Business Analytics from Brandeis University.",
+  "evidence_ids": [
+    "EDU_BRANDEIS_IDENTITY_001",
+    "EDU_BRANDEIS_AWARDED_ATTESTATION_001"
+  ],
+  "evidence_state": "OBSERVED",
+  "allowed_contexts": [
+    "resume",
+    "education",
+    "interview",
+    "networking"
+  ],
+  "forbidden_contexts": [
+    "independently verified degree conferral",
+    "official diploma received",
+    "STEM/CIP designation",
+    "exact conferral date"
+  ],
+  "human_approval": true,
+  "date": "2026-10-04",
+  "version": "1"
+}

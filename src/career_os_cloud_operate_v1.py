@@ -253,8 +253,10 @@ def make_cloud_operate_deps(root: Path, font_dir: Path, *, work_dir: Path, expec
     renderer = make_cloud_renderer(root, font_dir, work_dir=Path(work_dir))
     adapter_sha = _sha(Path(__file__).read_bytes())
     font_evidence = _sha(_canonical_bytes({p.name: _sha(p.read_bytes()) for p in sorted(font_dir.glob("*.ttf"))}))
+    approved_language = json.loads((root / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))
     return ptg.PackageDeps(
         load_claims=lambda: claims_result["index"],
+        approved_language=lambda: approved_language,
         validate_lineage=lineage,
         identity_provider=lambda: ptg.approved_identity_from_canonical_records(root, claims=claims_result["index"], evidence=evidence_result["index"]),
         fonts=fonts,
@@ -276,7 +278,14 @@ def run_request(request_path: str, runtime_root: str, font_dir: str, output_root
     deps=make_cloud_operate_deps(root,fonts,work_dir=out,expected_main_sha=expected_main_sha)
     result=ptg.generate_gold_resume_stage(request,deps)
     sidecar={"spec":"CAREER_OS_CLOUD_OPERATE_RESULT_V1","profile":PROFILE_ID,"canonical_main_sha":expected_main_sha,"package_generation_id":result['manifest']['package_generation_id'],"human_review":result['manifest']['human_review'],"submission_authority":"BORA_ONLY","operator_equivalent":False,"note":"Operational cloud render; canonical Gold logic and governed font bytes, but not byte-identical to the historical OPERATOR environment."}
-    Path(result['output_dir'],'cloud_operate_manifest.json').write_bytes(_canonical_bytes(sidecar)+b'\n')
+    package_dir = Path(result['output_dir'])
+    package_dir.joinpath('cloud_operate_manifest.json').write_bytes(_canonical_bytes(sidecar)+b'\n')
+    from gold_package_handoff import REVIEW_FILE, INVENTORY_FILE, format_claim_wording_review_table, package_persistence_inventory
+    review = json.loads(package_dir.joinpath(REVIEW_FILE).read_text(encoding='utf-8'))
+    print(format_claim_wording_review_table(review))
+    inventory = package_persistence_inventory(package_dir)
+    package_dir.joinpath(INVENTORY_FILE).write_bytes(_canonical_bytes(inventory)+b'\n')
+    result['package_inventory'] = inventory
     return result
 
 

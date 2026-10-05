@@ -39,6 +39,8 @@ PACKAGE_FILES = (
 )
 # Written next to the package by the CHATGPT_CLOUD_OPERATIONAL_RENDER_V1 lane (career_os_cloud_operate_v1.run_request) only.
 CLOUD_LANE_FILES = ("cloud_operate_manifest.json",)
+INVENTORY_FILE = "package_inventory.json"
+META_FILES = (INVENTORY_FILE,)
 UNSUPPORTED_BY_CONNECTOR = "UNSUPPORTED_BY_CONNECTOR"
 
 
@@ -61,13 +63,23 @@ def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def format_claim_wording_review_table(review: Mapping[str, Any]) -> str:
+    lines = ["location | candidate text | claim ID | approved claim wording"]
+    for row in review.get("rows", []):
+        cited = row.get("cited_claims", []) or [{"claim_id": "", "approved_claim_wording": ""}]
+        for claim in cited:
+            values = [row.get("location", ""), row.get("candidate_text", ""), claim.get("claim_id", ""), claim.get("approved_claim_wording", "")]
+            lines.append(" | ".join(str(value).replace("\n", " ").replace("\r", " ") for value in values))
+    return "\n".join(lines)
+
+
 def package_persistence_inventory(package_dir: Any) -> dict:
     """The exact files to persist for one generated package, with byte sizes and SHA-256. Fails closed (problems list) when a required file
     is missing, an unexpected file is present, or the manifest's DOCX/PDF hashes disagree with the files on disk."""
     package_dir = Path(package_dir)
     present = {path.name for path in package_dir.iterdir() if path.is_file()} if package_dir.is_dir() else set()
     problems = ["MISSING:" + name for name in PACKAGE_FILES if name not in present]
-    problems += ["UNEXPECTED:" + name for name in sorted(present - set(PACKAGE_FILES) - set(CLOUD_LANE_FILES))]
+    problems += ["UNEXPECTED:" + name for name in sorted(present - set(PACKAGE_FILES) - set(CLOUD_LANE_FILES) - set(META_FILES))]
     files = []
     for name in [*PACKAGE_FILES, *CLOUD_LANE_FILES]:
         if name in present:

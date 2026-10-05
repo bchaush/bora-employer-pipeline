@@ -1,13 +1,13 @@
 {
   "record_id": "BORA_GOLD_APPROVED_DISPLAY_V1",
   "kind": "APPROVED_DISPLAY_OVERLAY_DATA_RECORD",
-  "locked_date": "2026-10-03",
+  "locked_date": "2026-10-04",
   "authority_scope": "Candidate-facing Gold resume presentation overlay only. It is never Candidate Truth: GPA, organization names, titles, dates, claims and evidence stay exactly as recorded in evidence/, claims/, experiences/ and resume/master/. This record binds Bora's explicit approval of display choices and of the canonical candidate-facing link destinations, and every entry names the canonical record it is bound to. The Gold exemplar is not evidence for anything recorded here.",
   "approval": {
     "approved": true,
     "approved_by": "Bora",
-    "approved_on": "2026-10-03",
-    "approval_note": "Explicit approval given in the Career OS completion conversation: GPA displayed as 3.64 while truth stays 3.635 (presentation rounding only); TELUS Digital Bulgaria displayed as TELUS Digital; D Commerce Bank displayed as Junior Expert; the email, LinkedIn, GitHub profile and MarketMind repository destinations as canonical candidate-facing links with the labels LinkedIn, GitHub and GitHub."
+    "approved_on": "2026-10-04",
+    "approval_note": "Explicit approval given in the Career OS completion conversation: GPA displayed as 3.64 while truth stays 3.635 (presentation rounding only); TELUS Digital Bulgaria displayed as TELUS Digital; D Commerce Bank displayed as Junior Expert; the email, LinkedIn, GitHub profile and MarketMind repository destinations as canonical candidate-facing links with the labels LinkedIn, GitHub and GitHub. On 2026-10-04 Bora additionally approved title-case name presentation, the Bulmarma candidate-attested display identity, and pinned LoanIQ and Market Empire project links."
   },
   "contact_links": [
     {
@@ -76,6 +76,16 @@
       "formal_title_evidence_id": "DCOMMERCE_REFERENCE_001",
       "date_range": "Aug 2021 - Sep 2022",
       "date_basis": "DCOMMERCE_REFERENCE_001 (intern from 09.08.2021, employed until 19.09.2022); corroborated by DCOMMERCE_LINKEDIN_PERIOD_001 Aug 2021 - Sep 2022."
+    },
+    {
+      "experience_id": "EXP_BULMARMA_001",
+      "employer": "Bulmarma 2008 Ltd",
+      "organization_truth": "Bulmarma 2008 Ltd",
+      "title": "Financial & Business Analyst",
+      "title_basis": "CANDIDATE_ATTESTED_PROFILE_HISTORY",
+      "identity_evidence_id": "BULMARMA_IDENTITY_ATTESTED_002",
+      "date_range": "Sep 2022 - Nov 2023",
+      "date_basis": "BULMARMA_IDENTITY_ATTESTED_002 (OBSERVED candidate attestation + professional-profile history)."
     }
   ],
   "project_display": [
@@ -87,6 +97,26 @@
         "label": "GitHub",
         "url": "https://github.com/bchaush/marketmind-ai",
         "bound_evidence_id": "MM_AUTHOR_001"
+      }
+    },
+    {
+      "experience_id": "EXP_LOANIQ_001",
+      "name": "LoanIQ",
+      "tech_label": "Python / SQL / XGBoost Credit-Risk Research Prototype",
+      "link": {
+        "label": "GitHub",
+        "url": "https://github.com/bchaush/loaniq-credit-risk",
+        "bound_evidence_id": "LOANIQ_REPO_001"
+      }
+    },
+    {
+      "experience_id": "EXP_MARKET_EMPIRE_001",
+      "name": "Market Empire",
+      "tech_label": "React / TypeScript Financial-Education Demo",
+      "link": {
+        "label": "GitHub",
+        "url": "https://github.com/bchaush/market-empire",
+        "bound_evidence_id": "MARKET_EMPIRE_REPO_001"
       }
     }
   ]
