@@ -33,6 +33,7 @@
     "tests/candidate_source_ingestion_v1_test.py",
     "tests/career_os_final_hygiene_v1_test.py",
     "schemas/gold_resume_model.schema.json",
+    "golden-tests/run_job_analysis_golden_set.py",
     "tests/application_clause_qualifier_semantics_v1_test.py",
     "tests/compound_requirement_semantics_v1_test.py",
     "tests/education_evidence_v1_test.py",
