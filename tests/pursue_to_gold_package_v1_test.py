@@ -95,7 +95,8 @@ def fixture_claims() -> dict:
 def fixture_evidence() -> dict:
     mapping = {"A1": "SYN_EXP_A", "A2": "SYN_EXP_A", "A3": "SYN_EXP_A", "A4": "SYN_EXP_A",
                "B1": "SYN_EXP_B", "B2": "SYN_EXP_B", "C1": "SYN_EXP_C", "C2": "SYN_EXP_C",
-               "P1": "SYN_EXP_P", "P2": "SYN_EXP_P", "P3": "SYN_EXP_P", "P4": "SYN_EXP_P", "P5": "SYN_EXP_P"}
+               "P1": "SYN_EXP_P", "P2": "SYN_EXP_P", "P3": "SYN_EXP_P", "P4": "SYN_EXP_P", "P5": "SYN_EXP_P",
+               "S": "SYN_EXP_EDU_1", "K1": "SYN_EXP_A", "K2": "SYN_EXP_P", "K3": "SYN_EXP_C"}
     return {"SYN_EVID_" + key: {"evidence_id": "SYN_EVID_" + key, "experience_id": experience_id}
             for key, experience_id in mapping.items()}
 
@@ -144,6 +145,7 @@ def fixture_identity() -> dict:
     return {"contact": {"name": "Jordan Example", "location": "Springfield, IL", "phone": "+1 555 010 0199", "email": EMAIL,
                         "profile_links": [{"label": "LinkedIn", "url": LINKEDIN}, {"label": "GitHub", "url": GITHUB}]},
             "education": copy.deepcopy(model["education"]),
+            "education_experience_ids": {"Example State University": "SYN_EXP_EDU_1", "Sample Institute of Economics": "SYN_EXP_EDU_2"},
             "experiences": {**{entry["experience_id"]: {"title": entry["title"], "employer": entry["employer"], "date_range": entry["date_range"]}
                                for entry in model["work"]},
                             "SYN_EXP_P": {"project_name": "Fixture Prototype", "project_tech_label": "Python / Streamlit Market-Screening Prototype"}},
@@ -175,13 +177,19 @@ def build_gold(model, fonts=None):
     return builder.build_gold_docx(model, metrics(), fonts or synthetic_fonts())
 
 
-def run_pre_qa(model=None, build=None, claims=None, identity=None, roster=ROSTER, fonts=None, terms=()):
+def fixture_crosswalk() -> list:
+    return [{"requirement_id": "REQ_1", "importance": "MANDATORY", "results": ["STRONG"], "claim_ids": ["SYN_CLAIM_A3"],
+             "evidence_ids": ["SYN_EVID_A3"]}]
+
+
+def run_pre_qa(model=None, build=None, claims=None, identity=None, roster=ROSTER, fonts=None, terms=(), crosswalk=None):
     model = model if model is not None else fixture_model()
     fonts = fonts or synthetic_fonts()
     build = build or build_gold(model, fonts)
     return qa.pre_render_qa(model, build, metrics=metrics(), claims=claims if claims is not None else fixture_claims(), evidence=fixture_evidence(),
                             identity=identity if identity is not None else fixture_identity(),
-                            rebuild=lambda: build_gold(model, fonts), roster=roster, job_relevant_terms=terms, approved_language=fixture_language())
+                            rebuild=lambda: build_gold(model, fonts), roster=roster, job_relevant_terms=terms, approved_language=fixture_language(),
+                            crosswalk=crosswalk if crosswalk is not None else fixture_crosswalk())
 
 
 def failed(result) -> set:
@@ -914,7 +922,7 @@ def operator_main(argv: list) -> int:
     metrics_value = metrics()
     build = builder.build_gold_docx(model, metrics_value, fonts)
     pre = qa.pre_render_qa(model, build, metrics=metrics_value, claims=fixture_claims(), evidence=fixture_evidence(), identity=fixture_identity(),
-                           rebuild=lambda: builder.build_gold_docx(model, metrics_value, fonts), roster=ROSTER, approved_language=fixture_language())
+                           rebuild=lambda: builder.build_gold_docx(model, metrics_value, fonts), roster=ROSTER, approved_language=fixture_language(), crosswalk=fixture_crosswalk())
     print(json.dumps({"pre_render_qa_passed": pre["passed"], "failed": pre["failed_checks"], "layout": build.layout}, sort_keys=True))
     assert_true(pre["passed"], "pre-render Gold QA passes with the real pinned fonts")
     render = ptg.governed_render_function(ROOT, verification_record=verification, work_dir=str(work / "inputs"))

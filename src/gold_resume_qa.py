@@ -241,6 +241,76 @@ def approved_language_problems(model: Mapping[str, Any], approved: Mapping[str, 
     return problems
 
 
+POSITIVE_MATCH_RESULTS = frozenset({"STRONG", "SUPPORTED", "PARTIAL"})
+
+
+def _claim_owner_ids(claim_id: str, claims: Mapping[str, Any], evidence: Mapping[str, Any]) -> set:
+    claim = claims.get(claim_id) or {}
+    owners = {(evidence.get(evidence_id) or {}).get("experience_id") for evidence_id in claim.get("evidence_ids", [])}
+    return {owner for owner in owners if owner}
+
+
+def rendered_owner_kinds(model: Mapping[str, Any], identity: Mapping[str, Any]) -> dict:
+    """experience_id -> WORK | PROJECT | EDUCATION for every entry actually rendered. Work/project owners are their own
+    experience_id; a school maps to its canonical education experience_id through the approved identity."""
+    owners = {entry["experience_id"]: "WORK" for entry in model["work"]}
+    project = model.get("project")
+    if project:
+        owners[project["experience_id"]] = "PROJECT"
+    school_owner = identity.get("education_experience_ids", {})
+    for school in model["education"]:
+        owner = school_owner.get(school["school"])
+        if owner:
+            owners[owner] = "EDUCATION"
+    return owners
+
+
+def claim_owner_on_page_problems(model: Mapping[str, Any], claims: Mapping[str, Any], evidence: Mapping[str, Any],
+                                 identity: Mapping[str, Any], approved: Mapping[str, Any]) -> list:
+    """Visible-evidence integrity: every summary claim and every skill item must be owned by at least one rendered entry."""
+    rendered = set(rendered_owner_kinds(model, identity))
+    problems = []
+    for claim_id in model["summary"].get("claim_ids", []):
+        owners = _claim_owner_ids(claim_id, claims, evidence)
+        if not owners:
+            problems.append("summary claim %s has no canonical evidence owner" % claim_id)
+        elif not owners & rendered:
+            problems.append("summary claim %s owner %s is not rendered" % (claim_id, sorted(owners)))
+    skill_index = {(item["row"], item["text"]): list(item["claim_ids"]) for item in approved.get("skills", [])}
+    for row in model["skills"]:
+        for item in row["items"]:
+            approved_claims = skill_index.get((row["label"], item))
+            if not approved_claims:
+                problems.append("skill %r in row %s has no approved claim binding" % (item, row["label"]))
+            elif not any(_claim_owner_ids(claim_id, claims, evidence) & rendered for claim_id in approved_claims):
+                problems.append("skill %r in row %s has no rendered evidence owner for %s" % (item, row["label"], sorted(approved_claims)))
+    return problems
+
+
+def mandatory_evidence_on_page_problems(model: Mapping[str, Any], crosswalk: Sequence[Mapping[str, Any]], claims: Mapping[str, Any],
+                                        evidence: Mapping[str, Any], identity: Mapping[str, Any]) -> list:
+    """A positively matched MANDATORY requirement needs a matched claim cited by a rendered work/project bullet or owned by a
+    rendered education entry. Summary-only and skill-only mentions do not count."""
+    kinds = rendered_owner_kinds(model, identity)
+    education = {owner for owner, kind in kinds.items() if kind == "EDUCATION"}
+    bullet_claims = {claim for entry in model["work"] for bullet in entry["bullets"] for claim in bullet.get("claim_ids", [])}
+    project = model.get("project")
+    if project:
+        bullet_claims |= {claim for bullet in project["bullets"] for claim in bullet.get("claim_ids", [])}
+    problems = []
+    for entry in crosswalk:
+        requirement_id = entry.get("requirement_id")
+        if "importance" not in entry:
+            problems.append("%s: crosswalk entry has no importance" % requirement_id)
+        elif entry["importance"] == "MANDATORY" and POSITIVE_MATCH_RESULTS & set(entry.get("results", [])):
+            matched = entry.get("claim_ids", [])
+            if not matched:
+                problems.append("%s: positive mandatory match has no claim_ids" % requirement_id)
+            elif not any(claim in bullet_claims or _claim_owner_ids(claim, claims, evidence) & education for claim in matched):
+                problems.append("%s: no matched claim is cited by a rendered work/project bullet or owned by a rendered education entry" % requirement_id)
+    return problems
+
+
 def candidate_control_character_problems(model: Mapping[str, Any]) -> list:
     problems = []
     def walk(value: Any, path: str) -> None:
@@ -420,7 +490,8 @@ def artifact_grammar_checks(parsed: Mapping[str, Any], types: Sequence[str], met
 
 def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMetrics, claims: Mapping[str, Any],
                   evidence: Mapping[str, Any], identity: Mapping[str, Any], rebuild: Callable[[], GoldBuild], roster: Sequence[str],
-                  job_relevant_terms: Sequence[str] = (), approved_language: Mapping[str, Any]) -> dict:
+                  job_relevant_terms: Sequence[str] = (), approved_language: Mapping[str, Any],
+                  crosswalk: Sequence[Mapping[str, Any]]) -> dict:
     try:
         parsed = parse_docx(build.docx_bytes)
     except Exception as error:  # a package the QA cannot read is a failed package
@@ -449,6 +520,10 @@ def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMe
     checks.append(_check("CANDIDATE_TRUTH_LINEAGE", not problems, "; ".join(problems[:6])))
     language_problems = approved_language_problems(model, approved_language, claims, evidence)
     checks.append(_check("APPROVED_RESUME_LANGUAGE_EXACT", not language_problems, "; ".join(language_problems[:6])))
+    owner_problems = claim_owner_on_page_problems(model, claims, evidence, identity, approved_language)
+    checks.append(_check("CLAIM_OWNER_ON_PAGE", not owner_problems, "; ".join(owner_problems[:6])))
+    mandatory_problems = mandatory_evidence_on_page_problems(model, crosswalk, claims, evidence, identity)
+    checks.append(_check("MANDATORY_EVIDENCE_ON_PAGE", not mandatory_problems, "; ".join(mandatory_problems[:6])))
     control_problems = candidate_control_character_problems(model)
     checks.append(_check("CANDIDATE_TEXT_CONTROL_CHARACTERS", not control_problems, "; ".join(control_problems[:6])))
     identity_problems = check_identity(model, identity)

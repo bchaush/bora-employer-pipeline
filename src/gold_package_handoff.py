@@ -95,22 +95,43 @@ def package_persistence_inventory(package_dir: Any) -> dict:
     return {"package_dir_name": package_dir.name, "files": files, "problems": sorted(problems), "complete": not problems}
 
 
-def verify_persisted(inventory: Mapping[str, Any], persisted: Mapping[str, Mapping[str, Any]]) -> dict:
+PERSIST_BUNDLE_ROLES = ("resume_pdf", "resume_docx", "package_bundle")
+
+
+def persist_plan_inventory(plan: Mapping[str, Any]) -> dict:
+    """The inventory of the exact three-file persist bundle (resume PDF, resume DOCX, package_bundle.zip) named by a persist plan.
+    Anything other than exactly those three roles, each once, is an inventory problem rather than a silent partial bundle."""
+    files = [dict(item) for item in plan.get("files", [])]
+    problems = []
+    if sorted(item.get("role") for item in files) != sorted(PERSIST_BUNDLE_ROLES):
+        problems.append("BUNDLE_ROLES_NOT_EXACTLY_THREE")
+    if len({item.get("name") for item in files}) != len(files):
+        problems.append("BUNDLE_DUPLICATE_NAME")
+    return {"package_dir_name": plan.get("target_folder_name"), "files": files, "problems": sorted(problems), "complete": not problems}
+
+
+def verify_persisted(inventory: Mapping[str, Any], persisted: Mapping[str, Mapping[str, Any]], *, exact: bool = False) -> dict:
     """Compare what the Drive connector reports (name -> {"sha256": ...} or {"status": UNSUPPORTED_BY_CONNECTOR, "reason": ...}) with the
     inventory. A recorded unsupported byte type is an honest, visible gap; a missing, unexplained or hash-mismatched file is a failure."""
     if not inventory.get("complete"):
-        return {"status": "PERSISTENCE_FAILED", "missing": [], "hash_mismatch": [], "unsupported_recorded": [], "inventory_problems": list(inventory.get("problems", []))}
-    missing, mismatch, unsupported = [], [], []
+        return {"status": "PERSISTENCE_FAILED", "missing": [], "hash_mismatch": [], "size_mismatch": [], "unexpected": [], "unsupported_recorded": [], "inventory_problems": list(inventory.get("problems", []))}
+    missing, mismatch, size_mismatch, unsupported = [], [], [], []
     for item in inventory["files"]:
         report: Optional[Mapping[str, Any]] = persisted.get(item["name"])
         if report is None:
             missing.append(item["name"])
         elif report.get("status") == UNSUPPORTED_BY_CONNECTOR:
-            if report.get("reason"):
+            # An exact bundle has no honest gaps: an unsupported byte type means the bundle is not persisted.
+            if report.get("reason") and not exact:
                 unsupported.append({"name": item["name"], "reason": report["reason"]})
             else:
                 missing.append(item["name"])
         elif report.get("sha256") != item["sha256"]:
             mismatch.append(item["name"])
-    status = "PERSISTENCE_FAILED" if missing or mismatch else ("PERSISTED_WITH_RECORDED_GAPS" if unsupported else "PERSISTED_COMPLETE")
-    return {"status": status, "missing": sorted(missing), "hash_mismatch": sorted(mismatch), "unsupported_recorded": unsupported, "inventory_problems": []}
+        elif "byte_size" in report and "byte_size" in item and report["byte_size"] != item["byte_size"]:
+            size_mismatch.append(item["name"])
+    unexpected = sorted(set(persisted) - {item["name"] for item in inventory["files"]}) if exact else []
+    failed = missing or mismatch or size_mismatch or unexpected
+    status = "PERSISTENCE_FAILED" if failed else ("PERSISTED_WITH_RECORDED_GAPS" if unsupported else "PERSISTED_COMPLETE")
+    return {"status": status, "missing": sorted(missing), "hash_mismatch": sorted(mismatch), "size_mismatch": sorted(size_mismatch), "unexpected": unexpected,
+            "unsupported_recorded": unsupported, "inventory_problems": []}
