@@ -73,6 +73,7 @@ class PackageDeps:
     """Every external effect, injected. Production wiring is make_governed_deps; tests inject deterministic fakes."""
 
     load_claims: Callable[[], Mapping[str, Any]]
+    load_evidence: Callable[[], Mapping[str, Any]]
     approved_language: Callable[[], Mapping[str, Any]]
     validate_lineage: Callable[[Mapping[str, Any]], list]
     identity_provider: Callable[[], Mapping[str, Any]]
@@ -194,7 +195,7 @@ def generate_gold_resume_stage(request: Mapping[str, Any], deps: PackageDeps) ->
         build = build_gold_docx(model, metrics, deps.fonts)
     except GoldBuildError as error:
         raise PackageError("GOLD_BUILD_FAILED_" + error.code, error.detail) from error
-    pre = pre_render_qa(model, build, metrics=metrics, claims=claims, identity=identity,
+    pre = pre_render_qa(model, build, metrics=metrics, claims=claims, evidence=deps.load_evidence(), identity=identity,
                         rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), roster=list(deps.roster) if deps.roster is not None else display_roster(load_doctrine_roster(deps.doctrine_root), identity),
                         job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])), approved_language=deps.approved_language())
     if not pre["passed"]:
@@ -456,7 +457,8 @@ def make_governed_deps(root: Path, *, verification_record: Mapping[str, Any], wo
     render = governed_render_function(root, verification_record=verification_record, work_dir=work_dir)
 
     approved_language = json.loads((root / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))
-    return PackageDeps(load_claims=lambda: claims_result["index"], approved_language=lambda: approved_language, validate_lineage=lineage,
+    return PackageDeps(load_claims=lambda: claims_result["index"], load_evidence=lambda: evidence_result["index"],
+                       approved_language=lambda: approved_language, validate_lineage=lineage,
                        identity_provider=lambda: approved_identity_from_canonical_records(root, claims=claims_result["index"], evidence=evidence_result["index"]), fonts=fonts, render=render,
                        renderer_identity=lambda: {"adapter_sha256": adapter_sha,
                                                   "operator_verification_evidence_digest": verification_record["evidence_digest"]},

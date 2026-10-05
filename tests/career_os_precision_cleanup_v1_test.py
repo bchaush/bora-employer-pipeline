@@ -90,7 +90,7 @@ model = {
     },
     "crosswalk_exception": {"bulmarma_requirement_ids": ["REQ_FINANCE"]},
 }
-ok(not qa.approved_language_problems(model, library), "full real model uses only approved language")
+ok(not qa.approved_language_problems(model, library, claims["index"], evidence["index"]), "full real model uses only approved language")
 
 # Known production failure must fail.
 bad = copy.deepcopy(model)
@@ -98,7 +98,7 @@ bad["work"][0]["bullets"][0] = {
     "text": "Block live email execution when test mode, follow-up, or master-sending gates are disabled.",
     "claim_ids": ["CLAIM_WW_002"],
 }
-ok(any("not exact approved bullet language" in x for x in qa.approved_language_problems(bad, library)), "inverted WW_002 fails")
+ok(any("not exact approved bullet language" in x for x in qa.approved_language_problems(bad, library, claims["index"], evidence["index"])), "inverted WW_002 fails")
 
 # Embedded control characters fail regardless of claim lineage.
 bad = copy.deepcopy(model)
@@ -108,19 +108,37 @@ ok(qa.candidate_control_character_problems(bad), "embedded newline fails")
 # Row-specific skill gate.
 bad = copy.deepcopy(model)
 bad["skills"][0]["items"][0] = "SQL (SQLite)"
-ok(any("not approved for row Process & quality" in x for x in qa.approved_language_problems(bad, library)), "row-mismatched SQL fails")
+ok(any("not approved for row Process & quality" in x for x in qa.approved_language_problems(bad, library, claims["index"], evidence["index"])), "row-mismatched SQL fails")
 bad = copy.deepcopy(model)
 bad["skills"][1]["items"][1] = "Advanced SQL"
-ok(any("Advanced SQL" in x for x in qa.approved_language_problems(bad, library)), "Advanced SQL fails")
+ok(any("Advanced SQL" in x for x in qa.approved_language_problems(bad, library, claims["index"], evidence["index"])), "Advanced SQL fails")
 ok(("Technical", "SQL (SQLite)") in {(x["row"], x["text"]) for x in library["skills"]}, "approved SQL (SQLite) exists")
 ok(("Technical", "TypeScript") in {(x["row"], x["text"]) for x in library["skills"]}, "Market Empire TypeScript skill exists")
+
+
+# Claim/evidence-to-experience placement gate.
+wrong_job = copy.deepcopy(model)
+wrong_job["work"][0]["bullets"][0] = {"text": bullet["B017"]["text"], "claim_ids": bullet["B017"]["claim_ids"]}
+wrong = qa.approved_language_problems(wrong_job, library, claims["index"], evidence["index"])
+ok(any("CLAIM_LOANIQ_SQL_001 is not evidenced by that experience" in item for item in wrong),
+   "LoanIQ SQL bullet fails when placed under Winter Walk")
+right_project = copy.deepcopy(model)
+right_project["project"] = {
+    "experience_id": "EXP_LOANIQ_001",
+    "name": identity["experiences"]["EXP_LOANIQ_001"]["project_name"],
+    "tech_label": identity["experiences"]["EXP_LOANIQ_001"]["project_tech_label"],
+    "link": identity["project_links"]["EXP_LOANIQ_001"],
+    "bullets": [{"text": bullet["B017"]["text"], "claim_ids": bullet["B017"]["claim_ids"]}],
+}
+ok(not qa.approved_language_problems(right_project, library, claims["index"], evidence["index"]),
+   "LoanIQ SQL bullet passes under the LoanIQ project")
 
 # 2. Real Gold pre-render with Bulmarma and exactly one project remains one-page-capable.
 metrics = builder.load_gold_metrics(ROOT)[0]
 fonts = builder.FontMetrics.synthetic(0.49, 0.53)
 build = builder.build_gold_docx(model, metrics, fonts)
 pre = qa.pre_render_qa(
-    model, build, metrics=metrics, claims=claims["index"], identity=identity,
+    model, build, metrics=metrics, claims=claims["index"], evidence=evidence["index"], identity=identity,
     rebuild=lambda: builder.build_gold_docx(model, metrics, fonts),
     roster=ptg.display_roster(builder.load_doctrine_roster(ROOT), identity),
     approved_language=library,

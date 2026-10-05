@@ -92,6 +92,14 @@ def fixture_claims() -> dict:
     return {"SYN_CLAIM_" + key: claim_for(key) for key in BULLETS}
 
 
+def fixture_evidence() -> dict:
+    mapping = {"A1": "SYN_EXP_A", "A2": "SYN_EXP_A", "A3": "SYN_EXP_A", "A4": "SYN_EXP_A",
+               "B1": "SYN_EXP_B", "B2": "SYN_EXP_B", "C1": "SYN_EXP_C", "C2": "SYN_EXP_C",
+               "P1": "SYN_EXP_P", "P2": "SYN_EXP_P", "P3": "SYN_EXP_P", "P4": "SYN_EXP_P", "P5": "SYN_EXP_P"}
+    return {"SYN_EVID_" + key: {"evidence_id": "SYN_EVID_" + key, "experience_id": experience_id}
+            for key, experience_id in mapping.items()}
+
+
 def fixture_language() -> dict:
     model = fixture_model()
     bullets = [{"bullet_id": "SYN_%s" % key, "text": BULLETS[key], "claim_ids": ["SYN_CLAIM_" + key]}
@@ -171,7 +179,7 @@ def run_pre_qa(model=None, build=None, claims=None, identity=None, roster=ROSTER
     model = model if model is not None else fixture_model()
     fonts = fonts or synthetic_fonts()
     build = build or build_gold(model, fonts)
-    return qa.pre_render_qa(model, build, metrics=metrics(), claims=claims if claims is not None else fixture_claims(),
+    return qa.pre_render_qa(model, build, metrics=metrics(), claims=claims if claims is not None else fixture_claims(), evidence=fixture_evidence(),
                             identity=identity if identity is not None else fixture_identity(),
                             rebuild=lambda: build_gold(model, fonts), roster=roster, job_relevant_terms=terms, approved_language=fixture_language())
 
@@ -279,7 +287,7 @@ def fixture_pdf_facts(extra=None, drop=None, order=None):
 def make_deps(renderer=None, facts=None, row_log=None, claims=None, lineage=None, identity=None):
     renderer = renderer or FakeRenderer()
     return ptg.PackageDeps(
-        load_claims=lambda: claims if claims is not None else fixture_claims(), approved_language=lambda: fixture_language(), validate_lineage=lineage or (lambda claim: []),
+        load_claims=lambda: claims if claims is not None else fixture_claims(), load_evidence=lambda: fixture_evidence(), approved_language=lambda: fixture_language(), validate_lineage=lineage or (lambda claim: []),
         identity_provider=lambda: identity if identity is not None else fixture_identity(), fonts=synthetic_fonts(), render=renderer,
         renderer_identity=lambda: {"adapter_sha256": "c" * 64, "operator_verification_evidence_digest": "d" * 64},
         pdf_facts=lambda pdf: facts or fixture_pdf_facts(), current_state=(lambda job_id: row_log) if row_log else None,
@@ -905,7 +913,7 @@ def operator_main(argv: list) -> int:
     model = fixture_model()
     metrics_value = metrics()
     build = builder.build_gold_docx(model, metrics_value, fonts)
-    pre = qa.pre_render_qa(model, build, metrics=metrics_value, claims=fixture_claims(), identity=fixture_identity(),
+    pre = qa.pre_render_qa(model, build, metrics=metrics_value, claims=fixture_claims(), evidence=fixture_evidence(), identity=fixture_identity(),
                            rebuild=lambda: builder.build_gold_docx(model, metrics_value, fonts), roster=ROSTER, approved_language=fixture_language())
     print(json.dumps({"pre_render_qa_passed": pre["passed"], "failed": pre["failed_checks"], "layout": build.layout}, sort_keys=True))
     assert_true(pre["passed"], "pre-render Gold QA passes with the real pinned fonts")
