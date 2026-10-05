@@ -200,7 +200,8 @@ def load_approved_language(path: Optional[Path] = None) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def approved_language_problems(model: Mapping[str, Any], approved: Mapping[str, Any]) -> list:
+def approved_language_problems(model: Mapping[str, Any], approved: Mapping[str, Any],
+                               claims: Mapping[str, Any], evidence: Mapping[str, Any]) -> list:
     problems = []
     if approved.get("status") != "CURRENT_APPROVED" or (approved.get("approval") or {}).get("approved") is not True:
         return ["approved language library is not CURRENT_APPROVED"]
@@ -210,15 +211,25 @@ def approved_language_problems(model: Mapping[str, Any], approved: Mapping[str, 
     summary = model["summary"]
     if (summary["text"], tuple(summary.get("claim_ids", []))) not in summary_index:
         problems.append("summary is not an exact approved summary/claim binding")
+    def check_bullet(entry: Mapping[str, Any], number: int, bullet: Mapping[str, Any], prefix: str) -> None:
+        claim_ids = tuple(bullet.get("claim_ids", []))
+        if (bullet["text"], claim_ids) not in bullet_index:
+            problems.append("%s:%s:%d is not exact approved bullet language" % (prefix, entry["experience_id"], number))
+        for claim_id in claim_ids:
+            claim = claims.get(claim_id) or {}
+            evidence_ids = claim.get("evidence_ids", [])
+            if not any((evidence.get(evidence_id) or {}).get("experience_id") == entry["experience_id"]
+                       for evidence_id in evidence_ids):
+                problems.append("%s:%s:%d claim %s is not evidenced by that experience" %
+                                (prefix, entry["experience_id"], number, claim_id))
+
     for entry in model["work"]:
         for number, bullet in enumerate(entry["bullets"]):
-            if (bullet["text"], tuple(bullet.get("claim_ids", []))) not in bullet_index:
-                problems.append("work:%s:%d is not exact approved bullet language" % (entry["experience_id"], number))
+            check_bullet(entry, number, bullet, "work")
     project = model.get("project")
     if project:
         for number, bullet in enumerate(project["bullets"]):
-            if (bullet["text"], tuple(bullet.get("claim_ids", []))) not in bullet_index:
-                problems.append("project:%s:%d is not exact approved bullet language" % (project["experience_id"], number))
+            check_bullet(project, number, bullet, "project")
     for row in model["skills"]:
         cited = set(row.get("claim_ids", []))
         for item in row["items"]:
@@ -408,7 +419,7 @@ def artifact_grammar_checks(parsed: Mapping[str, Any], types: Sequence[str], met
 
 
 def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMetrics, claims: Mapping[str, Any],
-                  identity: Mapping[str, Any], rebuild: Callable[[], GoldBuild], roster: Sequence[str],
+                  evidence: Mapping[str, Any], identity: Mapping[str, Any], rebuild: Callable[[], GoldBuild], roster: Sequence[str],
                   job_relevant_terms: Sequence[str] = (), approved_language: Mapping[str, Any]) -> dict:
     try:
         parsed = parse_docx(build.docx_bytes)
@@ -436,7 +447,7 @@ def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMe
                          "unapproved=%s" % [pair for pair in expected_pairs if pair not in approved_pairs]))
     problems = check_lineage(model, claims)
     checks.append(_check("CANDIDATE_TRUTH_LINEAGE", not problems, "; ".join(problems[:6])))
-    language_problems = approved_language_problems(model, approved_language)
+    language_problems = approved_language_problems(model, approved_language, claims, evidence)
     checks.append(_check("APPROVED_RESUME_LANGUAGE_EXACT", not language_problems, "; ".join(language_problems[:6])))
     control_problems = candidate_control_character_problems(model)
     checks.append(_check("CANDIDATE_TEXT_CONTROL_CHARACTERS", not control_problems, "; ".join(control_problems[:6])))

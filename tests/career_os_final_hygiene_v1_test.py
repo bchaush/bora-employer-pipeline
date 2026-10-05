@@ -31,6 +31,7 @@ ADAPTER_PATH = ROOT / "src" / "career_os_cloud_operate_v1.py"
 # normalized to LF before hashing so a Windows autocrlf checkout does not change the identity.
 RECOVERED_ADAPTER_SHA256 = "f10513d6ac36c58c31885c2ae35d52fb26b9f6218b6ba9f4aefb2206d3c275dc"
 POST_HYGIENE_ADAPTER_SHA256 = "c6c5bc6741c31414d245d3a3f9a223659ddd1c6862019b8b088f2c059a3243ef"
+POST_PRECISION_ADAPTER_SHA256 = "5106ca1474a901034398798b15c362582e0daf9018f6ebe406cc9c8702dd4921"
 POINTER_PATH = ROOT / "docs" / "CAREER_OS_RECOVERY_POINTER_V1.md"
 STANDARDS_PATH = ROOT / "docs" / "resume" / "BORA_RESUME_STANDARDS_V1.json"
 
@@ -50,6 +51,10 @@ def adapter_source() -> str:
 # explicit expected-main-SHA runtime binding below. CAREER_OS_PRECISION_CLEANUP_V1 intentionally adds a second,
 # separately enumerated delta for approved-language loading and package handoff. Reversing the precision delta must
 # reproduce the post-hygiene adapter; reversing the runtime-binding delta after that must reproduce the recovered bytes.
+EXPERIENCE_BINDING_ADAPTER_DEVIATIONS = (
+    ('        load_evidence=lambda: evidence_result["index"],\n', ''),
+)
+
 PRECISION_ADAPTER_DEVIATIONS = (
     ('    approved_language = json.loads((root / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))\n', ''),
     ('        approved_language=lambda: approved_language,\n', ''),
@@ -75,6 +80,12 @@ RUNTIME_BINDING_DEVIATIONS = (
 
 def test_adapter_recovered_provenance() -> None:
     source = adapter_source()
+    for canonical, prior in EXPERIENCE_BINDING_ADAPTER_DEVIATIONS:
+        assert_true(source.count(canonical) == 1, "documented experience-binding adapter deviation is present exactly once: %s" % canonical[:60])
+        source = source.replace(canonical, prior)
+    precision_digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    assert_true(precision_digest == POST_PRECISION_ADAPTER_SHA256,
+                "reversing the experience-binding adapter delta reproduces the precision-cleanup canonical adapter: %s" % precision_digest)
     for canonical, prior in PRECISION_ADAPTER_DEVIATIONS:
         assert_true(source.count(canonical) == 1, "documented precision-cleanup adapter deviation is present exactly once: %s" % canonical[:60])
         source = source.replace(canonical, prior)
@@ -88,9 +99,9 @@ def test_adapter_recovered_provenance() -> None:
     assert_true(recovered_digest == RECOVERED_ADAPTER_SHA256,
                 "post-hygiene runtime-binding provenance still reconstructs the recovered live adapter: %s" % recovered_digest)
     current_digest = hashlib.sha256(adapter_source().encode("utf-8")).hexdigest()
-    assert_true(current_digest not in (RECOVERED_ADAPTER_SHA256, POST_HYGIENE_ADAPTER_SHA256),
-                "the precision adapter has its own honest current identity")
-    print("PASS: recovered -> post-hygiene -> precision adapter provenance is explicit and mechanically reproducible.")
+    assert_true(current_digest not in (RECOVERED_ADAPTER_SHA256, POST_HYGIENE_ADAPTER_SHA256, POST_PRECISION_ADAPTER_SHA256),
+                "the experience-binding adapter has its own honest current identity")
+    print("PASS: recovered -> post-hygiene -> precision -> experience-binding adapter provenance is explicit and mechanically reproducible.")
 
 
 def test_adapter_profile_and_honesty() -> None:

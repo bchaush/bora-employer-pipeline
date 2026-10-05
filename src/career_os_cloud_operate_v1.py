@@ -256,6 +256,7 @@ def make_cloud_operate_deps(root: Path, font_dir: Path, *, work_dir: Path, expec
     approved_language = json.loads((root / "docs" / "resume" / "BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))
     return ptg.PackageDeps(
         load_claims=lambda: claims_result["index"],
+        load_evidence=lambda: evidence_result["index"],
         approved_language=lambda: approved_language,
         validate_lineage=lineage,
         identity_provider=lambda: ptg.approved_identity_from_canonical_records(root, claims=claims_result["index"], evidence=evidence_result["index"]),

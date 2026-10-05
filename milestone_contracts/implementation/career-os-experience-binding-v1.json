@@ -1,0 +1,41 @@
+{
+  "milestone_id": "CAREER_OS_EXPERIENCE_BINDING_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Fail closed when an approved resume bullet is placed under a work/project experience that does not own evidence for every cited claim.",
+  "baseline_sha": "0dbe512905994598c9fb62b6d7edbba43d38a28a",
+  "allowed_paths": [
+    "src/gold_resume_qa.py",
+    "src/pursue_to_gold_package.py",
+    "src/career_os_cloud_operate_v1.py",
+    "tests/career_os_precision_cleanup_v1_test.py",
+    "tests/pursue_to_gold_package_v1_test.py",
+    "milestone_contracts/implementation/career-os-experience-binding-v1.json",
+    "tests/career_os_final_hygiene_v1_test.py"
+  ],
+  "forbidden_paths": [
+    "src/requirement_match.py",
+    "src/job_analysis.py",
+    "src/pursuit_decision.py",
+    "src/qualification_gate.py",
+    "src/application_logic.py",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "B017 LoanIQ SQL under EXP_WW_001 fails.",
+    "B017 under EXP_LOANIQ_001 project passes.",
+    "Existing approved-language and Gold package regressions remain green.",
+    "No matcher/gate/submission semantics change."
+  ],
+  "review_requirements": "STOP after PR creation for Bora/independent review and merge.",
+  "required_tests": [
+    "python tests/career_os_precision_cleanup_v1_test.py",
+    "python tests/pursue_to_gold_package_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need to change matcher/gate/submission semantics or broaden beyond bullet-to-experience evidence binding."
+  ],
+  "human_approval_requirements": "Bora explicitly authorized this bounded post-merge correction; STOP after PR creation for review/merge."
+}
