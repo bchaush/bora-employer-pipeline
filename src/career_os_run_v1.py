@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_1"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
@@ -42,11 +42,19 @@ FENCE = "```"
 
 # SETTINGS readback keys (flat object, or a list of {"Key"/"Value"} rows).
 SETTINGS_CANONICAL_MAIN = "CANONICAL_MAIN_SHA"
-SETTINGS_RUNTIME_SHA = "RUNTIME_ZIP_SHA256"
-SETTINGS_ADAPTER_SHA = "ADAPTER_SHA256"
-SETTINGS_CONFIG_SHA = "CONFIG_SHA256"
-SETTINGS_RUNBOOK_SHA = "RUNBOOK_SHA256"
+SETTINGS_RUNTIME_SHA = "RUNTIME_BUNDLE_SHA256"
+SETTINGS_ADAPTER_SHA = "CLOUD_ADAPTER_SHA256"
+SETTINGS_CONFIG_SHA = "OPERATE_MODE_CONFIG_SHA256"
+SETTINGS_RUNBOOK_SHA = "OPERATE_MODE_RUNBOOK_SHA256"
+SETTINGS_FONTS_SHA = "GOVERNED_FONTS_SHA256"
 SETTINGS_PROFILE = "CLOUD_RENDER_PROFILE"
+
+JOBS_HEADERS = ("Job_ID", "Company", "Role", "Discovery_Source", "Discovery_URL", "Official_URL", "First_Seen", "Last_Verified",
+                "Pipeline_State", "Freshness_State", "Geography_State", "OPT_Screen_State", "Candidate_Condition_State",
+                "Threshold_State", "Role_Status", "Match_State", "Decision", "Bora_Decision", "Package_Status", "Application_Status")
+APPLICATIONS_HEADERS = ("Application_ID", "Job_ID", "Applied_Date", "Resume_Version", "Cover_Letter_Version", "Channel",
+                        "Current_Status", "Last_Update", "Next_Action", "Outcome")
+LOG_HEADERS = ("Run_ID", "Timestamp", "Stage", "Source", "Job_ID", "Status", "Error_Code", "Engine_Baseline", "Notes")
 
 SLATE_KEYS = ("job_id", "company", "role", "official_url", "source", "location_arrangement", "Geography_State",
               "work_authorization_text", "OPT_Screen_State", "mandatory_gaps", "recommendation", "reasons")
@@ -131,6 +139,35 @@ def non_empty(value: Any) -> bool:
     return value is not None and str(value).strip() != ""
 
 
+def _require_exact_row_shape(row: Mapping[str, Any], headers: Sequence[str], label: str) -> None:
+    keys = set(row)
+    expected = set(headers)
+    if keys != expected:
+        missing = sorted(expected - keys)
+        extra = sorted(keys - expected)
+        raise RunError("LEDGER_SHAPE_INVALID", "%s missing=%s extra=%s" % (label, missing, extra))
+
+
+def load_ledger(path: str) -> dict:
+    ledger = read_json(path, "Ledger readback")
+    if not isinstance(ledger, Mapping):
+        raise RunError("LEDGER_INVALID", "Ledger readback must be an object")
+    for name, headers in (("JOBS", JOBS_HEADERS), ("APPLICATIONS", APPLICATIONS_HEADERS), ("LOG", LOG_HEADERS)):
+        rows = ledger.get(name)
+        if not isinstance(rows, list):
+            raise RunError("LEDGER_INVALID", "%s must be an array" % name)
+        for index, row in enumerate(rows):
+            if not isinstance(row, Mapping):
+                raise RunError("LEDGER_SHAPE_INVALID", "%s[%d] must be an object" % (name, index))
+            _require_exact_row_shape(row, headers, "%s[%d]" % (name, index))
+    return dict(ledger)
+
+
+def _resume_sha_from_version(value: Any) -> Optional[str]:
+    match = re.search(r"sha256:([0-9a-fA-F]{64})(?:\b|$)", str(value or ""))
+    return match.group(1).lower() if match else None
+
+
 # preflight --------------------------------------------------------------------------------------
 
 def _settings_map(raw: Any) -> dict:
@@ -150,7 +187,8 @@ def _settings_map(raw: Any) -> dict:
 def cmd_preflight(args: argparse.Namespace) -> tuple:
     settings = _settings_map(read_json(args.settings, "SETTINGS readback"))
     expected = args.expected_main_sha
-    observed = {"runtime_zip_sha256": args.runtime_zip_sha,
+    observed = {"runtime_bundle_sha256": sha256_hex(read_bytes(args.runtime_zip, "runtime ZIP")),
+                "governed_fonts_sha256": sha256_hex(read_bytes(args.fonts_zip, "governed fonts ZIP")),
                 "adapter_sha256": sha256_hex(read_bytes(args.adapter, "adapter")),
                 "config_sha256": sha256_hex(read_bytes(args.config, "config")),
                 "runbook_sha256": sha256_hex(read_bytes(args.runbook, "runbook"))}
@@ -176,13 +214,14 @@ def cmd_preflight(args: argparse.Namespace) -> tuple:
         check("GOVERNED_FONTS_VERIFIED", True)
     except Exception as error:
         check("GOVERNED_FONTS_VERIFIED", False, "%s: %s" % (type(error).__name__, error))
-    settings_equals("SETTINGS_RUNTIME_SHA_MATCHES_OBSERVED_ZIP", SETTINGS_RUNTIME_SHA, observed["runtime_zip_sha256"])
+    settings_equals("SETTINGS_RUNTIME_SHA_MATCHES_OBSERVED_ZIP", SETTINGS_RUNTIME_SHA, observed["runtime_bundle_sha256"])
+    settings_equals("SETTINGS_FONTS_SHA_MATCHES_OBSERVED_ZIP", SETTINGS_FONTS_SHA, observed["governed_fonts_sha256"])
     settings_equals("SETTINGS_ADAPTER_SHA_MATCHES_OBSERVED_ADAPTER", SETTINGS_ADAPTER_SHA, observed["adapter_sha256"])
     settings_equals("SETTINGS_CONFIG_SHA_MATCHES_OBSERVED_CONFIG", SETTINGS_CONFIG_SHA, observed["config_sha256"])
     settings_equals("SETTINGS_RUNBOOK_SHA_MATCHES_OBSERVED_RUNBOOK", SETTINGS_RUNBOOK_SHA, observed["runbook_sha256"])
     profile = settings.get(SETTINGS_PROFILE)
-    check("CLOUD_RENDER_PROFILE_IF_PRESENT", profile is None or profile == cloud.PROFILE_ID,
-          "absent" if profile is None else "present %s" % profile)
+    check("CLOUD_RENDER_PROFILE_REQUIRED", profile == cloud.PROFILE_ID,
+          "missing" if profile is None else "present %s" % profile)
     passed = all(item["passed"] for item in checks)
     receipt = {"spec": "CAREER_OS_RUN_PREFLIGHT_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "status": "PASS" if passed else "STOP",
                "expected_main_sha": expected, "observed": observed, "checks": checks}
@@ -273,10 +312,23 @@ def validate_slate_role(role: Any, index: int) -> list:
 
 
 def jobs_row_values(role: Mapping[str, Any]) -> dict:
-    """Exact owned JOBS row values for one screened role. Bora_Decision is never populated here."""
-    return {"Job_ID": role["job_id"], "Company": role["company"], "Role": role["role"], "Official_URL": role["official_url"],
-            "Discovery_Source": role["source"], "Geography_State": role["Geography_State"], "OPT_Screen_State": role["OPT_Screen_State"],
-            "Match_State": "ANALYZED", "Decision": role["recommendation"], "Bora_Decision": None}
+    """Full live JOBS-row shape for one new screened role. Bora_Decision is never populated here."""
+    values = {key: "" for key in JOBS_HEADERS}
+    values.update({"Job_ID": role["job_id"], "Company": role["company"], "Role": role["role"], "Discovery_Source": role["source"],
+                   "Discovery_URL": role["official_url"], "Official_URL": role["official_url"], "Pipeline_State": "REVIEW_READY",
+                   "Geography_State": role["Geography_State"], "OPT_Screen_State": role["OPT_Screen_State"],
+                   "Match_State": "ANALYZED", "Decision": role["recommendation"], "Bora_Decision": None})
+    return values
+
+
+def _tracked_job(role: Mapping[str, Any], jobs: Sequence[Mapping[str, Any]]) -> Optional[Mapping[str, Any]]:
+    official = str(role.get("official_url") or "").strip()
+    for row in jobs:
+        if row.get("Job_ID") == role.get("job_id"):
+            return row
+        if official and str(row.get("Official_URL") or "").strip() == official:
+            return row
+    return None
 
 
 def cmd_slate(args: argparse.Namespace) -> tuple:
@@ -294,18 +346,35 @@ def cmd_slate(args: argparse.Namespace) -> tuple:
     problems += ["duplicate job_id %s" % job_id for job_id in sorted({item for item in ids if ids.count(item) > 1})]
     if problems:
         raise RunError("SLATE_INVALID", "; ".join(problems[:20]))
-    rows = [jobs_row_values(role) for role in roles]
-    slate = [{"job_id": role["job_id"], "company": role["company"], "role": role["role"], "recommendation": role["recommendation"],
-              "Geography_State": role["Geography_State"], "OPT_Screen_State": role["OPT_Screen_State"],
-              "mandatory_gaps": list(role["mandatory_gaps"]), "reasons": list(role["reasons"])} for role in roles]
+    ledger = load_ledger(args.ledger)
+    rows = []
+    slate = []
+    for role in roles:
+        tracked = _tracked_job(role, ledger["JOBS"])
+        item = {"job_id": role["job_id"], "company": role["company"], "role": role["role"], "recommendation": role["recommendation"],
+                "Geography_State": role["Geography_State"], "OPT_Screen_State": role["OPT_Screen_State"],
+                "mandatory_gaps": list(role["mandatory_gaps"]), "reasons": list(role["reasons"])}
+        if tracked is not None:
+            item.update({"tracking_status": "ALREADY_TRACKED", "tracked_job_id": tracked["Job_ID"],
+                         "current_Bora_Decision": tracked.get("Bora_Decision"), "current_Package_Status": tracked.get("Package_Status"),
+                         "current_Application_Status": tracked.get("Application_Status")})
+        else:
+            item["tracking_status"] = "NEW"
+            rows.append(jobs_row_values(role))
+        slate.append(item)
     receipt = {"spec": "CAREER_OS_RUN_SLATE_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "status": "SLATE_READY_AWAITING_BORA_DECISION",
                "screening_sha256": sha256_hex(raw_bytes), "slate": slate, "jobs_rows": rows}
     receipt_sha = write_receipt(args.receipt, receipt)
     lines = ["CAREER_OS_RUN_SLATE (system recommendations only; STOP for Bora decision)"]
     for item in slate:
-        lines.append("%s | %s | %s | %s | geo=%s | opt=%s | gaps=%s | %s" % (
-            item["job_id"], item["company"], item["role"], item["recommendation"], item["Geography_State"], item["OPT_Screen_State"],
-            "; ".join(item["mandatory_gaps"]) or "none", "; ".join(item["reasons"])))
+        if item["tracking_status"] == "ALREADY_TRACKED":
+            lines.append("%s | %s | %s | ALREADY_TRACKED | Bora=%s | Package=%s | Application=%s" % (
+                item["job_id"], item["company"], item["role"], item.get("current_Bora_Decision") or "",
+                item.get("current_Package_Status") or "", item.get("current_Application_Status") or ""))
+        else:
+            lines.append("%s | %s | %s | %s | geo=%s | opt=%s | gaps=%s | %s" % (
+                item["job_id"], item["company"], item["role"], item["recommendation"], item["Geography_State"], item["OPT_Screen_State"],
+                "; ".join(item["mandatory_gaps"]) or "none", "; ".join(item["reasons"])))
     lines.append("JOBS_ROW_VALUES (Bora_Decision stays null):")
     lines += [json.dumps(row, sort_keys=True, ensure_ascii=False) for row in rows]
     lines.append("receipt_sha256: " + receipt_sha)
@@ -332,12 +401,20 @@ def persist_names(company: str, role: str) -> tuple:
 
 def cmd_package(args: argparse.Namespace) -> tuple:
     request = read_json(args.request, "request")
+    ledger = load_ledger(args.ledger)
     job_id = request.get("job_id") if isinstance(request, Mapping) else None
     rows = [row for row in (request.get("jobs_rows") or []) if isinstance(row, Mapping) and row.get("Job_ID") == job_id] if job_id else []
-    if len(rows) != 1:
-        raise RunError("REQUEST_JOB_UNRESOLVED", "request.job_id must match exactly one jobs_rows row")
-    if rows[0].get("Company") != args.company or rows[0].get("Role") != args.role:
-        raise RunError("ROLE_IDENTITY_MISMATCH", "--company/--role must equal the JOBS row Company/Role for %s" % job_id)
+    ledger_rows = [row for row in ledger["JOBS"] if row.get("Job_ID") == job_id]
+    if len(rows) != 1 or len(ledger_rows) != 1:
+        raise RunError("REQUEST_JOB_UNRESOLVED", "request.job_id must match exactly one request jobs_rows row and one Ledger JOBS row")
+    live = ledger_rows[0]
+    if not non_empty(live.get("Official_URL")):
+        raise RunError("OFFICIAL_URL_MISSING_IN_LEDGER", str(job_id))
+    for key in ("Job_ID", "Company", "Role", "Official_URL"):
+        if rows[0].get(key) != live.get(key):
+            raise RunError("REQUEST_LEDGER_IDENTITY_MISMATCH", "%s differs between request and Ledger" % key)
+    if live.get("Company") != args.company or live.get("Role") != args.role:
+        raise RunError("ROLE_IDENTITY_MISMATCH", "--company/--role must equal the Ledger JOBS row Company/Role for %s" % job_id)
     pdf_name, docx_name, bundle_name = persist_names(args.company, args.role)
     folder = args.target_folder_name
     if not non_empty(folder):
@@ -453,18 +530,23 @@ def cmd_record_submit(args: argparse.Namespace) -> tuple:
         receipt_data = read_bytes(args.receipt_file, "submission receipt file")
         if not receipt_data:
             raise RunError("SUBMISSION_RECEIPT_EMPTY")
-        evidence = {"Submission_Evidence": "RECEIPT_FILE", "Submission_Receipt_SHA256": sha256_hex(receipt_data)}
-        note = "Bora manual submit; submission receipt file sha256 " + evidence["Submission_Receipt_SHA256"]
+        proof_note = "receipt sha256:%s" % sha256_hex(receipt_data)
+        log_note = "Bora manual submit; " + proof_note
     else:
-        evidence = {"Submission_Evidence": "BORA_CONFIRMED_NO_SEPARATE_RECEIPT_ARTIFACT", "Submission_Receipt_SHA256": None}
-        note = "Bora manual submit; Bora confirmed; no separate receipt artifact"
-    application = {"Application_ID": "APP::" + args.job_id, "Job_ID": args.job_id, "Company": args.company, "Role": args.role,
-                   "Applied_Date": args.applied_date, "Resume_Version": pdf["name"], "Resume_SHA256": pdf["sha256"], "Cover_Letter_Version": None,
-                   "Channel": args.channel, "Current_Status": "SUBMITTED", "Last_Update": args.applied_date, "Next_Action": None, "Outcome": None,
-                   **evidence}
+        proof_note = "Bora confirmed; no separate receipt"
+        log_note = "Bora manual submit; Bora confirmed; no separate receipt artifact"
+    application = {"Application_ID": "APP::%s::%s" % (args.job_id, args.applied_date),
+                   "Job_ID": args.job_id, "Applied_Date": args.applied_date,
+                   "Resume_Version": "%s | sha256:%s" % (pdf["name"], pdf["sha256"]),
+                   "Cover_Letter_Version": "NONE", "Channel": args.channel,
+                   "Current_Status": "SUBMITTED", "Last_Update": args.applied_date,
+                   "Next_Action": "Monitor for employer response", "Outcome": proof_note}
+    _require_exact_row_shape(application, APPLICATIONS_HEADERS, "APPLICATIONS")
     jobs = {"Job_ID": args.job_id, "Application_Status": "SUBMITTED"}
-    log = {"Run_ID": "RECORD_SUBMIT::%s::%s" % (args.job_id, args.applied_date), "Timestamp": args.applied_date, "Stage": "APPLICATION_RECORDED",
-           "Source": "CAREER_OS_RUN_V1", "Job_ID": args.job_id, "Status": "SUBMITTED", "Error_Code": None, "Engine_Baseline": None, "Notes": note}
+    log = {"Run_ID": "RECORD_SUBMIT::%s::%s" % (args.job_id, args.applied_date), "Timestamp": args.applied_date,
+           "Stage": "APPLICATION_RECORDED", "Source": "CAREER_OS_RUN_V1", "Job_ID": args.job_id,
+           "Status": "SUBMITTED", "Error_Code": "", "Engine_Baseline": "", "Notes": log_note}
+    _require_exact_row_shape(log, LOG_HEADERS, "LOG")
     receipt = {"spec": "CAREER_OS_RECORD_SUBMIT_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "status": "SUBMISSION_RECORDED_BY_BORA",
                "plan_sha256": sha256_hex(plan_bytes), "applications_row": application, "jobs_row": jobs, "log_row": log}
     receipt_sha = write_receipt(args.receipt, receipt)
@@ -494,16 +576,18 @@ def _folder_map(raw: Any) -> dict:
     return result
 
 
-def closeout_missing(batch: Sequence[Mapping[str, Any]], ledger: Mapping[str, Any], folders: Mapping[str, list], plans: Sequence[Mapping[str, Any]]) -> list:
+def closeout_missing(slate: Sequence[Mapping[str, Any]], ledger: Mapping[str, Any], folders: Mapping[str, list],
+                    plans: Sequence[Mapping[str, Any]]) -> list:
     jobs, applications = ledger.get("JOBS", []), ledger.get("APPLICATIONS", [])
     plans_by_job = {plan.get("job_id"): plan for plan in plans}
     missing = []
-    for role in sorted(batch, key=lambda item: str(item.get("job_id"))):
+    for role in sorted(slate, key=lambda item: str(item.get("job_id"))):
         job_id = role.get("job_id")
+        tracking = role.get("tracking_status")
         if not non_empty(job_id):
-            missing.append("(batch): BATCH_ROLE_WITHOUT_JOB_ID")
+            missing.append("(slate): BATCH_ROLE_WITHOUT_JOB_ID")
             continue
-        rows = [row for row in jobs if row.get("Job_ID") == job_id]
+        rows = [row for row in jobs if row.get("Job_ID") == job_id or (tracking == "ALREADY_TRACKED" and row.get("Job_ID") == role.get("tracked_job_id"))]
         if len(rows) != 1:
             missing.append("%s: %s" % (job_id, "JOBS_ROW_MISSING" if not rows else "JOBS_ROW_DUPLICATE"))
             continue
@@ -517,30 +601,34 @@ def closeout_missing(batch: Sequence[Mapping[str, Any]], ledger: Mapping[str, An
         if not submitted:
             continue
         plan = plans_by_job.get(job_id)
-        app_rows = [item for item in applications if item.get("Job_ID") == job_id]
+        if tracking != "ALREADY_TRACKED" and plan is None:
+            missing.append("%s: PLAN_NOT_SUPPLIED" % job_id)
+        app_rows = [item for item in applications if item.get("Job_ID") == row.get("Job_ID")]
         if not app_rows:
             missing.append("%s: APPLICATIONS_ROW_MISSING" % job_id)
         elif len(app_rows) > 1:
             missing.append("%s: APPLICATIONS_ROW_DUPLICATE" % job_id)
-        folder_name = plan.get("target_folder_name") if plan else role.get("target_folder_name")
-        if not non_empty(folder_name):
+        folder_key = job_id if job_id in folders else (plan.get("target_folder_name") if plan else role.get("target_folder_name"))
+        if not non_empty(folder_key):
             missing.append("%s: ROLE_FOLDER_UNRESOLVED" % job_id)
-        elif not folders.get(str(folder_name)):
+        elif not folders.get(str(folder_key)):
             missing.append("%s: ROLE_FOLDER_MISSING_OR_EMPTY" % job_id)
         if plan and len(app_rows) == 1:
-            recorded = str(app_rows[0].get("Resume_SHA256") or app_rows[0].get("Resume_Version") or "").strip().lower()
-            if recorded != plan_file(plan, "resume_pdf")["sha256"]:
+            recorded = _resume_sha_from_version(app_rows[0].get("Resume_Version"))
+            if recorded is None:
+                missing.append("%s: APPLICATIONS_RESUME_SHA_MISSING" % job_id)
+            elif recorded != plan_file(plan, "resume_pdf")["sha256"]:
                 missing.append("%s: APPLICATIONS_RESUME_SHA_MISMATCH_WITH_PLAN" % job_id)
     return missing
 
 
 def cmd_closeout(args: argparse.Namespace) -> tuple:
-    batch = read_json(args.batch, "batch")
-    if not isinstance(batch, list) or not batch or not all(isinstance(item, Mapping) for item in batch):
-        raise RunError("BATCH_INVALID", "batch must be a non-empty array of role objects")
-    ledger = read_json(args.ledger, "Ledger readback")
-    if not isinstance(ledger, Mapping) or not isinstance(ledger.get("JOBS"), list):
-        raise RunError("LEDGER_INVALID", "Ledger readback must be an object with a JOBS array (and optional APPLICATIONS/LOG)")
+    slate_receipt = read_json(args.slate_receipt, "slate receipt")
+    if not isinstance(slate_receipt, Mapping) or slate_receipt.get("spec") != "CAREER_OS_RUN_SLATE_RECEIPT_V1" \
+            or not isinstance(slate_receipt.get("slate"), list) or not slate_receipt["slate"]:
+        raise RunError("SLATE_RECEIPT_INVALID", "closeout requires the complete slate receipt")
+    slate = slate_receipt["slate"]
+    ledger = load_ledger(args.ledger)
     folders = _folder_map(read_json(args.folders, "Drive folder listing"))
     plans = read_json(args.plans, "plans") if args.plans else []
     if not isinstance(plans, list) or not all(isinstance(plan, Mapping) for plan in plans):
@@ -552,12 +640,13 @@ def cmd_closeout(args: argparse.Namespace) -> tuple:
         handoff_inventory = handoff.persist_plan_inventory(plan)
         if not handoff_inventory["complete"]:
             raise RunError("PLANS_INVALID", ",".join(handoff_inventory["problems"]))
-    missing = closeout_missing(batch, ledger, folders, plans)
+    missing = closeout_missing(slate, ledger, folders, plans)
     status = "COMPLETE" if not missing else "INCOMPLETE"
     receipt = {"spec": "CAREER_OS_RUN_CLOSEOUT_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "status": status,
-               "roles": sorted(str(item.get("job_id")) for item in batch), "missing": missing}
+               "slate_receipt_sha256": sha256_hex(read_bytes(args.slate_receipt, "slate receipt")),
+               "roles": sorted(str(item.get("job_id")) for item in slate), "missing": missing}
     receipt_sha = write_receipt(args.receipt, receipt)
-    lines = ["CAREER_OS_RUN_CLOSEOUT_DETAIL roles=%d missing=%d" % (len(batch), len(missing))] + ["MISSING: " + item for item in missing]
+    lines = ["CAREER_OS_RUN_CLOSEOUT_DETAIL roles=%d missing=%d" % (len(slate), len(missing))] + ["MISSING: " + item for item in missing]
     lines.append("receipt_sha256: " + receipt_sha)
     return (EXIT_OK if not missing else EXIT_STOP), block(lines) + "\n" + CLOSEOUT_MARKER + " " + status, None
 
@@ -583,11 +672,14 @@ def build_parser() -> argparse.ArgumentParser:
     item.add_argument("--adapter", required=True)
     item.add_argument("--config", required=True)
     item.add_argument("--runbook", required=True)
-    item.add_argument("--runtime-zip-sha", required=True, help="explicit SHA-256 of the runtime outer ZIP")
+    item.add_argument("--runtime-zip", required=True, help="downloaded runtime bundle ZIP; hashed by the CLI")
+    item.add_argument("--fonts-zip", required=True, help="downloaded governed fonts ZIP; hashed by the CLI")
     item = add("slate", cmd_slate)
     item.add_argument("--screening", required=True, help="screening.json array")
+    item.add_argument("--ledger", required=True, help="live Ledger readback JSON with JOBS/APPLICATIONS/LOG arrays")
     item = add("package", cmd_package, receipt=False)
     item.add_argument("--request", required=True)
+    item.add_argument("--ledger", required=True, help="live Ledger readback JSON")
     item.add_argument("--runtime-root", required=True)
     item.add_argument("--font-dir", required=True)
     item.add_argument("--output-root", required=True)
@@ -610,7 +702,7 @@ def build_parser() -> argparse.ArgumentParser:
     proof.add_argument("--bora-confirmed", action="store_true")
     proof.add_argument("--receipt-file")
     item = add("closeout", cmd_closeout)
-    item.add_argument("--batch", required=True)
+    item.add_argument("--slate-receipt", required=True)
     item.add_argument("--ledger", required=True)
     item.add_argument("--folders", required=True)
     item.add_argument("--plans")
