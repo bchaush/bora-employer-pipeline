@@ -409,7 +409,7 @@ def artifact_grammar_checks(parsed: Mapping[str, Any], types: Sequence[str], met
 
 def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMetrics, claims: Mapping[str, Any],
                   identity: Mapping[str, Any], rebuild: Callable[[], GoldBuild], roster: Sequence[str],
-                  job_relevant_terms: Sequence[str] = (), approved_language: Optional[Mapping[str, Any]] = None) -> dict:
+                  job_relevant_terms: Sequence[str] = (), approved_language: Mapping[str, Any]) -> dict:
     try:
         parsed = parse_docx(build.docx_bytes)
     except Exception as error:  # a package the QA cannot read is a failed package
@@ -436,9 +436,8 @@ def pre_render_qa(model: Mapping[str, Any], build: GoldBuild, *, metrics: GoldMe
                          "unapproved=%s" % [pair for pair in expected_pairs if pair not in approved_pairs]))
     problems = check_lineage(model, claims)
     checks.append(_check("CANDIDATE_TRUTH_LINEAGE", not problems, "; ".join(problems[:6])))
-    if approved_language is not None:
-        language_problems = approved_language_problems(model, approved_language)
-        checks.append(_check("APPROVED_RESUME_LANGUAGE_EXACT", not language_problems, "; ".join(language_problems[:6])))
+    language_problems = approved_language_problems(model, approved_language)
+    checks.append(_check("APPROVED_RESUME_LANGUAGE_EXACT", not language_problems, "; ".join(language_problems[:6])))
     control_problems = candidate_control_character_problems(model)
     checks.append(_check("CANDIDATE_TEXT_CONTROL_CHARACTERS", not control_problems, "; ".join(control_problems[:6])))
     identity_problems = check_identity(model, identity)

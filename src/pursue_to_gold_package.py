@@ -73,12 +73,12 @@ class PackageDeps:
     """Every external effect, injected. Production wiring is make_governed_deps; tests inject deterministic fakes."""
 
     load_claims: Callable[[], Mapping[str, Any]]
+    approved_language: Callable[[], Mapping[str, Any]]
     validate_lineage: Callable[[Mapping[str, Any]], list]
     identity_provider: Callable[[], Mapping[str, Any]]
     fonts: FontMetrics
     render: Callable[[bytes, list, str], tuple]  # (docx_bytes, structure_map, out_dir) -> (record, pdf_bytes or None)
     renderer_identity: Callable[[], Mapping[str, str]]
-    approved_language: Optional[Callable[[], Mapping[str, Any]]] = None
     pdf_facts: Callable[[bytes], Mapping[str, Any]] = read_pdf_facts
     current_state: Optional[Callable[[str], tuple]] = None  # job_id -> (jobs_row, decision_log_rows) re-read at the end
     doctrine_root: Path = ROOT
@@ -196,7 +196,7 @@ def generate_gold_resume_stage(request: Mapping[str, Any], deps: PackageDeps) ->
         raise PackageError("GOLD_BUILD_FAILED_" + error.code, error.detail) from error
     pre = pre_render_qa(model, build, metrics=metrics, claims=claims, identity=identity,
                         rebuild=lambda: build_gold_docx(model, metrics, deps.fonts), roster=list(deps.roster) if deps.roster is not None else display_roster(load_doctrine_roster(deps.doctrine_root), identity),
-                        job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])), approved_language=deps.approved_language() if deps.approved_language else None)
+                        job_relevant_terms=tuple(frozen_request.get("job_relevant_terms", [])), approved_language=deps.approved_language())
     if not pre["passed"]:
         raise PackageError("GOLD_PRE_RENDER_QA_FAILED", ",".join(pre["failed_checks"]), pre)
     staging = Path(tempfile.mkdtemp(prefix="gold-stage-", dir=_ensure_dir(frozen_request["output_root"])))
