@@ -1,0 +1,12 @@
+{
+  "evidence_id": "MARKET_EMPIRE_REPO_001",
+  "experience_id": "EXP_MARKET_EMPIRE_001",
+  "fact": "Bora's public Market Empire repository is https://github.com/bchaush/market-empire and is pinned for Career OS evidence at commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "GitHub repository bchaush/market-empire",
+  "source_location": "Repository URL and commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4.",
+  "safe_for_external_use": true,
+  "notes": "Repository identity evidence used for the approved project hyperlink."
+}

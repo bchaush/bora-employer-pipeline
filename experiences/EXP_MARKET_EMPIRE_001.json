@@ -1,0 +1,8 @@
+{
+  "experience_id": "EXP_MARKET_EMPIRE_001",
+  "experience_name": "Market Empire",
+  "experience_type": "OTHER",
+  "organization": "Market Empire course/project team",
+  "source_of_truth": "Public GitHub repository bchaush/market-empire pinned at commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4.",
+  "notes": "Course/team-reviewed project. Repository history attributes all 72 commits to bchaush, with 3 commits carrying Claude co-authorship. Candidate-facing wording may say Bora built the demo but must not claim sole or independent authorship."
+}

@@ -1,0 +1,12 @@
+{
+  "evidence_id": "LOANIQ_REPO_001",
+  "experience_id": "EXP_LOANIQ_001",
+  "fact": "Bora's public LoanIQ repository is https://github.com/bchaush/loaniq-credit-risk and is pinned for Career OS evidence at commit 8778cbbd453cc654529c3bf1d70bfc2a848158a8.",
+  "capabilities": [],
+  "technologies": [],
+  "evidence_state": "VERIFIED",
+  "original_source": "GitHub repository bchaush/loaniq-credit-risk",
+  "source_location": "Repository URL and commit 8778cbbd453cc654529c3bf1d70bfc2a848158a8.",
+  "safe_for_external_use": true,
+  "notes": "Repository identity evidence used for the approved project hyperlink. It does not by itself establish every technology or outcome in the project."
+}

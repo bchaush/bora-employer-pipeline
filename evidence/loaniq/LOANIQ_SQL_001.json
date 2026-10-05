@@ -1,0 +1,22 @@
+{
+  "evidence_id": "LOANIQ_SQL_001",
+  "experience_id": "EXP_LOANIQ_001",
+  "fact": "At commit 8778cbbd453cc654529c3bf1d70bfc2a848158a8, sql/feature_engineering.sql creates the SQLite model_features view from applications and uses CASE, COALESCE, NULLIF, arithmetic ratios and derived flags; database/build_db.py loads Home Credit application_train.csv into SQLite.",
+  "capabilities": [
+    "sql_feature_engineering",
+    "tabular_data_preparation"
+  ],
+  "technologies": [
+    "SQL",
+    "SQLite"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "GitHub repository bchaush/loaniq-credit-risk",
+  "source_location": "commit 8778cbbd453cc654529c3bf1d70bfc2a848158a8; sql/feature_engineering.sql blob 6ab7b7f1ca95586ddaf64215a7451d146a769abb; database/build_db.py.",
+  "safe_for_external_use": true,
+  "notes": "The SQL file originated in Bora's initial repository commit 1d89c547e97d51006070160d5fcbc33d3b1fb4cc. Supports SQL (SQLite), not 'advanced SQL', database administration, warehousing, or other SQL platforms.",
+  "limitations": [
+    "Research/portfolio prototype, not a production data warehouse.",
+    "Does not establish PostgreSQL, SQL Server, Snowflake, BigQuery, database administration, or advanced-SQL proficiency."
+  ]
+}

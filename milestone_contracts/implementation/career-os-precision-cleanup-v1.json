@@ -1,0 +1,62 @@
+{
+  "milestone_id": "CAREER_OS_PRECISION_CLEANUP_V1_IMPLEMENTATION_BRANCH_CONTRACT",
+  "kind": "IMPLEMENTATION",
+  "goal": "One bounded production-earned precision cleanup: add pinned LoanIQ/Market Empire project evidence, approve Bulmarma without upgrading certainty, reconcile Bora Chaush display casing, establish Bora-approved exact resume language, fail closed on unapproved candidate-facing language/control characters, harden package persistence/screening/recovery discipline, and honestly backfill only retained historical artifacts.",
+  "baseline_sha": "f3b3e51eb3e58f9d0844aa49defefd44312af480",
+  "allowed_paths": [
+    "AGENTS.md",
+    "claims/bulmarma/CLAIM_BULMARMA_001.json",
+    "claims/loaniq/**",
+    "claims/market_empire/**",
+    "evidence/bulmarma/BULMARMA_IDENTITY_ATTESTED_002.json",
+    "evidence/loaniq/**",
+    "evidence/market_empire/**",
+    "experiences/EXP_LOANIQ_001.json",
+    "experiences/EXP_MARKET_EMPIRE_001.json",
+    "docs/resume/BORA_APPROVED_RESUME_LANGUAGE_V1.json",
+    "docs/resume/BORA_GOLD_APPROVED_DISPLAY_V1.json",
+    "docs/resume/BORA_RESUME_STANDARDS_V1.json",
+    "schemas/gold_approved_display.schema.json",
+    "src/gold_resume_qa.py",
+    "src/pursue_to_gold_package.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/gold_package_handoff.py",
+    "tests/career_os_precision_cleanup_v1_test.py",
+    "tests/gold_truth_display_v1_test.py",
+    "tests/pursue_to_gold_package_v1_test.py",
+    "milestone_contracts/implementation/career-os-precision-cleanup-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/pursuit_decision.py",
+    "src/job_analysis.py",
+    "src/job_decision.py",
+    "src/qualification_gate.py",
+    "src/application_logic.py",
+    "src/document_render_adapter.py",
+    "docs/rendering/**",
+    ".github/**",
+    "requirements.in",
+    "requirements-lock.txt"
+  ],
+  "required_tests": [
+    "python tests/career_os_precision_cleanup_v1_test.py",
+    "python tests/gold_truth_display_v1_test.py",
+    "python tests/pursue_to_gold_package_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "acceptance_conditions": [
+    "Bora approves the exact language library in one numbered review before it becomes CURRENT_APPROVED.",
+    "Every candidate-facing bullet, summary and skill fails closed unless authorized by the approved library; control characters fail.",
+    "LoanIQ/Market Empire evidence is pinned to immutable commits and remains within documented limits.",
+    "Bulmarma human approval becomes true while evidence state remains OBSERVED; title/date display uses an honest candidate-attested evidence basis, not employer-formal evidence.",
+    "One-page Gold output including Bulmarma passes the existing one-page and utilization gates.",
+    "No Match Truth, Pursuit Truth, immigration, identity-resolution or SUBMIT-authority semantics change."
+  ],
+  "stop_conditions": [
+    "Any need to broaden into a new architecture, numeric scoring, LLM semantic judging, auto-submit, cover-letter runtime, or the historical OPERATOR renderer.",
+    "Any historical artifact would need to be regenerated and mislabeled as original."
+  ],
+  "review_requirements": "One fresh read-only independent review of the exact frozen PR candidate before merge.",
+  "human_approval_requirements": "Bora approves the language library and separately authorizes merge after independent SAFE review. SUBMIT remains Bora-only."
+}

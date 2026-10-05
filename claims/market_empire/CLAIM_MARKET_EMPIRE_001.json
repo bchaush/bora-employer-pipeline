@@ -1,0 +1,29 @@
+{
+  "claim_id": "CLAIM_MARKET_EMPIRE_001",
+  "wording": "Built a React/TypeScript financial-education demo with deterministic financial logic, Vitest and Playwright coverage, and Vercel deployment; the completed version recorded 32/32 unit/calculation tests and 6/6 browser tests.",
+  "evidence_ids": [
+    "MARKET_EMPIRE_REPO_001",
+    "MARKET_EMPIRE_TECH_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Analyst",
+    "Applied AI / Automation",
+    "Business Operations"
+  ],
+  "forbidden_contexts": [
+    "sole authorship",
+    "independent authorship",
+    "professional software-engineering employment",
+    "production-scale SaaS",
+    "backend/API expertise",
+    "database expertise",
+    "AI/ML expertise"
+  ],
+  "human_approval": false,
+  "date": "2026-10-04",
+  "version": "1"
+}

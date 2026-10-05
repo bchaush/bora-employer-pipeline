@@ -1,0 +1,313 @@
+{
+  "record_id": "BORA_APPROVED_RESUME_LANGUAGE_V1",
+  "status": "PENDING_BORA_APPROVAL",
+  "drafted_on": "2026-10-04",
+  "source_rule": "Drafted only from canonical Candidate Truth claims/evidence plus the explicitly authorized pinned LoanIQ and Market Empire evidence added in this branch. Prior generated resumes are not evidence.",
+  "approval": {
+    "approved": false,
+    "approved_by": null,
+    "approved_on": null
+  },
+  "bullets": [
+    {
+      "bullet_id": "B001",
+      "claim_ids": [
+        "CLAIM_DCOMMERCE_001"
+      ],
+      "text": "Prepared structured financial reports in Excel for Bulgarian National Bank submission and reconciled 1,000+ monthly transactions."
+    },
+    {
+      "bullet_id": "B002",
+      "claim_ids": [
+        "CLAIM_DCOMMERCE_002"
+      ],
+      "text": "Extracted and processed data for daily, weekly, and monthly reporting to Bulgarian National Bank requirements."
+    },
+    {
+      "bullet_id": "B003",
+      "claim_ids": [
+        "CLAIM_MM_001"
+      ],
+      "text": "Built a Python/Streamlit coffee-shop market-screening prototype with explicit limits on predictive and business-success claims."
+    },
+    {
+      "bullet_id": "B004",
+      "claim_ids": [
+        "CLAIM_MM_002"
+      ],
+      "text": "Separated deterministic screening scores from an optional LLM narrative layer that cannot change official scores, thresholds, status, or scenario calculations."
+    },
+    {
+      "bullet_id": "B005",
+      "claim_ids": [
+        "CLAIM_MM_003"
+      ],
+      "text": "Integrated Google Places nearby-search and U.S. Census ACS demographic feeds into the MarketMind screening workflow."
+    },
+    {
+      "bullet_id": "B006",
+      "claim_ids": [
+        "CLAIM_MM_004"
+      ],
+      "text": "Implemented a 3.5-mile geofence, a 50-request local daily counter, and retry with degraded fallback for external data failures."
+    },
+    {
+      "bullet_id": "B007",
+      "claim_ids": [
+        "CLAIM_MM_005"
+      ],
+      "text": "Built an automated pytest validation suite covering the MarketMind screening pipeline."
+    },
+    {
+      "bullet_id": "B008",
+      "claim_ids": [
+        "CLAIM_TELUS_001"
+      ],
+      "text": "Reviewed 500+ user cases weekly against platform policy, identifying violations and behavioral patterns across structured and unstructured data."
+    },
+    {
+      "bullet_id": "B009",
+      "claim_ids": [
+        "CLAIM_TELUS_002"
+      ],
+      "text": "Tracked and categorized enforcement decisions for trend analysis and consistency, collaborating across policy, operations, and analytics teams."
+    },
+    {
+      "bullet_id": "B010",
+      "claim_ids": [
+        "CLAIM_WW_001"
+      ],
+      "text": "Defined an internal Google Workspace operating tool with explicit scope boundaries before implementation."
+    },
+    {
+      "bullet_id": "B011",
+      "claim_ids": [
+        "CLAIM_WW_002"
+      ],
+      "text": "Built send controls that stop live follow-up email when the master kill switch is on, test mode is on, or live follow-ups are not allowed."
+    },
+    {
+      "bullet_id": "B012",
+      "claim_ids": [
+        "CLAIM_WW_003"
+      ],
+      "text": "Built Drive-folder CSV intake into Workbook A with automated import logging for Success, Held, and Failed run states."
+    },
+    {
+      "bullet_id": "B013",
+      "claim_ids": [
+        "CLAIM_WW_004"
+      ],
+      "text": "Automated mapping of self-report responses into an Evidence_Log and synchronized approved updates into an Adoption_Matrix with audit logging."
+    },
+    {
+      "bullet_id": "B014",
+      "claim_ids": [
+        "CLAIM_WW_005"
+      ],
+      "text": "Documented pilot and UAT results across ten PASS test rows covering import validation, PII checks, applicability checks, and related scenarios."
+    },
+    {
+      "bullet_id": "B015",
+      "claim_ids": [
+        "CLAIM_WW_006"
+      ],
+      "text": "Mapped a manual support workflow into a structured process covering evidence tracking, review, follow-up, and human approval."
+    },
+    {
+      "bullet_id": "B016",
+      "claim_ids": [
+        "CLAIM_BULMARMA_001"
+      ],
+      "text": "Built Excel reports for expenses, revenues, and cash flows and managed monthly budget/cash-flow reporting of approximately $80K."
+    },
+    {
+      "bullet_id": "B017",
+      "claim_ids": [
+        "CLAIM_LOANIQ_SQL_001"
+      ],
+      "text": "Used SQLite and SQL feature engineering to create a model_features view with derived ratios and flags for the LoanIQ credit-risk research prototype."
+    },
+    {
+      "bullet_id": "B018",
+      "claim_ids": [
+        "CLAIM_LOANIQ_STACK_001"
+      ],
+      "text": "Built LoanIQ, a Python/Pandas/SQLite/XGBoost credit-risk research prototype with Streamlit delivery and explicit production/regulatory limits."
+    },
+    {
+      "bullet_id": "B019",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ],
+      "text": "Built a React/TypeScript financial-education demo with deterministic financial logic, Vitest and Playwright coverage, and Vercel deployment."
+    }
+  ],
+  "summaries": [
+    {
+      "summary_id": "S001",
+      "role_family": "Data Analyst",
+      "claim_ids": [
+        "CLAIM_DCOMMERCE_001",
+        "CLAIM_TELUS_001",
+        "CLAIM_LOANIQ_SQL_001"
+      ],
+      "text": "Analyst with experience in structured financial reporting, high-volume case review, and evidence-backed SQL/data workflows."
+    },
+    {
+      "summary_id": "S002",
+      "role_family": "Data Operations",
+      "claim_ids": [
+        "CLAIM_WW_003",
+        "CLAIM_WW_004",
+        "CLAIM_DCOMMERCE_002"
+      ],
+      "text": "Data-operations analyst with experience building controlled intake, synchronization, reporting, and audit-log workflows."
+    },
+    {
+      "summary_id": "S003",
+      "role_family": "Business Analyst",
+      "claim_ids": [
+        "CLAIM_WW_006",
+        "CLAIM_TELUS_002",
+        "CLAIM_MM_003"
+      ],
+      "text": "Business analyst with experience mapping operational workflows, tracking recurring patterns, and integrating external data into decision-support processes."
+    },
+    {
+      "summary_id": "S004",
+      "role_family": "Financial Analyst",
+      "claim_ids": [
+        "CLAIM_BULMARMA_001",
+        "CLAIM_DCOMMERCE_001",
+        "CLAIM_DCOMMERCE_002"
+      ],
+      "text": "Financial analyst with experience in Excel-based budgeting, cash-flow and transaction reporting, reconciliation, and recurring regulatory reporting."
+    },
+    {
+      "summary_id": "S005",
+      "role_family": "Applied AI / Automation",
+      "claim_ids": [
+        "CLAIM_WW_002",
+        "CLAIM_MM_002",
+        "CLAIM_LOANIQ_STACK_001"
+      ],
+      "text": "Applied automation analyst with experience building controlled workflow automation, bounded AI-assisted narratives, and research-grade ML prototypes."
+    },
+    {
+      "summary_id": "S006",
+      "role_family": "Business Operations",
+      "claim_ids": [
+        "CLAIM_WW_006",
+        "CLAIM_TELUS_002",
+        "CLAIM_BULMARMA_001"
+      ],
+      "text": "Business-operations analyst with experience structuring workflows, tracking recurring operational patterns, and supporting financial reporting processes."
+    }
+  ],
+  "skills": [
+    {
+      "skill_id": "K001",
+      "text": "Microsoft Excel",
+      "claim_ids": [
+        "CLAIM_BULMARMA_001",
+        "CLAIM_DCOMMERCE_001"
+      ]
+    },
+    {
+      "skill_id": "K002",
+      "text": "SQL (SQLite)",
+      "claim_ids": [
+        "CLAIM_LOANIQ_SQL_001"
+      ]
+    },
+    {
+      "skill_id": "K003",
+      "text": "Python",
+      "claim_ids": [
+        "CLAIM_MM_001",
+        "CLAIM_LOANIQ_STACK_001"
+      ]
+    },
+    {
+      "skill_id": "K004",
+      "text": "Pandas",
+      "claim_ids": [
+        "CLAIM_LOANIQ_STACK_001"
+      ]
+    },
+    {
+      "skill_id": "K005",
+      "text": "XGBoost",
+      "claim_ids": [
+        "CLAIM_LOANIQ_STACK_001"
+      ]
+    },
+    {
+      "skill_id": "K006",
+      "text": "Streamlit",
+      "claim_ids": [
+        "CLAIM_MM_001",
+        "CLAIM_LOANIQ_STACK_001"
+      ]
+    },
+    {
+      "skill_id": "K007",
+      "text": "TypeScript",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ]
+    },
+    {
+      "skill_id": "K008",
+      "text": "React",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ]
+    },
+    {
+      "skill_id": "K009",
+      "text": "Vite",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ]
+    },
+    {
+      "skill_id": "K010",
+      "text": "Vitest",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ]
+    },
+    {
+      "skill_id": "K011",
+      "text": "Playwright",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ]
+    },
+    {
+      "skill_id": "K012",
+      "text": "Vercel",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_001"
+      ]
+    },
+    {
+      "skill_id": "K013",
+      "text": "Google Workspace",
+      "claim_ids": [
+        "CLAIM_WW_001",
+        "CLAIM_WW_003",
+        "CLAIM_WW_004"
+      ]
+    },
+    {
+      "skill_id": "K014",
+      "text": "pytest",
+      "claim_ids": [
+        "CLAIM_MM_005"
+      ]
+    }
+  ]
+}

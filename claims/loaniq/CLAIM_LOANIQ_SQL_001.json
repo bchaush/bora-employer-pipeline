@@ -1,0 +1,29 @@
+{
+  "claim_id": "CLAIM_LOANIQ_SQL_001",
+  "wording": "Used SQLite and SQL feature engineering to create a model_features view with derived ratios and flags for the LoanIQ credit-risk research prototype.",
+  "evidence_ids": [
+    "LOANIQ_SQL_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Data Operations",
+    "Data Analyst",
+    "Applied AI / Automation"
+  ],
+  "forbidden_contexts": [
+    "advanced SQL",
+    "database administration",
+    "production data warehouse",
+    "PostgreSQL",
+    "SQL Server",
+    "Snowflake",
+    "BigQuery",
+    "production underwriting"
+  ],
+  "human_approval": false,
+  "date": "2026-10-04",
+  "version": "1"
+}

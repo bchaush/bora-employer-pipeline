@@ -1,0 +1,8 @@
+{
+  "experience_id": "EXP_LOANIQ_001",
+  "experience_name": "LoanIQ — Credit Risk Intelligence",
+  "experience_type": "PERSONAL_PROJECT",
+  "organization": "LoanIQ",
+  "source_of_truth": "Public GitHub repository bchaush/loaniq-credit-risk pinned at commit 8778cbbd453cc654529c3bf1d70bfc2a848158a8.",
+  "notes": "Research/portfolio prototype. The repository explicitly disclaims production underwriting, regulated adverse-action use, and regulatory compliance claims."
+}
