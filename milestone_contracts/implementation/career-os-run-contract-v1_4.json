@@ -1,0 +1,53 @@
+{
+  "milestone_id": "CAREER_OS_RUN_CONTRACT_V1_4",
+  "kind": "IMPLEMENTATION",
+  "goal": "Remove the last hand-copy step in a run. On 2026-10-06 the operator had to retype the whole Ledger from the Sheets read-values call into raw_values.json; as the Ledger grew it read a single row instead (JOBS rows=1) and later refused to continue. readback now reads the Google Drive .xlsx export of the whole Ledger directly and deterministically, so nothing is retyped and no row can be left out.",
+  "baseline_sha": "e6abbe7a6f619abb7e34f06c74f2be3cc62c8c60",
+  "allowed_paths": [
+    "src/career_os_run_v1.py",
+    "tests/career_os_run_contract_cli_v1_test.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "milestone_contracts/implementation/career-os-run-contract-v1_4.json"
+  ],
+  "forbidden_paths": [
+    "src/pursuit_decision.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_resume_qa.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/career_os_network_v1.py",
+    "src/claim_repository.py",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "docs/resume/**",
+    "schemas/**",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "readback takes exactly one of --xlsx or --raw (ARGUMENT_ERROR otherwise); --raw behaviour is unchanged.",
+    "readback --xlsx parses the .xlsx with the standard library only (zipfile + ElementTree): workbook relationships, shared strings by index (rich-text runs joined, phonetic runs ignored), inline strings, formula string results and cell positions from r= references (positional when absent); the JOBS, APPLICATIONS, LOG and NETWORK tabs are read whole and every other tab is ignored.",
+    "readback --xlsx refuses a numeric, boolean, error or date cell (READBACK_CELL_TYPE); a shared-string index that is not plain ASCII digits of at most 9 characters or is outside 0..len-1 (negative, signed, padded, decimal, non-ASCII, missing, too large or thousands of digits); a row number (row r= or cell reference) that is not a plain positive integer of at most 7 digits or exceeds 100000; a cell reference outside its row or beyond column 702 (ZZ); a repeated cell; more than 200000 cells in a tab or a grid that would materialize more than 200000 cells (checked before it is built); a non-xlsx file, a corrupt member, or a file or member expanding beyond 20 MB (member reads are capped, never trusting the declared size) (all READBACK_XLSX_INVALID); and any non-blank cell past the last header column (READBACK_ROW_TOO_LONG). Blank cells are never stored, and blank or styled-blank cells past the header are ignored.",
+    "Every malformed .xlsx ends in a controlled CAREER_OS_RUN_FAILURE (READBACK_XLSX_INVALID or READBACK_CELL_TYPE), never an uncaught exception. Every readback failure detail, from either source (header mismatch, bare-number cell, duplicate Job_ID, unknown or duplicate tab, cell type, references and indexes), shows any input value only through a repr of at most 40 characters, and lists at most 5 such values.",
+    "Both sources then go through the same normalize_tab checks (exact header, bare-number guard, duplicate Job_ID), and the same Ledger read both ways produces byte-identical ledger.json.",
+    "The readback receipt records source (xlsx|raw) and source_sha256 of the exact input file.",
+    "No change to decide, pursuit-state, package, slate, record-submit, record-external-submit, closeout, the pursuit gate, the network CLI or the cloud adapter.",
+    "Runbook and config document --xlsx as the preferred readback, that OPT/Geography/system Decision never block package after Bora's PURSUE (existing behaviour), and the LAYOUT_UNDERFILLED/OVERFLOW response; contract id is CAREER_OS_RUN_CONTRACT_V1_4."
+  ],
+  "review_requirements": "STOP after one PR is opened. Do not merge until Bora obtains a fresh independent read-only SAFE review.",
+  "required_tests": [
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python tests/career_os_network_v1_test.py",
+    "python tests/career_os_final_hygiene_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need for a network, Drive or Sheets call inside the CLI.",
+    "Any need to accept a non-text Ledger cell or to relax the bare-number guard.",
+    "Any change to the pursuit gate or decision semantics."
+  ],
+  "human_approval_requirements": "Bora retains merge authority, confirms every submission, and makes every decision and Ledger write."
+}

@@ -1,6 +1,6 @@
-# Career OS Operate Mode V1 — Run Contract V1.3
+# Career OS Operate Mode V1 — Run Contract V1.4
 
-Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_3).
+Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_4).
 
 It is pure/local. It reads caller-supplied files and writes local receipts/output. It never calls Drive, Sheets, the web, or an employer application surface. ChatGPT connectors perform external reads/writes and hand exact readbacks to the CLI.
 
@@ -29,7 +29,16 @@ All examples use local files produced/downloaded by ChatGPT.
 
 ### 0. readback (the only way to build ledger.json)
 
-Never hand-build ledger.json. Read each tab's values with the Google Sheets connector's read-values call (formatted values, header row first), never by downloading or exporting the spreadsheet file and parsing it, and save them as they come:
+Never hand-build, retype or partly read ledger.json. Download the whole Production Ledger with the Google Drive connector, exported as .xlsx (Microsoft Excel format), save it as is, and let the CLI read it:
+
+    python src/career_os_run_v1.py readback \
+      --xlsx ledger.xlsx \
+      --out ledger.json \
+      --receipt receipts/readback.json
+
+The CLI parses the file itself (never parse it yourself) and reads the JOBS, APPLICATIONS, LOG and NETWORK tabs whole, so nothing is copied by hand and no row can be left out. Every cell must be text or empty; a number, true/false, error or date cell is refused (READBACK_CELL_TYPE), so fix that cell in the sheet as plain text and export again. Blank cells, blank rows and styled blank cells past the last header column are ignored; any non-blank cell past the header is refused.
+
+Fallback only if the .xlsx export is unavailable: the raw values from the Google Sheets read-values call (formatted values, header row first), saved as they come:
 
     {
       "JOBS": [["Job_ID", "Company", "..."], ["ACME::DATA-ANALYST", "Acme", "..."]],
@@ -38,12 +47,11 @@ Never hand-build ledger.json. Read each tab's values with the Google Sheets conn
       "NETWORK": [["Contact_ID", "..."]]
     }
 
-    python src/career_os_run_v1.py readback \
-      --raw raw_values.json \
-      --out ledger.json \
-      --receipt receipts/readback.json
+    python src/career_os_run_v1.py readback --raw raw_values.json --out ledger.json --receipt receipts/readback.json
 
-It changes only three things: null cells become "", short rows are padded with "", and rows whose every cell is "" are skipped. It fails closed on any header that is not exactly the live header (no trimming), any cell beyond the last header column (even a blank one), a non-string cell, a bare-number cell (READBACK_SUSPECT_NUMERIC_CELL: no Ledger cell holds one; it means the read was corrupted, so read the tab again with the read-values call), or a duplicate Job_ID. NETWORK is optional for run commands and required for network commands. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write.
+With --raw it changes only three things: null cells become "", short rows are padded with "", and rows whose every cell is "" are skipped; any cell beyond the last header column (even a blank one) is refused.
+
+Both sources fail closed on any header that is not exactly the live header (no trimming), a non-string cell, a bare-number cell (READBACK_SUSPECT_NUMERIC_CELL: no Ledger cell holds one; it means the read was corrupted), or a duplicate Job_ID. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write. If neither source can be read whole, stop and tell Bora.
 
 ### 1. preflight
 
@@ -131,6 +139,8 @@ Check any role at any time:
 
 STALE_RECONFIRMATION_REQUIRED means the JOBS context changed after Bora's decision; ask Bora and run decide again. Use the printed latest_event_id and decision_context_fingerprint in the package attestation.
 
+OPT_Screen_State, Geography_State and the system Decision are information for Bora. Once pursuit-state shows Bora's PURSUE with authorizes_pursuit true, they never block package; keep them as they are and mention them once.
+
 ### 4. package
 
     python src/career_os_run_v1.py package \
@@ -146,6 +156,7 @@ STALE_RECONFIRMATION_REQUIRED means the JOBS context changed after Bora's decisi
 
 The request jobs_rows entry must exactly equal the Ledger JOBS row on Job_ID, Company, Role, and Official_URL. package then replaces jobs_rows and decision_log_rows with the rows from ledger.json, so the pursuit gate always reads the same Ledger file (written to run_output/effective_request.json).
 A blank live Official_URL fails with OFFICIAL_URL_MISSING_IN_LEDGER.
+GOLD_BUILD_FAILED_LAYOUT_UNDERFILLED means the resume model is too short for the one-page fill floor: add more bullets from docs/resume/BORA_APPROVED_RESUME_LANGUAGE_V1.json exactly as written (keep every work entry and the project; about 14 bullets in total) and run package again. GOLD_BUILD_FAILED_LAYOUT_OVERFLOW: remove the least relevant bullet. Never write new or reworded text.
 
 persist/ contains exactly:
 - Bora_Chaush_<Company>_<Role>_Resume.pdf

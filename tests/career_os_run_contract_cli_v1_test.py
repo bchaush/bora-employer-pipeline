@@ -1,4 +1,4 @@
-"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_3 (V1_2 plus the bare-number readback guard and record-external-submit).
+"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_4 (V1_3 plus readback --xlsx from the Drive export).
 
 Fixtures use the exact Production Ledger headers:
 - JOBS: 20 columns
@@ -428,6 +428,231 @@ def test_readback_normalizes_sheet_values():
     print("PASS: readback turns raw Sheets values into the exact Ledger file and fails closed on anything ambiguous.")
 
 
+XLSX_MAIN="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+
+
+def _col(number):
+    letters=""
+    while number:
+        number,rest=divmod(number-1,26)
+        letters=chr(65+rest)+letters
+    return letters
+
+
+def make_xlsx(path, tabs, refs=True):
+    """A minimal real .xlsx, shaped like a Google Sheets export. tabs: {name: [[cell, ...], ...]}; a cell is a str (shared
+    string), None (absent), or a tuple: ("inline", text) ("str", text) ("rich", [parts]) ("num", v) ("bool", v) ("blank",)
+    ("badindex",) ("raw", xml)."""
+    shared,index={},[]
+    def sid(text):
+        if text not in shared:
+            shared[text]=len(index); index.append(("t",text))
+        return shared[text]
+    def esc(text):
+        return text.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+    sheets=[]
+    for name,rows in tabs.items():
+        xml_rows=[]
+        for r,row in enumerate(rows,start=1):
+            cells=[]
+            for c,cell in enumerate(row,start=1):
+                ref=' r="%s%d"'%(_col(c),r) if refs else ""
+                if cell is None:
+                    continue
+                if isinstance(cell,str):
+                    cells.append('<c%s t="s"><v>%d</v></c>'%(ref,sid(cell)))
+                elif cell[0]=="inline":
+                    cells.append('<c%s t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>'%(ref,esc(cell[1])))
+                elif cell[0]=="str":
+                    cells.append('<c%s t="str"><f>A1</f><v>%s</v></c>'%(ref,esc(cell[1])))
+                elif cell[0]=="rich":
+                    index.append(("r",cell[1])); cells.append('<c%s t="s"><v>%d</v></c>'%(ref,len(index)-1))
+                elif cell[0]=="num":
+                    cells.append('<c%s><v>%s</v></c>'%(ref,cell[1]))
+                elif cell[0]=="bool":
+                    cells.append('<c%s t="b"><v>%s</v></c>'%(ref,cell[1]))
+                elif cell[0]=="blank":
+                    cells.append('<c%s s="1"/>'%ref)
+                elif cell[0]=="badindex":
+                    cells.append('<c%s t="s"><v>99999</v></c>'%ref)
+                elif cell[0]=="raw":
+                    cells.append(cell[1])
+            xml_rows.append('<row r="%d">%s</row>'%(r,"".join(cells)))
+        sheets.append((name,'<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="%s"><sheetData>%s</sheetData></worksheet>'%(XLSX_MAIN,"".join(xml_rows))))
+    def si(item):
+        if item[0]=="t":
+            return '<si><t xml:space="preserve">%s</t></si>'%esc(item[1])
+        return '<si>%s<rPh><t>IGNORED</t></rPh></si>'%"".join('<r><rPr/><t xml:space="preserve">%s</t></r>'%esc(part) for part in item[1])
+    workbook=('<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="%s" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>%s</sheets></workbook>'
+              %(XLSX_MAIN,"".join('<sheet name="%s" sheetId="%d" r:id="rId%d"/>'%(esc(n),i,i) for i,(n,_x) in enumerate(sheets,start=1))))
+    rels=('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">%s</Relationships>'
+          %"".join('<Relationship Id="rId%d" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet%d.xml"/>'%(i,i)
+                   for i in range(1,len(sheets)+1)))
+    with zipfile.ZipFile(path,"w") as archive:
+        archive.writestr("xl/workbook.xml",workbook)
+        archive.writestr("xl/_rels/workbook.xml.rels",rels)
+        archive.writestr("xl/sharedStrings.xml",'<?xml version="1.0" encoding="UTF-8"?><sst xmlns="%s">%s</sst>'%(XLSX_MAIN,"".join(si(x) for x in index)))
+        for i,(_name,xml) in enumerate(sheets,start=1):
+            archive.writestr("xl/worksheets/sheet%d.xml"%i,xml)
+    return path
+
+
+def xlsx_tabs(led, network=()):
+    tabs={"SETTINGS":[["Key","Value"],["CANONICAL_MAIN_SHA","x"]]}
+    for name,headers in (("JOBS",run.JOBS_HEADERS),("APPLICATIONS",run.APPLICATIONS_HEADERS),("LOG",run.LOG_HEADERS)):
+        tabs[name]=[list(headers)]+[[row[h] if row[h]!="" else None for h in headers] for row in led[name]]
+    tabs["NETWORK"]=[list(run.NETWORK_HEADERS)]+[list(row) for row in network]
+    return tabs
+
+
+def readback_xlsx(tmp, tabs, name="ledger-x.json", refs=True):
+    return invoke(["readback","--xlsx",make_xlsx(tmp/"ledger.xlsx",tabs,refs=refs),"--out",tmp/name,"--receipt",tmp/"readback-x.json"])
+
+
+def test_readback_from_xlsx_export():
+    with tempfile.TemporaryDirectory() as raw_dir:
+        tmp=Path(raw_dir)
+        led=ledger([job_row(Role_Status=" ",Company="Café Résumé — Co & <Partners>")],[app_row()],[log_row()])
+        tabs=xlsx_tabs(led)
+        # Export realities: styled blank cells, a blank row, a styled blank past the header, an inline string, a formula string,
+        # rich text with a phonetic run, and empty shared strings (the 2026-10-06 "261" incident) all read back exactly.
+        tabs["JOBS"][1][1]=("inline",led["JOBS"][0][run.JOBS_HEADERS[1]])
+        tabs["JOBS"][1][2]=("str",led["JOBS"][0][run.JOBS_HEADERS[2]])
+        first=led["APPLICATIONS"][0][run.APPLICATIONS_HEADERS[0]]
+        tabs["APPLICATIONS"][1][0]=("rich",[first[:4],first[4:]])
+        tabs["APPLICATIONS"][1]=[cell if cell is not None else ("blank",) for cell in tabs["APPLICATIONS"][1]]+[("blank",),("blank",)]
+        tabs["LOG"][1]=[cell if cell is not None else "" for cell in tabs["LOG"][1]]
+        tabs["LOG"].insert(1,[("blank",)]*3)  # an interior blank row is skipped and counted
+        tabs["LOG"].append([("blank",)]*3)  # trailing blank rows are not content at all
+        tabs["JOBS"].append([])
+        code,out=readback_xlsx(tmp,tabs)
+        assert_true(code==0 and "LEDGER FILE READY" in out and "source: xlsx" in out,"readback --xlsx builds the Ledger file: "+out)
+        built=json.loads((tmp/"ledger-x.json").read_text(encoding="utf-8"))
+        assert_true(built["JOBS"]==led["JOBS"] and built["APPLICATIONS"]==led["APPLICATIONS"] and built["LOG"]==led["LOG"] and built["NETWORK"]==[],
+                    "xlsx readback equals the Ledger exactly")
+        assert_true("LOG rows=1 blank_rows_skipped=1" in out and "APPLICATIONS rows=1 blank_rows_skipped=0" in out and "NETWORK rows=0" in out,"blank rows are skipped and counted; NETWORK is read")
+        code,raw_out=readback(tmp,raw_values(led,network=[]),"ledger-raw.json")
+        assert_true(code==0 and (tmp/"ledger-raw.json").read_bytes()==(tmp/"ledger-x.json").read_bytes(),
+                    "the same Ledger via --raw and --xlsx gives byte-identical ledger.json")
+        dense={name:[[cell if cell is not None else "" for cell in row] for row in rows] for name,rows in xlsx_tabs(led).items()}
+        assert_true(readback_xlsx(tmp,dense,"norefs.json",refs=False)[0]==0 and
+                    json.loads((tmp/"norefs.json").read_text(encoding="utf-8"))["LOG"]==led["LOG"],"cells without r= references are read by position")
+        receipt=json.loads((tmp/"readback-x.json").read_text())
+        assert_true(receipt["source"]=="xlsx" and receipt["source_sha256"]==sha((tmp/"ledger.xlsx").read_bytes()),"receipt binds the exact .xlsx")
+        cases=[]
+        bad=xlsx_tabs(led); bad["APPLICATIONS"][1][2]=("num","46301"); cases.append((bad,"READBACK_CELL_TYPE"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("bool","1"); cases.append((bad,"READBACK_CELL_TYPE"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="e"><v>#REF!</v></c>'); cases.append((bad,"READBACK_CELL_TYPE"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="d"><v>2026-10-06</v></c>'); cases.append((bad,"READBACK_CELL_TYPE"))
+        for broken in ("99999","-1","-0"," 1","1 ","+1","1.0","01","٣","","x","1"*5000,"9"*10):
+            bad=xlsx_tabs(led); bad["JOBS"][1][4]=("raw",'<c r="E2" t="s"><v>%s</v></c>'%broken); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["JOBS"][1][4]=("raw",'<c r="E2" t="s"/>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        # Resource bounds: sparse or huge coordinates are refused before any grid is built.
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="100000000"><c r="A100000000" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="100001"><c r="A100001" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        for row_attribute in ("0","-5","1e9","abc","٣"):
+            bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="%s"><c t="inlineStr"><is><t>x</t></is></c>'%row_attribute); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="AAA2" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B%s" t="inlineStr"><is><t>x</t></is></c>'%("1"*5000)); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="%s"><c t="inlineStr"><is><t>x</t></is></c>'%("1"*5000)); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B7" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1]=bad["LOG"][1]+["stray"]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
+        bad=xlsx_tabs(led); bad["LOG"][1]=bad["LOG"][1]+[("blank",),("inline"," ")]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
+        bad=xlsx_tabs(led); bad["JOBS"][0][0]=" Job_ID"; cases.append((bad,"READBACK_HEADER_MISMATCH"))
+        bad=xlsx_tabs(led); bad["JOBS"].insert(0,[]); cases.append((bad,"READBACK_HEADER_MISMATCH"))
+        bad=xlsx_tabs(led); del bad["LOG"]; cases.append((bad,"READBACK_INVALID"))
+        bad=xlsx_tabs(led); bad["APPLICATIONS"]=[]; cases.append((bad,"READBACK_INVALID"))
+        bad=xlsx_tabs(ledger([job_row(),job_row()])); cases.append((bad,"READBACK_DUPLICATE_JOB_ID"))
+        bad=xlsx_tabs(ledger([job_row(Role_Status="261")])); cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        for value,expected in cases:
+            code,out=readback_xlsx(tmp,value,"bad.json")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]==expected,"readback --xlsx fails closed with "+expected+": "+out)
+        saved=run.XLSX_MAX_CELLS
+        try:
+            run.XLSX_MAX_CELLS=25
+            code,out=readback_xlsx(tmp,xlsx_tabs(led),"capped.json")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","the per-tab cell bound is enforced")
+            run.XLSX_MAX_CELLS=150
+            wide=xlsx_tabs(led); wide["LOG"].extend([[None]*100+[("inline","x")] for _ in range(3)])
+            code,out=readback_xlsx(tmp,wide,"wide.json")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID" and "expand" in failure(out)["detail"],
+                        "the materialized-grid bound is checked before the grid is built: "+out)
+        finally:
+            run.XLSX_MAX_CELLS=saved
+        good=(tmp/"ledger.xlsx")
+        make_xlsx(good,xlsx_tabs(led))
+        corrupt=bytearray(good.read_bytes())
+        with zipfile.ZipFile(good) as archive:
+            info=archive.getinfo("xl/worksheets/sheet2.xml")
+        start=info.header_offset+30+len(info.filename.encode())+len(info.extra)
+        corrupt[start:start+8]=b"\xff"*8  # damage stored member bytes: a CRC failure on read
+        write(tmp/"corrupt.xlsx",bytes(corrupt))
+        code,out=invoke(["readback","--xlsx",tmp/"corrupt.xlsx","--out",tmp/"c.json","--receipt",tmp/"c-r.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a corrupt member is a controlled refusal: "+out)
+        # Failure details never echo more than 40 characters of any input value, on either source.
+        long_text,long_digits="Z"*5000,"7"*5000
+        def bounded(out,expected):
+            detail=failure(out)
+            return detail["code"]==expected and long_text[:41] not in detail["detail"] and long_digits[:41] not in detail["detail"] \
+                and len(detail["detail"])<400
+        echo_cases=[]
+        bad=xlsx_tabs(led); bad["JOBS"][0][0]=long_text; echo_cases.append(("x",bad,"READBACK_HEADER_MISMATCH"))
+        bad=xlsx_tabs(led); bad["JOBS"][0]=bad["JOBS"][0]+[long_text]; echo_cases.append(("x",bad,"READBACK_HEADER_MISMATCH"))
+        bad=xlsx_tabs(ledger([job_row(Role_Status=long_digits)])); echo_cases.append(("x",bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=xlsx_tabs(ledger([job_row(job_id=long_text),job_row(job_id=long_text)])); echo_cases.append(("x",bad,"READBACK_DUPLICATE_JOB_ID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="%s"><v>1</v></c>'%long_text); echo_cases.append(("x",bad,"READBACK_CELL_TYPE"))
+        bad=raw_values(led); bad["JOBS"][0][0]=long_text; echo_cases.append(("r",bad,"READBACK_HEADER_MISMATCH"))
+        bad=raw_values(ledger([job_row(Role_Status=long_digits)])); echo_cases.append(("r",bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=raw_values(led); bad[long_text]=[["x"]]; echo_cases.append(("r",bad,"READBACK_INVALID"))
+        for source,value,expected in echo_cases:
+            code,out=readback_xlsx(tmp,value,"echo.json") if source=="x" else readback(tmp,value,"echo.json")
+            assert_true(code==run.EXIT_ERROR and bounded(out,expected),"%s failure detail is bounded (%s): %s"%(expected,source,out[:300]))
+        dup=make_xlsx(tmp/"dup.xlsx",xlsx_tabs(led))
+        with zipfile.ZipFile(dup) as archive:
+            parts={name:archive.read(name) for name in archive.namelist()}
+        parts["xl/workbook.xml"]=parts["xl/workbook.xml"].replace(b'name="SETTINGS"',('name="%s"'%long_text).encode()).replace(
+            b'name="EVIDENCE"',b"").replace(b"</sheets>",('<sheet name="%s" sheetId="99" r:id="rId1"/></sheets>'%long_text).encode())
+        with zipfile.ZipFile(dup,"w") as archive:
+            for name,data in parts.items():
+                archive.writestr(name,data)
+        code,out=invoke(["readback","--xlsx",dup,"--out",tmp/"d.json","--receipt",tmp/"d-r.json"])
+        assert_true(code==run.EXIT_ERROR and bounded(out,"READBACK_XLSX_INVALID"),"duplicate long tab name is bounded: "+out[:300])
+        # The reviewer's case: an oversized worksheet relationship target pointing at a missing part.
+        with zipfile.ZipFile(tmp/"ledger.xlsx") as archive:
+            parts={name:archive.read(name) for name in archive.namelist()}
+        rels=dict(parts); rels["xl/_rels/workbook.xml.rels"]=parts["xl/_rels/workbook.xml.rels"].replace(
+            b'Target="worksheets/sheet2.xml"',('Target="%s"'%long_text).encode())
+        with zipfile.ZipFile(tmp/"rels.xlsx","w") as archive:
+            for name,data in rels.items():
+                archive.writestr(name,data)
+        code,out=invoke(["readback","--xlsx",tmp/"rels.xlsx","--out",tmp/"rl.json","--receipt",tmp/"rl-r.json"])
+        assert_true(code==run.EXIT_ERROR and bounded(out,"READBACK_XLSX_INVALID"),"oversized relationship target is bounded: "+out[:300])
+        # Sweep: every attribute value and text node of every part, replaced in turn by 5000 letters or digits, ends in a bounded,
+        # controlled outcome (no crash, no echoed long value).
+        import re
+        for name,data in parts.items():
+            spots=[m.span(1) for m in re.finditer(rb'="([^"]*)"',data)]+[m.span(1) for m in re.finditer(rb'>([^<]+)<',data)]
+            for start,end in spots:
+                for value in (long_text.encode(),long_digits.encode()):
+                    changed=dict(parts); changed[name]=data[:start]+value+data[end:]
+                    with zipfile.ZipFile(tmp/"sweep.xlsx","w") as archive:
+                        for part_name,part_data in changed.items():
+                            archive.writestr(part_name,part_data)
+                    code,out=invoke(["readback","--xlsx",tmp/"sweep.xlsx","--out",tmp/"sw.json","--receipt",tmp/"sw-r.json"])
+                    if code:
+                        detail=failure(out)["detail"]
+                        assert_true(long_text[:41] not in detail and long_digits[:41] not in detail and len(detail)<400,
+                                    "sweep %s: bounded detail: %s"%(name,detail[:200]))
+        write(tmp/"not.xlsx",b"not a zip")
+        code,out=invoke(["readback","--xlsx",tmp/"not.xlsx","--out",tmp/"n.json","--receipt",tmp/"n-r.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a non-xlsx file is refused")
+        for argv in (["readback","--out",tmp/"n.json","--receipt",tmp/"n-r.json"],
+                     ["readback","--xlsx",tmp/"ledger.xlsx","--raw",tmp/"raw.json","--out",tmp/"n.json","--receipt",tmp/"n-r.json"]):
+            code,out=invoke(argv)
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="ARGUMENT_ERROR","exactly one of --xlsx or --raw")
+    print("PASS: readback --xlsx reads the whole Drive export exactly and fails closed on non-text, broken or misplaced cells.")
+
+
 def test_decide_and_pursuit_state():
     with tempfile.TemporaryDirectory() as raw_dir:
         tmp=Path(raw_dir)
@@ -564,11 +789,12 @@ def test_local_only():
         assert_true(forbidden not in source,"no network/process import: "+forbidden)
     runbook=(ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.md").read_text(encoding="utf-8")
     for needle in ("career_os_run_v1.py readback","career_os_run_v1.py decide","career_os_run_v1.py pursuit-state","--as-of",
-                   "Never hand-build ledger.json","career_os_run_v1.py record-external-submit","never by downloading"):
+                   "Never hand-build, retype or partly read ledger.json","career_os_run_v1.py record-external-submit","--xlsx ledger.xlsx",
+                   "never parse it yourself","they never block package","GOLD_BUILD_FAILED_LAYOUT_UNDERFILLED"):
         assert_true(needle in runbook,"runbook documents "+needle)
     config=json.loads((ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.json").read_text(encoding="utf-8"))["run_contract"]
     assert_true(config["contract_id"]==run.RUN_CONTRACT_ID and config["state_machine"][0]=="readback" and "decide" in config["state_machine"],
-                "config names contract V1_2 with readback and decide")
+                "config names the current contract with readback and decide")
     print("PASS: run-contract CLI remains pure/local and the runbook/config document readback, decide and slate dates.")
 
 
@@ -576,9 +802,9 @@ def main():
     assert_true(len(run.JOBS_HEADERS)==20 and len(run.APPLICATIONS_HEADERS)==10 and len(run.LOG_HEADERS)==9,"live header counts")
     for test in (test_preflight_live_settings,test_slate_dedupe_and_score_rules,test_package_ledger_binding_and_persistence,
                  test_record_submit_live_shapes,test_closeout_slate_authority_and_sha_parse,test_end_to_end_live_shapes,
-                 test_readback_normalizes_sheet_values,test_decide_and_pursuit_state,test_record_external_submit,test_local_only):
+                 test_readback_normalizes_sheet_values,test_readback_from_xlsx_export,test_decide_and_pursuit_state,test_record_external_submit,test_local_only):
         test()
-    print("PASS: 10 groups of CAREER_OS_RUN_CONTRACT_V1_3 live-shape tests")
+    print("PASS: 11 groups of CAREER_OS_RUN_CONTRACT_V1_4 live-shape tests")
 
 
 if __name__=="__main__":
