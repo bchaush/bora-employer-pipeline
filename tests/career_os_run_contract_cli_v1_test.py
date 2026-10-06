@@ -544,7 +544,7 @@ def test_readback_from_xlsx_export():
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("bool","1"); cases.append((bad,"READBACK_CELL_TYPE"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="e"><v>#REF!</v></c>'); cases.append((bad,"READBACK_CELL_TYPE"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="d"><v>2026-10-06</v></c>'); cases.append((bad,"READBACK_CELL_TYPE"))
-        for broken in ("99999","-1","-0"," 1","1 ","+1","1.0","01","٣","","x"):
+        for broken in ("99999","-1","-0"," 1","1 ","+1","1.0","01","٣","","x","1"*5000,"9"*10):
             bad=xlsx_tabs(led); bad["JOBS"][1][4]=("raw",'<c r="E2" t="s"><v>%s</v></c>'%broken); cases.append((bad,"READBACK_XLSX_INVALID"))
         bad=xlsx_tabs(led); bad["JOBS"][1][4]=("raw",'<c r="E2" t="s"/>'); cases.append((bad,"READBACK_XLSX_INVALID"))
         # Resource bounds: sparse or huge coordinates are refused before any grid is built.
@@ -553,6 +553,8 @@ def test_readback_from_xlsx_export():
         for row_attribute in ("0","-5","1e9","abc","٣"):
             bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="%s"><c t="inlineStr"><is><t>x</t></is></c>'%row_attribute); cases.append((bad,"READBACK_XLSX_INVALID"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="AAA2" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B%s" t="inlineStr"><is><t>x</t></is></c>'%("1"*5000)); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="%s"><c t="inlineStr"><is><t>x</t></is></c>'%("1"*5000)); cases.append((bad,"READBACK_XLSX_INVALID"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B7" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
         bad=xlsx_tabs(led); bad["LOG"][1]=bad["LOG"][1]+["stray"]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
         bad=xlsx_tabs(led); bad["LOG"][1]=bad["LOG"][1]+[("blank",),("inline"," ")]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
@@ -577,6 +579,16 @@ def test_readback_from_xlsx_export():
                         "the materialized-grid bound is checked before the grid is built: "+out)
         finally:
             run.XLSX_MAX_CELLS=saved
+        good=(tmp/"ledger.xlsx")
+        make_xlsx(good,xlsx_tabs(led))
+        corrupt=bytearray(good.read_bytes())
+        with zipfile.ZipFile(good) as archive:
+            info=archive.getinfo("xl/worksheets/sheet2.xml")
+        start=info.header_offset+30+len(info.filename.encode())+len(info.extra)
+        corrupt[start:start+8]=b"\xff"*8  # damage stored member bytes: a CRC failure on read
+        write(tmp/"corrupt.xlsx",bytes(corrupt))
+        code,out=invoke(["readback","--xlsx",tmp/"corrupt.xlsx","--out",tmp/"c.json","--receipt",tmp/"c-r.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a corrupt member is a controlled refusal: "+out)
         write(tmp/"not.xlsx",b"not a zip")
         code,out=invoke(["readback","--xlsx",tmp/"not.xlsx","--out",tmp/"n.json","--receipt",tmp/"n-r.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a non-xlsx file is refused")

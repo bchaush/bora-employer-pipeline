@@ -86,12 +86,12 @@ XLSX_MAX_UNCOMPRESSED_BYTES = 20 * 1024 * 1024
 XLSX_MAX_ROW = 100000
 XLSX_MAX_COLUMN = 702  # ZZ
 XLSX_MAX_CELLS = 200000  # <c> elements per tab, and materialized cells per tab
-XLSX_POSITIVE_INT = re.compile(r"[1-9][0-9]*")
-XLSX_INDEX = re.compile(r"0|[1-9][0-9]*")
+XLSX_POSITIVE_INT = re.compile(r"[1-9][0-9]{0,6}")  # at most 7 digits
+XLSX_INDEX = re.compile(r"0|[1-9][0-9]{0,8}")  # at most 9 digits, so int() is always safe and never hits the int-string limit
 XLSX_NS_MAIN = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 XLSX_NS_DOC_REL = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 XLSX_NS_PKG_REL = "{http://schemas.openxmlformats.org/package/2006/relationships}"
-XLSX_CELL_REF = re.compile(r"^([A-Z]{1,3})([1-9][0-9]*)$")
+XLSX_CELL_REF = re.compile(r"^([A-Z]{1,3})([1-9][0-9]{0,6})$")  # at most 7 digits, so int() is always safe
 AWARE_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$")
 
 SLATE_KEYS = ("job_id", "company", "role", "official_url", "source", "location_arrangement", "Geography_State",
@@ -266,6 +266,11 @@ def _xlsx_text(element: Any) -> str:
     return "".join(parts)
 
 
+def _short(value: Any) -> str:
+    text = repr(value)
+    return text if len(text) <= 40 else text[:37] + "..."
+
+
 def _xlsx_column(letters: str) -> int:
     number = 0
     for letter in letters:
@@ -288,11 +293,16 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
 
         def part(name: str, required: bool = True) -> Any:
             try:
-                data = archive.read(name)
+                with archive.open(name) as member:
+                    data = member.read(XLSX_MAX_UNCOMPRESSED_BYTES + 1)  # never trust the declared size
             except KeyError:
                 if required:
                     raise RunError("READBACK_XLSX_INVALID", "missing part %s" % name)
                 return None
+            except Exception as error:  # corrupt member: bad CRC, bad compression, truncated archive
+                raise RunError("READBACK_XLSX_INVALID", "%s cannot be read: %s" % (name, type(error).__name__)) from error
+            if len(data) > XLSX_MAX_UNCOMPRESSED_BYTES:
+                raise RunError("READBACK_XLSX_INVALID", "%s expands beyond %d bytes" % (name, XLSX_MAX_UNCOMPRESSED_BYTES))
             try:
                 return ElementTree.fromstring(data)
             except ElementTree.ParseError as error:
@@ -323,10 +333,10 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                 row_attribute = row.get("r")
                 if row_attribute is None:
                     row_number += 1
-                elif XLSX_POSITIVE_INT.fullmatch(row_attribute) and len(row_attribute) <= 7:
+                elif XLSX_POSITIVE_INT.fullmatch(row_attribute):
                     row_number = int(row_attribute)
                 else:
-                    raise RunError("READBACK_XLSX_INVALID", "%s has an invalid row number %r" % (name, row_attribute))
+                    raise RunError("READBACK_XLSX_INVALID", "%s has an invalid row number %s" % (name, _short(row_attribute)))
                 if row_number > XLSX_MAX_ROW:
                     raise RunError("READBACK_XLSX_INVALID", "%s row %d is beyond the %d-row limit" % (name, row_number, XLSX_MAX_ROW))
                 column = 0
@@ -338,7 +348,7 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                     if reference is not None:
                         match = XLSX_CELL_REF.match(reference)
                         if not match or int(match.group(2)) != row_number:
-                            raise RunError("READBACK_XLSX_INVALID", "%s cell reference %r is not in row %d" % (name, reference, row_number))
+                            raise RunError("READBACK_XLSX_INVALID", "%s cell reference %s is not in row %d" % (name, _short(reference), row_number))
                         column = _xlsx_column(match.group(1))
                     else:
                         column += 1
@@ -352,8 +362,8 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                     if kind == "s":
                         raw_index = value_element.text if value_element is not None else None
                         if raw_index is None or not XLSX_INDEX.fullmatch(raw_index) or int(raw_index) >= len(shared):
-                            raise RunError("READBACK_XLSX_INVALID", "%s %s has a broken shared-string index %r"
-                                           % (name, reference or "row %d" % row_number, raw_index))
+                            raise RunError("READBACK_XLSX_INVALID", "%s %s has a broken shared-string index %s"
+                                           % (name, _short(reference or "row %d" % row_number), _short(raw_index)))
                         text = shared[int(raw_index)]
                     elif kind == "str":
                         text = (value_element.text or "") if value_element is not None else ""
@@ -385,7 +395,12 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
 def cmd_readback(args: argparse.Namespace) -> tuple:
     if args.xlsx:
         source_kind, source_path = "xlsx", args.xlsx
-        raw = read_xlsx_tabs(args.xlsx, [name for name, _headers, _required in READBACK_TABS])
+        try:
+            raw = read_xlsx_tabs(args.xlsx, [name for name, _headers, _required in READBACK_TABS])
+        except RunError:
+            raise
+        except Exception as error:  # every malformed .xlsx is a controlled refusal, never a crash
+            raise RunError("READBACK_XLSX_INVALID", "unreadable .xlsx: %s" % type(error).__name__) from error
         for name in list(raw):
             if not raw[name]:
                 raise RunError("READBACK_INVALID", "%s tab is empty; its header row must be row 1" % name)
