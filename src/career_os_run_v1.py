@@ -750,20 +750,19 @@ def cmd_record_external_submit(args: argparse.Namespace) -> tuple:
     for value, what in ((args.channel, "--channel"), (args.resume_note, "--resume-note"), (args.evidence_note, "--evidence-note")):
         if not single_clean_line(value):
             raise RunError("FIELD_INVALID", "%s must be one non-empty line without control, format or separator characters" % what)
-    if HASH_LIKE.search(args.resume_note):
-        raise RunError("FIELD_INVALID", "--resume-note must not contain anything hash-like; an external submission has no Career OS resume hash")
+    for value, what in ((args.channel, "--channel"), (args.resume_note, "--resume-note"), (args.evidence_note, "--evidence-note")):
+        if HASH_LIKE.search(unicodedata.normalize("NFKC", value)):
+            raise RunError("FIELD_INVALID", "%s must not contain anything hash-like (checked after Unicode NFKC normalization)" % what)
     if any(row.get("Job_ID") == args.job_id for row in ledger["APPLICATIONS"]):
         raise RunError("ALREADY_RECORDED", "an APPLICATIONS row already exists for %s" % args.job_id)
     if any(row.get("Job_ID") == args.job_id and row.get("Stage") == "APPLICATION_RECORDED" for row in ledger["LOG"]):
         raise RunError("ALREADY_RECORDED", "LOG already records an application for %s" % args.job_id)
     application = {"Application_ID": "APP::%s::%s" % (args.job_id, args.applied_date), "Job_ID": args.job_id,
-                   "Applied_Date": args.applied_date, "Resume_Version": "%s | %s" % (EXTERNAL_RESUME_PREFIX, args.resume_note.strip()),
+                   "Applied_Date": args.applied_date, "Resume_Version": EXTERNAL_RESUME_PREFIX,
                    "Cover_Letter_Version": "NOT_RECORDED", "Channel": args.channel.strip(), "Current_Status": "SUBMITTED",
                    "Last_Update": args.applied_date, "Next_Action": "Monitor for employer response",
-                   "Outcome": "Bora confirmed external submission; " + args.evidence_note.strip()}
+                   "Outcome": "Bora confirmed external submission; resume used: %s; %s" % (args.resume_note.strip(), args.evidence_note.strip())}
     _require_exact_row_shape(application, APPLICATIONS_HEADERS, "APPLICATIONS")
-    if _resume_sha_from_version(application["Resume_Version"]) is not None:
-        raise RunError("FIELD_INVALID", "Resume_Version of an external submission must never carry a resume hash")
     jobs = {"Job_ID": args.job_id, "Application_Status": "SUBMITTED"}
     log = {"Run_ID": "RECORD_EXTERNAL_SUBMIT::%s::%s" % (args.job_id, args.applied_date), "Timestamp": args.applied_date,
            "Stage": "APPLICATION_RECORDED", "Source": "CAREER_OS_RUN_V1", "Job_ID": args.job_id, "Status": "SUBMITTED",

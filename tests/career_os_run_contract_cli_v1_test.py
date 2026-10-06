@@ -509,8 +509,8 @@ def test_record_external_submit():
         rec=json.loads((tmp/"ext.json").read_text())
         app=rec["applications_row"]; log=rec["log_row"]
         assert_true(set(app)==set(run.APPLICATIONS_HEADERS) and set(log)==set(run.LOG_HEADERS),"exact live shapes")
-        assert_true(app["Resume_Version"]=="EXTERNAL_NO_CAREER_OS_PACKAGE | Bora's own Handshake resume" and "sha256" not in app["Resume_Version"],
-                    "never claims a Career OS resume hash")
+        assert_true(app["Resume_Version"]=="EXTERNAL_NO_CAREER_OS_PACKAGE","Resume_Version is the fixed label, so it can never carry a hash")
+        assert_true("resume used: Bora's own Handshake resume" in app["Outcome"],"the resume note is kept in Outcome")
         assert_true(app["Cover_Letter_Version"]=="NOT_RECORDED" and rec["jobs_row"]=={"Job_ID":JOB_ID,"Application_Status":"SUBMITTED"},
                     "only Application_Status changes in JOBS; nothing invented about a cover letter")
         assert_true(app["Outcome"].endswith("Handshake shows Applied on October 6, 2026"),"Bora's evidence note is kept")
@@ -526,7 +526,10 @@ def test_record_external_submit():
                            ("--resume-note","sha_256 "+hexs),("--resume-note","digest "+hexs),("--resume-note","md5 "+"b"*32),
                            ("--channel","Handshake\rQuick"),("--evidence-note","line1\rline2"),("--resume-note","tab\there"),
                            ("--channel","Handshake\u0085Quick"),("--evidence-note","a\u2028b"),("--evidence-note","a\u2029b"),
-                           ("--resume-note","zero\u200bwidth"),("--channel","   ")):
+                           ("--resume-note","zero\u200bwidth"),("--channel","   "),
+                           ("--resume-note","SHA\u00b2\u2075\u2076: "+"\uff41"*64),("--resume-note","sha\u2082\u2085\u2086: "+"\uff41"*64),
+                           ("--resume-note","\uff33\uff28\uff21\uff12\uff15\uff16: "+"\uff41"*64),("--evidence-note","receipt "+"\uff10"*40),
+                           ("--channel","sha256 portal")):
             argv=["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake","--applied-date","2026-10-06",
                   "--resume-note","own resume","--evidence-note","Handshake shows Applied","--bora-confirmed","--receipt",tmp/"bad.json"]
             argv[argv.index(flag)+1]=value
