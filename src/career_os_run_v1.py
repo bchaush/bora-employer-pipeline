@@ -215,6 +215,12 @@ def require_aware_timestamp(value: Any, what: str) -> str:
 
 # readback ---------------------------------------------------------------------------------------
 
+def _short(value: Any) -> str:
+    """An input value as it may appear in a failure detail: its repr, never more than 40 characters."""
+    text = repr(value)
+    return text if len(text) <= 40 else text[:37] + "..."
+
+
 def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
     """Raw Sheets values (header row first) -> exact row objects.
 
@@ -225,7 +231,11 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
         raise RunError("READBACK_INVALID", "%s must be an array of rows with the header row first" % name)
     header = list(values[0])
     if header != list(headers):
-        raise RunError("READBACK_HEADER_MISMATCH", "%s header is %s; expected exactly %s" % (name, header, list(headers)))
+        position = next((index for index, (got, want) in enumerate(zip(header, headers)) if got != want), min(len(header), len(headers)))
+        got = _short(header[position]) if position < len(header) else "nothing"
+        want = _short(headers[position]) if position < len(headers) else "nothing"
+        raise RunError("READBACK_HEADER_MISMATCH", "%s header has %d columns (expected exactly %d); column %d is %s, expected %s"
+                       % (name, len(header), len(headers), position + 1, got, want))
     rows, skipped = [], 0
     for number, raw in enumerate(values[1:], start=2):
         if not isinstance(raw, list):
@@ -244,9 +254,9 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
         cells = cells + [""] * (len(headers) - len(cells))
         for column, cell in zip(headers, cells):
             if DIGITS_ONLY.fullmatch(cell) and (name, column) not in DIGITS_ONLY_EXEMPT:
-                raise RunError("READBACK_SUSPECT_NUMERIC_CELL", "%s row %d %s is the bare number %r; no Ledger cell holds one. Rebuild "
+                raise RunError("READBACK_SUSPECT_NUMERIC_CELL", "%s row %d %s is the bare number %s; no Ledger cell holds one. Rebuild "
                                "ledger.json with readback --xlsx from a fresh Drive .xlsx export; never parse the sheet yourself"
-                               % (name, number, column, cell))
+                               % (name, number, column, _short(cell)))
         if all(cell == "" for cell in cells):
             skipped += 1
             continue
@@ -264,11 +274,6 @@ def _xlsx_text(element: Any) -> str:
             for run_text in child.findall(XLSX_NS_MAIN + "t"):
                 parts.append(run_text.text or "")
     return "".join(parts)
-
-
-def _short(value: Any) -> str:
-    text = repr(value)
-    return text if len(text) <= 40 else text[:37] + "..."
 
 
 def _xlsx_column(letters: str) -> int:
@@ -317,7 +322,7 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
         for sheet in workbook.iter(XLSX_NS_MAIN + "sheet"):
             name = sheet.get("name")
             if name in sheets:
-                raise RunError("READBACK_XLSX_INVALID", "duplicate tab %s" % name)
+                raise RunError("READBACK_XLSX_INVALID", "duplicate tab %s" % _short(name))
             sheets[name] = targets.get(sheet.get(XLSX_NS_DOC_REL + "id"))
         tabs = {}
         for name in wanted:
@@ -376,7 +381,7 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                         raise RunError("READBACK_CELL_TYPE", "%s %s is a %s cell, not text; Ledger cells are text only. Fix that cell in "
                                        "the sheet (format it as plain text) and export again" % (name, reference or "row %d" % row_number,
                                                                                                 {"n": "number", "b": "true/false", "e": "error",
-                                                                                                 "d": "date"}.get(kind, kind)))
+                                                                                                 "d": "date"}.get(kind, _short(kind))))
                     if text != "":
                         filled.setdefault(row_number, {})[column] = text
             # Blank cells are never stored, so the grid is sized by real content only: each row is as wide as its last non-blank
@@ -411,7 +416,7 @@ def cmd_readback(args: argparse.Namespace) -> tuple:
             raise RunError("READBACK_INVALID", "raw values must be an object keyed by tab name")
     unknown = sorted(set(raw) - {name for name, _headers, _required in READBACK_TABS})
     if unknown:
-        raise RunError("READBACK_INVALID", "unknown tabs %s" % unknown)
+        raise RunError("READBACK_INVALID", "unknown tabs %s" % ", ".join(_short(item) for item in unknown[:5]))
     ledger, counts = {}, []
     for name, headers, required in READBACK_TABS:
         if name not in raw:
@@ -424,7 +429,7 @@ def cmd_readback(args: argparse.Namespace) -> tuple:
     ids = [row["Job_ID"] for row in ledger["JOBS"]]
     duplicates = sorted({job_id for job_id in ids if ids.count(job_id) > 1})
     if duplicates:
-        raise RunError("READBACK_DUPLICATE_JOB_ID", ",".join(duplicates))
+        raise RunError("READBACK_DUPLICATE_JOB_ID", "%d duplicated: %s" % (len(duplicates), ", ".join(_short(item) for item in duplicates[:5])))
     ledger_sha = write_receipt(args.out, ledger)
     load_ledger(args.out)
     receipt = {"spec": "CAREER_OS_RUN_READBACK_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "source": source_kind,

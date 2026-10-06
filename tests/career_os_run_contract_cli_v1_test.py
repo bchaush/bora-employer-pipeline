@@ -589,6 +589,34 @@ def test_readback_from_xlsx_export():
         write(tmp/"corrupt.xlsx",bytes(corrupt))
         code,out=invoke(["readback","--xlsx",tmp/"corrupt.xlsx","--out",tmp/"c.json","--receipt",tmp/"c-r.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a corrupt member is a controlled refusal: "+out)
+        # Failure details never echo more than 40 characters of any input value, on either source.
+        long_text,long_digits="Z"*5000,"7"*5000
+        def bounded(out,expected):
+            detail=failure(out)
+            return detail["code"]==expected and long_text[:41] not in detail["detail"] and long_digits[:41] not in detail["detail"] \
+                and len(detail["detail"])<400
+        echo_cases=[]
+        bad=xlsx_tabs(led); bad["JOBS"][0][0]=long_text; echo_cases.append(("x",bad,"READBACK_HEADER_MISMATCH"))
+        bad=xlsx_tabs(led); bad["JOBS"][0]=bad["JOBS"][0]+[long_text]; echo_cases.append(("x",bad,"READBACK_HEADER_MISMATCH"))
+        bad=xlsx_tabs(ledger([job_row(Role_Status=long_digits)])); echo_cases.append(("x",bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=xlsx_tabs(ledger([job_row(job_id=long_text),job_row(job_id=long_text)])); echo_cases.append(("x",bad,"READBACK_DUPLICATE_JOB_ID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="%s"><v>1</v></c>'%long_text); echo_cases.append(("x",bad,"READBACK_CELL_TYPE"))
+        bad=raw_values(led); bad["JOBS"][0][0]=long_text; echo_cases.append(("r",bad,"READBACK_HEADER_MISMATCH"))
+        bad=raw_values(ledger([job_row(Role_Status=long_digits)])); echo_cases.append(("r",bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=raw_values(led); bad[long_text]=[["x"]]; echo_cases.append(("r",bad,"READBACK_INVALID"))
+        for source,value,expected in echo_cases:
+            code,out=readback_xlsx(tmp,value,"echo.json") if source=="x" else readback(tmp,value,"echo.json")
+            assert_true(code==run.EXIT_ERROR and bounded(out,expected),"%s failure detail is bounded (%s): %s"%(expected,source,out[:300]))
+        dup=make_xlsx(tmp/"dup.xlsx",xlsx_tabs(led))
+        with zipfile.ZipFile(dup) as archive:
+            parts={name:archive.read(name) for name in archive.namelist()}
+        parts["xl/workbook.xml"]=parts["xl/workbook.xml"].replace(b'name="SETTINGS"',('name="%s"'%long_text).encode()).replace(
+            b'name="EVIDENCE"',b"").replace(b"</sheets>",('<sheet name="%s" sheetId="99" r:id="rId1"/></sheets>'%long_text).encode())
+        with zipfile.ZipFile(dup,"w") as archive:
+            for name,data in parts.items():
+                archive.writestr(name,data)
+        code,out=invoke(["readback","--xlsx",dup,"--out",tmp/"d.json","--receipt",tmp/"d-r.json"])
+        assert_true(code==run.EXIT_ERROR and bounded(out,"READBACK_XLSX_INVALID"),"duplicate long tab name is bounded: "+out[:300])
         write(tmp/"not.xlsx",b"not a zip")
         code,out=invoke(["readback","--xlsx",tmp/"not.xlsx","--out",tmp/"n.json","--receipt",tmp/"n-r.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a non-xlsx file is refused")
