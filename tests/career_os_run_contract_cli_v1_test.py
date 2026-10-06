@@ -1,4 +1,4 @@
-"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_5 (V1_4 plus resume-model, package --resume-model and QA failure details).
+"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_6 (V1_5 plus slate Ledger Job_IDs, posting source tiers and confirm-write).
 
 Fixtures use the exact Production Ledger headers:
 - JOBS: 20 columns
@@ -107,7 +107,7 @@ def ledger(jobs=None, applications=None, logs=None):
 
 
 def role(job_id=JOB_ID, official_url=URL, **overrides):
-    value = {"job_id": job_id, "company": COMPANY, "role": ROLE, "official_url": official_url, "source": "MANUAL_URL",
+    value = {"job_id": job_id, "company": COMPANY, "role": ROLE, "official_url": official_url, "source": "EMPLOYER_SITE (careers.example, opened live)",
              "location_arrangement": "Remote", "Geography_State": "PASS", "work_authorization_text": "No sponsorship language stated.",
              "OPT_Screen_State": "HUMAN_REQUIRED", "mandatory_gaps": [], "recommendation": "PURSUE",
              "reasons": ["Requirements align with approved evidence."]}
@@ -911,6 +911,73 @@ def test_resume_model():
     print("PASS: resume-model builds only approved one-page recipes (MarketMind or Market Empire) that pass page fill and pre-render QA.")
 
 
+def test_tracked_ids_source_tiers_and_confirm_write():
+    with tempfile.TemporaryDirectory() as raw_dir:
+        tmp=Path(raw_dir)
+        # The 2026-10-06 Entegris incident: screened under a new id, matched by URL, then decide used the screening id.
+        ledger_id="ENTEGRIS::LAB-AUTOMATION-AI-ENGINEERING-COOP-REQ-14498"
+        tracked=job_row(job_id=ledger_id,Bora_Decision="REJECT")
+        code,out=run_slate(tmp,[role(job_id="ENTEGRIS::REQ-14498")],ledger([tracked]))
+        line=[l for l in out.splitlines() if "ALREADY_TRACKED" in l][0]
+        assert_true(code==0 and line.startswith(ledger_id+" | ") and "screened_as=ENTEGRIS::REQ-14498" in line,
+                    "a tracked role is printed under its Ledger Job_ID: "+line)
+        same=[l for l in run_slate(tmp,[role(job_id=ledger_id)],ledger([tracked]))[1].splitlines() if "ALREADY_TRACKED" in l][0]
+        assert_true("screened_as" not in same,"no screened_as note when the ids already match")
+        code,out=run_slate(tmp,[role(job_id="ENTEGRIS::REQ-14498")],ledger([tracked]))
+        slate_receipt=tmp/"slate.json"
+        led_path=write(tmp/"closeout-ledger.json",ledger([job_row(job_id=ledger_id,Bora_Decision="PURSUE")]))
+        code,out=invoke(["closeout","--slate-receipt",slate_receipt,"--ledger",led_path,"--folders",write(tmp/"folders.json",{}),
+                         "--receipt",tmp/"close.json"])
+        assert_true("MISSING: %s: PURSUE_PACKAGE_NOT_PERSISTED_COMPLETE"%ledger_id in out,"closeout names the Ledger Job_ID: "+out)
+        # Source tiers: every screened role says how its posting was verified.
+        for good in ("EMPLOYER_SITE","SCHOOL_PORTAL (Babson; employer contact dkent@ae-ventures.com matches ae-ventures.com/careers)",
+                     "JOB_BOARD (LinkedIn repost; Bora verified)"):
+            assert_true(run_slate(tmp,[role(source=good)],ledger([]))[0]==0,"source tier accepted: "+good)
+        for bad in ("MANUAL_URL","FIRST_PARTY","school_portal","EMPLOYER_SITES","Handshake"):
+            code,out=run_slate(tmp,[role(source=bad)],ledger([]))
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="SLATE_INVALID" and "source must start with" in failure(out)["detail"],
+                        "untiered source refused: "+bad)
+        # confirm-write: every printed row must be in a fresh readback exactly.
+        code,out=run_slate(tmp,[role()],ledger([]))
+        rows=json.loads((tmp/"slate.json").read_text())["jobs_rows"]
+        good_row={k:("" if v is None else v) for k,v in rows[0].items()}
+        after=write(tmp/"after.json",ledger([good_row]))
+        code,out=invoke(["confirm-write","--ledger",after,"--written",tmp/"slate.json","--receipt",tmp/"cw.json"])
+        assert_true(code==0 and "CONFIRM_WRITE: PASS" in out and "JOBS 'FIXTURE::DATA-ANALYST'" in out,"slate rows confirmed: "+out)
+        typo=dict(good_row,Official_URL=good_row["Official_URL"]+"x")
+        code,out=invoke(["confirm-write","--ledger",write(tmp/"typo.json",ledger([typo])),"--written",tmp/"slate.json","--receipt",tmp/"cw.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="WRITE_NOT_CONFIRMED" and "Official_URL" in failure(out)["detail"],
+                    "a mistyped cell is caught and named: "+out)
+        code,out=invoke(["confirm-write","--ledger",write(tmp/"none.json",ledger([])),"--written",tmp/"slate.json","--receipt",tmp/"cw.json"])
+        assert_true(code==run.EXIT_ERROR and "found 0 rows" in failure(out)["detail"],"a missing row is caught")
+        # decide: the one JOBS cell plus the exact LOG row; a shortened fingerprint inside Notes is caught.
+        base=write(tmp/"base.json",ledger([job_row(First_Seen=AS_OF)],[],[log_row()]))
+        assert_true(invoke(["decide","--ledger",base,"--job-id",JOB_ID,"--decision","PURSUE","--decided-at","2026-10-06T19:06:03-04:00",
+                            "--receipt",tmp/"decide.json"])[0]==0,"decide")
+        rec=json.loads((tmp/"decide.json").read_text())
+        good=ledger([job_row(First_Seen=AS_OF,Bora_Decision="PURSUE")],[],[log_row(),rec["log_row"]])
+        code,out=invoke(["confirm-write","--ledger",write(tmp/"d-ok.json",good),"--written",tmp/"decide.json","--receipt",tmp/"cw.json"])
+        assert_true(code==0 and out.count("confirmed: ")==2,"decide cell and LOG row confirmed: "+out)
+        fp=rec["request"]["reviewed_context_fingerprint"]
+        mangled=dict(rec["log_row"],Notes=rec["log_row"]["Notes"].replace(fp,fp[:40]+fp[52:]))
+        bad=ledger([job_row(First_Seen=AS_OF,Bora_Decision="PURSUE")],[],[log_row(),mangled])
+        code,out=invoke(["confirm-write","--ledger",write(tmp/"d-bad.json",bad),"--written",tmp/"decide.json","--receipt",tmp/"cw.json"])
+        assert_true(code==run.EXIT_ERROR and "Notes differ" in failure(out)["detail"],"a shortened fingerprint in the LOG row is caught: "+out)
+        wrong_cell=ledger([job_row(First_Seen=AS_OF,Bora_Decision="WATCH")],[],[log_row(),rec["log_row"]])
+        code,out=invoke(["confirm-write","--ledger",write(tmp/"d-cell.json",wrong_cell),"--written",tmp/"decide.json","--receipt",tmp/"cw.json"])
+        assert_true(code==run.EXIT_ERROR and "Bora_Decision" in failure(out)["detail"],"a wrong decision cell is caught")
+        # Two receipts at once, and receipts that write nothing are refused.
+        assert_true(run_slate(tmp,[role(job_id="OTHER::JOB",official_url="https://careers.example/other")],ledger([]))[0]==0,"second slate")
+        other={k:("" if v is None else v) for k,v in json.loads((tmp/"slate.json").read_text())["jobs_rows"][0].items()}
+        both=ledger([other,job_row(First_Seen=AS_OF,Bora_Decision="PURSUE")],[],[log_row(),rec["log_row"]])
+        code,out=invoke(["confirm-write","--ledger",write(tmp/"both.json",both),"--written",tmp/"slate.json","--written",tmp/"decide.json",
+                         "--receipt",tmp/"cw.json"])
+        assert_true(code==0 and out.count("confirmed: ")==3,"several receipts are confirmed together: "+out)
+        code,out=invoke(["confirm-write","--ledger",base,"--written",tmp/"cw.json","--receipt",tmp/"cw2.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_UNSUPPORTED","a non-write receipt is refused")
+    print("PASS: tracked roles use their Ledger Job_ID, every source carries a verification tier, and confirm-write proves each write.")
+
+
 def test_local_only():
     source=(ROOT/"src"/"career_os_run_v1.py").read_text(encoding="utf-8")
     for forbidden in ("import requests","urllib","http.client","googleapiclient","socket","subprocess","smtplib"):
@@ -919,7 +986,8 @@ def test_local_only():
     for needle in ("career_os_run_v1.py readback","career_os_run_v1.py decide","career_os_run_v1.py pursuit-state","--as-of",
                    "Never hand-build, retype or partly read ledger.json","career_os_run_v1.py record-external-submit","--xlsx ledger.xlsx",
                    "never parse it yourself","they never block package","career_os_run_v1.py resume-model","--resume-model run_output_model/model.json",
-                   "MARKET_EMPIRE","Never assemble the resume model by hand"):
+                   "MARKET_EMPIRE","Never assemble the resume model by hand","career_os_run_v1.py confirm-write","SCHOOL_PORTAL",
+                   "never keep a role outside the Ledger","use that Ledger Job_ID in every later command"):
         assert_true(needle in runbook,"runbook documents "+needle)
     config=json.loads((ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.json").read_text(encoding="utf-8"))["run_contract"]
     assert_true(config["contract_id"]==run.RUN_CONTRACT_ID and config["state_machine"][0]=="readback" and "decide" in config["state_machine"]
@@ -932,9 +1000,9 @@ def main():
     assert_true(len(run.JOBS_HEADERS)==20 and len(run.APPLICATIONS_HEADERS)==10 and len(run.LOG_HEADERS)==9,"live header counts")
     for test in (test_preflight_live_settings,test_slate_dedupe_and_score_rules,test_package_ledger_binding_and_persistence,
                  test_record_submit_live_shapes,test_closeout_slate_authority_and_sha_parse,test_end_to_end_live_shapes,
-                 test_readback_normalizes_sheet_values,test_readback_from_xlsx_export,test_decide_and_pursuit_state,test_record_external_submit,test_resume_model,test_local_only):
+                 test_readback_normalizes_sheet_values,test_readback_from_xlsx_export,test_decide_and_pursuit_state,test_record_external_submit,test_resume_model,test_tracked_ids_source_tiers_and_confirm_write,test_local_only):
         test()
-    print("PASS: 12 groups of CAREER_OS_RUN_CONTRACT_V1_5 live-shape tests")
+    print("PASS: 13 groups of CAREER_OS_RUN_CONTRACT_V1_6 live-shape tests")
 
 
 if __name__=="__main__":

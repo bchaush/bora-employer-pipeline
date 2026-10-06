@@ -1,4 +1,4 @@
-"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_5).
+"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_6).
 
 A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
 
@@ -44,7 +44,7 @@ import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
 import pursuit_decision  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_5"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_6"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
@@ -119,6 +119,10 @@ SLATE_TEXT_KEYS = ("job_id", "company", "role", "official_url", "source", "locat
                    "work_authorization_text", "OPT_Screen_State")
 SLATE_LIST_KEYS = ("mandatory_gaps", "reasons")
 RECOMMENDATIONS = ("PURSUE", "WATCH", "HOLD", "REJECT")
+# Posting verification tier (Bora's rule, 2026-10-06: verify the employer and the live posting, not where it is posted). The slate
+# source must start with one of these; the evidence follows in the same text.
+SOURCE_TIERS = ("EMPLOYER_SITE", "SCHOOL_PORTAL", "JOB_BOARD")
+SOURCE_TIER_PATTERN = re.compile(r"^(EMPLOYER_SITE|SCHOOL_PORTAL|JOB_BOARD)(\b|$)")
 UNKNOWN_GEOGRAPHY = frozenset({"", "UNKNOWN", "UNCLEAR", "UNRESOLVED", "NOT_SPECIFIED", "NOT SPECIFIED"})
 
 PLAN_SPEC = "CAREER_OS_PERSIST_PLAN_V1"
@@ -651,6 +655,66 @@ def cmd_decide(args: argparse.Namespace) -> tuple:
     return EXIT_OK, block(lines), None
 
 
+# confirm-write ----------------------------------------------------------------------------------
+
+def _written_expectations(receipt: Mapping[str, Any]) -> list:
+    """(tab, kind, row) for every Ledger write a CLI receipt printed. kind is 'row' (an exact full row: append or overwrite) or
+    'cells' (the listed cells of the JOBS row with that Job_ID)."""
+    spec = receipt.get("spec") if isinstance(receipt, Mapping) else None
+    out = []
+    if spec == "CAREER_OS_RUN_SLATE_RECEIPT_V1":
+        out += [("JOBS", "row", {key: ("" if value is None else value) for key, value in row.items()}) for row in receipt.get("jobs_rows", [])]
+    elif spec == "CAREER_OS_RUN_DECIDE_RECEIPT_V1":
+        out += [("JOBS", "cells", receipt["jobs_update"]), ("LOG", "row", receipt["log_row"])]
+    elif spec in ("CAREER_OS_RECORD_SUBMIT_RECEIPT_V1", "CAREER_OS_RECORD_EXTERNAL_SUBMIT_RECEIPT_V1"):
+        out += [("APPLICATIONS", "row", receipt["applications_row"]), ("JOBS", "cells", receipt["jobs_row"]), ("LOG", "row", receipt["log_row"])]
+    elif spec == PERSIST_RECEIPT_SPEC and receipt.get("jobs_row_values"):
+        out += [("JOBS", "cells", receipt["jobs_row_values"])]
+    elif spec in ("CAREER_OS_NETWORK_ADD_RECEIPT_V1", "CAREER_OS_NETWORK_UPDATE_RECEIPT_V1"):
+        out += [("NETWORK", "row", receipt["network_row"]), ("LOG", "row", receipt["log_row"])]
+    elif spec == "CAREER_OS_RECORD_OUTCOME_RECEIPT_V1":
+        out += [("APPLICATIONS", "row", receipt["applications_row"]), ("LOG", "row", receipt["log_row"])]
+    else:
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "spec %s writes nothing to the Ledger or is unknown" % _short(spec))
+    return out
+
+
+def cmd_confirm_write(args: argparse.Namespace) -> tuple:
+    ledger = load_ledger(args.ledger)
+    keys = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
+    confirmed, problems = [], []
+    for path in args.written:
+        for tab, kind, expected in _written_expectations(read_json(path, "written receipt")):
+            rows = ledger.get(tab)
+            if rows is None:
+                problems.append("%s tab missing from the readback (read the whole Ledger)" % tab)
+                continue
+            key = keys[tab]
+            ident = str(expected.get(key, ""))
+            matches = [row for row in rows if row.get(key) == ident]
+            label = "%s %s" % (tab, _short(ident))
+            if len(matches) != 1:
+                problems.append("%s: found %d rows" % (label, len(matches)))
+                continue
+            row = matches[0]
+            fields = expected.keys() if kind == "cells" else set(expected) | set(row)
+            wrong = sorted(field for field in fields if str(row.get(field, "")) != str("" if expected.get(field) is None else expected.get(field, "")))
+            if wrong:
+                problems.append("%s: %s differ from the CLI output" % (label, ", ".join(wrong[:5])))
+            else:
+                confirmed.append(label)
+    if problems:
+        detail = "; ".join(problems)
+        raise RunError("WRITE_NOT_CONFIRMED", detail if len(detail) <= 600 else detail[:597] + "...")
+    receipt = {"spec": "CAREER_OS_RUN_CONFIRM_WRITE_RECEIPT_V1", "contract": RUN_CONTRACT_ID,
+               "written_receipts_sha256": [sha256_hex(read_bytes(path, "written receipt")) for path in args.written],
+               "ledger_sha256": sha256_hex(read_bytes(args.ledger, "Ledger readback")), "confirmed": confirmed}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_CONFIRM_WRITE: PASS (every printed row is in the Ledger exactly)"] + ["confirmed: " + item for item in confirmed]
+    lines.append("receipt_sha256: " + receipt_sha)
+    return EXIT_OK, block(lines), None
+
+
 # preflight --------------------------------------------------------------------------------------
 
 def _settings_map(raw: Any) -> dict:
@@ -780,6 +844,8 @@ def validate_slate_role(role: Any, index: int) -> list:
             problems.append("%s: %s must be a list of strings" % (where, key))
     if role["recommendation"] not in RECOMMENDATIONS:
         problems.append("%s: recommendation must be one of %s" % (where, "|".join(RECOMMENDATIONS)))
+    if isinstance(role["source"], str) and not SOURCE_TIER_PATTERN.match(role["source"]):
+        problems.append("%s: source must start with %s, then the evidence" % (where, ", ".join(SOURCE_TIERS)))
     if problems:
         return problems
     for key in SLATE_KEYS:
@@ -853,9 +919,11 @@ def cmd_slate(args: argparse.Namespace) -> tuple:
     lines = ["CAREER_OS_RUN_SLATE (system recommendations only; STOP for Bora decision)"]
     for item in slate:
         if item["tracking_status"] == "ALREADY_TRACKED":
-            lines.append("%s | %s | %s | ALREADY_TRACKED | Bora=%s | Package=%s | Application=%s" % (
-                item["job_id"], item["company"], item["role"], item.get("current_Bora_Decision") or "",
-                item.get("current_Package_Status") or "", item.get("current_Application_Status") or ""))
+            # Always the Ledger Job_ID: every later command (decide, pursuit-state, resume-model, package) must use it.
+            screened = "" if item["tracked_job_id"] == item["job_id"] else " | screened_as=%s" % item["job_id"]
+            lines.append("%s | %s | %s | ALREADY_TRACKED | Bora=%s | Package=%s | Application=%s%s" % (
+                item["tracked_job_id"], item["company"], item["role"], item.get("current_Bora_Decision") or "",
+                item.get("current_Package_Status") or "", item.get("current_Application_Status") or "", screened))
         else:
             lines.append("%s | %s | %s | %s | geo=%s | opt=%s | gaps=%s | %s" % (
                 item["job_id"], item["company"], item["role"], item["recommendation"], item["Geography_State"], item["OPT_Screen_State"],
@@ -1138,6 +1206,7 @@ def closeout_missing(slate: Sequence[Mapping[str, Any]], ledger: Mapping[str, An
             missing.append("%s: %s" % (job_id, "JOBS_ROW_MISSING" if not rows else "JOBS_ROW_DUPLICATE"))
             continue
         row = rows[0]
+        job_id = row["Job_ID"]  # report and match plans/folders by the Ledger Job_ID
         if not any(non_empty(row.get(key)) for key in ("Decision", "Bora_Decision", "Package_Status", "Application_Status")):
             missing.append("%s: JOBS_DURABLE_STATE_MISSING" % job_id)
         submitted = str(row.get("Application_Status") or "").strip().upper() == "SUBMITTED"
@@ -1217,6 +1286,9 @@ def build_parser() -> argparse.ArgumentParser:
     source.add_argument("--xlsx", help="the whole Ledger exported from Google Drive as .xlsx (preferred: nothing is retyped)")
     source.add_argument("--raw", help="raw Sheets values: {JOBS|APPLICATIONS|LOG[|NETWORK]: [[header...], [row...], ...]}")
     item.add_argument("--out", required=True, help="Ledger file to write; use it for every --ledger in this run")
+    item = add("confirm-write", cmd_confirm_write)
+    item.add_argument("--ledger", required=True, help="a fresh readback taken after the write")
+    item.add_argument("--written", required=True, action="append", help="receipt of the command whose rows were written (repeatable)")
     item = add("pursuit-state", cmd_pursuit_state)
     item.add_argument("--ledger", required=True)
     item.add_argument("--job-id", required=True)
