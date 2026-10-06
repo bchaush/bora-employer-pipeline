@@ -1,0 +1,57 @@
+{
+  "milestone_id": "CAREER_OS_RUN_CONTRACT_V1_2",
+  "kind": "IMPLEMENTATION",
+  "goal": "Fix the two failures found in the first live run on 2026-10-06: decision fingerprints and Ledger row shapes broke because ChatGPT hand-built the Ledger readback differently between steps. Add one canonical readback command, a decide command and a pursuit-state command that use that one file, make package feed the pursuit gate from the same file, and make slate stamp First_Seen/Last_Verified.",
+  "baseline_sha": "f90c0a7b27ae7446452239bf54a89506dacc7bab",
+  "allowed_paths": [
+    "src/career_os_run_v1.py",
+    "src/career_os_network_v1.py",
+    "tests/career_os_run_contract_cli_v1_test.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "milestone_contracts/implementation/career-os-run-contract-v1_2.json"
+  ],
+  "forbidden_paths": [
+    "src/pursuit_decision.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_resume_qa.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/claim_repository.py",
+    "src/requirement_match.py",
+    "src/job_analysis.py",
+    "src/qualification_gate.py",
+    "src/application_logic.py",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "docs/resume/**",
+    "schemas/**",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "readback converts raw Sheets values (header row first) into the exact JOBS 20 / APPLICATIONS 10 / LOG 9 (and optional NETWORK 13) row objects: the only changes are null cells to \"\", padding short rows with \"\", and skipping rows whose every cell is \"\"; it fails closed on any header that is not exactly the live header (no trimming), any cell beyond the last header column (even blank), non-string cells, unknown or missing required tabs, and duplicate Job_IDs; its output passes run.load_ledger and the network loader.",
+    "decide builds the event only through pursuit_decision.build_decision_mutation_plan, fingerprints the JOBS row from the same ledger file, sets supersedes_event_id to the current latest event, refuses invalid decisions, offset-less timestamps and an unchanged repeat decision, and emits one Bora_Decision cell plus one exact 9-column LOG row.",
+    "pursuit-state reports state, authorizes_pursuit, latest_event_id and the context fingerprint from the same ledger file; STALE and non-PURSUE states never authorize.",
+    "package passes the live Ledger JOBS row and Ledger LOG rows to the pursuit gate (effective_request.json) after the existing identity checks.",
+    "slate requires --as-of with a UTC offset and writes it to First_Seen and Last_Verified of new JOBS rows.",
+    "pursuit_decision.py, the package gate and the cloud adapter are unchanged; the CLI stays local and writes nothing external.",
+    "Runbook and config document readback, decide, pursuit-state and slate --as-of; contract id is CAREER_OS_RUN_CONTRACT_V1_2."
+  ],
+  "review_requirements": "STOP after one PR is opened. Do not merge until Bora obtains a fresh independent read-only SAFE review.",
+  "required_tests": [
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python tests/career_os_network_v1_test.py",
+    "python tests/career_os_run_contract_qa_v1_test.py",
+    "python tests/career_os_final_hygiene_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need to change pursuit_decision.py, the package gate, resume QA, Candidate Truth, the renderer or the cloud adapter.",
+    "Any need to write Drive/Sheets from this engineering PR.",
+    "Any change that lets a stale, WATCH or REJECT decision authorize packaging."
+  ],
+  "human_approval_requirements": "Bora retains merge authority, every PURSUE/WATCH/REJECT decision, all Ledger/Drive writes, and all submissions."
+}

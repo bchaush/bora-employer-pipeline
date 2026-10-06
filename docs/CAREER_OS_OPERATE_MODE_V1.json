@@ -1,13 +1,15 @@
 {
   "spec": "CAREER_OS_OPERATE_MODE_V1",
   "run_contract": {
-    "contract_id": "CAREER_OS_RUN_CONTRACT_V1_1",
+    "contract_id": "CAREER_OS_RUN_CONTRACT_V1_2",
     "cli": "src/career_os_run_v1.py",
     "runbook": "docs/CAREER_OS_OPERATE_MODE_V1.md",
     "state_machine": [
+      "readback",
       "preflight",
       "slate",
       "STOP_FOR_BORA_DECISION",
+      "decide",
       "package",
       "CONNECTOR_UPLOADS_EXACTLY_3",
       "CONNECTOR_DOWNLOADS_READBACK",
@@ -47,7 +49,10 @@
     ],
     "submission_authority": "BORA_ONLY",
     "auto_submit": false,
-    "cover_letter_runtime": false
+    "cover_letter_runtime": false,
+    "readback_rule": "ledger.json is built only by the readback command from raw Sheets values; run readback again after every Ledger write.",
+    "decision_command": "decide (pursuit_decision.build_decision_mutation_plan from the canonical ledger.json)",
+    "slate_dates": "slate --as-of stamps First_Seen and Last_Verified"
   },
   "network_contract": {
     "contract_id": "CAREER_OS_NETWORK_V1",

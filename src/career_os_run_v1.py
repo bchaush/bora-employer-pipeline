@@ -1,9 +1,13 @@
-"""CAREER_OS_RUN_CONTRACT_V1 operator CLI.
+"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_2).
 
 A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
 
-    preflight -> slate -> STOP for Bora decision -> package -> connector uploads exactly 3 -> connector downloads/readback
-    -> verify-persisted -> human visual + claim review -> Bora manual submit -> record-submit -> closeout
+    readback -> preflight -> slate -> STOP for Bora decision -> decide -> package -> connector uploads exactly 3
+    -> connector downloads/readback -> verify-persisted -> human visual + claim review -> Bora manual submit -> record-submit
+    -> closeout
+
+`readback` is the only way a Ledger readback file is built: it turns the raw Sheets values (arrays of cells, header row first)
+into the exact JSON every other command consumes, so no step ever hand-builds Ledger rows.
 
 Every subcommand reads only caller-supplied local files and writes only local receipts/output. There are no Drive, Sheets, web or
 submission calls anywhere in this module; the ChatGPT connector performs every external write and read-back and hands the results
@@ -12,8 +16,9 @@ to this CLI as files. A step is done only when its receipt exists. Receipts are 
 Success prints exactly one fenced operator block intended for verbatim paste (closeout additionally ends with its exact status
 line). Failure returns a nonzero exit code and one machine-readable line: CAREER_OS_RUN_FAILURE: {json}.
 
-Bora keeps every consequential decision: this module never writes Bora_Decision, never submits and never records a submission
-without an explicit --bora-confirmed or a receipt file.
+Bora keeps every consequential decision: this module never writes anything; `decide` only turns Bora's explicit decision into
+the pursuit_decision.py mutation plan values. It never submits and never records a submission without an explicit
+--bora-confirmed or a receipt file.
 """
 
 from __future__ import annotations
@@ -33,12 +38,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
+import pursuit_decision  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_1"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_2"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
 FENCE = "```"
+EFFECTIVE_REQUEST_FILE = "effective_request.json"
 
 # SETTINGS readback keys (flat object, or a list of {"Key"/"Value"} rows).
 SETTINGS_CANONICAL_MAIN = "CANONICAL_MAIN_SHA"
@@ -55,6 +62,11 @@ JOBS_HEADERS = ("Job_ID", "Company", "Role", "Discovery_Source", "Discovery_URL"
 APPLICATIONS_HEADERS = ("Application_ID", "Job_ID", "Applied_Date", "Resume_Version", "Cover_Letter_Version", "Channel",
                         "Current_Status", "Last_Update", "Next_Action", "Outcome")
 LOG_HEADERS = ("Run_ID", "Timestamp", "Stage", "Source", "Job_ID", "Status", "Error_Code", "Engine_Baseline", "Notes")
+NETWORK_HEADERS = ("Contact_ID", "Name", "Company", "Role_Title", "How_Found", "Relationship", "Purpose", "Linked_Job_ID",
+                   "Status", "Added_On", "Last_Touch", "Next_Action_Date", "Notes")
+READBACK_TABS = (("JOBS", JOBS_HEADERS, True), ("APPLICATIONS", APPLICATIONS_HEADERS, True), ("LOG", LOG_HEADERS, True),
+                 ("NETWORK", NETWORK_HEADERS, False))
+AWARE_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$")
 
 SLATE_KEYS = ("job_id", "company", "role", "official_url", "source", "location_arrangement", "Geography_State",
               "work_authorization_text", "OPT_Screen_State", "mandatory_gaps", "recommendation", "reasons")
@@ -166,6 +178,144 @@ def load_ledger(path: str) -> dict:
 def _resume_sha_from_version(value: Any) -> Optional[str]:
     match = re.search(r"sha256:([0-9a-fA-F]{64})(?:\b|$)", str(value or ""))
     return match.group(1).lower() if match else None
+
+
+def require_aware_timestamp(value: Any, what: str) -> str:
+    text = str(value or "")
+    if not AWARE_TIMESTAMP.match(text):
+        raise RunError("TIMESTAMP_INVALID", "%s must be an ISO timestamp with a UTC offset, e.g. 2026-10-06T09:40:00-04:00" % what)
+    return text
+
+
+# readback ---------------------------------------------------------------------------------------
+
+def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
+    """Raw Sheets values (header row first) -> exact row objects.
+
+    The only changes made: null cells become "", rows shorter than the header are padded with "", and rows whose every cell is
+    exactly "" are skipped. Everything else fails closed: the header must match exactly (no trimming), and any cell beyond the
+    last header column, even a blank one, is refused."""
+    if not isinstance(values, list) or not values or not isinstance(values[0], list):
+        raise RunError("READBACK_INVALID", "%s must be an array of rows with the header row first" % name)
+    header = list(values[0])
+    if header != list(headers):
+        raise RunError("READBACK_HEADER_MISMATCH", "%s header is %s; expected exactly %s" % (name, header, list(headers)))
+    rows, skipped = [], 0
+    for number, raw in enumerate(values[1:], start=2):
+        if not isinstance(raw, list):
+            raise RunError("READBACK_INVALID", "%s row %d is not an array" % (name, number))
+        cells = []
+        for cell in raw:
+            if cell is None:
+                cells.append("")
+            elif isinstance(cell, str):
+                cells.append(cell)
+            else:
+                raise RunError("READBACK_CELL_TYPE", "%s row %d has a %s cell; read the sheet with formatted (string) values"
+                               % (name, number, type(cell).__name__))
+        if len(cells) > len(headers):
+            raise RunError("READBACK_ROW_TOO_LONG", "%s row %d has %d cells; the header has %d" % (name, number, len(cells), len(headers)))
+        cells = cells + [""] * (len(headers) - len(cells))
+        if all(cell == "" for cell in cells):
+            skipped += 1
+            continue
+        rows.append(dict(zip(headers, cells)))
+    return rows, skipped
+
+
+def cmd_readback(args: argparse.Namespace) -> tuple:
+    raw = read_json(args.raw, "raw Sheets values")
+    if not isinstance(raw, Mapping):
+        raise RunError("READBACK_INVALID", "raw values must be an object keyed by tab name")
+    unknown = sorted(set(raw) - {name for name, _headers, _required in READBACK_TABS})
+    if unknown:
+        raise RunError("READBACK_INVALID", "unknown tabs %s" % unknown)
+    ledger, counts = {}, []
+    for name, headers, required in READBACK_TABS:
+        if name not in raw:
+            if required:
+                raise RunError("READBACK_INVALID", "%s values are required" % name)
+            continue
+        rows, skipped = normalize_tab(name, raw[name], headers)
+        ledger[name] = rows
+        counts.append("%s rows=%d blank_rows_skipped=%d" % (name, len(rows), skipped))
+    ids = [row["Job_ID"] for row in ledger["JOBS"]]
+    duplicates = sorted({job_id for job_id in ids if ids.count(job_id) > 1})
+    if duplicates:
+        raise RunError("READBACK_DUPLICATE_JOB_ID", ",".join(duplicates))
+    ledger_sha = write_receipt(args.out, ledger)
+    load_ledger(args.out)
+    receipt = {"spec": "CAREER_OS_RUN_READBACK_RECEIPT_V1", "contract": RUN_CONTRACT_ID,
+               "raw_sha256": sha256_hex(read_bytes(args.raw, "raw Sheets values")), "ledger_sha256": ledger_sha, "counts": counts}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_READBACK: LEDGER FILE READY (use this file for every --ledger in this run)", "ledger: " + args.out,
+             "ledger_sha256: " + ledger_sha] + counts + ["receipt_sha256: " + receipt_sha]
+    return EXIT_OK, block(lines), None
+
+
+# decide / pursuit-state -------------------------------------------------------------------------
+
+def _single_job(ledger: Mapping[str, Any], job_id: str) -> Mapping[str, Any]:
+    rows = [row for row in ledger["JOBS"] if row.get("Job_ID") == job_id]
+    if len(rows) != 1:
+        raise RunError("JOB_UNRESOLVED", "%s must match exactly one Ledger JOBS row (found %d)" % (job_id, len(rows)))
+    return rows[0]
+
+
+def _pursuit_state(ledger: Mapping[str, Any], job_id: str) -> tuple:
+    row = _single_job(ledger, job_id)
+    try:
+        state = pursuit_decision.derive_current_pursuit_state(row, ledger["LOG"])
+        fingerprint = pursuit_decision.compute_context_fingerprint(row)
+    except pursuit_decision.PursuitDecisionError as error:
+        raise RunError(error.error_code, str(error)) from error
+    return state, fingerprint
+
+
+def cmd_pursuit_state(args: argparse.Namespace) -> tuple:
+    ledger = load_ledger(args.ledger)
+    state, fingerprint = _pursuit_state(ledger, args.job_id)
+    receipt = {"spec": "CAREER_OS_RUN_PURSUIT_STATE_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "job_id": args.job_id,
+               "state": state["state"], "authorizes_pursuit": state["authorizes_pursuit"],
+               "latest_event_id": state["latest_event_id"], "decision_context_fingerprint": fingerprint}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_PURSUIT_STATE " + args.job_id, "state: %s" % state["state"],
+             "authorizes_pursuit: %s" % ("true" if state["authorizes_pursuit"] else "false"),
+             "latest_event_id: %s" % (state["latest_event_id"] or ""), "decision_context_fingerprint: " + fingerprint,
+             "receipt_sha256: " + receipt_sha]
+    return EXIT_OK, block(lines), None
+
+
+def cmd_decide(args: argparse.Namespace) -> tuple:
+    ledger = load_ledger(args.ledger)
+    decided_at = require_aware_timestamp(args.decided_at, "--decided-at")
+    if args.decision not in pursuit_decision.VALID_DECISIONS:
+        raise RunError("INVALID_DECISION", "--decision must be PURSUE, WATCH or REJECT")
+    state, fingerprint = _pursuit_state(ledger, args.job_id)
+    if state["state"] == args.decision:
+        raise RunError("ALREADY_DECIDED", "%s is already %s on the current JOBS context" % (args.job_id, args.decision))
+    run_id = "DECISION::%s::%s" % (args.job_id, decided_at)
+    request = {"job_id": args.job_id, "decision": args.decision, "reviewed_context_fingerprint": fingerprint,
+               "decision_run_id": run_id, "decided_at": decided_at, "supersedes_event_id": state["latest_event_id"],
+               "reason_note": args.reason_note}
+    try:
+        plan = pursuit_decision.build_decision_mutation_plan(request, ledger["JOBS"], ledger["LOG"])
+    except pursuit_decision.PursuitDecisionError as error:
+        raise RunError(error.error_code, str(error)) from error
+    if not plan["log_mutations"]:
+        raise RunError("ALREADY_RECORDED", "this exact decision event is already in LOG")
+    log = {key: ("" if value is None else value) for key, value in plan["log_mutations"][0].items()}
+    _require_exact_row_shape(log, LOG_HEADERS, "LOG")
+    jobs_update = {"Job_ID": args.job_id, "Bora_Decision": args.decision}
+    receipt = {"spec": "CAREER_OS_RUN_DECIDE_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "request": request,
+               "jobs_update": jobs_update, "log_row": log}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_DECIDE (Bora's decision; set this one JOBS cell and append this LOG row exactly, then run readback again)",
+             "previous_state: %s" % state["state"],
+             "JOBS_UPDATE: " + json.dumps(jobs_update, ensure_ascii=False),
+             "LOG_ROW_VALUES: " + json.dumps(log, ensure_ascii=False),
+             "receipt_sha256: " + receipt_sha]
+    return EXIT_OK, block(lines), None
 
 
 # preflight --------------------------------------------------------------------------------------
@@ -311,11 +461,12 @@ def validate_slate_role(role: Any, index: int) -> list:
     return problems
 
 
-def jobs_row_values(role: Mapping[str, Any]) -> dict:
+def jobs_row_values(role: Mapping[str, Any], as_of: str) -> dict:
     """Full live JOBS-row shape for one new screened role. Bora_Decision is never populated here."""
     values = {key: "" for key in JOBS_HEADERS}
     values.update({"Job_ID": role["job_id"], "Company": role["company"], "Role": role["role"], "Discovery_Source": role["source"],
-                   "Discovery_URL": role["official_url"], "Official_URL": role["official_url"], "Pipeline_State": "REVIEW_READY",
+                   "Discovery_URL": role["official_url"], "Official_URL": role["official_url"], "First_Seen": as_of,
+                   "Last_Verified": as_of, "Pipeline_State": "REVIEW_READY",
                    "Geography_State": role["Geography_State"], "OPT_Screen_State": role["OPT_Screen_State"],
                    "Match_State": "ANALYZED", "Decision": role["recommendation"], "Bora_Decision": None})
     return values
@@ -332,6 +483,7 @@ def _tracked_job(role: Mapping[str, Any], jobs: Sequence[Mapping[str, Any]]) -> 
 
 
 def cmd_slate(args: argparse.Namespace) -> tuple:
+    as_of = require_aware_timestamp(args.as_of, "--as-of")
     raw_bytes = read_bytes(args.screening, "screening")
     try:
         roles = json.loads(raw_bytes.decode("utf-8"))
@@ -360,7 +512,7 @@ def cmd_slate(args: argparse.Namespace) -> tuple:
                          "current_Application_Status": tracked.get("Application_Status")})
         else:
             item["tracking_status"] = "NEW"
-            rows.append(jobs_row_values(role))
+            rows.append(jobs_row_values(role, as_of))
         slate.append(item)
     receipt = {"spec": "CAREER_OS_RUN_SLATE_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "status": "SLATE_READY_AWAITING_BORA_DECISION",
                "screening_sha256": sha256_hex(raw_bytes), "slate": slate, "jobs_rows": rows}
@@ -423,10 +575,17 @@ def cmd_package(args: argparse.Namespace) -> tuple:
     persist = output_root / PERSIST_DIR
     if persist.exists() and any(persist.iterdir()):
         raise RunError("PERSIST_DIR_NOT_CLEAN", str(persist))
+    # The pursuit gate reads JOBS and the decision LOG from the same canonical Ledger file as every other step.
+    effective = dict(request)
+    effective["jobs_rows"] = [dict(live)]
+    effective["decision_log_rows"] = [dict(row) for row in ledger["LOG"]]
+    output_root.mkdir(parents=True, exist_ok=True)
+    effective_path = output_root / EFFECTIVE_REQUEST_FILE
+    write_receipt(str(effective_path), effective)
     captured = io.StringIO()
     try:
         with contextlib.redirect_stdout(captured):  # run_request prints the claim table itself; the block below carries it
-            result = cloud.run_request(args.request, args.runtime_root, args.font_dir, str(output_root), args.expected_main_sha)
+            result = cloud.run_request(str(effective_path), args.runtime_root, args.font_dir, str(output_root), args.expected_main_sha)
     except RunError:
         raise
     except Exception as error:
@@ -664,6 +823,18 @@ def build_parser() -> argparse.ArgumentParser:
             item.add_argument("--receipt", required=True, help="local receipt JSON to write")
         return item
 
+    item = add("readback", cmd_readback)
+    item.add_argument("--raw", required=True, help="raw Sheets values: {JOBS|APPLICATIONS|LOG[|NETWORK]: [[header...], [row...], ...]}")
+    item.add_argument("--out", required=True, help="Ledger file to write; use it for every --ledger in this run")
+    item = add("pursuit-state", cmd_pursuit_state)
+    item.add_argument("--ledger", required=True)
+    item.add_argument("--job-id", required=True)
+    item = add("decide", cmd_decide)
+    item.add_argument("--ledger", required=True)
+    item.add_argument("--job-id", required=True)
+    item.add_argument("--decision", required=True, help="PURSUE|WATCH|REJECT, exactly as Bora said it")
+    item.add_argument("--decided-at", required=True, help="ISO timestamp with offset, e.g. 2026-10-06T09:40:00-04:00")
+    item.add_argument("--reason-note", help="optional short note in Bora's words")
     item = add("preflight", cmd_preflight)
     item.add_argument("--runtime-root", required=True)
     item.add_argument("--expected-main-sha", required=True)
@@ -676,6 +847,7 @@ def build_parser() -> argparse.ArgumentParser:
     item.add_argument("--fonts-zip", required=True, help="downloaded governed fonts ZIP; hashed by the CLI")
     item = add("slate", cmd_slate)
     item.add_argument("--screening", required=True, help="screening.json array")
+    item.add_argument("--as-of", required=True, help="ISO timestamp with offset; stamped into First_Seen and Last_Verified")
     item.add_argument("--ledger", required=True, help="live Ledger readback JSON with JOBS/APPLICATIONS/LOG arrays")
     item = add("package", cmd_package, receipt=False)
     item.add_argument("--request", required=True)
