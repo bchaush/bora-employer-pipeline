@@ -1,6 +1,6 @@
-# Career OS Operate Mode V1 — Run Contract V1.1
+# Career OS Operate Mode V1 — Run Contract V1.2
 
-Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_1).
+Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_2).
 
 It is pure/local. It reads caller-supplied files and writes local receipts/output. It never calls Drive, Sheets, the web, or an employer application surface. ChatGPT connectors perform external reads/writes and hand exact readbacks to the CLI.
 
@@ -10,9 +10,10 @@ Upload package files as-is. Never convert the PDF, DOCX, or ZIP into Google Docs
 
 ## State machine
 
+0. readback (again after every Ledger write)
 1. preflight
 2. slate
-3. STOP for Bora decision
+3. STOP for Bora decision, then decide
 4. package for Bora-PURSUE roles only
 5. connector uploads exactly 3 files as-is
 6. connector downloads/readbacks the same 3 files
@@ -25,6 +26,24 @@ Upload package files as-is. Never convert the PDF, DOCX, or ZIP into Google Docs
 ## Quick reference commands
 
 All examples use local files produced/downloaded by ChatGPT.
+
+### 0. readback (the only way to build ledger.json)
+
+Never hand-build ledger.json. Read each tab's values with the Sheets connector (formatted values, header row first) and save them as they come:
+
+    {
+      "JOBS": [["Job_ID", "Company", "..."], ["ACME::DATA-ANALYST", "Acme", "..."]],
+      "APPLICATIONS": [["Application_ID", "..."]],
+      "LOG": [["Run_ID", "..."]],
+      "NETWORK": [["Contact_ID", "..."]]
+    }
+
+    python src/career_os_run_v1.py readback \
+      --raw raw_values.json \
+      --out ledger.json \
+      --receipt receipts/readback.json
+
+It pads short rows, turns blank cells into "", skips empty rows, and fails closed on a header mismatch, a non-string cell, a value beyond the last header column, or a duplicate Job_ID. NETWORK is optional for run commands and required for network commands. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write.
 
 ### 1. preflight
 
@@ -50,7 +69,10 @@ CLOUD_RENDER_PROFILE must equal CHATGPT_CLOUD_OPERATIONAL_RENDER_V1.
     python src/career_os_run_v1.py slate \
       --screening screening.json \
       --ledger ledger.json \
+      --as-of 2026-10-06T09:40:00-04:00 \
       --receipt receipts/slate.json
+
+--as-of is the screening time with its UTC offset; it is written to First_Seen and Last_Verified of every new JOBS row.
 
 A role already present by Job_ID or non-empty Official_URL is ALREADY_TRACKED and produces no new JOBS row.
 Unknown/unclear onsite geography requires HOLD. Numeric/letter fit scoring is forbidden. Bora_Decision remains empty until Bora acts.
@@ -76,7 +98,7 @@ Minimal screening.json:
 
 ### Ledger readback shape
 
-ledger.json always has JOBS, APPLICATIONS, and LOG arrays. Each row uses the exact live headers.
+readback produces ledger.json with JOBS, APPLICATIONS and LOG arrays (and NETWORK when read). Each row uses the exact live headers.
 
 JOBS headers (20):
 Job_ID, Company, Role, Discovery_Source, Discovery_URL, Official_URL, First_Seen, Last_Verified, Pipeline_State, Freshness_State, Geography_State, OPT_Screen_State, Candidate_Condition_State, Threshold_State, Role_Status, Match_State, Decision, Bora_Decision, Package_Status, Application_Status.
@@ -87,17 +109,27 @@ Application_ID, Job_ID, Applied_Date, Resume_Version, Cover_Letter_Version, Chan
 LOG headers (9):
 Run_ID, Timestamp, Stage, Source, Job_ID, Status, Error_Code, Engine_Baseline, Notes.
 
-Minimal ledger.json:
+### 3. STOP for Bora decision, then decide
 
-    {
-      "JOBS": [],
-      "APPLICATIONS": [],
-      "LOG": []
-    }
+Only Bora decides PURSUE|WATCH|REJECT. A system recommendation never grants package or submission authority. For each role, run decide with exactly Bora's decision:
 
-### 3. STOP for Bora decision
+    python src/career_os_run_v1.py decide \
+      --ledger ledger.json \
+      --job-id "ACME::DATA-ANALYST" \
+      --decision PURSUE \
+      --decided-at 2026-10-06T09:45:00-04:00 \
+      --receipt receipts/decide_acme.json
 
-Only Bora sets Bora_Decision = PURSUE|WATCH|REJECT. A system recommendation never grants package or submission authority.
+It fingerprints the JOBS row from the same ledger.json, supersedes the latest decision automatically, and prints JOBS_UPDATE (the one Bora_Decision cell) and LOG_ROW_VALUES (one append). Write exactly those, then run readback again. ALREADY_DECIDED means nothing needs writing.
+
+Check any role at any time:
+
+    python src/career_os_run_v1.py pursuit-state \
+      --ledger ledger.json \
+      --job-id "ACME::DATA-ANALYST" \
+      --receipt receipts/state_acme.json
+
+STALE_RECONFIRMATION_REQUIRED means the JOBS context changed after Bora's decision; ask Bora and run decide again. Use the printed latest_event_id and decision_context_fingerprint in the package attestation.
 
 ### 4. package
 
@@ -112,7 +144,7 @@ Only Bora sets Bora_Decision = PURSUE|WATCH|REJECT. A system recommendation neve
       --role "Data Analyst" \
       --target-folder-name "2026-10-05 — Acme — Data Analyst"
 
-The request jobs_rows entry must exactly equal the Ledger JOBS row on Job_ID, Company, Role, and Official_URL.
+The request jobs_rows entry must exactly equal the Ledger JOBS row on Job_ID, Company, Role, and Official_URL. package then replaces jobs_rows and decision_log_rows with the rows from ledger.json, so the pursuit gate always reads the same Ledger file (written to run_output/effective_request.json).
 A blank live Official_URL fails with OFFICIAL_URL_MISSING_IN_LEDGER.
 
 persist/ contains exactly:

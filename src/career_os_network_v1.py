@@ -34,8 +34,7 @@ import career_os_run_v1 as run  # noqa: E402
 NETWORK_CONTRACT_ID = "CAREER_OS_NETWORK_V1"
 LOG_SOURCE = "CAREER_OS_NETWORK_V1"
 
-NETWORK_HEADERS = ("Contact_ID", "Name", "Company", "Role_Title", "How_Found", "Relationship", "Purpose", "Linked_Job_ID",
-                   "Status", "Added_On", "Last_Touch", "Next_Action_Date", "Notes")
+NETWORK_HEADERS = run.NETWORK_HEADERS  # single definition; the readback command normalizes this tab too
 CONTACT_INPUT_KEYS = ("Name", "Company", "Role_Title", "How_Found", "Relationship", "Purpose", "Linked_Job_ID", "Notes")
 RELATIONSHIPS = ("BRANDEIS_ALUMNI", "FORMER_COLLEAGUE", "WINTER_WALK", "FACULTY", "RECRUITER", "OTHER")
 PURPOSES = ("JOB_REFERRAL", "INFO_CHAT", "CLIENT_PROSPECT")
