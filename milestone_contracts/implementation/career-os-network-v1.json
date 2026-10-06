@@ -1,0 +1,56 @@
+{
+  "milestone_id": "CAREER_OS_NETWORK_V1",
+  "kind": "IMPLEMENTATION",
+  "goal": "Fill the empty NETWORK tab and track employer outcomes with a separate local CLI: validate real contacts (no invented people), deterministic status/follow-up updates, outreach drafts built only from approved networking-allowed resume language, CLI-backed application outcomes, and a counts-only weekly report. Network access stays separate from qualification (BLUEPRINT section 136).",
+  "baseline_sha": "1934b0e46037b1a4b7e41eeadd224e61dc3dcb25",
+  "allowed_paths": [
+    "src/career_os_network_v1.py",
+    "tests/career_os_network_v1_test.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "milestone_contracts/implementation/career-os-network-v1.json"
+  ],
+  "forbidden_paths": [
+    "src/career_os_run_v1.py",
+    "src/gold_resume_qa.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/requirement_match.py",
+    "src/job_analysis.py",
+    "src/pursuit_decision.py",
+    "src/qualification_gate.py",
+    "src/application_logic.py",
+    "src/claim_repository.py",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "docs/resume/**",
+    "schemas/**",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "network-add requires an https How_Found link or KNOWN_PERSONALLY with Notes, validates Relationship/Purpose enums and Linked_Job_ID against JOBS, refuses duplicates by Contact_ID, link, or name+company, and emits exactly the 13-column NETWORK row and the live 9-column LOG row.",
+    "network-update rejects TO_CONTACT as a target, reopening CLOSED contacts, backwards dates, and a repeated same-day event; follow-up dates are deterministic (SENT +7, REPLIED +3, CALL_DONE +7, REFERRED +14, NO_REPLY/CLOSED blank).",
+    "network-draft uses only approved bullets whose every claim is human-approved and allows networking, quotes the bullet text exactly (first-person verb only), stays at or under 120 words, and fails with DRAFT_TOO_LONG instead of trimming.",
+    "record-outcome emits the live 10-column APPLICATIONS row and a LOG row, keeps existing Outcome evidence, and never emits a JOBS change.",
+    "weekly-report reports counts and follow-ups due only; no scores or percentages.",
+    "The CLI imports nothing that can send, browse, or call out, and the released run CLI is unchanged.",
+    "Runbook and config document the commands, the contact JSON, and the NETWORK headers; runbook command lines use POSIX continuation."
+  ],
+  "review_requirements": "STOP after one PR is opened. Do not merge until Bora obtains a fresh independent read-only SAFE review.",
+  "required_tests": [
+    "python tests/career_os_network_v1_test.py",
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python tests/career_os_final_hygiene_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need to change the run CLI, resume QA gates, matcher, qualification, pursuit decisions, Candidate Truth, approved resume language, renderer, or cloud adapter.",
+    "Any need to send messages, automate or scrape LinkedIn, or write Drive/Sheets from this engineering PR.",
+    "Any need for scoring, automatic contact discovery, or automatic bullet selection."
+  ],
+  "human_approval_requirements": "Bora retains merge authority, all Ledger/Drive writes (including writing the NETWORK header row at release), every contact added, every message sent, and every application decision."
+}

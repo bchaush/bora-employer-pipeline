@@ -28,16 +28,16 @@ All examples use local files produced/downloaded by ChatGPT.
 
 ### 1. preflight
 
-    python src/career_os_run_v1.py preflight ^
-      --runtime-root runtime_extracted ^
-      --expected-main-sha <LIVE_MAIN_SHA> ^
-      --font-dir governed_fonts_extracted ^
-      --settings settings.json ^
-      --adapter career_os_cloud_operate_v1.py ^
-      --config CAREER_OS_OPERATE_MODE_V1.json ^
-      --runbook CAREER_OS_OPERATE_MODE_V1.md ^
-      --runtime-zip Career_OS_Runtime_<sha>_FULL.zip ^
-      --fonts-zip Liberation_Sans_Governed.zip ^
+    python src/career_os_run_v1.py preflight \
+      --runtime-root runtime_extracted \
+      --expected-main-sha <LIVE_MAIN_SHA> \
+      --font-dir governed_fonts_extracted \
+      --settings settings.json \
+      --adapter career_os_cloud_operate_v1.py \
+      --config CAREER_OS_OPERATE_MODE_V1.json \
+      --runbook CAREER_OS_OPERATE_MODE_V1.md \
+      --runtime-zip Career_OS_Runtime_<sha>_FULL.zip \
+      --fonts-zip Liberation_Sans_Governed.zip \
       --receipt receipts/preflight.json
 
 The CLI hashes the actual runtime ZIP and governed-fonts ZIP. It requires these live SETTINGS keys:
@@ -47,9 +47,9 @@ CLOUD_RENDER_PROFILE must equal CHATGPT_CLOUD_OPERATIONAL_RENDER_V1.
 
 ### 2. slate
 
-    python src/career_os_run_v1.py slate ^
-      --screening screening.json ^
-      --ledger ledger.json ^
+    python src/career_os_run_v1.py slate \
+      --screening screening.json \
+      --ledger ledger.json \
       --receipt receipts/slate.json
 
 A role already present by Job_ID or non-empty Official_URL is ALREADY_TRACKED and produces no new JOBS row.
@@ -101,15 +101,15 @@ Only Bora sets Bora_Decision = PURSUE|WATCH|REJECT. A system recommendation neve
 
 ### 4. package
 
-    python src/career_os_run_v1.py package ^
-      --request request.json ^
-      --ledger ledger.json ^
-      --runtime-root runtime_extracted ^
-      --font-dir governed_fonts_extracted ^
-      --output-root run_output ^
-      --expected-main-sha <LIVE_MAIN_SHA> ^
-      --company "Acme" ^
-      --role "Data Analyst" ^
+    python src/career_os_run_v1.py package \
+      --request request.json \
+      --ledger ledger.json \
+      --runtime-root runtime_extracted \
+      --font-dir governed_fonts_extracted \
+      --output-root run_output \
+      --expected-main-sha <LIVE_MAIN_SHA> \
+      --company "Acme" \
+      --role "Data Analyst" \
       --target-folder-name "2026-10-05 — Acme — Data Analyst"
 
 The request jobs_rows entry must exactly equal the Ledger JOBS row on Job_ID, Company, Role, and Official_URL.
@@ -138,9 +138,9 @@ Minimal folder-listing JSON for closeout can be keyed by Job_ID:
 
 ### 7. verify-persisted
 
-    python src/career_os_run_v1.py verify-persisted ^
-      --plan run_output/persist_plan.json ^
-      --downloaded-dir drive_readback ^
+    python src/career_os_run_v1.py verify-persisted \
+      --plan run_output/persist_plan.json \
+      --downloaded-dir drive_readback \
       --receipt receipts/persisted.json
 
 Only exact filenames, byte sizes, and SHA-256s emit PERSISTED_COMPLETE and Package_Status=READY.
@@ -155,15 +155,15 @@ Career OS never submits externally. Bora alone submits.
 
 ### 10. record-submit
 
-    python src/career_os_run_v1.py record-submit ^
-      --plan run_output/persist_plan.json ^
-      --persist-receipt receipts/persisted.json ^
-      --job-id "ACME::DATA-ANALYST" ^
-      --company "Acme" ^
-      --role "Data Analyst" ^
-      --channel "Company careers site" ^
-      --applied-date "2026-10-05" ^
-      --bora-confirmed ^
+    python src/career_os_run_v1.py record-submit \
+      --plan run_output/persist_plan.json \
+      --persist-receipt receipts/persisted.json \
+      --job-id "ACME::DATA-ANALYST" \
+      --company "Acme" \
+      --role "Data Analyst" \
+      --channel "Company careers site" \
+      --applied-date "2026-10-05" \
+      --bora-confirmed \
       --receipt receipts/submitted.json
 
 Use --receipt-file <path> instead of --bora-confirmed when a separate receipt artifact exists.
@@ -176,11 +176,11 @@ Next_Action is Monitor for employer response.
 
 ### 11. closeout
 
-    python src/career_os_run_v1.py closeout ^
-      --slate-receipt receipts/slate.json ^
-      --ledger ledger_after_writes.json ^
-      --folders drive_folder_listing.json ^
-      --plans plans.json ^
+    python src/career_os_run_v1.py closeout \
+      --slate-receipt receipts/slate.json \
+      --ledger ledger_after_writes.json \
+      --folders drive_folder_listing.json \
+      --plans plans.json \
       --receipt receipts/closeout.json
 
 The slate receipt, not a hand-typed batch list, defines the batch.
@@ -190,6 +190,85 @@ An already-tracked historical submitted role may close without a plan only when 
 The final line is exactly one of:
 CAREER_OS_RUN_CLOSEOUT: COMPLETE
 CAREER_OS_RUN_CLOSEOUT: INCOMPLETE
+
+## Network and outcomes (CAREER_OS_NETWORK_V1)
+
+src/career_os_network_v1.py is a separate local CLI. It never sends a message, never opens LinkedIn or Gmail, and never changes a JOBS decision, a resume, or Candidate Truth. Network access is separate from qualification (BLUEPRINT section 136). Write only the row values it prints; Bora sends every message himself.
+
+For network commands, ledger.json also has a NETWORK array (use [] when the tab has no rows). NETWORK headers (13), in this order:
+Contact_ID | Name | Company | Role_Title | How_Found | Relationship | Purpose | Linked_Job_ID | Status | Added_On | Last_Touch | Next_Action_Date | Notes
+
+Contact JSON (exactly these 8 keys). How_Found is the https link where Bora found the person (LinkedIn profile, Brandeis directory, company page), or KNOWN_PERSONALLY with Notes saying how he knows them. No link and no personal tie means the contact is not added.
+
+    {
+      "Name": "First Last",
+      "Company": "Company",
+      "Role_Title": "Their title as shown on the profile",
+      "How_Found": "https://www.linkedin.com/in/...",
+      "Relationship": "BRANDEIS_ALUMNI",
+      "Purpose": "JOB_REFERRAL",
+      "Linked_Job_ID": "",
+      "Notes": ""
+    }
+
+Relationship: BRANDEIS_ALUMNI|FORMER_COLLEAGUE|WINTER_WALK|FACULTY|RECRUITER|OTHER
+Purpose: JOB_REFERRAL|INFO_CHAT|CLIENT_PROSPECT
+Linked_Job_ID is blank or an existing JOBS Job_ID.
+
+### network-add
+
+    python src/career_os_network_v1.py network-add \
+      --ledger ledger.json \
+      --contact contact.json \
+      --as-of 2026-10-06 \
+      --receipt receipts/network_add.json
+
+Append the printed NETWORK_ROW_VALUES to NETWORK and LOG_ROW_VALUES to LOG. ALREADY_IN_NETWORK means the person is already there.
+
+### network-draft
+
+    python src/career_os_network_v1.py network-draft \
+      --ledger ledger.json \
+      --contact-id NET::XXXXXXXXXXXX \
+      --bullet-id B007 \
+      --runtime-root runtime_extracted \
+      --receipt receipts/network_draft.json
+
+Prints a draft of at most 120 words. The work example is one approved resume bullet whose claims allow networking, quoted exactly. Bora edits and sends it himself. Nothing is written to the Ledger.
+
+### network-update
+
+    python src/career_os_network_v1.py network-update \
+      --ledger ledger.json \
+      --contact-id NET::XXXXXXXXXXXX \
+      --status SENT \
+      --as-of 2026-10-06 \
+      --note "LinkedIn message" \
+      --receipt receipts/network_update.json
+
+Status: SENT|REPLIED|CALL_DONE|REFERRED|NO_REPLY|CLOSED. Next_Action_Date: SENT +7 days, REPLIED +3, CALL_DONE +7, REFERRED +14, NO_REPLY and CLOSED blank. --next-date overrides it. Overwrite the contact's NETWORK row and append the LOG row.
+
+### record-outcome
+
+    python src/career_os_network_v1.py record-outcome \
+      --ledger ledger.json \
+      --job-id "ACME::DATA-ANALYST" \
+      --status INTERVIEW \
+      --as-of 2026-10-09 \
+      --note "Recruiter email: phone screen scheduled" \
+      --receipt receipts/outcome.json
+
+Status: UNDER_REVIEW|INTERVIEW|REJECTED|OFFER|WITHDRAWN|NO_RESPONSE. Use only what the employer actually sent. Overwrite the APPLICATIONS row and append the LOG row. JOBS is not changed. An OFFER sets Next_Action to confirm work authorization with ISSO before accepting.
+
+### weekly-report
+
+    python src/career_os_network_v1.py weekly-report \
+      --ledger ledger.json \
+      --from 2026-10-05 \
+      --to 2026-10-11 \
+      --receipt receipts/weekly.json
+
+Counts only, no scores: jobs first seen, applications submitted, outcomes, contacts added, contact updates, current snapshots, and follow-ups due by --to.
 
 ## Rules that do not change
 
@@ -202,3 +281,5 @@ CAREER_OS_RUN_CLOSEOUT: INCOMPLETE
 - Desktop/Codespaces are engineering-only fallback paths.
 - No cover-letter runtime.
 - No auto-submit.
+- The system never sends networking messages and never automates LinkedIn.
+- A contact needs a real source link or a personal tie (How_Found); no invented people.
