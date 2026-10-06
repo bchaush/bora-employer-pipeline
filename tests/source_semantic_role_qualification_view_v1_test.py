@@ -541,10 +541,10 @@ claim_result = validate_claim_repository(None)
 evidence_result = validate_evidence_repository(None)
 experience_result = validate_experience_repository(None)
 assert_true(len(experience_result["index"]) == 9, f"Experiences must remain 9, got {len(experience_result['index'])}")
-assert_true(len(evidence_result["index"]) == 49, f"Evidence must remain 43, got {len(evidence_result['index'])}")
-assert_true(len(claim_result["index"]) == 21, f"Claims are 21 after the precision-cleanup additions, got {len(claim_result['index'])}")
+assert_true(len(evidence_result["index"]) == 50, f"Evidence must remain 43, got {len(evidence_result['index'])}")
+assert_true(len(claim_result["index"]) == 22, f"Claims are 22 after the precision-cleanup additions, got {len(claim_result['index'])}")
 reusable_count = sum(1 for c in claim_result["index"].values() if c.get("human_approval") is True)
-assert_true(reusable_count == 21, f"Reusable claims are 21 after Bora's 2026-10-04 approvals, got {reusable_count}")
+assert_true(reusable_count == 22, f"Reusable claims are 22 after Bora's 2026-10-04 approvals, got {reusable_count}")
 for claim_id, approved in (("CLAIM_EDU_UNWE_001", True), ("CLAIM_DCOMMERCE_001", True), ("CLAIM_DCOMMERCE_002", True), ("CLAIM_BULMARMA_001", True)):
     assert_true(
         claim_result["index"][claim_id]["human_approval"] is approved,

@@ -7,7 +7,7 @@
     "approved": true,
     "approved_by": "Bora",
     "approved_on": "2026-10-04",
-    "approval_note": "Approved in one pass with explicit edits to B004/B010/B012/B013, six replacement summaries, Brandeis claim addition, and row-specific skills vocabulary."
+    "approval_note": "Approved in one pass with explicit edits to B004/B010/B012/B013, six replacement summaries, Brandeis claim addition, and row-specific skills vocabulary. On 2026-10-06 Bora approved B020-B023 (Market Empire, CLAIM_MARKET_EMPIRE_002) word for word in the Career OS conversation."
   },
   "bullets": [
     {
@@ -142,6 +142,34 @@
         "CLAIM_MARKET_EMPIRE_001"
       ],
       "text": "Built a React/TypeScript financial-education demo with deterministic financial logic, Vitest and Playwright coverage, and Vercel deployment."
+    },
+    {
+      "bullet_id": "B020",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_002"
+      ],
+      "text": "Built a seven-screen beginner investing journey covering market information, allocation across four sectors, calculated results, and a sealed-bid property auction."
+    },
+    {
+      "bullet_id": "B021",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_002"
+      ],
+      "text": "Kept official financial and auction calculations in a separate tested engine, so the interface only displays engine results."
+    },
+    {
+      "bullet_id": "B022",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_002"
+      ],
+      "text": "Added validation for investment allocations and property bids, with 32/32 Vitest unit/calculation tests and 6/6 Playwright browser tests passing."
+    },
+    {
+      "bullet_id": "B023",
+      "claim_ids": [
+        "CLAIM_MARKET_EMPIRE_002"
+      ],
+      "text": "Tracked work through GitHub issues and reviewed pull requests; the demo was approved for presentation by the project team and course professor."
     }
   ],
   "summaries": [

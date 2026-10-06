@@ -49,10 +49,10 @@ assert_true(exp_result["valid"] is True, "experience repository invalid")
 assert_true(len(exp_result["index"]) == 9, "Experience count must be 9 (Winter Walk, MarketMind, Brandeis education, TELUS, undergraduate education, D Commerce, Bulmarma)")
 ev_result = validate_evidence_repository(experience_result=exp_result)
 assert_true(ev_result["valid"] is True, "evidence repository invalid")
-assert_true(len(ev_result["index"]) == 49, "Evidence count must be 49 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records: undergraduate identity, D Commerce Excel, Bulmarma Excel + 2 human-source-resolution records: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001 + 1 Brandeis MSBA awarded attestation record)")
+assert_true(len(ev_result["index"]) == 50, "Evidence count must be 50 (37 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 records: undergraduate identity, D Commerce Excel, Bulmarma Excel + 2 human-source-resolution records: DCOMMERCE_REFERENCE_001, DCOMMERCE_LINKEDIN_PERIOD_001 + 1 Brandeis MSBA awarded attestation record)")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 21, "Claim count must be 17 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval: undergraduate, D Commerce, Bulmarma) -- Brandeis education itself adds no Claims")
+assert_true(claim_result["records_checked"] == 22, "Claim count must be 17 (13 prior + 3 CANDIDATE_SOURCE_INGESTION_V1 draft claims + 1 CLAIM_DCOMMERCE_002 added 2026-10-03 with Bora's explicit approval: undergraduate, D Commerce, Bulmarma) -- Brandeis education itself adds no Claims")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]

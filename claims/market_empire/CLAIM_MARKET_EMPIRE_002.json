@@ -1,0 +1,29 @@
+{
+  "claim_id": "CLAIM_MARKET_EMPIRE_002",
+  "wording": "Built Market Empire's seven-screen beginner investing journey (market information, allocation across four sectors, calculated results and a sealed-bid property auction), kept official financial and auction calculations in a separate tested engine whose results the interface only displays, added investment-allocation and property-bid validation with 32/32 Vitest unit/calculation tests and 6/6 Playwright browser tests passing, and tracked work through GitHub issues and reviewed pull requests; the demo was approved for presentation by the project team and course professor.",
+  "evidence_ids": [
+    "MARKET_EMPIRE_DEMO_001",
+    "MARKET_EMPIRE_TECH_001"
+  ],
+  "evidence_state": "VERIFIED",
+  "allowed_contexts": [
+    "resume",
+    "interview",
+    "networking",
+    "Business Analyst",
+    "Applied AI / Automation",
+    "Business Operations"
+  ],
+  "forbidden_contexts": [
+    "sole authorship",
+    "independent authorship",
+    "professional software-engineering employment",
+    "production-scale SaaS",
+    "backend/API expertise",
+    "database expertise",
+    "AI/ML expertise"
+  ],
+  "human_approval": true,
+  "date": "2026-10-06",
+  "version": "1"
+}

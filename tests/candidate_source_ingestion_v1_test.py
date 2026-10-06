@@ -48,10 +48,10 @@ assert_true(exp_result["valid"] is True, "experience repository must be valid")
 assert_true(exp_result["records_checked"] == 9, f"expected 9 Experience records, got {exp_result['records_checked']}")
 ev_result = validate_evidence_repository()
 assert_true(ev_result["valid"] is True, "evidence repository must be valid")
-assert_true(ev_result["records_checked"] == 49, f"expected 49 Evidence records, got {ev_result['records_checked']}")
+assert_true(ev_result["records_checked"] == 50, f"expected 50 Evidence records, got {ev_result['records_checked']}")
 cl_result = validate_claim_repository()
 assert_true(cl_result["valid"] is True, "claim repository must be valid")
-assert_true(cl_result["records_checked"] == 21, f"expected 21 Claim records, got {cl_result['records_checked']}")
+assert_true(cl_result["records_checked"] == 22, f"expected 22 Claim records, got {cl_result['records_checked']}")
 
 EXPERIENCE_INDEX = exp_result["index"]
 EVIDENCE_INDEX = ev_result["index"]

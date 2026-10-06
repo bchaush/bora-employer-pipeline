@@ -1,0 +1,38 @@
+{
+  "evidence_id": "MARKET_EMPIRE_DEMO_001",
+  "experience_id": "EXP_MARKET_EMPIRE_001",
+  "fact": "At commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4, the Market Empire README records a completed one-round, seven-screen demo in which the player reviews market information, allocates cash across four investment sectors, sees a calculated market result and submits a sealed bid in a fictional property auction. Official financial and auction calculations live in a separate engine (src/engine) and the interface displays the engine's result. Investment-allocation and property-bid validation are implemented in src/engine/validation.ts. The completed version recorded 32/32 Vitest unit/calculation tests and 6/6 Playwright browser tests passing. Work was tracked through GitHub issues and merged pull requests, and the demo was reviewed by the project team and course professor and approved for presentation.",
+  "capabilities": [
+    "deterministic_business_logic",
+    "input_validation",
+    "software_testing_and_validation",
+    "issue_and_pull_request_workflow"
+  ],
+  "technologies": [
+    "TypeScript",
+    "React",
+    "Vitest",
+    "Playwright",
+    "GitHub"
+  ],
+  "evidence_state": "VERIFIED",
+  "original_source": "GitHub repository bchaush/market-empire",
+  "source_location": "commit c86338d0ba6f891ae09bf39fc5f135eb1ad2b5c4; README.md blob c9138245f1b38bae132c911bab61495063c59cc0 (sections 'The seven-screen journey', 'What has been completed', 'Final verified results', 'How the code works'); src/engine/validation.ts blob 9b1f07f19dbe7a5727b31cc98a2820142b421256 (validateAllocation, validateBid); docs/testing/evidence/issue-11-final-acceptance.md blob d0a3496763f61cdad7d81f1a998101d5210f40d9; merged pull requests #4, #5, #6, #9, #10, #12, #14, #16 and #18 in repository history.",
+  "safe_for_external_use": true,
+  "notes": "Added 2026-10-06 so the approved Market Empire bullets B020-B023 cite pinned repository facts. 'Built' is supported; sole or independent authorship is not.",
+  "limitations": [
+    "Do not claim sole or independent authorship.",
+    "Approval for presentation covers the one-round demo, not the larger future Market Empire product.",
+    "Does not establish professional software-engineering employment, backend/API expertise, database expertise, or AI/ML expertise."
+  ],
+  "stakeholders": [
+    "project team",
+    "course professor"
+  ],
+  "workflow_stage": "build",
+  "tests": [
+    "32/32 Vitest unit/calculation tests passed",
+    "6/6 Playwright browser tests passed"
+  ],
+  "outcome": "The README records that the demo was reviewed by the project team and course professor and approved for presentation."
+}

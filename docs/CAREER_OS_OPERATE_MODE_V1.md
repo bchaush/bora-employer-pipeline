@@ -1,6 +1,6 @@
-# Career OS Operate Mode V1 — Run Contract V1.4
+# Career OS Operate Mode V1 — Run Contract V1.5
 
-Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_4).
+Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_5).
 
 It is pure/local. It reads caller-supplied files and writes local receipts/output. It never calls Drive, Sheets, the web, or an employer application surface. ChatGPT connectors perform external reads/writes and hand exact readbacks to the CLI.
 
@@ -14,7 +14,7 @@ Upload package files as-is. Never convert the PDF, DOCX, or ZIP into Google Docs
 1. preflight
 2. slate
 3. STOP for Bora decision, then decide
-4. package for Bora-PURSUE roles only
+4. resume-model, then package with --resume-model, for Bora-PURSUE roles only
 5. connector uploads exactly 3 files as-is
 6. connector downloads/readbacks the same 3 files
 7. verify-persisted
@@ -141,7 +141,28 @@ STALE_RECONFIRMATION_REQUIRED means the JOBS context changed after Bora's decisi
 
 OPT_Screen_State, Geography_State and the system Decision are information for Bora. Once pursuit-state shows Bora's PURSUE with authorizes_pursuit true, they never block package; keep them as they are and mention them once.
 
-### 4. package
+### 4. resume-model, then package
+
+Never assemble the resume model by hand. resume-model builds it from the approved language by id and proves it passes the page-fill floor and the pre-render quality checks before package runs:
+
+    python src/career_os_run_v1.py resume-model \
+      --job-id "ACME::DATA-ANALYST" \
+      --project MARKETMIND \
+      --summary S002 \
+      --runtime-root runtime_extracted \
+      --font-dir governed_fonts_extracted \
+      --expected-main-sha <LIVE_MAIN_SHA> \
+      --out run_output_model/model.json \
+      --receipt receipts/resume_model_acme.json
+
+Choices (the only ones; everything else is fixed by the approved recipe):
+- --project MARKETMIND (default; data, analytics, operations, automation roles) or MARKET_EMPIRE (product, fintech, edtech, front-end or business-analyst roles where a tested React/TypeScript demo fits better). Pick per role and tell Bora which one was used and why, in one line.
+- --summary: MARKETMIND takes S002 or S003; MARKET_EMPIRE takes S002.
+- --order (optional): comma-separated bullet ids to put first within their own entry, most relevant first, e.g. B013,B022.
+
+Work is Winter Walk (B010, B012, B013, B014), TELUS Digital (B008, B009) and D Commerce Bank (B001, B002), newest first. MARKETMIND adds MarketMind B003-B007; MARKET_EMPIRE adds Market Empire B019-B023 and records MarketMind as NOT_RELEVANT_PER_CROSSWALK. Bulmarma, B011, B015 and S005 are never used. RESUME_MODEL_* codes are gates: quote them and stop.
+
+Then package with that model (it replaces any resume_model in request.json):
 
     python src/career_os_run_v1.py package \
       --request request.json \
@@ -152,11 +173,12 @@ OPT_Screen_State, Geography_State and the system Decision are information for Bo
       --expected-main-sha <LIVE_MAIN_SHA> \
       --company "Acme" \
       --role "Data Analyst" \
-      --target-folder-name "2026-10-05 — Acme — Data Analyst"
+      --target-folder-name "2026-10-05 — Acme — Data Analyst" \
+      --resume-model run_output_model/model.json
 
 The request jobs_rows entry must exactly equal the Ledger JOBS row on Job_ID, Company, Role, and Official_URL. package then replaces jobs_rows and decision_log_rows with the rows from ledger.json, so the pursuit gate always reads the same Ledger file (written to run_output/effective_request.json).
 A blank live Official_URL fails with OFFICIAL_URL_MISSING_IN_LEDGER.
-GOLD_BUILD_FAILED_LAYOUT_UNDERFILLED means the resume model is too short for the one-page fill floor: add more bullets from docs/resume/BORA_APPROVED_RESUME_LANGUAGE_V1.json exactly as written (keep every work entry and the project; about 14 bullets in total) and run package again. GOLD_BUILD_FAILED_LAYOUT_OVERFLOW: remove the least relevant bullet. Never write new or reworded text.
+Keep --output-root separate from the --out folder of resume-model (package needs an empty persist/). A failed quality check prints each failed check and why after "|" in the failure detail (for example RECRUITER_JARGON_PROHIBITION: hits=[...]); quote it and stop.
 
 persist/ contains exactly:
 - Bora_Chaush_<Company>_<Role>_Resume.pdf
