@@ -81,7 +81,13 @@ NETWORK_HEADERS = ("Contact_ID", "Name", "Company", "Role_Title", "How_Found", "
                    "Status", "Added_On", "Last_Touch", "Next_Action_Date", "Notes")
 READBACK_TABS = (("JOBS", JOBS_HEADERS, True), ("APPLICATIONS", APPLICATIONS_HEADERS, True), ("LOG", LOG_HEADERS, True),
                  ("NETWORK", NETWORK_HEADERS, False))
-XLSX_MAX_UNCOMPRESSED_BYTES = 50 * 1024 * 1024
+XLSX_MAX_UNCOMPRESSED_BYTES = 20 * 1024 * 1024
+# Hard bounds checked before anything is allocated (the live Ledger is about 31 x 20 cells per tab).
+XLSX_MAX_ROW = 100000
+XLSX_MAX_COLUMN = 702  # ZZ
+XLSX_MAX_CELLS = 200000  # <c> elements per tab, and materialized cells per tab
+XLSX_POSITIVE_INT = re.compile(r"[1-9][0-9]*")
+XLSX_INDEX = re.compile(r"0|[1-9][0-9]*")
 XLSX_NS_MAIN = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 XLSX_NS_DOC_REL = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 XLSX_NS_PKG_REL = "{http://schemas.openxmlformats.org/package/2006/relationships}"
@@ -312,26 +318,43 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                 raise RunError("READBACK_XLSX_INVALID", "tab %s has no worksheet part" % name)
             target = target.lstrip("/") if target.startswith("/") else "xl/" + target
             root = part(target)
-            cells, row_number = {}, 0
+            filled, seen, row_number, cell_count = {}, set(), 0, 0
             for row in root.iter(XLSX_NS_MAIN + "row"):
-                row_number = int(row.get("r")) if row.get("r") else row_number + 1
+                row_attribute = row.get("r")
+                if row_attribute is None:
+                    row_number += 1
+                elif XLSX_POSITIVE_INT.fullmatch(row_attribute) and len(row_attribute) <= 7:
+                    row_number = int(row_attribute)
+                else:
+                    raise RunError("READBACK_XLSX_INVALID", "%s has an invalid row number %r" % (name, row_attribute))
+                if row_number > XLSX_MAX_ROW:
+                    raise RunError("READBACK_XLSX_INVALID", "%s row %d is beyond the %d-row limit" % (name, row_number, XLSX_MAX_ROW))
                 column = 0
                 for cell in row.findall(XLSX_NS_MAIN + "c"):
+                    cell_count += 1
+                    if cell_count > XLSX_MAX_CELLS:
+                        raise RunError("READBACK_XLSX_INVALID", "%s has more than %d cells" % (name, XLSX_MAX_CELLS))
                     reference = cell.get("r")
-                    if reference:
+                    if reference is not None:
                         match = XLSX_CELL_REF.match(reference)
                         if not match or int(match.group(2)) != row_number:
                             raise RunError("READBACK_XLSX_INVALID", "%s cell reference %r is not in row %d" % (name, reference, row_number))
                         column = _xlsx_column(match.group(1))
                     else:
                         column += 1
+                    if column > XLSX_MAX_COLUMN:
+                        raise RunError("READBACK_XLSX_INVALID", "%s row %d has a cell beyond column %d" % (name, row_number, XLSX_MAX_COLUMN))
+                    if (row_number, column) in seen:
+                        raise RunError("READBACK_XLSX_INVALID", "%s row %d has a repeated cell" % (name, row_number))
+                    seen.add((row_number, column))
                     kind = cell.get("t", "n")
                     value_element = cell.find(XLSX_NS_MAIN + "v")
                     if kind == "s":
-                        try:
-                            text = shared[int(value_element.text)]
-                        except (AttributeError, TypeError, ValueError, IndexError) as error:
-                            raise RunError("READBACK_XLSX_INVALID", "%s %s has a broken shared-string index" % (name, reference)) from error
+                        raw_index = value_element.text if value_element is not None else None
+                        if raw_index is None or not XLSX_INDEX.fullmatch(raw_index) or int(raw_index) >= len(shared):
+                            raise RunError("READBACK_XLSX_INVALID", "%s %s has a broken shared-string index %r"
+                                           % (name, reference or "row %d" % row_number, raw_index))
+                        text = shared[int(raw_index)]
                     elif kind == "str":
                         text = (value_element.text or "") if value_element is not None else ""
                     elif kind == "inlineStr":
@@ -344,17 +367,17 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                                        "the sheet (format it as plain text) and export again" % (name, reference or "row %d" % row_number,
                                                                                                 {"n": "number", "b": "true/false", "e": "error",
                                                                                                  "d": "date"}.get(kind, kind)))
-                    if (row_number, column) in cells:
-                        raise RunError("READBACK_XLSX_INVALID", "%s row %d has a repeated cell" % (name, row_number))
-                    cells[(row_number, column)] = text
-            last_row = max([number for number, _column in cells] or [0])
+                    if text != "":
+                        filled.setdefault(row_number, {})[column] = text
+            # Blank cells are never stored, so the grid is sized by real content only: each row is as wide as its last non-blank
+            # cell (trailing blanks are dropped) and is checked against the cell bound before it is built.
+            last_row = max(filled) if filled else 0
+            if sum(max(columns) for columns in filled.values()) > XLSX_MAX_CELLS:
+                raise RunError("READBACK_XLSX_INVALID", "%s would expand beyond %d cells" % (name, XLSX_MAX_CELLS))
             grid = []
             for number in range(1, last_row + 1):
-                width = max([column for row_index, column in cells if row_index == number] or [0])
-                values = [cells.get((number, column), "") for column in range(1, width + 1)]
-                while values and values[-1] == "":
-                    values.pop()
-                grid.append(values)
+                columns = filled.get(number, {})
+                grid.append([columns.get(column, "") for column in range(1, max(columns) + 1)] if columns else [])
             tabs[name] = grid
     return tabs
 

@@ -522,14 +522,15 @@ def test_readback_from_xlsx_export():
         tabs["APPLICATIONS"][1][0]=("rich",[first[:4],first[4:]])
         tabs["APPLICATIONS"][1]=[cell if cell is not None else ("blank",) for cell in tabs["APPLICATIONS"][1]]+[("blank",),("blank",)]
         tabs["LOG"][1]=[cell if cell is not None else "" for cell in tabs["LOG"][1]]
-        tabs["LOG"].append([("blank",)]*3)
+        tabs["LOG"].insert(1,[("blank",)]*3)  # an interior blank row is skipped and counted
+        tabs["LOG"].append([("blank",)]*3)  # trailing blank rows are not content at all
         tabs["JOBS"].append([])
         code,out=readback_xlsx(tmp,tabs)
         assert_true(code==0 and "LEDGER FILE READY" in out and "source: xlsx" in out,"readback --xlsx builds the Ledger file: "+out)
         built=json.loads((tmp/"ledger-x.json").read_text(encoding="utf-8"))
         assert_true(built["JOBS"]==led["JOBS"] and built["APPLICATIONS"]==led["APPLICATIONS"] and built["LOG"]==led["LOG"] and built["NETWORK"]==[],
                     "xlsx readback equals the Ledger exactly")
-        assert_true("LOG rows=1 blank_rows_skipped=1" in out and "NETWORK rows=0" in out,"blank rows are skipped and counted; NETWORK is read")
+        assert_true("LOG rows=1 blank_rows_skipped=1" in out and "APPLICATIONS rows=1 blank_rows_skipped=0" in out and "NETWORK rows=0" in out,"blank rows are skipped and counted; NETWORK is read")
         code,raw_out=readback(tmp,raw_values(led,network=[]),"ledger-raw.json")
         assert_true(code==0 and (tmp/"ledger-raw.json").read_bytes()==(tmp/"ledger-x.json").read_bytes(),
                     "the same Ledger via --raw and --xlsx gives byte-identical ledger.json")
@@ -543,7 +544,15 @@ def test_readback_from_xlsx_export():
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("bool","1"); cases.append((bad,"READBACK_CELL_TYPE"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="e"><v>#REF!</v></c>'); cases.append((bad,"READBACK_CELL_TYPE"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B2" t="d"><v>2026-10-06</v></c>'); cases.append((bad,"READBACK_CELL_TYPE"))
-        bad=xlsx_tabs(led); bad["JOBS"][1][4]=("badindex",); cases.append((bad,"READBACK_XLSX_INVALID"))
+        for broken in ("99999","-1","-0"," 1","1 ","+1","1.0","01","٣","","x"):
+            bad=xlsx_tabs(led); bad["JOBS"][1][4]=("raw",'<c r="E2" t="s"><v>%s</v></c>'%broken); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["JOBS"][1][4]=("raw",'<c r="E2" t="s"/>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        # Resource bounds: sparse or huge coordinates are refused before any grid is built.
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="100000000"><c r="A100000000" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="100001"><c r="A100001" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
+        for row_attribute in ("0","-5","1e9","abc","٣"):
+            bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'</row><row r="%s"><c t="inlineStr"><is><t>x</t></is></c>'%row_attribute); cases.append((bad,"READBACK_XLSX_INVALID"))
+        bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="AAA2" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
         bad=xlsx_tabs(led); bad["LOG"][1][1]=("raw",'<c r="B7" t="inlineStr"><is><t>x</t></is></c>'); cases.append((bad,"READBACK_XLSX_INVALID"))
         bad=xlsx_tabs(led); bad["LOG"][1]=bad["LOG"][1]+["stray"]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
         bad=xlsx_tabs(led); bad["LOG"][1]=bad["LOG"][1]+[("blank",),("inline"," ")]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
@@ -556,6 +565,18 @@ def test_readback_from_xlsx_export():
         for value,expected in cases:
             code,out=readback_xlsx(tmp,value,"bad.json")
             assert_true(code==run.EXIT_ERROR and failure(out)["code"]==expected,"readback --xlsx fails closed with "+expected+": "+out)
+        saved=run.XLSX_MAX_CELLS
+        try:
+            run.XLSX_MAX_CELLS=25
+            code,out=readback_xlsx(tmp,xlsx_tabs(led),"capped.json")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","the per-tab cell bound is enforced")
+            run.XLSX_MAX_CELLS=150
+            wide=xlsx_tabs(led); wide["LOG"].extend([[None]*100+[("inline","x")] for _ in range(3)])
+            code,out=readback_xlsx(tmp,wide,"wide.json")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID" and "expand" in failure(out)["detail"],
+                        "the materialized-grid bound is checked before the grid is built: "+out)
+        finally:
+            run.XLSX_MAX_CELLS=saved
         write(tmp/"not.xlsx",b"not a zip")
         code,out=invoke(["readback","--xlsx",tmp/"not.xlsx","--out",tmp/"n.json","--receipt",tmp/"n-r.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a non-xlsx file is refused")
