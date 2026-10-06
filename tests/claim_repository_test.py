@@ -56,6 +56,7 @@ EXPECTED_PROJECT_CLAIM_IDS = [
     "CLAIM_LOANIQ_SQL_001",
     "CLAIM_LOANIQ_STACK_001",
     "CLAIM_MARKET_EMPIRE_001",
+    "CLAIM_MARKET_EMPIRE_002",
 ]
 
 EXPECTED_ALL_CLAIM_IDS = sorted(
@@ -104,17 +105,17 @@ def write_json(path: Path, payload) -> None:
 # ---------------------------------------------------------------------------
 real = validate_claim_repository(CLAIMS_ROOT)
 assert_true(real["valid"] is True, f"real claim repository failed: {real['errors']}")
-assert_true(real["records_checked"] == 21, f"expected 21 claims, got {real['records_checked']}")
+assert_true(real["records_checked"] == 22, f"expected 22 claims, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_ALL_CLAIM_IDS,
     f"unexpected Claim_ID set: {sorted(real['index'].keys())}",
 )
 assert_true(
-    len(discover_claim_files(CLAIMS_ROOT)) == 21,
+    len(discover_claim_files(CLAIMS_ROOT)) == 22,
     "discover_claim_files should find 21 claim files",
 )
-print("PASS 1: valid real claim repository (21 records including Brandeis, LoanIQ and Market Empire claims) passed.")
+print("PASS 1: valid real claim repository (22 records including Brandeis, LoanIQ and Market Empire claims) passed.")
 
 
 # ---------------------------------------------------------------------------

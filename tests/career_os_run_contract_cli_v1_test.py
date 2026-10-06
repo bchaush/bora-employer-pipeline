@@ -1,4 +1,4 @@
-"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_4 (V1_3 plus readback --xlsx from the Drive export).
+"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_5 (V1_4 plus resume-model, package --resume-model and QA failure details).
 
 Fixtures use the exact Production Ledger headers:
 - JOBS: 20 columns
@@ -783,6 +783,134 @@ def test_record_external_submit():
     print("PASS: record-external-submit records Bora's outside-package applications honestly and closeout accepts only those.")
 
 
+def real_package_deps():
+    """PackageDeps over this repository's Candidate Truth with the host Liberation Sans fonts (None when they are not installed or not
+    the pinned bytes); used in place of the cloud runtime loader, which needs a released runtime ZIP."""
+    import gold_resume_docx_builder as builder
+    import pursue_to_gold_package as ptg
+    from claim_repository import load_validated_claim_repository
+    from evidence_repository import load_validated_evidence_repository
+    manifest=json.loads((ROOT/"docs"/"rendering"/"RENDERING_ENVIRONMENT_V1.json").read_text(encoding="utf-8"))
+    try:
+        fonts=builder.fonts_from_manifest(manifest,lambda path: Path(path).read_bytes())
+    except Exception:
+        return None
+    claims=load_validated_claim_repository(ROOT/"claims"); evidence=load_validated_evidence_repository(ROOT/"evidence")
+    assert_true(claims["valid"] and evidence["valid"],"Candidate Truth repositories are valid")
+    language=json.loads((ROOT/"docs"/"resume"/"BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))
+    return ptg.PackageDeps(load_claims=lambda:claims["index"],load_evidence=lambda:evidence["index"],approved_language=lambda:language,
+                           validate_lineage=lambda claim:[],
+                           identity_provider=lambda:ptg.approved_identity_from_canonical_records(ROOT,claims=claims["index"],evidence=evidence["index"]),
+                           fonts=fonts,render=None,renderer_identity=None,pdf_facts=None,current_state=None,doctrine_root=ROOT,roster=None)
+
+
+def test_resume_model():
+    import gold_resume_qa as qa
+    import pursue_to_gold_package as ptg
+    from claim_repository import load_validated_claim_repository
+    from evidence_repository import load_validated_evidence_repository
+    language=json.loads((ROOT/"docs"/"resume"/"BORA_APPROVED_RESUME_LANGUAGE_V1.json").read_text(encoding="utf-8"))
+    claims=load_validated_claim_repository(ROOT/"claims")["index"]; evidence=load_validated_evidence_repository(ROOT/"evidence")["index"]
+    identity=ptg.approved_identity_from_canonical_records(ROOT,claims=claims,evidence=evidence)
+    bullets={item["bullet_id"]:item for item in language["bullets"]}
+    summaries={item["summary_id"]:item for item in language["summaries"]}
+    # The recipes only ever name approved, jargon-free language, never Bulmarma or the always-failing entries.
+    for name,recipe in run.RESUME_RECIPES.items():
+        ids=[i for _e,group in run.RESUME_WORK for i in group]+list(recipe["project_bullets"])
+        for bullet_id in ids:
+            assert_true(bullet_id in bullets and not qa.jargon_hits(bullets[bullet_id]["text"]),"%s %s approved and jargon-free"%(name,bullet_id))
+        for summary_id in recipe["summaries"]:
+            assert_true(summary_id in summaries and not qa.jargon_hits(summaries[summary_id]["text"]),"%s %s approved and jargon-free"%(name,summary_id))
+        assert_true(not {"B011","B015","B016"}&set(ids) and "S005" not in recipe["summaries"],"%s never uses B011/B015/B016/S005"%name)
+    for name,summary_id in (("MARKETMIND","S002"),("MARKETMIND","S003"),("MARKET_EMPIRE","S002")):
+        model=run.build_resume_model(JOB_ID,name,summary_id,[],identity,language)
+        assert_true([entry["employer"] for entry in model["work"]]==["Winter Walk","TELUS Digital","D Commerce Bank"],"work is newest first")
+        assert_true(model["summary"]["text"]==summaries[summary_id]["text"] and model["job_id"]==JOB_ID,"summary text is the approved one")
+        texts={(item["text"],tuple(item["claim_ids"])) for item in language["bullets"]}
+        assert_true(all((b["text"],tuple(b["claim_ids"])) in texts for entry in model["work"]+[model["project"]] for b in entry["bullets"]),
+                    "every bullet is exact approved language with its claim binding")
+        assert_true(qa.approved_language_problems(model,language,claims,evidence)==[],"approved-language check passes: %s"%name)
+        assert_true(qa.jargon_hits(qa._all_visible_text(model))==[],"no recruiter jargon: %s"%name)
+        if name=="MARKET_EMPIRE":
+            assert_true(model["project"]["name"]=="Market Empire" and model["roster_omissions"]==[{"roster_entry":"MarketMind","reason":"NOT_RELEVANT_PER_CROSSWALK"}],
+                        "Market Empire replaces MarketMind with a recorded omission")
+        else:
+            assert_true(model["project"]["name"]=="MarketMind" and "roster_omissions" not in model,"MarketMind is the default project")
+    ordered=run.build_resume_model(JOB_ID,"MARKET_EMPIRE","S002",["B013","B022","B009"],identity,language)
+    ww=[b["text"] for b in ordered["work"][0]["bullets"]]; project=[b["text"] for b in ordered["project"]["bullets"]]
+    assert_true(ww[0]==bullets["B013"]["text"] and project[0]==bullets["B022"]["text"] and ordered["work"][1]["bullets"][0]["text"]==bullets["B009"]["text"]
+                and len(ww)==4 and len(project)==5,"--order moves listed bullets first within their own entry and drops nothing")
+    for args,code in (((JOB_ID,"LOANIQ","S002",[]),"RESUME_MODEL_PROJECT_INVALID"),((JOB_ID,"MARKET_EMPIRE","S003",[]),"RESUME_MODEL_SUMMARY_INVALID"),
+                      ((JOB_ID,"MARKETMIND","S005",[]),"RESUME_MODEL_SUMMARY_INVALID"),((JOB_ID,"MARKETMIND","S002",["B011"]),"RESUME_MODEL_ORDER_INVALID"),
+                      ((JOB_ID,"MARKETMIND","S002",["B019"]),"RESUME_MODEL_ORDER_INVALID"),((JOB_ID,"MARKETMIND","S002",["B013","B013"]),"RESUME_MODEL_ORDER_INVALID")):
+        try:
+            run.build_resume_model(*args,identity,language); got=None
+        except run.RunError as error:
+            got=error.code
+        assert_true(got==code,"build_resume_model %s -> %s (got %s)"%(args[1:],code,got))
+    # The full command: page fill and the canonical pre-render QA, with the real fonts when the host has the pinned bytes.
+    deps=real_package_deps()
+    if deps is None:
+        print("NOTE: pinned Liberation Sans not on this host; the resume-model page-fill/QA run is covered where the fonts exist.")
+    else:
+        real=cloud.make_cloud_operate_deps
+        cloud.make_cloud_operate_deps=lambda *a,**k: deps
+        try:
+            with tempfile.TemporaryDirectory() as raw:
+                tmp=Path(raw)
+                for name,summary_id,order in (("MARKETMIND","S002",""),("MARKETMIND","S003",""),("MARKET_EMPIRE","S002",""),
+                                              ("MARKET_EMPIRE","S002","B013,B022")):
+                    argv=["resume-model","--job-id",JOB_ID,"--project",name,"--summary",summary_id,"--runtime-root",tmp,"--font-dir",tmp,
+                          "--expected-main-sha",MAIN_SHA,"--out",tmp/"model.json","--receipt",tmp/"rm.json"]+(["--order",order] if order else [])
+                    code,out=invoke(argv)
+                    assert_true(code==0 and "CAREER_OS_RUN_RESUME_MODEL: READY" in out,"resume-model READY for %s %s %s: %s"%(name,summary_id,order,out))
+                    fill=float(out.split("page_fill: ")[1].split()[0])
+                    assert_true(fill>=0.935,"page fill meets the doctrine target: %s"%fill)
+                    receipt=json.loads((tmp/"rm.json").read_text())
+                    assert_true(receipt["model_sha256"]==sha((tmp/"model.json").read_bytes()),"receipt binds the model bytes")
+                code,out=invoke(["resume-model","--job-id","bad\nid","--project","MARKETMIND","--summary","S002","--runtime-root",tmp,"--font-dir",tmp,
+                                 "--expected-main-sha",MAIN_SHA,"--out",tmp/"m.json","--receipt",tmp/"r.json"])
+                assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="RESUME_MODEL_JOB_INVALID","a multi-line job id is refused")
+        finally:
+            cloud.make_cloud_operate_deps=real
+    # package --resume-model replaces the request model, bound to the same job; QA failures name the failing checks.
+    real=cloud.run_request; cloud.run_request=fake_run_request
+    try:
+        with tempfile.TemporaryDirectory() as raw:
+            tmp=Path(raw)
+            led=write(tmp/"ledger.json",ledger([job_row()],[],[log_row()]))
+            model=run.build_resume_model(JOB_ID,"MARKETMIND","S002",[],identity,language)
+            SEEN_REQUESTS.clear()
+            code,out=invoke(package_argv(tmp,request_file(tmp),led)+["--resume-model",write(tmp/"model.json",model)])
+            assert_true(code==0 and SEEN_REQUESTS[-1]["resume_model"]==model,"package uses the --resume-model file as the resume model")
+            other=dict(model,job_id="OTHER::JOB")
+            shutil.rmtree(tmp/"out")
+            code,out=invoke(package_argv(tmp,request_file(tmp),led)+["--resume-model",write(tmp/"other.json",other)])
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="RESUME_MODEL_JOB_MISMATCH","a model for another job is refused")
+    finally:
+        cloud.run_request=real
+    class QaError(Exception):
+        def __init__(self):
+            super().__init__("GOLD_PRE_RENDER_QA_FAILED")
+            self.code="GOLD_PRE_RENDER_QA_FAILED"; self.detail="ROSTER_POLICY,RECRUITER_JARGON_PROHIBITION"
+            self.report={"checks":[{"check":"ROSTER_POLICY","passed":False,"detail":"Bulmarma included without a crosswalk exception"},
+                                   {"check":"RECRUITER_JARGON_PROHIBITION","passed":False,"detail":"hits=['kill switch']"},
+                                   {"check":"DOCX_PARSEABLE","passed":True,"detail":""}]}
+    def failing_run_request(*_args):
+        raise QaError()
+    cloud.run_request=failing_run_request
+    try:
+        with tempfile.TemporaryDirectory() as raw:
+            tmp=Path(raw)
+            code,out=invoke(package_argv(tmp,request_file(tmp),write(tmp/"ledger.json",ledger([job_row()],[],[log_row()]))))
+            detail=failure(out)["detail"]
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="GOLD_PRE_RENDER_QA_FAILED" and "hits=['kill switch']" in detail
+                        and "Bulmarma included" in detail and "DOCX_PARSEABLE" not in detail,"package failure names each failed check and why: "+detail)
+    finally:
+        cloud.run_request=real
+    print("PASS: resume-model builds only approved one-page recipes (MarketMind or Market Empire) that pass page fill and pre-render QA.")
+
+
 def test_local_only():
     source=(ROOT/"src"/"career_os_run_v1.py").read_text(encoding="utf-8")
     for forbidden in ("import requests","urllib","http.client","googleapiclient","socket","subprocess","smtplib"):
@@ -790,10 +918,12 @@ def test_local_only():
     runbook=(ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.md").read_text(encoding="utf-8")
     for needle in ("career_os_run_v1.py readback","career_os_run_v1.py decide","career_os_run_v1.py pursuit-state","--as-of",
                    "Never hand-build, retype or partly read ledger.json","career_os_run_v1.py record-external-submit","--xlsx ledger.xlsx",
-                   "never parse it yourself","they never block package","GOLD_BUILD_FAILED_LAYOUT_UNDERFILLED"):
+                   "never parse it yourself","they never block package","career_os_run_v1.py resume-model","--resume-model run_output_model/model.json",
+                   "MARKET_EMPIRE","Never assemble the resume model by hand"):
         assert_true(needle in runbook,"runbook documents "+needle)
     config=json.loads((ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.json").read_text(encoding="utf-8"))["run_contract"]
-    assert_true(config["contract_id"]==run.RUN_CONTRACT_ID and config["state_machine"][0]=="readback" and "decide" in config["state_machine"],
+    assert_true(config["contract_id"]==run.RUN_CONTRACT_ID and config["state_machine"][0]=="readback" and "decide" in config["state_machine"]
+                and config["state_machine"].index("resume-model")==config["state_machine"].index("package")-1,
                 "config names the current contract with readback and decide")
     print("PASS: run-contract CLI remains pure/local and the runbook/config document readback, decide and slate dates.")
 
@@ -802,9 +932,9 @@ def main():
     assert_true(len(run.JOBS_HEADERS)==20 and len(run.APPLICATIONS_HEADERS)==10 and len(run.LOG_HEADERS)==9,"live header counts")
     for test in (test_preflight_live_settings,test_slate_dedupe_and_score_rules,test_package_ledger_binding_and_persistence,
                  test_record_submit_live_shapes,test_closeout_slate_authority_and_sha_parse,test_end_to_end_live_shapes,
-                 test_readback_normalizes_sheet_values,test_readback_from_xlsx_export,test_decide_and_pursuit_state,test_record_external_submit,test_local_only):
+                 test_readback_normalizes_sheet_values,test_readback_from_xlsx_export,test_decide_and_pursuit_state,test_record_external_submit,test_resume_model,test_local_only):
         test()
-    print("PASS: 11 groups of CAREER_OS_RUN_CONTRACT_V1_4 live-shape tests")
+    print("PASS: 12 groups of CAREER_OS_RUN_CONTRACT_V1_5 live-shape tests")
 
 
 if __name__=="__main__":

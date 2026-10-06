@@ -1,7 +1,7 @@
 {
   "spec": "CAREER_OS_OPERATE_MODE_V1",
   "run_contract": {
-    "contract_id": "CAREER_OS_RUN_CONTRACT_V1_4",
+    "contract_id": "CAREER_OS_RUN_CONTRACT_V1_5",
     "cli": "src/career_os_run_v1.py",
     "runbook": "docs/CAREER_OS_OPERATE_MODE_V1.md",
     "state_machine": [
@@ -10,6 +10,7 @@
       "slate",
       "STOP_FOR_BORA_DECISION",
       "decide",
+      "resume-model",
       "package",
       "CONNECTOR_UPLOADS_EXACTLY_3",
       "CONNECTOR_DOWNLOADS_READBACK",
@@ -54,7 +55,8 @@
     "decision_command": "decide (pursuit_decision.build_decision_mutation_plan from the canonical ledger.json)",
     "slate_dates": "slate --as-of stamps First_Seen and Last_Verified",
     "external_submission_command": "record-external-submit (Bora-confirmed; Resume_Version EXTERNAL_NO_CAREER_OS_PACKAGE, never a hash)",
-    "screening_states_rule": "OPT_Screen_State, Geography_State and the system Decision inform Bora; after Bora's PURSUE they never block package."
+    "screening_states_rule": "OPT_Screen_State, Geography_State and the system Decision inform Bora; after Bora's PURSUE they never block package.",
+    "resume_model_rule": "The resume model is built only by resume-model (approved language by id; MARKETMIND or MARKET_EMPIRE recipe; summary and optional bullet order are the only choices) and passed to package with --resume-model; it must print READY (page fill and pre-render QA passed)."
   },
   "network_contract": {
     "contract_id": "CAREER_OS_NETWORK_V1",

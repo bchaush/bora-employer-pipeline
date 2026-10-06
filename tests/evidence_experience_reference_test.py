@@ -90,6 +90,7 @@ EXPECTED_PROJECT_IDS = [
     "LOANIQ_STACK_001",
     "MARKET_EMPIRE_REPO_001",
     "MARKET_EMPIRE_TECH_001",
+    "MARKET_EMPIRE_DEMO_001",
 ]
 
 EXPECTED_ALL_IDS = sorted(
@@ -155,9 +156,9 @@ exp = validate_experience_repository(EXPERIENCE_ROOT)
 assert_true(exp["valid"] is True, "real Experience Registry must be valid for REF PASS 1")
 evidence = validate_evidence_repository(EVIDENCE_ROOT, experience_root=EXPERIENCE_ROOT)
 assert_true(evidence["valid"] is True, "real Evidence Repository failed with Experience refs")
-assert_true(evidence["records_checked"] == 49, f"expected 49 evidence, got {evidence['records_checked']}")
+assert_true(evidence["records_checked"] == 50, f"expected 50 evidence, got {evidence['records_checked']}")
 assert_true(evidence["index"] is not None, "trusted Evidence index missing")
-assert_true(len(evidence["index"]) == 49, f"trusted Evidence index length {len(evidence['index'])}")
+assert_true(len(evidence["index"]) == 50, f"trusted Evidence index length {len(evidence['index'])}")
 assert_true(
     sorted(evidence["index"].keys()) == EXPECTED_ALL_IDS,
     f"unexpected Evidence_ID set: {sorted(evidence['index'].keys())}",

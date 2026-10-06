@@ -76,12 +76,12 @@ assert_true(experience_result["valid"] is True, "experience repository invalid")
 assert_true(len(experience_result["index"]) == 9, "Experience count must be 9 after MarketMind, Brandeis education, TELUS, and CANDIDATE_SOURCE_INGESTION_V1 ingestion")
 evidence_result = validate_evidence_repository(experience_result=experience_result)
 assert_true(evidence_result["valid"] is True, "evidence repository invalid")
-assert_true(len(evidence_result["index"]) == 49, "Evidence count must be 49 after MarketMind, Brandeis education, TELUS, CANDIDATE_SOURCE_INGESTION_V1, and human-source-resolution ingestion")
+assert_true(len(evidence_result["index"]) == 50, "Evidence count must be 50 after MarketMind, Brandeis education, TELUS, CANDIDATE_SOURCE_INGESTION_V1, and human-source-resolution ingestion")
 claim_result = validate_claim_repository()
 assert_true(claim_result["valid"] is True, "claim repository invalid")
-assert_true(claim_result["records_checked"] == 21, "claim repository must have 21 records")
+assert_true(claim_result["records_checked"] == 22, "claim repository must have 22 records")
 reusable_claims = [cid for cid, rec in claim_result["index"].items() if rec.get("human_approval") is True]
-assert_true(len(reusable_claims) == 21, "reusable claim count must be 21 after Bora's 2026-10-04 precision-cleanup approvals")
+assert_true(len(reusable_claims) == 22, "reusable claim count must be 22 after Bora's 2026-10-04 precision-cleanup approvals")
 
 identity_patch = {
     "patch_id": "PATCH_WW_CONTACT_NOOP",

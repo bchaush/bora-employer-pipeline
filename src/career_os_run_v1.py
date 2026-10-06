@@ -1,4 +1,4 @@
-"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_4).
+"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_5).
 
 A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
 
@@ -44,7 +44,7 @@ import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
 import pursuit_decision  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_4"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_5"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
@@ -61,6 +61,25 @@ def single_clean_line(value: str) -> bool:
 # No Ledger cell in these tabs is ever a bare number; one is the signature of a broken sheet export (an empty cell read as an index).
 DIGITS_ONLY_EXEMPT = {("NETWORK", "Notes")}
 EFFECTIVE_REQUEST_FILE = "effective_request.json"
+
+# resume-model: the only two approved one-page recipes. Every text comes from BORA_APPROVED_RESUME_LANGUAGE_V1 by id; the work roster
+# is the Gold doctrine default (Winter Walk, TELUS Digital, D Commerce Bank); approved entries that always fail the recruiter-jargon
+# check (B011, B015, S005) and the non-default Bulmarma entry (B016) are never used. Market Empire replaces MarketMind as the project
+# with MarketMind recorded as NOT_RELEVANT_PER_CROSSWALK. Both recipes are proven by tests to pass page fill and pre-render QA.
+RESUME_WORK = (("EXP_WW_001", ("B010", "B012", "B013", "B014")), ("EXP_TELUS_001", ("B008", "B009")),
+               ("EXP_DCOMMERCE_001", ("B001", "B002")))
+RESUME_SKILLS = (("Process & quality", ("Data validation", "Data reconciliation", "Process mapping", "Workflow documentation", "Import logging")),
+                 ("Technical", None),
+                 ("Operations", ("Regulatory reporting", "Financial reporting", "Policy case review", "Trend analysis",
+                                 "Cross-functional collaboration")))
+RESUME_RECIPES = {
+    "MARKETMIND": {"project": "EXP_MM_001", "project_bullets": ("B003", "B004", "B005", "B006", "B007"), "summaries": ("S002", "S003"),
+                   "technical": ("Microsoft Excel", "Google Workspace", "Python", "Streamlit", "pytest"), "omit": ()},
+    "MARKET_EMPIRE": {"project": "EXP_MARKET_EMPIRE_001", "project_bullets": ("B019", "B020", "B021", "B022", "B023"), "summaries": ("S002",),
+                      "technical": ("Microsoft Excel", "Google Workspace", "TypeScript", "React", "Vitest", "Playwright"),
+                      "omit": ("MarketMind",)},
+}
+RESUME_MONTHS = {name: number for number, name in enumerate(("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), 1)}
 
 # SETTINGS readback keys (flat object, or a list of {"Key"/"Value"} rows).
 SETTINGS_CANONICAL_MAIN = "CANONICAL_MAIN_SHA"
@@ -440,6 +459,133 @@ def cmd_readback(args: argparse.Namespace) -> tuple:
     return EXIT_OK, block(lines), None
 
 
+# resume-model ------------------------------------------------------------------------------------
+
+def _start_key(date_range: str) -> tuple:
+    match = re.match(r"^([A-Z][a-z]{2}) (\d{4})", str(date_range))
+    if not match or match.group(1) not in RESUME_MONTHS:
+        raise RunError("RESUME_MODEL_IDENTITY_INVALID", "date range %s" % _short(date_range))
+    return int(match.group(2)), RESUME_MONTHS[match.group(1)]
+
+
+def build_resume_model(job_id: str, recipe_name: str, summary_id: str, order: Sequence[str], identity: Mapping[str, Any],
+                       approved: Mapping[str, Any]) -> dict:
+    """The Gold resume model for one approved recipe, assembled only from approved records by id. ORDER lists bullet ids to move to the
+    front of their own entry, in that order; nothing else can be changed."""
+    recipe = RESUME_RECIPES.get(recipe_name)
+    if recipe is None:
+        raise RunError("RESUME_MODEL_PROJECT_INVALID", "--project must be one of %s" % ", ".join(sorted(RESUME_RECIPES)))
+    if summary_id not in recipe["summaries"]:
+        raise RunError("RESUME_MODEL_SUMMARY_INVALID", "--summary for %s must be one of %s" % (recipe_name, ", ".join(recipe["summaries"])))
+    bullets = {item["bullet_id"]: item for item in approved.get("bullets", [])}
+    summaries = {item["summary_id"]: item for item in approved.get("summaries", [])}
+    skills = {(item["row"], item["text"]): item for item in approved.get("skills", [])}
+    entries = [(experience_id, list(ids)) for experience_id, ids in RESUME_WORK] + [(recipe["project"], list(recipe["project_bullets"]))]
+    known = {bullet_id for _experience, ids in entries for bullet_id in ids}
+    if len(set(order)) != len(order) or any(bullet_id not in known for bullet_id in order):
+        raise RunError("RESUME_MODEL_ORDER_INVALID", "--order may list each of %s at most once" % ", ".join(sorted(known)))
+    for _experience, ids in entries:
+        first = [bullet_id for bullet_id in order if bullet_id in ids]
+        ids[:] = first + [bullet_id for bullet_id in ids if bullet_id not in first]
+
+    def approved_bullet(bullet_id: str) -> dict:
+        if bullet_id not in bullets:
+            raise RunError("RESUME_MODEL_LANGUAGE_MISSING", bullet_id)
+        return {"text": bullets[bullet_id]["text"], "claim_ids": list(bullets[bullet_id]["claim_ids"])}
+
+    experiences = identity.get("experiences", {})
+    work = []
+    for experience_id, ids in entries[:-1]:
+        entry = experiences.get(experience_id)
+        if not entry:
+            raise RunError("RESUME_MODEL_IDENTITY_INVALID", "no approved identity for %s" % experience_id)
+        work.append({"experience_id": experience_id, "title": entry["title"], "employer": entry["employer"],
+                     "date_range": entry["date_range"], "bullets": [approved_bullet(bullet_id) for bullet_id in ids]})
+    work.sort(key=lambda item: _start_key(item["date_range"]), reverse=True)
+    project_id, project_ids = entries[-1]
+    project_identity = experiences.get(project_id)
+    project_link = identity.get("project_links", {}).get(project_id)
+    if not project_identity or not project_link:
+        raise RunError("RESUME_MODEL_IDENTITY_INVALID", "no approved project identity or link for %s" % project_id)
+    rows = []
+    for label, items in RESUME_SKILLS:
+        items = recipe["technical"] if items is None else items
+        missing = [item for item in items if (label, item) not in skills]
+        if missing:
+            raise RunError("RESUME_MODEL_LANGUAGE_MISSING", "skill %s" % _short(missing[0]))
+        rows.append({"label": label, "items": list(items),
+                     "claim_ids": sorted({claim for item in items for claim in skills[(label, item)]["claim_ids"]})})
+    if summary_id not in summaries:
+        raise RunError("RESUME_MODEL_LANGUAGE_MISSING", summary_id)
+    model = {"model_id": "RESUME_MODEL_V1::%s::%s::%s" % (job_id, recipe_name, summary_id), "job_id": job_id,
+             "contact": dict(identity["contact"]),
+             "summary": {"text": summaries[summary_id]["text"], "claim_ids": list(summaries[summary_id]["claim_ids"])},
+             "education": [dict(item) for item in identity["education"]], "skills": rows, "work": work,
+             "project": {"experience_id": project_id, "name": project_identity["project_name"],
+                         "tech_label": project_identity["project_tech_label"], "link": dict(project_link),
+                         "bullets": [approved_bullet(bullet_id) for bullet_id in project_ids]}}
+    if recipe["omit"]:
+        model["roster_omissions"] = [{"roster_entry": name, "reason": "NOT_RELEVANT_PER_CROSSWALK"} for name in recipe["omit"]]
+    return model
+
+
+def _failed_check_details(report: Any, limit: int = 600) -> str:
+    """'CHECK: detail; CHECK: detail' for the failed checks of a QA report, bounded."""
+    checks = report.get("checks", []) if isinstance(report, Mapping) else []
+    parts = ["%s: %s" % (item.get("check"), str(item.get("detail") or "")[:200]) for item in checks
+             if isinstance(item, Mapping) and not item.get("passed")]
+    text = "; ".join(parts)
+    return text if len(text) <= limit else text[:limit - 3] + "..."
+
+
+def cmd_resume_model(args: argparse.Namespace) -> tuple:
+    if not single_clean_line(args.job_id or "") or len(args.job_id) > 200:
+        raise RunError("RESUME_MODEL_JOB_INVALID", "--job-id must be the Ledger Job_ID")
+    order = [item.strip() for item in (args.order or "").split(",") if item.strip()]
+    root = Path(args.runtime_root)
+    work_dir = Path(args.out).resolve().parent
+    work_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        deps = cloud.make_cloud_operate_deps(root, Path(args.font_dir), work_dir=work_dir, expected_main_sha=args.expected_main_sha)
+    except RunError:
+        raise
+    except Exception as error:
+        raise RunError("RESUME_MODEL_RUNTIME_UNAVAILABLE", str(error)[:300]) from error
+    import gold_resume_docx_builder as builder
+    import gold_resume_qa as qa
+    import pursue_to_gold_package as ptg
+    identity = deps.identity_provider()
+    approved = deps.approved_language()
+    model = build_resume_model(args.job_id, args.project, args.summary, order, identity, approved)
+    metrics, _digests = builder.load_gold_metrics(deps.doctrine_root)
+    try:
+        build = builder.build_gold_docx(model, metrics, deps.fonts)
+    except builder.GoldBuildError as error:
+        raise RunError("RESUME_MODEL_LAYOUT_" + error.code, error.detail) from error
+    roster = ptg.display_roster(builder.load_doctrine_roster(deps.doctrine_root), identity)
+    report = qa.pre_render_qa(model, build, metrics=metrics, claims=deps.load_claims(), evidence=deps.load_evidence(), identity=identity,
+                              rebuild=lambda: builder.build_gold_docx(model, metrics, deps.fonts), roster=roster, job_relevant_terms=(),
+                              approved_language=approved, crosswalk=[])
+    if not report["passed"]:
+        raise RunError("RESUME_MODEL_QA_FAILED", _failed_check_details(report))
+    model_sha = write_receipt(args.out, model)
+    ids = {item["bullet_id"]: (item["text"], tuple(item["claim_ids"])) for item in approved["bullets"]}
+    def bullet_ids(entry: Mapping[str, Any]) -> str:
+        return ",".join(next(key for key, value in ids.items() if value == (bullet["text"], tuple(bullet["claim_ids"])))
+                        for bullet in entry["bullets"])
+    receipt = {"spec": "CAREER_OS_RUN_RESUME_MODEL_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "job_id": args.job_id, "project": args.project,
+               "summary": args.summary, "order": order, "model_sha256": model_sha,
+               "page_fill": build.layout["estimated_bottom_fraction"]}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_RESUME_MODEL: READY (approved language only; page fill and pre-render QA passed; pass --resume-model to package)",
+             "job_id: " + args.job_id, "project: %s | summary: %s" % (args.project, args.summary)]
+    lines += ["%s: %s" % (entry["employer"], bullet_ids(entry)) for entry in model["work"]]
+    lines += ["%s: %s" % (model["project"]["name"], bullet_ids(model["project"])),
+              "page_fill: %.4f" % build.layout["estimated_bottom_fraction"], "model: " + args.out, "model_sha256: " + model_sha,
+              "receipt_sha256: " + receipt_sha]
+    return EXIT_OK, block(lines), None
+
+
 # decide / pursuit-state -------------------------------------------------------------------------
 
 def _single_job(ledger: Mapping[str, Any], job_id: str) -> Mapping[str, Any]:
@@ -764,6 +910,11 @@ def cmd_package(args: argparse.Namespace) -> tuple:
         raise RunError("PERSIST_DIR_NOT_CLEAN", str(persist))
     # The pursuit gate reads JOBS and the decision LOG from the same canonical Ledger file as every other step.
     effective = dict(request)
+    if args.resume_model:
+        model = read_json(args.resume_model, "resume model")
+        if not isinstance(model, Mapping) or model.get("job_id") != job_id:
+            raise RunError("RESUME_MODEL_JOB_MISMATCH", "the --resume-model job_id must equal the request job_id")
+        effective["resume_model"] = dict(model)
     effective["jobs_rows"] = [dict(live)]
     effective["decision_log_rows"] = [dict(row) for row in ledger["LOG"]]
     output_root.mkdir(parents=True, exist_ok=True)
@@ -776,7 +927,9 @@ def cmd_package(args: argparse.Namespace) -> tuple:
     except RunError:
         raise
     except Exception as error:
-        raise RunError(getattr(error, "code", None) or type(error).__name__, str(getattr(error, "detail", "") or error)[:300]) from error
+        detail = str(getattr(error, "detail", "") or error)[:300]
+        failed = _failed_check_details(getattr(error, "report", None))
+        raise RunError(getattr(error, "code", None) or type(error).__name__, (detail + " | " + failed) if failed else detail) from error
     inventory = result["package_inventory"]
     if not inventory.get("complete"):
         raise RunError("PACKAGE_INVENTORY_INCOMPLETE", ",".join(inventory.get("problems", [])))
@@ -1105,6 +1258,16 @@ def build_parser() -> argparse.ArgumentParser:
     item.add_argument("--company", required=True)
     item.add_argument("--role", required=True)
     item.add_argument("--target-folder-name", required=True)
+    item.add_argument("--resume-model", help="model.json printed by resume-model; replaces the request resume_model (recommended)")
+    item = add("resume-model", cmd_resume_model)
+    item.add_argument("--job-id", required=True)
+    item.add_argument("--project", required=True, help="MARKETMIND (default choice) or MARKET_EMPIRE")
+    item.add_argument("--summary", required=True, help="MARKETMIND: S002 or S003; MARKET_EMPIRE: S002")
+    item.add_argument("--order", help="optional comma-separated bullet ids to put first within their own entry, e.g. B013,B021")
+    item.add_argument("--runtime-root", required=True)
+    item.add_argument("--font-dir", required=True)
+    item.add_argument("--expected-main-sha", required=True)
+    item.add_argument("--out", required=True, help="model.json to write")
     item = add("verify-persisted", cmd_verify_persisted)
     item.add_argument("--plan", required=True)
     item.add_argument("--downloaded-dir", required=True)

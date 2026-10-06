@@ -99,6 +99,7 @@ EXPECTED_PROJECT_IDS = [
     "LOANIQ_STACK_001",
     "MARKET_EMPIRE_REPO_001",
     "MARKET_EMPIRE_TECH_001",
+    "MARKET_EMPIRE_DEMO_001",
 ]
 
 EXPECTED_ALL_IDS = sorted(
@@ -164,7 +165,7 @@ def write_temp_experience_root(base: Path, experience_id: str = "EXP_TEST_001") 
 # ---------------------------------------------------------------------------
 real = validate_evidence_repository(EVIDENCE_ROOT)
 assert_true(real["valid"] is True, "current evidence repository failed")
-assert_true(real["records_checked"] == 49, f"expected 49 records, got {real['records_checked']}")
+assert_true(real["records_checked"] == 50, f"expected 50 records, got {real['records_checked']}")
 assert_true(real["index"] is not None, "trusted index missing for valid repository")
 assert_true(
     sorted(real["index"].keys()) == EXPECTED_ALL_IDS,
@@ -178,7 +179,7 @@ assert_true(
     EXPERIENCE_REGISTRY_STATUS == EXPERIENCE_REFERENCE_STATUS,
     "status alias drifted",
 )
-print("PASS 1 [AUTHORITATIVE]: current real evidence repository (49 records) passed.")
+print("PASS 1 [AUTHORITATIVE]: current real evidence repository (50 records) passed.")
 
 
 # ---------------------------------------------------------------------------
