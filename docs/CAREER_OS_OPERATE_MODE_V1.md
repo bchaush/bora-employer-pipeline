@@ -220,7 +220,7 @@ When Bora applied himself without a Career OS package (Handshake Quick apply, Li
       --bora-confirmed \
       --receipt receipts/external_acme.json
 
-Resume_Version is written as EXTERNAL_NO_CAREER_OS_PACKAGE | <note>, never a résumé hash (a note containing "sha256" is refused). Notes must be single lines without control characters. It refuses a job that already has an APPLICATIONS row or an APPLICATION_RECORDED LOG event on any date. Write the three printed rows exactly, then run readback again. closeout counts such a role as submitted without a plan or folder.
+Resume_Version is written as EXTERNAL_NO_CAREER_OS_PACKAGE | <note>, never a résumé hash (a résumé note with anything hash-like is refused). Notes must be single lines without control, format or separator characters, and --applied-date must be a real calendar date. It refuses a job that already has an APPLICATIONS row or an APPLICATION_RECORDED LOG event on any date. Write the three printed rows exactly, then run readback again. closeout counts such a role as submitted without a plan or folder.
 
 ### 11. closeout
 

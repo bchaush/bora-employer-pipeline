@@ -522,13 +522,25 @@ def test_record_external_submit():
         code,out=go(ledger_path=write(tmp/"log-only.json",log_only))
         assert_true(failure(out)["code"]=="ALREADY_RECORDED","an earlier application LOG event on another date also blocks (job-level)")
         hexs="a"*64
-        for flag,value in (("--resume-note","my resume | sha256:"+hexs),("--resume-note","SHA256 x"),
-                           ("--channel","Handshake\rQuick"),("--evidence-note","line1\rline2"),("--resume-note","tab\there")):
+        for flag,value in (("--resume-note","my resume | sha256:"+hexs),("--resume-note","SHA256 x"),("--resume-note","SHA-256: "+hexs),
+                           ("--resume-note","sha_256 "+hexs),("--resume-note","digest "+hexs),("--resume-note","md5 "+"b"*32),
+                           ("--channel","Handshake\rQuick"),("--evidence-note","line1\rline2"),("--resume-note","tab\there"),
+                           ("--channel","Handshake\u0085Quick"),("--evidence-note","a\u2028b"),("--evidence-note","a\u2029b"),
+                           ("--resume-note","zero\u200bwidth"),("--channel","   ")):
             argv=["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake","--applied-date","2026-10-06",
                   "--resume-note","own resume","--evidence-note","Handshake shows Applied","--bora-confirmed","--receipt",tmp/"bad.json"]
             argv[argv.index(flag)+1]=value
             code,out=invoke(argv)
             assert_true(failure(out)["code"]=="FIELD_INVALID","refused %s=%r"%(flag,value))
+        for bad_date in ("2026-99-99","2026-02-30","2026-10-6","06/10/2026"):
+            argv=["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake","--applied-date",bad_date,
+                  "--resume-note","own resume","--evidence-note","Handshake shows Applied","--bora-confirmed","--receipt",tmp/"bad.json"]
+            code,out=invoke(argv)
+            assert_true(failure(out)["code"]=="APPLIED_DATE_INVALID","refused applied date %r"%bad_date)
+        code,out=invoke(["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake Quick apply (Brandeis)",
+                         "--applied-date","2026-10-06","--resume-note","My own résumé, v3 — Oct 2026","--evidence-note",
+                         "Handshake: Applied on October 6, 2026","--bora-confirmed","--receipt",tmp/"ok.json"])
+        assert_true(code==0,"ordinary notes with accents, dashes, digits and punctuation are accepted: "+out)
         code,out=invoke(["record-external-submit","--ledger",path,"--job-id","NOPE","--channel","x","--applied-date","2026-10-06",
                          "--resume-note","x","--evidence-note","x","--bora-confirmed","--receipt",tmp/"x.json"])
         assert_true(failure(out)["code"]=="JOB_UNRESOLVED","unknown job refused")

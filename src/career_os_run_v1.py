@@ -25,11 +25,13 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import datetime
 import hashlib
 import io
 import json
 import re
 import sys
+import unicodedata
 import zipfile
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
@@ -47,7 +49,13 @@ CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
 FENCE = "```"
 EXTERNAL_RESUME_PREFIX = "EXTERNAL_NO_CAREER_OS_PACKAGE"
 DIGITS_ONLY = re.compile(r"[0-9]+")  # used with fullmatch: "259\n" is not digits-only
-CONTROL_CHARACTERS = re.compile(r"[\x00-\x1f\x7f]")
+HASH_LIKE = re.compile(r"sha[\W_]*\d|[0-9a-f]{32,}", re.IGNORECASE)
+
+
+def single_clean_line(value: str) -> bool:
+    """Non-empty and free of every Unicode control/format/separator character (categories C*, Zl, Zp)."""
+    return bool(value.strip()) and not any(unicodedata.category(ch).startswith("C") or unicodedata.category(ch) in ("Zl", "Zp")
+                                           for ch in value)
 # No Ledger cell in these tabs is ever a bare number; one is the signature of a broken sheet export (an empty cell read as an index).
 DIGITS_ONLY_EXEMPT = {("NETWORK", "Notes")}
 EFFECTIVE_REQUEST_FILE = "effective_request.json"
@@ -733,13 +741,17 @@ def cmd_record_external_submit(args: argparse.Namespace) -> tuple:
         raise RunError("BORA_CONFIRMATION_REQUIRED", "pass --bora-confirmed only after Bora says he submitted it himself")
     ledger = load_ledger(args.ledger)
     _single_job(ledger, args.job_id)
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", args.applied_date):
-        raise RunError("APPLIED_DATE_INVALID", "expected YYYY-MM-DD")
+    try:
+        valid_date = re.fullmatch(r"\d{4}-\d{2}-\d{2}", args.applied_date) and datetime.date.fromisoformat(args.applied_date)
+    except ValueError:
+        valid_date = None
+    if not valid_date:
+        raise RunError("APPLIED_DATE_INVALID", "expected a real calendar date as YYYY-MM-DD")
     for value, what in ((args.channel, "--channel"), (args.resume_note, "--resume-note"), (args.evidence_note, "--evidence-note")):
-        if not non_empty(value) or CONTROL_CHARACTERS.search(value):
-            raise RunError("FIELD_INVALID", "%s must be one non-empty line without control characters" % what)
-    if "sha256" in args.resume_note.lower():
-        raise RunError("FIELD_INVALID", "--resume-note must not contain a hash; an external submission has no Career OS resume hash")
+        if not single_clean_line(value):
+            raise RunError("FIELD_INVALID", "%s must be one non-empty line without control, format or separator characters" % what)
+    if HASH_LIKE.search(args.resume_note):
+        raise RunError("FIELD_INVALID", "--resume-note must not contain anything hash-like; an external submission has no Career OS resume hash")
     if any(row.get("Job_ID") == args.job_id for row in ledger["APPLICATIONS"]):
         raise RunError("ALREADY_RECORDED", "an APPLICATIONS row already exists for %s" % args.job_id)
     if any(row.get("Job_ID") == args.job_id and row.get("Stage") == "APPLICATION_RECORDED" for row in ledger["LOG"]):
