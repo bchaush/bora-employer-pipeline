@@ -1,4 +1,4 @@
-"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_3).
+"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_4).
 
 A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
 
@@ -6,8 +6,9 @@ A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
     -> connector downloads/readback -> verify-persisted -> human visual + claim review -> Bora manual submit -> record-submit
     -> closeout
 
-`readback` is the only way a Ledger readback file is built: it turns the raw Sheets values (arrays of cells, header row first)
-into the exact JSON every other command consumes, so no step ever hand-builds Ledger rows.
+`readback` is the only way a Ledger readback file is built: it turns the whole Ledger (the Drive .xlsx export, parsed here
+deterministically, or raw Sheets values with the header row first) into the exact JSON every other command consumes, so no step
+ever hand-builds or retypes Ledger rows.
 
 Every subcommand reads only caller-supplied local files and writes only local receipts/output. There are no Drive, Sheets, web or
 submission calls anywhere in this module; the ChatGPT connector performs every external write and read-back and hands the results
@@ -32,6 +33,7 @@ import json
 import re
 import sys
 import unicodedata
+import xml.etree.ElementTree as ElementTree
 import zipfile
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
@@ -42,7 +44,7 @@ import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
 import pursuit_decision  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_3"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_4"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
@@ -79,6 +81,11 @@ NETWORK_HEADERS = ("Contact_ID", "Name", "Company", "Role_Title", "How_Found", "
                    "Status", "Added_On", "Last_Touch", "Next_Action_Date", "Notes")
 READBACK_TABS = (("JOBS", JOBS_HEADERS, True), ("APPLICATIONS", APPLICATIONS_HEADERS, True), ("LOG", LOG_HEADERS, True),
                  ("NETWORK", NETWORK_HEADERS, False))
+XLSX_MAX_UNCOMPRESSED_BYTES = 50 * 1024 * 1024
+XLSX_NS_MAIN = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+XLSX_NS_DOC_REL = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+XLSX_NS_PKG_REL = "{http://schemas.openxmlformats.org/package/2006/relationships}"
+XLSX_CELL_REF = re.compile(r"^([A-Z]{1,3})([1-9][0-9]*)$")
 AWARE_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$")
 
 SLATE_KEYS = ("job_id", "company", "role", "official_url", "source", "location_arrangement", "Geography_State",
@@ -231,8 +238,9 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
         cells = cells + [""] * (len(headers) - len(cells))
         for column, cell in zip(headers, cells):
             if DIGITS_ONLY.fullmatch(cell) and (name, column) not in DIGITS_ONLY_EXEMPT:
-                raise RunError("READBACK_SUSPECT_NUMERIC_CELL", "%s row %d %s is the bare number %r; no Ledger cell holds one. Re-read the "
-                               "tab with the Google Sheets read-values call (never by parsing an exported file)" % (name, number, column, cell))
+                raise RunError("READBACK_SUSPECT_NUMERIC_CELL", "%s row %d %s is the bare number %r; no Ledger cell holds one. Rebuild "
+                               "ledger.json with readback --xlsx from a fresh Drive .xlsx export; never parse the sheet yourself"
+                               % (name, number, column, cell))
         if all(cell == "" for cell in cells):
             skipped += 1
             continue
@@ -240,10 +248,129 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
     return rows, skipped
 
 
+def _xlsx_text(element: Any) -> str:
+    """Text of a shared-string <si> or inline <is>: its own <t>, or the <t> of each rich-text run; phonetic runs are ignored."""
+    parts = []
+    for child in element:
+        if child.tag == XLSX_NS_MAIN + "t":
+            parts.append(child.text or "")
+        elif child.tag == XLSX_NS_MAIN + "r":
+            for run_text in child.findall(XLSX_NS_MAIN + "t"):
+                parts.append(run_text.text or "")
+    return "".join(parts)
+
+
+def _xlsx_column(letters: str) -> int:
+    number = 0
+    for letter in letters:
+        number = number * 26 + (ord(letter) - 64)
+    return number
+
+
+def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
+    """The Ledger .xlsx export -> {tab: [[cell, ...], ...]} for the wanted tabs that exist, header row first.
+
+    Deterministic and strict: shared strings are resolved by index (never shown as numbers), every cell must be text or empty,
+    and a numeric, boolean, error or date cell is refused, so a converted or typed-over value can never pass silently."""
+    try:
+        archive = zipfile.ZipFile(path)
+    except (OSError, zipfile.BadZipFile) as error:
+        raise RunError("READBACK_XLSX_INVALID", "not a readable .xlsx file: %s" % type(error).__name__) from error
+    with archive:
+        if sum(info.file_size for info in archive.infolist()) > XLSX_MAX_UNCOMPRESSED_BYTES:
+            raise RunError("READBACK_XLSX_INVALID", "the .xlsx expands beyond %d bytes" % XLSX_MAX_UNCOMPRESSED_BYTES)
+
+        def part(name: str, required: bool = True) -> Any:
+            try:
+                data = archive.read(name)
+            except KeyError:
+                if required:
+                    raise RunError("READBACK_XLSX_INVALID", "missing part %s" % name)
+                return None
+            try:
+                return ElementTree.fromstring(data)
+            except ElementTree.ParseError as error:
+                raise RunError("READBACK_XLSX_INVALID", "%s is not valid XML" % name) from error
+
+        workbook = part("xl/workbook.xml")
+        relations = part("xl/_rels/workbook.xml.rels")
+        targets = {rel.get("Id"): rel.get("Target", "") for rel in relations.findall(XLSX_NS_PKG_REL + "Relationship")}
+        shared_root = part("xl/sharedStrings.xml", required=False)
+        shared = [_xlsx_text(item) for item in shared_root.findall(XLSX_NS_MAIN + "si")] if shared_root is not None else []
+        sheets = {}
+        for sheet in workbook.iter(XLSX_NS_MAIN + "sheet"):
+            name = sheet.get("name")
+            if name in sheets:
+                raise RunError("READBACK_XLSX_INVALID", "duplicate tab %s" % name)
+            sheets[name] = targets.get(sheet.get(XLSX_NS_DOC_REL + "id"))
+        tabs = {}
+        for name in wanted:
+            if name not in sheets:
+                continue
+            target = sheets[name]
+            if not target:
+                raise RunError("READBACK_XLSX_INVALID", "tab %s has no worksheet part" % name)
+            target = target.lstrip("/") if target.startswith("/") else "xl/" + target
+            root = part(target)
+            cells, row_number = {}, 0
+            for row in root.iter(XLSX_NS_MAIN + "row"):
+                row_number = int(row.get("r")) if row.get("r") else row_number + 1
+                column = 0
+                for cell in row.findall(XLSX_NS_MAIN + "c"):
+                    reference = cell.get("r")
+                    if reference:
+                        match = XLSX_CELL_REF.match(reference)
+                        if not match or int(match.group(2)) != row_number:
+                            raise RunError("READBACK_XLSX_INVALID", "%s cell reference %r is not in row %d" % (name, reference, row_number))
+                        column = _xlsx_column(match.group(1))
+                    else:
+                        column += 1
+                    kind = cell.get("t", "n")
+                    value_element = cell.find(XLSX_NS_MAIN + "v")
+                    if kind == "s":
+                        try:
+                            text = shared[int(value_element.text)]
+                        except (AttributeError, TypeError, ValueError, IndexError) as error:
+                            raise RunError("READBACK_XLSX_INVALID", "%s %s has a broken shared-string index" % (name, reference)) from error
+                    elif kind == "str":
+                        text = (value_element.text or "") if value_element is not None else ""
+                    elif kind == "inlineStr":
+                        inline = cell.find(XLSX_NS_MAIN + "is")
+                        text = _xlsx_text(inline) if inline is not None else ""
+                    elif kind == "n" and value_element is None:
+                        text = ""
+                    else:
+                        raise RunError("READBACK_CELL_TYPE", "%s %s is a %s cell, not text; Ledger cells are text only. Fix that cell in "
+                                       "the sheet (format it as plain text) and export again" % (name, reference or "row %d" % row_number,
+                                                                                                {"n": "number", "b": "true/false", "e": "error",
+                                                                                                 "d": "date"}.get(kind, kind)))
+                    if (row_number, column) in cells:
+                        raise RunError("READBACK_XLSX_INVALID", "%s row %d has a repeated cell" % (name, row_number))
+                    cells[(row_number, column)] = text
+            last_row = max([number for number, _column in cells] or [0])
+            grid = []
+            for number in range(1, last_row + 1):
+                width = max([column for row_index, column in cells if row_index == number] or [0])
+                values = [cells.get((number, column), "") for column in range(1, width + 1)]
+                while values and values[-1] == "":
+                    values.pop()
+                grid.append(values)
+            tabs[name] = grid
+    return tabs
+
+
 def cmd_readback(args: argparse.Namespace) -> tuple:
-    raw = read_json(args.raw, "raw Sheets values")
-    if not isinstance(raw, Mapping):
-        raise RunError("READBACK_INVALID", "raw values must be an object keyed by tab name")
+    if args.xlsx:
+        source_kind, source_path = "xlsx", args.xlsx
+        raw = read_xlsx_tabs(args.xlsx, [name for name, _headers, _required in READBACK_TABS])
+        for name in list(raw):
+            if not raw[name]:
+                raise RunError("READBACK_INVALID", "%s tab is empty; its header row must be row 1" % name)
+    else:
+        source_kind, source_path = "raw", args.raw
+        raw = read_json(args.raw, "raw Sheets values")
+        if not isinstance(raw, Mapping):
+            raise RunError("READBACK_INVALID", "raw values must be an object keyed by tab name")
     unknown = sorted(set(raw) - {name for name, _headers, _required in READBACK_TABS})
     if unknown:
         raise RunError("READBACK_INVALID", "unknown tabs %s" % unknown)
@@ -262,11 +389,11 @@ def cmd_readback(args: argparse.Namespace) -> tuple:
         raise RunError("READBACK_DUPLICATE_JOB_ID", ",".join(duplicates))
     ledger_sha = write_receipt(args.out, ledger)
     load_ledger(args.out)
-    receipt = {"spec": "CAREER_OS_RUN_READBACK_RECEIPT_V1", "contract": RUN_CONTRACT_ID,
-               "raw_sha256": sha256_hex(read_bytes(args.raw, "raw Sheets values")), "ledger_sha256": ledger_sha, "counts": counts}
+    receipt = {"spec": "CAREER_OS_RUN_READBACK_RECEIPT_V1", "contract": RUN_CONTRACT_ID, "source": source_kind,
+               "source_sha256": sha256_hex(read_bytes(source_path, "readback source")), "ledger_sha256": ledger_sha, "counts": counts}
     receipt_sha = write_receipt(args.receipt, receipt)
-    lines = ["CAREER_OS_RUN_READBACK: LEDGER FILE READY (use this file for every --ledger in this run)", "ledger: " + args.out,
-             "ledger_sha256: " + ledger_sha] + counts + ["receipt_sha256: " + receipt_sha]
+    lines = ["CAREER_OS_RUN_READBACK: LEDGER FILE READY (use this file for every --ledger in this run)", "source: " + source_kind,
+             "ledger: " + args.out, "ledger_sha256: " + ledger_sha] + counts + ["receipt_sha256: " + receipt_sha]
     return EXIT_OK, block(lines), None
 
 
@@ -890,7 +1017,9 @@ def build_parser() -> argparse.ArgumentParser:
         return item
 
     item = add("readback", cmd_readback)
-    item.add_argument("--raw", required=True, help="raw Sheets values: {JOBS|APPLICATIONS|LOG[|NETWORK]: [[header...], [row...], ...]}")
+    source = item.add_mutually_exclusive_group(required=True)
+    source.add_argument("--xlsx", help="the whole Ledger exported from Google Drive as .xlsx (preferred: nothing is retyped)")
+    source.add_argument("--raw", help="raw Sheets values: {JOBS|APPLICATIONS|LOG[|NETWORK]: [[header...], [row...], ...]}")
     item.add_argument("--out", required=True, help="Ledger file to write; use it for every --ledger in this run")
     item = add("pursuit-state", cmd_pursuit_state)
     item.add_argument("--ledger", required=True)
