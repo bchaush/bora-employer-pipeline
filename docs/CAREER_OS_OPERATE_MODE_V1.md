@@ -43,7 +43,7 @@ Never hand-build ledger.json. Read each tab's values with the Sheets connector (
       --out ledger.json \
       --receipt receipts/readback.json
 
-It pads short rows, turns blank cells into "", skips empty rows, and fails closed on a header mismatch, a non-string cell, a value beyond the last header column, or a duplicate Job_ID. NETWORK is optional for run commands and required for network commands. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write.
+It changes only three things: null cells become "", short rows are padded with "", and rows whose every cell is "" are skipped. It fails closed on any header that is not exactly the live header (no trimming), any cell beyond the last header column (even a blank one), a non-string cell, or a duplicate Job_ID. NETWORK is optional for run commands and required for network commands. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write.
 
 ### 1. preflight
 

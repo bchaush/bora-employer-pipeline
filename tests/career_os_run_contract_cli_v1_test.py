@@ -382,8 +382,7 @@ def test_readback_normalizes_sheet_values():
         tmp=Path(raw_dir)
         led=ledger([job_row()],[app_row()],[log_row()])
         raw=raw_values(led,network=[])
-        # What a Sheets read really returns: trailing blank cells dropped, blank cells as null, padded header, empty rows.
-        raw["JOBS"][0]=raw["JOBS"][0]+["",""]
+        # What a Sheets read really returns: trailing blank cells dropped, blank cells as null, empty rows.
         raw["JOBS"][1]=[cell if cell!="" else None for cell in raw["JOBS"][1]]
         while raw["JOBS"][1] and raw["JOBS"][1][-1] in ("",None):
             raw["JOBS"][1].pop()
@@ -394,6 +393,9 @@ def test_readback_normalizes_sheet_values():
         built=json.loads((tmp/"ledger-rb.json").read_text())
         assert_true(built["JOBS"]==[job_row()] and built["APPLICATIONS"]==[app_row()] and built["LOG"]==[log_row()],
                     "short rows are padded, nulls become \"\", blank rows are skipped")
+        spaced=raw_values(ledger([job_row(Role_Status=" ")]))
+        assert_true(readback(tmp,spaced,"spaced.json")[0]==0 and
+                    json.loads((tmp/"spaced.json").read_text())["JOBS"][0]["Role_Status"]==" ","whitespace values are kept exactly, never trimmed")
         assert_true(built["NETWORK"]==[] and "JOBS rows=1 blank_rows_skipped=1" in out,"NETWORK header-only tab and counts")
         assert_true(run.load_ledger(str(tmp/"ledger-rb.json"))["JOBS"][0]==job_row(),"output satisfies the strict Ledger loader")
         import career_os_network_v1 as net
@@ -402,6 +404,10 @@ def test_readback_normalizes_sheet_values():
         bad=raw_values(led); bad["JOBS"][0][3]="Source"; cases.append((bad,"READBACK_HEADER_MISMATCH"))
         bad=raw_values(led); bad["APPLICATIONS"][1][2]=20261005; cases.append((bad,"READBACK_CELL_TYPE"))
         bad=raw_values(led); bad["LOG"][1]=bad["LOG"][1]+["stray"]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
+        bad=raw_values(led); bad["LOG"][1]=bad["LOG"][1]+[""]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
+        bad=raw_values(led); bad["LOG"][1]=bad["LOG"][1]+[None]; cases.append((bad,"READBACK_ROW_TOO_LONG"))
+        bad=raw_values(led); bad["JOBS"][0][0]=" Job_ID "; cases.append((bad,"READBACK_HEADER_MISMATCH"))
+        bad=raw_values(led); bad["JOBS"][0]=bad["JOBS"][0]+[""]; cases.append((bad,"READBACK_HEADER_MISMATCH"))
         bad=raw_values(led); del bad["LOG"]; cases.append((bad,"READBACK_INVALID"))
         bad=raw_values(led); bad["SETTINGS"]=[["Key"]]; cases.append((bad,"READBACK_INVALID"))
         bad=raw_values(ledger([job_row(),job_row()])); cases.append((bad,"READBACK_DUPLICATE_JOB_ID"))

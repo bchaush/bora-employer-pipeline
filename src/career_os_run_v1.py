@@ -190,12 +190,14 @@ def require_aware_timestamp(value: Any, what: str) -> str:
 # readback ---------------------------------------------------------------------------------------
 
 def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
-    """Raw Sheets values (header row first) -> exact row objects. Blank and missing cells become "". Fail closed otherwise."""
+    """Raw Sheets values (header row first) -> exact row objects.
+
+    The only changes made: null cells become "", rows shorter than the header are padded with "", and rows whose every cell is
+    exactly "" are skipped. Everything else fails closed: the header must match exactly (no trimming), and any cell beyond the
+    last header column, even a blank one, is refused."""
     if not isinstance(values, list) or not values or not isinstance(values[0], list):
         raise RunError("READBACK_INVALID", "%s must be an array of rows with the header row first" % name)
-    header = [cell.strip() if isinstance(cell, str) else cell for cell in values[0]]
-    while header and header[-1] in ("", None):
-        header.pop()
+    header = list(values[0])
     if header != list(headers):
         raise RunError("READBACK_HEADER_MISMATCH", "%s header is %s; expected exactly %s" % (name, header, list(headers)))
     rows, skipped = [], 0
@@ -211,10 +213,10 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
             else:
                 raise RunError("READBACK_CELL_TYPE", "%s row %d has a %s cell; read the sheet with formatted (string) values"
                                % (name, number, type(cell).__name__))
-        if any(cell.strip() for cell in cells[len(headers):]):
-            raise RunError("READBACK_ROW_TOO_LONG", "%s row %d has values beyond the %d header columns" % (name, number, len(headers)))
-        cells = (cells + [""] * len(headers))[:len(headers)]
-        if not any(cell.strip() for cell in cells):
+        if len(cells) > len(headers):
+            raise RunError("READBACK_ROW_TOO_LONG", "%s row %d has %d cells; the header has %d" % (name, number, len(cells), len(headers)))
+        cells = cells + [""] * (len(headers) - len(cells))
+        if all(cell == "" for cell in cells):
             skipped += 1
             continue
         rows.append(dict(zip(headers, cells)))

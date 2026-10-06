@@ -31,7 +31,7 @@
     ".github/**"
   ],
   "acceptance_conditions": [
-    "readback converts raw Sheets values (header row first) into the exact JOBS 20 / APPLICATIONS 10 / LOG 9 (and optional NETWORK 13) row objects: short rows padded with \"\", null cells become \"\", empty rows skipped; it fails closed on header mismatch, non-string cells, values beyond the last header, unknown or missing required tabs, and duplicate Job_IDs; its output passes run.load_ledger and the network loader.",
+    "readback converts raw Sheets values (header row first) into the exact JOBS 20 / APPLICATIONS 10 / LOG 9 (and optional NETWORK 13) row objects: the only changes are null cells to \"\", padding short rows with \"\", and skipping rows whose every cell is \"\"; it fails closed on any header that is not exactly the live header (no trimming), any cell beyond the last header column (even blank), non-string cells, unknown or missing required tabs, and duplicate Job_IDs; its output passes run.load_ledger and the network loader.",
     "decide builds the event only through pursuit_decision.build_decision_mutation_plan, fingerprints the JOBS row from the same ledger file, sets supersedes_event_id to the current latest event, refuses invalid decisions, offset-less timestamps and an unchanged repeat decision, and emits one Bora_Decision cell plus one exact 9-column LOG row.",
     "pursuit-state reports state, authorizes_pursuit, latest_event_id and the context fingerprint from the same ledger file; STALE and non-PURSUE states never authorize.",
     "package passes the live Ledger JOBS row and Ledger LOG rows to the pursuit gate (effective_request.json) after the existing identity checks.",
