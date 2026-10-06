@@ -1,4 +1,4 @@
-"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_2).
+"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_3).
 
 A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
 
@@ -40,11 +40,15 @@ import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
 import pursuit_decision  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_2"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_3"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
 FENCE = "```"
+EXTERNAL_RESUME_PREFIX = "EXTERNAL_NO_CAREER_OS_PACKAGE"
+DIGITS_ONLY = re.compile(r"^[0-9]+$")
+# No Ledger cell in these tabs is ever a bare number; one is the signature of a broken sheet export (an empty cell read as an index).
+DIGITS_ONLY_EXEMPT = {("NETWORK", "Notes")}
 EFFECTIVE_REQUEST_FILE = "effective_request.json"
 
 # SETTINGS readback keys (flat object, or a list of {"Key"/"Value"} rows).
@@ -193,8 +197,8 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
     """Raw Sheets values (header row first) -> exact row objects.
 
     The only changes made: null cells become "", rows shorter than the header are padded with "", and rows whose every cell is
-    exactly "" are skipped. Everything else fails closed: the header must match exactly (no trimming), and any cell beyond the
-    last header column, even a blank one, is refused."""
+    exactly "" are skipped. Everything else fails closed: the header must match exactly (no trimming), any cell beyond the
+    last header column, even a blank one, is refused, and a bare-number cell is refused as a corrupted read."""
     if not isinstance(values, list) or not values or not isinstance(values[0], list):
         raise RunError("READBACK_INVALID", "%s must be an array of rows with the header row first" % name)
     header = list(values[0])
@@ -216,6 +220,10 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
         if len(cells) > len(headers):
             raise RunError("READBACK_ROW_TOO_LONG", "%s row %d has %d cells; the header has %d" % (name, number, len(cells), len(headers)))
         cells = cells + [""] * (len(headers) - len(cells))
+        for column, cell in zip(headers, cells):
+            if DIGITS_ONLY.match(cell) and (name, column) not in DIGITS_ONLY_EXEMPT:
+                raise RunError("READBACK_SUSPECT_NUMERIC_CELL", "%s row %d %s is the bare number %r; no Ledger cell holds one. Re-read the "
+                               "tab with the Google Sheets read-values call (never by parsing an exported file)" % (name, number, column, cell))
         if all(cell == "" for cell in cells):
             skipped += 1
             continue
@@ -716,6 +724,44 @@ def cmd_record_submit(args: argparse.Namespace) -> tuple:
     return EXIT_OK, block(lines), None
 
 
+# record-external-submit -------------------------------------------------------------------------
+
+def cmd_record_external_submit(args: argparse.Namespace) -> tuple:
+    """An application Bora submitted outside a Career OS package (e.g. Handshake Quick apply with his own resume)."""
+    if not args.bora_confirmed:
+        raise RunError("BORA_CONFIRMATION_REQUIRED", "pass --bora-confirmed only after Bora says he submitted it himself")
+    ledger = load_ledger(args.ledger)
+    _single_job(ledger, args.job_id)
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", args.applied_date):
+        raise RunError("APPLIED_DATE_INVALID", "expected YYYY-MM-DD")
+    for value, what in ((args.channel, "--channel"), (args.resume_note, "--resume-note"), (args.evidence_note, "--evidence-note")):
+        if not non_empty(value) or "\n" in value:
+            raise RunError("FIELD_INVALID", "%s must be one non-empty line" % what)
+    if any(row.get("Job_ID") == args.job_id for row in ledger["APPLICATIONS"]):
+        raise RunError("ALREADY_RECORDED", "an APPLICATIONS row already exists for %s" % args.job_id)
+    application = {"Application_ID": "APP::%s::%s" % (args.job_id, args.applied_date), "Job_ID": args.job_id,
+                   "Applied_Date": args.applied_date, "Resume_Version": "%s | %s" % (EXTERNAL_RESUME_PREFIX, args.resume_note.strip()),
+                   "Cover_Letter_Version": "NOT_RECORDED", "Channel": args.channel.strip(), "Current_Status": "SUBMITTED",
+                   "Last_Update": args.applied_date, "Next_Action": "Monitor for employer response",
+                   "Outcome": "Bora confirmed external submission; " + args.evidence_note.strip()}
+    _require_exact_row_shape(application, APPLICATIONS_HEADERS, "APPLICATIONS")
+    jobs = {"Job_ID": args.job_id, "Application_Status": "SUBMITTED"}
+    log = {"Run_ID": "RECORD_EXTERNAL_SUBMIT::%s::%s" % (args.job_id, args.applied_date), "Timestamp": args.applied_date,
+           "Stage": "APPLICATION_RECORDED", "Source": "CAREER_OS_RUN_V1", "Job_ID": args.job_id, "Status": "SUBMITTED",
+           "Error_Code": "", "Engine_Baseline": "", "Notes": "Bora external submit (no Career OS package); " + args.evidence_note.strip()}
+    _require_exact_row_shape(log, LOG_HEADERS, "LOG")
+    if any(row.get("Run_ID") == log["Run_ID"] for row in ledger["LOG"]):
+        raise RunError("ALREADY_RECORDED", "LOG already holds %s" % log["Run_ID"])
+    receipt = {"spec": "CAREER_OS_RECORD_EXTERNAL_SUBMIT_RECEIPT_V1", "contract": RUN_CONTRACT_ID,
+               "status": "EXTERNAL_SUBMISSION_RECORDED_BY_BORA", "applications_row": application, "jobs_row": jobs, "log_row": log}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_RECORD_EXTERNAL_SUBMIT (Bora submitted outside a Career OS package; no resume hash exists)",
+             "APPLICATIONS_ROW_VALUES: " + json.dumps(application, sort_keys=True, ensure_ascii=False),
+             "JOBS_ROW_VALUES: " + json.dumps(jobs, sort_keys=True), "LOG_ROW_VALUES: " + json.dumps(log, sort_keys=True, ensure_ascii=False),
+             "receipt_sha256: " + receipt_sha]
+    return EXIT_OK, block(lines), None
+
+
 # closeout ---------------------------------------------------------------------------------------
 
 def _folder_map(raw: Any) -> dict:
@@ -759,10 +805,12 @@ def closeout_missing(slate: Sequence[Mapping[str, Any]], ledger: Mapping[str, An
             missing.append("%s: PURSUE_PACKAGE_NOT_PERSISTED_COMPLETE" % job_id)
         if not submitted:
             continue
+        app_rows = [item for item in applications if item.get("Job_ID") == row.get("Job_ID")]
+        if len(app_rows) == 1 and str(app_rows[0].get("Resume_Version") or "").startswith(EXTERNAL_RESUME_PREFIX):
+            continue  # submitted outside a Career OS package: no plan, folder or resume hash exists by definition
         plan = plans_by_job.get(job_id)
         if tracking != "ALREADY_TRACKED" and plan is None:
             missing.append("%s: PLAN_NOT_SUPPLIED" % job_id)
-        app_rows = [item for item in applications if item.get("Job_ID") == row.get("Job_ID")]
         if not app_rows:
             missing.append("%s: APPLICATIONS_ROW_MISSING" % job_id)
         elif len(app_rows) > 1:
@@ -835,6 +883,14 @@ def build_parser() -> argparse.ArgumentParser:
     item.add_argument("--decision", required=True, help="PURSUE|WATCH|REJECT, exactly as Bora said it")
     item.add_argument("--decided-at", required=True, help="ISO timestamp with offset, e.g. 2026-10-06T09:40:00-04:00")
     item.add_argument("--reason-note", help="optional short note in Bora's words")
+    item = add("record-external-submit", cmd_record_external_submit)
+    item.add_argument("--ledger", required=True)
+    item.add_argument("--job-id", required=True)
+    item.add_argument("--channel", required=True, help="where Bora applied, e.g. Handshake Quick apply")
+    item.add_argument("--applied-date", required=True, help="YYYY-MM-DD")
+    item.add_argument("--resume-note", required=True, help="which resume Bora used, in his words")
+    item.add_argument("--evidence-note", required=True, help="what proves it, e.g. Handshake shows Applied on October 6, 2026")
+    item.add_argument("--bora-confirmed", action="store_true")
     item = add("preflight", cmd_preflight)
     item.add_argument("--runtime-root", required=True)
     item.add_argument("--expected-main-sha", required=True)

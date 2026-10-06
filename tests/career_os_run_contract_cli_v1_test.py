@@ -1,4 +1,4 @@
-"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_2 (V1_1 behaviour plus readback, decide, pursuit-state, slate dates).
+"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_3 (V1_2 plus the bare-number readback guard and record-external-submit).
 
 Fixtures use the exact Production Ledger headers:
 - JOBS: 20 columns
@@ -411,6 +411,10 @@ def test_readback_normalizes_sheet_values():
         bad=raw_values(led); del bad["LOG"]; cases.append((bad,"READBACK_INVALID"))
         bad=raw_values(led); bad["SETTINGS"]=[["Key"]]; cases.append((bad,"READBACK_INVALID"))
         bad=raw_values(ledger([job_row(),job_row()])); cases.append((bad,"READBACK_DUPLICATE_JOB_ID"))
+        # The 2026-10-06 incident: empty cells read back as shared-string indexes ("259", "261", "267").
+        bad=raw_values(ledger([job_row(Role_Status="261")])); cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=raw_values(led); bad["APPLICATIONS"][1][4]="259"; cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=raw_values(led); bad["LOG"][1][6]="267"; cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
         for value,expected in cases:
             code,out=readback(tmp,value,"bad.json")
             assert_true(code==run.EXIT_ERROR and failure(out)["code"]==expected,"readback fails closed with "+expected)
@@ -476,13 +480,57 @@ def test_decide_and_pursuit_state():
     print("PASS: decide/pursuit-state use the same canonical Ledger file, supersede correctly and never authorize a stale or non-PURSUE state.")
 
 
+def test_record_external_submit():
+    with tempfile.TemporaryDirectory() as raw_dir:
+        tmp=Path(raw_dir)
+        job=job_row(Bora_Decision="PURSUE")
+        path=write(tmp/"ledger.json",ledger([job],[],[log_row()]))
+
+        def go(*extra, ledger_path=path, confirmed=True):
+            argv=["record-external-submit","--ledger",ledger_path,"--job-id",JOB_ID,"--channel","Handshake Quick apply",
+                  "--applied-date","2026-10-06","--resume-note","Bora's own Handshake resume",
+                  "--evidence-note","Handshake shows Applied on October 6, 2026","--receipt",tmp/"ext.json"]+list(extra)
+            if confirmed:
+                argv.append("--bora-confirmed")
+            return invoke(argv)
+
+        code,out=go(confirmed=False)
+        assert_true(failure(out)["code"]=="BORA_CONFIRMATION_REQUIRED","external submit needs Bora's confirmation")
+        code,out=go()
+        assert_true(code==0 and "APPLICATIONS_ROW_VALUES" in out,"external submit records: "+out)
+        rec=json.loads((tmp/"ext.json").read_text())
+        app=rec["applications_row"]; log=rec["log_row"]
+        assert_true(set(app)==set(run.APPLICATIONS_HEADERS) and set(log)==set(run.LOG_HEADERS),"exact live shapes")
+        assert_true(app["Resume_Version"]=="EXTERNAL_NO_CAREER_OS_PACKAGE | Bora's own Handshake resume" and "sha256" not in app["Resume_Version"],
+                    "never claims a Career OS resume hash")
+        assert_true(app["Cover_Letter_Version"]=="NOT_RECORDED" and rec["jobs_row"]=={"Job_ID":JOB_ID,"Application_Status":"SUBMITTED"},
+                    "only Application_Status changes in JOBS; nothing invented about a cover letter")
+        assert_true(app["Outcome"].endswith("Handshake shows Applied on October 6, 2026"),"Bora's evidence note is kept")
+        done=ledger([dict(job,Application_Status="SUBMITTED")],[app],[log_row(),log])
+        done_path=write(tmp/"done.json",done)
+        code,out=go(ledger_path=done_path)
+        assert_true(failure(out)["code"]=="ALREADY_RECORDED","a second record for the same job is refused")
+        code,out=invoke(["record-external-submit","--ledger",path,"--job-id","NOPE","--channel","x","--applied-date","2026-10-06",
+                         "--resume-note","x","--evidence-note","x","--bora-confirmed","--receipt",tmp/"x.json"])
+        assert_true(failure(out)["code"]=="JOB_UNRESOLVED","unknown job refused")
+        slate={"spec":"CAREER_OS_RUN_SLATE_RECEIPT_V1","slate":[{"job_id":JOB_ID,"tracking_status":"NEW"}]}
+        code,out=invoke(["closeout","--slate-receipt",write(tmp/"slate.json",slate),"--ledger",done_path,
+                         "--folders",write(tmp/"folders.json",{}),"--plans",write(tmp/"plans.json",[]),"--receipt",tmp/"close.json"])
+        assert_true(code==0 and out.strip().endswith("CAREER_OS_RUN_CLOSEOUT: COMPLETE"),"closeout accepts an external submission: "+out)
+        fake=ledger([dict(job,Application_Status="SUBMITTED")],[dict(app,Resume_Version="resume.pdf")],[log_row()])
+        code,out=invoke(["closeout","--slate-receipt",tmp/"slate.json","--ledger",write(tmp/"fake.json",fake),
+                         "--folders",tmp/"folders.json","--plans",tmp/"plans.json","--receipt",tmp/"close2.json"])
+        assert_true(code==run.EXIT_STOP and "PLAN_NOT_SUPPLIED" in out,"an ordinary submission without a plan still fails closeout")
+    print("PASS: record-external-submit records Bora's outside-package applications honestly and closeout accepts only those.")
+
+
 def test_local_only():
     source=(ROOT/"src"/"career_os_run_v1.py").read_text(encoding="utf-8")
     for forbidden in ("import requests","urllib","http.client","googleapiclient","socket","subprocess","smtplib"):
         assert_true(forbidden not in source,"no network/process import: "+forbidden)
     runbook=(ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.md").read_text(encoding="utf-8")
     for needle in ("career_os_run_v1.py readback","career_os_run_v1.py decide","career_os_run_v1.py pursuit-state","--as-of",
-                   "Never hand-build ledger.json"):
+                   "Never hand-build ledger.json","career_os_run_v1.py record-external-submit","never by downloading"):
         assert_true(needle in runbook,"runbook documents "+needle)
     config=json.loads((ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.json").read_text(encoding="utf-8"))["run_contract"]
     assert_true(config["contract_id"]==run.RUN_CONTRACT_ID and config["state_machine"][0]=="readback" and "decide" in config["state_machine"],
@@ -494,9 +542,9 @@ def main():
     assert_true(len(run.JOBS_HEADERS)==20 and len(run.APPLICATIONS_HEADERS)==10 and len(run.LOG_HEADERS)==9,"live header counts")
     for test in (test_preflight_live_settings,test_slate_dedupe_and_score_rules,test_package_ledger_binding_and_persistence,
                  test_record_submit_live_shapes,test_closeout_slate_authority_and_sha_parse,test_end_to_end_live_shapes,
-                 test_readback_normalizes_sheet_values,test_decide_and_pursuit_state,test_local_only):
+                 test_readback_normalizes_sheet_values,test_decide_and_pursuit_state,test_record_external_submit,test_local_only):
         test()
-    print("PASS: 9 groups of CAREER_OS_RUN_CONTRACT_V1_2 live-shape tests")
+    print("PASS: 10 groups of CAREER_OS_RUN_CONTRACT_V1_3 live-shape tests")
 
 
 if __name__=="__main__":

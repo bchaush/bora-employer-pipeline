@@ -1,6 +1,6 @@
-# Career OS Operate Mode V1 — Run Contract V1.2
+# Career OS Operate Mode V1 — Run Contract V1.3
 
-Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_2).
+Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_3).
 
 It is pure/local. It reads caller-supplied files and writes local receipts/output. It never calls Drive, Sheets, the web, or an employer application surface. ChatGPT connectors perform external reads/writes and hand exact readbacks to the CLI.
 
@@ -29,7 +29,7 @@ All examples use local files produced/downloaded by ChatGPT.
 
 ### 0. readback (the only way to build ledger.json)
 
-Never hand-build ledger.json. Read each tab's values with the Sheets connector (formatted values, header row first) and save them as they come:
+Never hand-build ledger.json. Read each tab's values with the Google Sheets connector's read-values call (formatted values, header row first), never by downloading or exporting the spreadsheet file and parsing it, and save them as they come:
 
     {
       "JOBS": [["Job_ID", "Company", "..."], ["ACME::DATA-ANALYST", "Acme", "..."]],
@@ -43,7 +43,7 @@ Never hand-build ledger.json. Read each tab's values with the Sheets connector (
       --out ledger.json \
       --receipt receipts/readback.json
 
-It changes only three things: null cells become "", short rows are padded with "", and rows whose every cell is "" are skipped. It fails closed on any header that is not exactly the live header (no trimming), any cell beyond the last header column (even a blank one), a non-string cell, or a duplicate Job_ID. NETWORK is optional for run commands and required for network commands. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write.
+It changes only three things: null cells become "", short rows are padded with "", and rows whose every cell is "" are skipped. It fails closed on any header that is not exactly the live header (no trimming), any cell beyond the last header column (even a blank one), a non-string cell, a bare-number cell (READBACK_SUSPECT_NUMERIC_CELL: no Ledger cell holds one; it means the read was corrupted, so read the tab again with the read-values call), or a duplicate Job_ID. NETWORK is optional for run commands and required for network commands. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write.
 
 ### 1. preflight
 
@@ -205,6 +205,22 @@ Resume_Version is:
 <pdf filename> | sha256:<plan-derived sha256>
 
 Next_Action is Monitor for employer response.
+
+### 10b. record-external-submit (applied outside a Career OS package)
+
+When Bora applied himself without a Career OS package (Handshake Quick apply, LinkedIn Easy Apply with his own résumé), record it only after he confirms:
+
+    python src/career_os_run_v1.py record-external-submit \
+      --ledger ledger.json \
+      --job-id "ACME::DATA-ANALYST" \
+      --channel "Handshake Quick apply" \
+      --applied-date 2026-10-06 \
+      --resume-note "Bora's own Handshake résumé" \
+      --evidence-note "Handshake shows Applied on October 6, 2026" \
+      --bora-confirmed \
+      --receipt receipts/external_acme.json
+
+Resume_Version is written as EXTERNAL_NO_CAREER_OS_PACKAGE | <note>, never a résumé hash. Write the three printed rows exactly, then run readback again. closeout counts such a role as submitted without a plan or folder.
 
 ### 11. closeout
 
