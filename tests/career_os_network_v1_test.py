@@ -186,13 +186,11 @@ def test_update():
         code, text = update(ledger, status, "2026-10-08")
         assert_true(code == 0 and row_values(text, "NETWORK_ROW_VALUES")["Next_Action_Date"] == expected, "%s next action %s" % (status, expected))
     code, text = update(ledger, "SENT", "2026-10-08", "--next-date", "2026-10-20")
-    assert_true(row_values(text, "NETWORK_ROW_VALUES")["Next_Action_Date"] == "2026-10-20", "explicit --next-date wins")
+    assert_true(code != 0, "there is no --next-date override; follow-up dates are always the fixed rule")
     for args, expected in ((("TO_CONTACT", "2026-10-08"), "STATUS_INVALID"), (("WAITING", "2026-10-08"), "STATUS_INVALID"),
                            (("SENT", "2026-10-06"), "DATE_BACKWARDS"), (("SENT", "2026-13-01"), "DATE_INVALID")):
         code, text = update(ledger, *args)
         assert_true(failure_code(text) == expected, "%r fails %s (got %s)" % (args, expected, failure_code(text)))
-    code, text = update(ledger, "SENT", "2026-10-08", "--next-date", "2026-10-01")
-    assert_true(failure_code(text) == "DATE_BACKWARDS", "--next-date before --as-of fails")
 
     sent = copy.deepcopy(ledger)
     _, text = update(sent, "SENT", "2026-10-08")
@@ -239,6 +237,9 @@ def test_draft():
                     if linked and purpose != "CLIENT_PROSPECT":
                         assert_true("Business Systems Analyst" in body and "Fixture Co" in body and URL in body, "linked role is cited from JOBS")
                     assert_true("referral" not in body.lower(), "the first message never asks a stranger for a referral")
+                    template_only = body.replace("I " + original[0].lower() + original[1:], "").lower()
+                    for phrase in ("applying", "applied", "manual", "recurring", "your team needs", "your team has"):
+                        assert_true(phrase not in template_only, "system wording asserts nothing unproven about Bora or the contact: %s" % phrase)
     ledger, cid = ledger_with_contact(ws)
     code, text = draft(ledger, cid, "B999")
     assert_true(failure_code(text) == "BULLET_NOT_ALLOWED", "unknown bullet is refused")

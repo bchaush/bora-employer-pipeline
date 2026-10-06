@@ -246,7 +246,7 @@ Prints a draft of at most 120 words. The work example is one approved resume bul
       --note "LinkedIn message" \
       --receipt receipts/network_update.json
 
-Status: SENT|REPLIED|CALL_DONE|REFERRED|NO_REPLY|CLOSED. Next_Action_Date: SENT +7 days, REPLIED +3, CALL_DONE +7, REFERRED +14, NO_REPLY and CLOSED blank. --next-date overrides it. Overwrite the contact's NETWORK row and append the LOG row.
+Status: SENT|REPLIED|CALL_DONE|REFERRED|NO_REPLY|CLOSED. Next_Action_Date: SENT +7 days, REPLIED +3, CALL_DONE +7, REFERRED +14, NO_REPLY and CLOSED blank. These dates are fixed; there is no override. Overwrite the contact's NETWORK row and append the LOG row.
 
 ### record-outcome
 

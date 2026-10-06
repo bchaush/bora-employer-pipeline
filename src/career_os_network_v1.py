@@ -231,14 +231,8 @@ def cmd_network_update(args: argparse.Namespace) -> tuple:
         previous = date_prefix(row.get(label))
         if previous and as_of_date < previous:
             raise NetworkError("DATE_BACKWARDS", "--as-of %s is before %s %s" % (as_of, label, previous.isoformat()))
-    if args.next_date:
-        next_date = parse_date(args.next_date, "--next-date")
-        if next_date < as_of_date:
-            raise NetworkError("DATE_BACKWARDS", "--next-date is before --as-of")
-        next_action = next_date.isoformat()
-    else:
-        days = FOLLOW_UP_DAYS[status]
-        next_action = "" if days is None else (as_of_date + datetime.timedelta(days=days)).isoformat()
+    days = FOLLOW_UP_DAYS[status]
+    next_action = "" if days is None else (as_of_date + datetime.timedelta(days=days)).isoformat()
     note = clean_text(args.note or "", "--note", required=False)
     updated = dict(row, Status=status, Last_Touch=as_of, Next_Action_Date=next_action)
     if note:
@@ -287,11 +281,9 @@ def compose_draft(contact: Mapping[str, Any], job: Optional[Mapping[str, Any]], 
     purpose = contact["Purpose"]
     if job is not None and purpose != "CLIENT_PROSPECT":
         link = job.get("Official_URL") or job.get("Discovery_URL") or ""
-        verb = "applying for" if purpose == "JOB_REFERRAL" else "interested in"
-        context = "I'm %s the %s role at %s%s." % (verb, job["Role"], job["Company"], " (%s)" % link if link else "")
-    elif purpose == "CLIENT_PROSPECT":
-        context = "I'd like to learn how your team at %s handles its recurring manual workflows." % contact["Company"]
+        context = "I'm interested in the %s role at %s%s." % (job["Role"], job["Company"], " (%s)" % link if link else "")
     else:
+        # Neutral on purpose: nothing is asserted about the contact's company or how it works.
         context = "I'd like to learn how your team at %s works." % contact["Company"]
     body = " ".join([intro, context, "One example of my work: " + evidence, ASK[purpose]])
     return "Hi %s,\n\n%s\n\nThank you,\nBora" % (first, body)
@@ -430,7 +422,6 @@ def build_parser() -> argparse.ArgumentParser:
     item.add_argument("--contact-id", required=True)
     item.add_argument("--status", required=True)
     item.add_argument("--as-of", required=True)
-    item.add_argument("--next-date")
     item.add_argument("--note")
     item = add("network-draft", cmd_network_draft)
     item.add_argument("--contact-id", required=True)
