@@ -32,7 +32,8 @@
     "tests/telus_master_integration_v1_test.py",
     "tests/telus_resume_modules_v1_test.py",
     "tests/winter_walk_contact_resolution_test.py",
-    "tests/winter_walk_protected_metadata_evidence_test.py"
+    "tests/winter_walk_protected_metadata_evidence_test.py",
+    "golden-tests/run_job_analysis_golden_set.py"
   ],
   "forbidden_paths": [
     "src/pursuit_decision.py",
