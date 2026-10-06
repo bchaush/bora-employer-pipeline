@@ -46,7 +46,8 @@ FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
 FENCE = "```"
 EXTERNAL_RESUME_PREFIX = "EXTERNAL_NO_CAREER_OS_PACKAGE"
-DIGITS_ONLY = re.compile(r"^[0-9]+$")
+DIGITS_ONLY = re.compile(r"[0-9]+")  # used with fullmatch: "259\n" is not digits-only
+CONTROL_CHARACTERS = re.compile(r"[\x00-\x1f\x7f]")
 # No Ledger cell in these tabs is ever a bare number; one is the signature of a broken sheet export (an empty cell read as an index).
 DIGITS_ONLY_EXEMPT = {("NETWORK", "Notes")}
 EFFECTIVE_REQUEST_FILE = "effective_request.json"
@@ -221,7 +222,7 @@ def normalize_tab(name: str, values: Any, headers: Sequence[str]) -> tuple:
             raise RunError("READBACK_ROW_TOO_LONG", "%s row %d has %d cells; the header has %d" % (name, number, len(cells), len(headers)))
         cells = cells + [""] * (len(headers) - len(cells))
         for column, cell in zip(headers, cells):
-            if DIGITS_ONLY.match(cell) and (name, column) not in DIGITS_ONLY_EXEMPT:
+            if DIGITS_ONLY.fullmatch(cell) and (name, column) not in DIGITS_ONLY_EXEMPT:
                 raise RunError("READBACK_SUSPECT_NUMERIC_CELL", "%s row %d %s is the bare number %r; no Ledger cell holds one. Re-read the "
                                "tab with the Google Sheets read-values call (never by parsing an exported file)" % (name, number, column, cell))
         if all(cell == "" for cell in cells):
@@ -735,16 +736,22 @@ def cmd_record_external_submit(args: argparse.Namespace) -> tuple:
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", args.applied_date):
         raise RunError("APPLIED_DATE_INVALID", "expected YYYY-MM-DD")
     for value, what in ((args.channel, "--channel"), (args.resume_note, "--resume-note"), (args.evidence_note, "--evidence-note")):
-        if not non_empty(value) or "\n" in value:
-            raise RunError("FIELD_INVALID", "%s must be one non-empty line" % what)
+        if not non_empty(value) or CONTROL_CHARACTERS.search(value):
+            raise RunError("FIELD_INVALID", "%s must be one non-empty line without control characters" % what)
+    if "sha256" in args.resume_note.lower():
+        raise RunError("FIELD_INVALID", "--resume-note must not contain a hash; an external submission has no Career OS resume hash")
     if any(row.get("Job_ID") == args.job_id for row in ledger["APPLICATIONS"]):
         raise RunError("ALREADY_RECORDED", "an APPLICATIONS row already exists for %s" % args.job_id)
+    if any(row.get("Job_ID") == args.job_id and row.get("Stage") == "APPLICATION_RECORDED" for row in ledger["LOG"]):
+        raise RunError("ALREADY_RECORDED", "LOG already records an application for %s" % args.job_id)
     application = {"Application_ID": "APP::%s::%s" % (args.job_id, args.applied_date), "Job_ID": args.job_id,
                    "Applied_Date": args.applied_date, "Resume_Version": "%s | %s" % (EXTERNAL_RESUME_PREFIX, args.resume_note.strip()),
                    "Cover_Letter_Version": "NOT_RECORDED", "Channel": args.channel.strip(), "Current_Status": "SUBMITTED",
                    "Last_Update": args.applied_date, "Next_Action": "Monitor for employer response",
                    "Outcome": "Bora confirmed external submission; " + args.evidence_note.strip()}
     _require_exact_row_shape(application, APPLICATIONS_HEADERS, "APPLICATIONS")
+    if _resume_sha_from_version(application["Resume_Version"]) is not None:
+        raise RunError("FIELD_INVALID", "Resume_Version of an external submission must never carry a resume hash")
     jobs = {"Job_ID": args.job_id, "Application_Status": "SUBMITTED"}
     log = {"Run_ID": "RECORD_EXTERNAL_SUBMIT::%s::%s" % (args.job_id, args.applied_date), "Timestamp": args.applied_date,
            "Stage": "APPLICATION_RECORDED", "Source": "CAREER_OS_RUN_V1", "Job_ID": args.job_id, "Status": "SUBMITTED",

@@ -398,6 +398,13 @@ def test_readback_normalizes_sheet_values():
                     json.loads((tmp/"spaced.json").read_text())["JOBS"][0]["Role_Status"]==" ","whitespace values are kept exactly, never trimmed")
         assert_true(built["NETWORK"]==[] and "JOBS rows=1 blank_rows_skipped=1" in out,"NETWORK header-only tab and counts")
         assert_true(run.load_ledger(str(tmp/"ledger-rb.json"))["JOBS"][0]==job_row(),"output satisfies the strict Ledger loader")
+        for kept in ("259\n"," 259","259 ","25.9","MTA::17407"):
+            code,out=readback(tmp,raw_values(ledger([job_row(Role_Status=kept)])),"kept.json")
+            assert_true(code==0 and json.loads((tmp/"kept.json").read_text())["JOBS"][0]["Role_Status"]==kept,
+                        "only a cell that is digits and nothing else is refused: %r is kept exactly"%kept)
+        code,out=readback(tmp,raw_values(led,network=[["NET::A","N","C","T","https://x.example/a","OTHER","INFO_CHAT","","SENT",
+                                                         "2026-10-06","2026-10-06","2026-10-13","42"]]),"net.json")
+        assert_true(code==0,"NETWORK Notes may be a bare number")
         import career_os_network_v1 as net
         assert_true(net.load_ledger_with_network(str(tmp/"ledger-rb.json"))["NETWORK"]==[],"network commands accept it")
         cases=[]
@@ -484,7 +491,8 @@ def test_record_external_submit():
     with tempfile.TemporaryDirectory() as raw_dir:
         tmp=Path(raw_dir)
         job=job_row(Bora_Decision="PURSUE")
-        path=write(tmp/"ledger.json",ledger([job],[],[log_row()]))
+        screened=log_row(Run_ID="SLATE::1",Stage="SLATE_SCREENED",Status="REVIEW_READY")
+        path=write(tmp/"ledger.json",ledger([job],[],[screened]))
 
         def go(*extra, ledger_path=path, confirmed=True):
             argv=["record-external-submit","--ledger",ledger_path,"--job-id",JOB_ID,"--channel","Handshake Quick apply",
@@ -506,10 +514,21 @@ def test_record_external_submit():
         assert_true(app["Cover_Letter_Version"]=="NOT_RECORDED" and rec["jobs_row"]=={"Job_ID":JOB_ID,"Application_Status":"SUBMITTED"},
                     "only Application_Status changes in JOBS; nothing invented about a cover letter")
         assert_true(app["Outcome"].endswith("Handshake shows Applied on October 6, 2026"),"Bora's evidence note is kept")
-        done=ledger([dict(job,Application_Status="SUBMITTED")],[app],[log_row(),log])
+        done=ledger([dict(job,Application_Status="SUBMITTED")],[app],[screened,log])
         done_path=write(tmp/"done.json",done)
         code,out=go(ledger_path=done_path)
         assert_true(failure(out)["code"]=="ALREADY_RECORDED","a second record for the same job is refused")
+        log_only=ledger([job],[],[screened,dict(log,Run_ID="RECORD_EXTERNAL_SUBMIT::%s::2026-10-01"%JOB_ID,Timestamp="2026-10-01")])
+        code,out=go(ledger_path=write(tmp/"log-only.json",log_only))
+        assert_true(failure(out)["code"]=="ALREADY_RECORDED","an earlier application LOG event on another date also blocks (job-level)")
+        hexs="a"*64
+        for flag,value in (("--resume-note","my resume | sha256:"+hexs),("--resume-note","SHA256 x"),
+                           ("--channel","Handshake\rQuick"),("--evidence-note","line1\rline2"),("--resume-note","tab\there")):
+            argv=["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake","--applied-date","2026-10-06",
+                  "--resume-note","own resume","--evidence-note","Handshake shows Applied","--bora-confirmed","--receipt",tmp/"bad.json"]
+            argv[argv.index(flag)+1]=value
+            code,out=invoke(argv)
+            assert_true(failure(out)["code"]=="FIELD_INVALID","refused %s=%r"%(flag,value))
         code,out=invoke(["record-external-submit","--ledger",path,"--job-id","NOPE","--channel","x","--applied-date","2026-10-06",
                          "--resume-note","x","--evidence-note","x","--bora-confirmed","--receipt",tmp/"x.json"])
         assert_true(failure(out)["code"]=="JOB_UNRESOLVED","unknown job refused")
@@ -517,7 +536,7 @@ def test_record_external_submit():
         code,out=invoke(["closeout","--slate-receipt",write(tmp/"slate.json",slate),"--ledger",done_path,
                          "--folders",write(tmp/"folders.json",{}),"--plans",write(tmp/"plans.json",[]),"--receipt",tmp/"close.json"])
         assert_true(code==0 and out.strip().endswith("CAREER_OS_RUN_CLOSEOUT: COMPLETE"),"closeout accepts an external submission: "+out)
-        fake=ledger([dict(job,Application_Status="SUBMITTED")],[dict(app,Resume_Version="resume.pdf")],[log_row()])
+        fake=ledger([dict(job,Application_Status="SUBMITTED")],[dict(app,Resume_Version="resume.pdf")],[screened])
         code,out=invoke(["closeout","--slate-receipt",tmp/"slate.json","--ledger",write(tmp/"fake.json",fake),
                          "--folders",tmp/"folders.json","--plans",tmp/"plans.json","--receipt",tmp/"close2.json"])
         assert_true(code==run.EXIT_STOP and "PLAN_NOT_SUPPLIED" in out,"an ordinary submission without a plan still fails closeout")
