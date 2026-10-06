@@ -617,6 +617,32 @@ def test_readback_from_xlsx_export():
                 archive.writestr(name,data)
         code,out=invoke(["readback","--xlsx",dup,"--out",tmp/"d.json","--receipt",tmp/"d-r.json"])
         assert_true(code==run.EXIT_ERROR and bounded(out,"READBACK_XLSX_INVALID"),"duplicate long tab name is bounded: "+out[:300])
+        # The reviewer's case: an oversized worksheet relationship target pointing at a missing part.
+        with zipfile.ZipFile(tmp/"ledger.xlsx") as archive:
+            parts={name:archive.read(name) for name in archive.namelist()}
+        rels=dict(parts); rels["xl/_rels/workbook.xml.rels"]=parts["xl/_rels/workbook.xml.rels"].replace(
+            b'Target="worksheets/sheet2.xml"',('Target="%s"'%long_text).encode())
+        with zipfile.ZipFile(tmp/"rels.xlsx","w") as archive:
+            for name,data in rels.items():
+                archive.writestr(name,data)
+        code,out=invoke(["readback","--xlsx",tmp/"rels.xlsx","--out",tmp/"rl.json","--receipt",tmp/"rl-r.json"])
+        assert_true(code==run.EXIT_ERROR and bounded(out,"READBACK_XLSX_INVALID"),"oversized relationship target is bounded: "+out[:300])
+        # Sweep: every attribute value and text node of every part, replaced in turn by 5000 letters or digits, ends in a bounded,
+        # controlled outcome (no crash, no echoed long value).
+        import re
+        for name,data in parts.items():
+            spots=[m.span(1) for m in re.finditer(rb'="([^"]*)"',data)]+[m.span(1) for m in re.finditer(rb'>([^<]+)<',data)]
+            for start,end in spots:
+                for value in (long_text.encode(),long_digits.encode()):
+                    changed=dict(parts); changed[name]=data[:start]+value+data[end:]
+                    with zipfile.ZipFile(tmp/"sweep.xlsx","w") as archive:
+                        for part_name,part_data in changed.items():
+                            archive.writestr(part_name,part_data)
+                    code,out=invoke(["readback","--xlsx",tmp/"sweep.xlsx","--out",tmp/"sw.json","--receipt",tmp/"sw-r.json"])
+                    if code:
+                        detail=failure(out)["detail"]
+                        assert_true(long_text[:41] not in detail and long_digits[:41] not in detail and len(detail)<400,
+                                    "sweep %s: bounded detail: %s"%(name,detail[:200]))
         write(tmp/"not.xlsx",b"not a zip")
         code,out=invoke(["readback","--xlsx",tmp/"not.xlsx","--out",tmp/"n.json","--receipt",tmp/"n-r.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="READBACK_XLSX_INVALID","a non-xlsx file is refused")

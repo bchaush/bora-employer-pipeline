@@ -302,16 +302,16 @@ def read_xlsx_tabs(path: str, wanted: Sequence[str]) -> dict:
                     data = member.read(XLSX_MAX_UNCOMPRESSED_BYTES + 1)  # never trust the declared size
             except KeyError:
                 if required:
-                    raise RunError("READBACK_XLSX_INVALID", "missing part %s" % name)
+                    raise RunError("READBACK_XLSX_INVALID", "missing part %s" % _short(name))
                 return None
             except Exception as error:  # corrupt member: bad CRC, bad compression, truncated archive
-                raise RunError("READBACK_XLSX_INVALID", "%s cannot be read: %s" % (name, type(error).__name__)) from error
+                raise RunError("READBACK_XLSX_INVALID", "%s cannot be read: %s" % (_short(name), type(error).__name__)) from error
             if len(data) > XLSX_MAX_UNCOMPRESSED_BYTES:
-                raise RunError("READBACK_XLSX_INVALID", "%s expands beyond %d bytes" % (name, XLSX_MAX_UNCOMPRESSED_BYTES))
+                raise RunError("READBACK_XLSX_INVALID", "%s expands beyond %d bytes" % (_short(name), XLSX_MAX_UNCOMPRESSED_BYTES))
             try:
                 return ElementTree.fromstring(data)
             except ElementTree.ParseError as error:
-                raise RunError("READBACK_XLSX_INVALID", "%s is not valid XML" % name) from error
+                raise RunError("READBACK_XLSX_INVALID", "%s is not valid XML" % _short(name)) from error
 
         workbook = part("xl/workbook.xml")
         relations = part("xl/_rels/workbook.xml.rels")
