@@ -1,4 +1,4 @@
-"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_2 (V1_1 behaviour plus readback, decide, pursuit-state, slate dates).
+"""Live-shape regression tests for CAREER_OS_RUN_CONTRACT_V1_3 (V1_2 plus the bare-number readback guard and record-external-submit).
 
 Fixtures use the exact Production Ledger headers:
 - JOBS: 20 columns
@@ -398,6 +398,13 @@ def test_readback_normalizes_sheet_values():
                     json.loads((tmp/"spaced.json").read_text())["JOBS"][0]["Role_Status"]==" ","whitespace values are kept exactly, never trimmed")
         assert_true(built["NETWORK"]==[] and "JOBS rows=1 blank_rows_skipped=1" in out,"NETWORK header-only tab and counts")
         assert_true(run.load_ledger(str(tmp/"ledger-rb.json"))["JOBS"][0]==job_row(),"output satisfies the strict Ledger loader")
+        for kept in ("259\n"," 259","259 ","25.9","MTA::17407"):
+            code,out=readback(tmp,raw_values(ledger([job_row(Role_Status=kept)])),"kept.json")
+            assert_true(code==0 and json.loads((tmp/"kept.json").read_text())["JOBS"][0]["Role_Status"]==kept,
+                        "only a cell that is digits and nothing else is refused: %r is kept exactly"%kept)
+        code,out=readback(tmp,raw_values(led,network=[["NET::A","N","C","T","https://x.example/a","OTHER","INFO_CHAT","","SENT",
+                                                         "2026-10-06","2026-10-06","2026-10-13","42"]]),"net.json")
+        assert_true(code==0,"NETWORK Notes may be a bare number")
         import career_os_network_v1 as net
         assert_true(net.load_ledger_with_network(str(tmp/"ledger-rb.json"))["NETWORK"]==[],"network commands accept it")
         cases=[]
@@ -411,6 +418,10 @@ def test_readback_normalizes_sheet_values():
         bad=raw_values(led); del bad["LOG"]; cases.append((bad,"READBACK_INVALID"))
         bad=raw_values(led); bad["SETTINGS"]=[["Key"]]; cases.append((bad,"READBACK_INVALID"))
         bad=raw_values(ledger([job_row(),job_row()])); cases.append((bad,"READBACK_DUPLICATE_JOB_ID"))
+        # The 2026-10-06 incident: empty cells read back as shared-string indexes ("259", "261", "267").
+        bad=raw_values(ledger([job_row(Role_Status="261")])); cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=raw_values(led); bad["APPLICATIONS"][1][4]="259"; cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
+        bad=raw_values(led); bad["LOG"][1][6]="267"; cases.append((bad,"READBACK_SUSPECT_NUMERIC_CELL"))
         for value,expected in cases:
             code,out=readback(tmp,value,"bad.json")
             assert_true(code==run.EXIT_ERROR and failure(out)["code"]==expected,"readback fails closed with "+expected)
@@ -476,13 +487,84 @@ def test_decide_and_pursuit_state():
     print("PASS: decide/pursuit-state use the same canonical Ledger file, supersede correctly and never authorize a stale or non-PURSUE state.")
 
 
+def test_record_external_submit():
+    with tempfile.TemporaryDirectory() as raw_dir:
+        tmp=Path(raw_dir)
+        job=job_row(Bora_Decision="PURSUE")
+        screened=log_row(Run_ID="SLATE::1",Stage="SLATE_SCREENED",Status="REVIEW_READY")
+        path=write(tmp/"ledger.json",ledger([job],[],[screened]))
+
+        def go(*extra, ledger_path=path, confirmed=True):
+            argv=["record-external-submit","--ledger",ledger_path,"--job-id",JOB_ID,"--channel","Handshake Quick apply",
+                  "--applied-date","2026-10-06","--resume-note","Bora's own Handshake resume",
+                  "--evidence-note","Handshake shows Applied on October 6, 2026","--receipt",tmp/"ext.json"]+list(extra)
+            if confirmed:
+                argv.append("--bora-confirmed")
+            return invoke(argv)
+
+        code,out=go(confirmed=False)
+        assert_true(failure(out)["code"]=="BORA_CONFIRMATION_REQUIRED","external submit needs Bora's confirmation")
+        code,out=go()
+        assert_true(code==0 and "APPLICATIONS_ROW_VALUES" in out,"external submit records: "+out)
+        rec=json.loads((tmp/"ext.json").read_text())
+        app=rec["applications_row"]; log=rec["log_row"]
+        assert_true(set(app)==set(run.APPLICATIONS_HEADERS) and set(log)==set(run.LOG_HEADERS),"exact live shapes")
+        assert_true(app["Resume_Version"]=="EXTERNAL_NO_CAREER_OS_PACKAGE","Resume_Version is the fixed label, so it can never carry a hash")
+        assert_true("resume used: Bora's own Handshake resume" in app["Outcome"],"the resume note is kept in Outcome")
+        assert_true(app["Cover_Letter_Version"]=="NOT_RECORDED" and rec["jobs_row"]=={"Job_ID":JOB_ID,"Application_Status":"SUBMITTED"},
+                    "only Application_Status changes in JOBS; nothing invented about a cover letter")
+        assert_true(app["Outcome"].endswith("Handshake shows Applied on October 6, 2026"),"Bora's evidence note is kept")
+        done=ledger([dict(job,Application_Status="SUBMITTED")],[app],[screened,log])
+        done_path=write(tmp/"done.json",done)
+        code,out=go(ledger_path=done_path)
+        assert_true(failure(out)["code"]=="ALREADY_RECORDED","a second record for the same job is refused")
+        log_only=ledger([job],[],[screened,dict(log,Run_ID="RECORD_EXTERNAL_SUBMIT::%s::2026-10-01"%JOB_ID,Timestamp="2026-10-01")])
+        code,out=go(ledger_path=write(tmp/"log-only.json",log_only))
+        assert_true(failure(out)["code"]=="ALREADY_RECORDED","an earlier application LOG event on another date also blocks (job-level)")
+        hexs="a"*64
+        for flag,value in (("--resume-note","my resume | sha256:"+hexs),("--resume-note","SHA256 x"),("--resume-note","SHA-256: "+hexs),
+                           ("--resume-note","sha_256 "+hexs),("--resume-note","digest "+hexs),("--resume-note","md5 "+"b"*32),
+                           ("--channel","Handshake\rQuick"),("--evidence-note","line1\rline2"),("--resume-note","tab\there"),
+                           ("--channel","Handshake\u0085Quick"),("--evidence-note","a\u2028b"),("--evidence-note","a\u2029b"),
+                           ("--resume-note","zero\u200bwidth"),("--channel","   "),
+                           ("--resume-note","SHA\u00b2\u2075\u2076: "+"\uff41"*64),("--resume-note","sha\u2082\u2085\u2086: "+"\uff41"*64),
+                           ("--resume-note","\uff33\uff28\uff21\uff12\uff15\uff16: "+"\uff41"*64),("--evidence-note","receipt "+"\uff10"*40),
+                           ("--channel","sha256 portal")):
+            argv=["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake","--applied-date","2026-10-06",
+                  "--resume-note","own resume","--evidence-note","Handshake shows Applied","--bora-confirmed","--receipt",tmp/"bad.json"]
+            argv[argv.index(flag)+1]=value
+            code,out=invoke(argv)
+            assert_true(failure(out)["code"]=="FIELD_INVALID","refused %s=%r"%(flag,value))
+        for bad_date in ("2026-99-99","2026-02-30","2026-10-6","06/10/2026"):
+            argv=["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake","--applied-date",bad_date,
+                  "--resume-note","own resume","--evidence-note","Handshake shows Applied","--bora-confirmed","--receipt",tmp/"bad.json"]
+            code,out=invoke(argv)
+            assert_true(failure(out)["code"]=="APPLIED_DATE_INVALID","refused applied date %r"%bad_date)
+        code,out=invoke(["record-external-submit","--ledger",path,"--job-id",JOB_ID,"--channel","Handshake Quick apply (Brandeis)",
+                         "--applied-date","2026-10-06","--resume-note","My own résumé, v3 — Oct 2026","--evidence-note",
+                         "Handshake: Applied on October 6, 2026","--bora-confirmed","--receipt",tmp/"ok.json"])
+        assert_true(code==0,"ordinary notes with accents, dashes, digits and punctuation are accepted: "+out)
+        code,out=invoke(["record-external-submit","--ledger",path,"--job-id","NOPE","--channel","x","--applied-date","2026-10-06",
+                         "--resume-note","x","--evidence-note","x","--bora-confirmed","--receipt",tmp/"x.json"])
+        assert_true(failure(out)["code"]=="JOB_UNRESOLVED","unknown job refused")
+        slate={"spec":"CAREER_OS_RUN_SLATE_RECEIPT_V1","slate":[{"job_id":JOB_ID,"tracking_status":"NEW"}]}
+        code,out=invoke(["closeout","--slate-receipt",write(tmp/"slate.json",slate),"--ledger",done_path,
+                         "--folders",write(tmp/"folders.json",{}),"--plans",write(tmp/"plans.json",[]),"--receipt",tmp/"close.json"])
+        assert_true(code==0 and out.strip().endswith("CAREER_OS_RUN_CLOSEOUT: COMPLETE"),"closeout accepts an external submission: "+out)
+        fake=ledger([dict(job,Application_Status="SUBMITTED")],[dict(app,Resume_Version="resume.pdf")],[screened])
+        code,out=invoke(["closeout","--slate-receipt",tmp/"slate.json","--ledger",write(tmp/"fake.json",fake),
+                         "--folders",tmp/"folders.json","--plans",tmp/"plans.json","--receipt",tmp/"close2.json"])
+        assert_true(code==run.EXIT_STOP and "PLAN_NOT_SUPPLIED" in out,"an ordinary submission without a plan still fails closeout")
+    print("PASS: record-external-submit records Bora's outside-package applications honestly and closeout accepts only those.")
+
+
 def test_local_only():
     source=(ROOT/"src"/"career_os_run_v1.py").read_text(encoding="utf-8")
     for forbidden in ("import requests","urllib","http.client","googleapiclient","socket","subprocess","smtplib"):
         assert_true(forbidden not in source,"no network/process import: "+forbidden)
     runbook=(ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.md").read_text(encoding="utf-8")
     for needle in ("career_os_run_v1.py readback","career_os_run_v1.py decide","career_os_run_v1.py pursuit-state","--as-of",
-                   "Never hand-build ledger.json"):
+                   "Never hand-build ledger.json","career_os_run_v1.py record-external-submit","never by downloading"):
         assert_true(needle in runbook,"runbook documents "+needle)
     config=json.loads((ROOT/"docs"/"CAREER_OS_OPERATE_MODE_V1.json").read_text(encoding="utf-8"))["run_contract"]
     assert_true(config["contract_id"]==run.RUN_CONTRACT_ID and config["state_machine"][0]=="readback" and "decide" in config["state_machine"],
@@ -494,9 +576,9 @@ def main():
     assert_true(len(run.JOBS_HEADERS)==20 and len(run.APPLICATIONS_HEADERS)==10 and len(run.LOG_HEADERS)==9,"live header counts")
     for test in (test_preflight_live_settings,test_slate_dedupe_and_score_rules,test_package_ledger_binding_and_persistence,
                  test_record_submit_live_shapes,test_closeout_slate_authority_and_sha_parse,test_end_to_end_live_shapes,
-                 test_readback_normalizes_sheet_values,test_decide_and_pursuit_state,test_local_only):
+                 test_readback_normalizes_sheet_values,test_decide_and_pursuit_state,test_record_external_submit,test_local_only):
         test()
-    print("PASS: 9 groups of CAREER_OS_RUN_CONTRACT_V1_2 live-shape tests")
+    print("PASS: 10 groups of CAREER_OS_RUN_CONTRACT_V1_3 live-shape tests")
 
 
 if __name__=="__main__":

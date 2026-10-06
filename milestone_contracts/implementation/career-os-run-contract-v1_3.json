@@ -1,0 +1,50 @@
+{
+  "milestone_id": "CAREER_OS_RUN_CONTRACT_V1_3",
+  "kind": "IMPLEMENTATION",
+  "goal": "Close the two gaps found in the 2026-10-06 V1.2 runs: (1) the operator parsed an exported sheet file and empty cells became bare numbers (\"259\", \"261\", \"267\"), which readback passed through and decide fingerprinted; (2) applications Bora submits outside a Career OS package (Handshake Quick apply) had no CLI path to the Ledger.",
+  "baseline_sha": "f1cfe06929404e4ab057e38a463b975b09ee0937",
+  "allowed_paths": [
+    "src/career_os_run_v1.py",
+    "tests/career_os_run_contract_cli_v1_test.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "milestone_contracts/implementation/career-os-run-contract-v1_3.json"
+  ],
+  "forbidden_paths": [
+    "src/pursuit_decision.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_resume_qa.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/career_os_network_v1.py",
+    "src/claim_repository.py",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "docs/resume/**",
+    "schemas/**",
+    "docs/rendering/**",
+    ".github/**"
+  ],
+  "acceptance_conditions": [
+    "readback refuses any bare-number cell (the whole cell is digits and nothing else, checked with a full match) in JOBS, APPLICATIONS, LOG and NETWORK (except NETWORK Notes) with READBACK_SUSPECT_NUMERIC_CELL; all V1.2 readback behaviour is unchanged otherwise.",
+    "record-external-submit requires --bora-confirmed, an existing single JOBS row, a real calendar date as YYYY-MM-DD, channel/resume/evidence notes that are non-empty and contain no Unicode control, format or line/paragraph separator characters, channel/resume/evidence notes with nothing hash-like after Unicode NFKC normalization (no 'sha' followed by digits in any spelling and no run of 32+ hex characters), and no existing APPLICATIONS row or APPLICATION_RECORDED LOG event for the job on any date; it emits the exact 10-column APPLICATIONS row with Resume_Version exactly 'EXTERNAL_NO_CAREER_OS_PACKAGE' (a fixed label, so never a hash; the resume note is recorded in Outcome) and Cover_Letter_Version NOT_RECORDED, a JOBS update of Application_Status only, and an exact 9-column LOG row.",
+    "closeout treats a submitted role whose single APPLICATIONS row starts with EXTERNAL_NO_CAREER_OS_PACKAGE as complete without plan, folder or resume hash; every other submitted role keeps all existing checks.",
+    "No change to decide, pursuit-state, package, slate, the pursuit gate, the network CLI or the cloud adapter.",
+    "Runbook and config document both changes and the read-values-only rule; contract id is CAREER_OS_RUN_CONTRACT_V1_3."
+  ],
+  "review_requirements": "STOP after one PR is opened. Do not merge until Bora obtains a fresh independent read-only SAFE review.",
+  "required_tests": [
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python tests/career_os_network_v1_test.py",
+    "python tests/career_os_final_hygiene_v1_test.py",
+    "python scripts/verify_assurance_baseline.py",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need to let an external submission claim a Career OS resume hash, or to relax closeout for ordinary submissions.",
+    "Any change to the pursuit gate or decision semantics.",
+    "Any need to write Drive/Sheets from this engineering PR."
+  ],
+  "human_approval_requirements": "Bora retains merge authority, confirms every submission, and makes every decision and Ledger write."
+}
