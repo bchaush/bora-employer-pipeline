@@ -1,4 +1,4 @@
-"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_5).
+"""CAREER_OS_RUN_CONTRACT_V1 operator CLI (contract V1_6).
 
 A pure, local run-contract state machine for a ChatGPT-operated Career OS run:
 
@@ -44,7 +44,7 @@ import career_os_cloud_operate_v1 as cloud  # noqa: E402
 import gold_package_handoff as handoff  # noqa: E402
 import pursuit_decision  # noqa: E402
 
-RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_5"
+RUN_CONTRACT_ID = "CAREER_OS_RUN_CONTRACT_V1_6"
 EXIT_OK, EXIT_STOP, EXIT_ERROR = 0, 1, 2
 FAILURE_MARKER = "CAREER_OS_RUN_FAILURE:"
 CLOSEOUT_MARKER = "CAREER_OS_RUN_CLOSEOUT:"
@@ -119,6 +119,10 @@ SLATE_TEXT_KEYS = ("job_id", "company", "role", "official_url", "source", "locat
                    "work_authorization_text", "OPT_Screen_State")
 SLATE_LIST_KEYS = ("mandatory_gaps", "reasons")
 RECOMMENDATIONS = ("PURSUE", "WATCH", "HOLD", "REJECT")
+# Posting verification tier (Bora's rule, 2026-10-06: verify the employer and the live posting, not where it is posted). The slate
+# source must start with one of these; the evidence follows in the same text.
+SOURCE_TIERS = ("EMPLOYER_SITE", "SCHOOL_PORTAL", "JOB_BOARD")
+SOURCE_TIER_PATTERN = re.compile(r"^(EMPLOYER_SITE|SCHOOL_PORTAL|JOB_BOARD)(\b|$)")
 UNKNOWN_GEOGRAPHY = frozenset({"", "UNKNOWN", "UNCLEAR", "UNRESOLVED", "NOT_SPECIFIED", "NOT SPECIFIED"})
 
 PLAN_SPEC = "CAREER_OS_PERSIST_PLAN_V1"
@@ -651,6 +655,127 @@ def cmd_decide(args: argparse.Namespace) -> tuple:
     return EXIT_OK, block(lines), None
 
 
+# confirm-write ----------------------------------------------------------------------------------
+
+# The exact shape of every Ledger write a receipt may carry: (tab, kind, required keys, fixed cell values). A receipt whose rows or cell
+# updates do not have exactly these keys, string values and fixed values is refused before anything is compared.
+WRITE_SHAPES = {
+    "SLATE_JOBS_ROW": ("JOBS", "row", tuple(JOBS_HEADERS), {}),
+    "DECIDE_JOBS": ("JOBS", "cells", ("Job_ID", "Bora_Decision"), {"Bora_Decision": tuple(pursuit_decision.VALID_DECISIONS)}),
+    "SUBMIT_JOBS": ("JOBS", "cells", ("Job_ID", "Application_Status"), {"Application_Status": ("SUBMITTED",)}),
+    "PERSIST_JOBS": ("JOBS", "cells", ("Job_ID", "Package_Status"), {"Package_Status": ("READY",)}),
+    "LOG_ROW": ("LOG", "row", tuple(LOG_HEADERS), {}),
+    "APPLICATIONS_ROW": ("APPLICATIONS", "row", tuple(APPLICATIONS_HEADERS), {}),
+    "NETWORK_ROW": ("NETWORK", "row", tuple(NETWORK_HEADERS), {}),
+}
+RECEIPT_WRITES = {  # spec -> [(receipt field, shape, many rows?)]
+    "CAREER_OS_RUN_SLATE_RECEIPT_V1": [("jobs_rows", "SLATE_JOBS_ROW", True)],
+    "CAREER_OS_RUN_DECIDE_RECEIPT_V1": [("jobs_update", "DECIDE_JOBS", False), ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_RECORD_SUBMIT_RECEIPT_V1": [("applications_row", "APPLICATIONS_ROW", False), ("jobs_row", "SUBMIT_JOBS", False),
+                                           ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_RECORD_EXTERNAL_SUBMIT_RECEIPT_V1": [("applications_row", "APPLICATIONS_ROW", False), ("jobs_row", "SUBMIT_JOBS", False),
+                                                    ("log_row", "LOG_ROW", False)],
+    PERSIST_RECEIPT_SPEC: [("jobs_row_values", "PERSIST_JOBS", False)],
+    "CAREER_OS_NETWORK_ADD_RECEIPT_V1": [("network_row", "NETWORK_ROW", False), ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_NETWORK_UPDATE_RECEIPT_V1": [("network_row", "NETWORK_ROW", False), ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_RECORD_OUTCOME_RECEIPT_V1": [("applications_row", "APPLICATIONS_ROW", False), ("log_row", "LOG_ROW", False)],
+}
+WRITE_KEYS = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
+
+
+def _receipt_expectations(path: str) -> list:
+    try:
+        return _receipt_expectations_checked(path)
+    except RunError:
+        raise
+    except Exception as error:  # any malformed receipt is a controlled refusal, never a crash
+        raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s is malformed: %s" % (_short(Path(path).name), type(error).__name__)) from error
+
+
+def _receipt_expectations_checked(path: str) -> list:
+    """(tab, kind, row) for every Ledger write the receipt printed, after strict validation: a known writing spec, exactly the
+    expected keys per row or cell update, string values (None only in slate rows), fixed values where the command fixes them, a
+    non-empty key, and every row of one receipt bound to the same job. A receipt that printed no rows (e.g. an all-ALREADY_TRACKED
+    slate) is refused, never counted as a pass; a malformed receipt is refused, never a crash."""
+    receipt = read_json(path, "written receipt")
+    name = _short(Path(path).name)
+    spec = receipt.get("spec") if isinstance(receipt, Mapping) else None
+    if not isinstance(spec, str) or spec not in RECEIPT_WRITES:
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s: spec %s writes nothing to the Ledger or is unknown" % (name, _short(spec)))
+    if spec == PERSIST_RECEIPT_SPEC and receipt.get("status") != "PERSISTED_COMPLETE":
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s: persistence was not PERSISTED_COMPLETE, so nothing was written" % name)
+    out = []
+    for field, shape_name, many in RECEIPT_WRITES[spec]:
+        tab, kind, keys, fixed = WRITE_SHAPES[shape_name]
+        value = receipt.get(field)
+        items = value if many else [value]
+        if not isinstance(items, list):
+            raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s must be a list" % (name, field))
+        for item in items:
+            if not isinstance(item, Mapping) or set(item) != set(keys):
+                raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s must have exactly the keys %s" % (name, field, ", ".join(keys)))
+            for key, cell in item.items():
+                if not (isinstance(cell, str) or (cell is None and shape_name == "SLATE_JOBS_ROW")):
+                    raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s.%s must be text" % (name, field, key))
+            for key, allowed in fixed.items():
+                if item[key] not in allowed:
+                    raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s.%s must be one of %s" % (name, field, key, ", ".join(allowed)))
+            if not non_empty(item[WRITE_KEYS[tab]]):
+                raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s has an empty %s" % (name, field, WRITE_KEYS[tab]))
+            out.append((tab, kind, {key: ("" if cell is None else cell) for key, cell in item.items()}))
+    if not out:
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s printed no rows to write, so there is nothing to confirm" % name)
+    if spec != "CAREER_OS_RUN_SLATE_RECEIPT_V1":
+        jobs = {row.get("Job_ID") for tab, _kind, row in out if tab in ("JOBS", "APPLICATIONS", "LOG")}
+        jobs |= {row.get("Linked_Job_ID") for tab, _kind, row in out if tab == "NETWORK"}
+        if len(jobs) != 1:
+            raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: its rows name different jobs" % name)
+    return out
+
+
+def cmd_confirm_write(args: argparse.Namespace) -> tuple:
+    readback_receipt = read_json(args.readback_receipt, "readback receipt")
+    ledger_sha = sha256_hex(read_bytes(args.ledger, "Ledger readback"))
+    if not isinstance(readback_receipt, Mapping) or not isinstance(readback_receipt.get("spec"), str) \
+            or readback_receipt.get("spec") != "CAREER_OS_RUN_READBACK_RECEIPT_V1" or not isinstance(readback_receipt.get("ledger_sha256"), str) \
+            or readback_receipt.get("ledger_sha256") != ledger_sha:
+        raise RunError("CONFIRM_WRITE_LEDGER_NOT_READBACK", "--ledger must be the exact file written by the readback whose receipt is --readback-receipt")
+    ledger = load_ledger(args.ledger)
+    keys = WRITE_KEYS
+    confirmed, problems = [], []
+    for path in args.written:
+        for tab, kind, expected in _receipt_expectations(path):
+            rows = ledger.get(tab)
+            if rows is None:
+                problems.append("%s tab missing from the readback (read the whole Ledger)" % tab)
+                continue
+            key = keys[tab]
+            ident = str(expected.get(key, ""))
+            matches = [row for row in rows if row.get(key) == ident]
+            label = "%s %s" % (tab, _short(ident))
+            if len(matches) != 1:
+                problems.append("%s: found %d rows" % (label, len(matches)))
+                continue
+            row = matches[0]
+            fields = expected.keys() if kind == "cells" else set(expected) | set(row)
+            wrong = sorted(field for field in fields if str(row.get(field, "")) != str("" if expected.get(field) is None else expected.get(field, "")))
+            if wrong:
+                problems.append("%s: %s differ from the CLI output" % (label, ", ".join(wrong[:5])))
+            else:
+                confirmed.append(label)
+    if problems:
+        detail = "; ".join(problems)
+        raise RunError("WRITE_NOT_CONFIRMED", detail if len(detail) <= 600 else detail[:597] + "...")
+    receipt = {"spec": "CAREER_OS_RUN_CONFIRM_WRITE_RECEIPT_V1", "contract": RUN_CONTRACT_ID,
+               "written_receipts_sha256": [sha256_hex(read_bytes(path, "written receipt")) for path in args.written],
+               "ledger_sha256": ledger_sha, "readback_receipt_sha256": sha256_hex(read_bytes(args.readback_receipt, "readback receipt")),
+               "confirmed": confirmed}
+    receipt_sha = write_receipt(args.receipt, receipt)
+    lines = ["CAREER_OS_RUN_CONFIRM_WRITE: PASS (every printed row is in the Ledger exactly)"] + ["confirmed: " + item for item in confirmed]
+    lines.append("receipt_sha256: " + receipt_sha)
+    return EXIT_OK, block(lines), None
+
+
 # preflight --------------------------------------------------------------------------------------
 
 def _settings_map(raw: Any) -> dict:
@@ -780,6 +905,8 @@ def validate_slate_role(role: Any, index: int) -> list:
             problems.append("%s: %s must be a list of strings" % (where, key))
     if role["recommendation"] not in RECOMMENDATIONS:
         problems.append("%s: recommendation must be one of %s" % (where, "|".join(RECOMMENDATIONS)))
+    if isinstance(role["source"], str) and not SOURCE_TIER_PATTERN.match(role["source"]):
+        problems.append("%s: source must start with %s, then the evidence" % (where, ", ".join(SOURCE_TIERS)))
     if problems:
         return problems
     for key in SLATE_KEYS:
@@ -853,9 +980,11 @@ def cmd_slate(args: argparse.Namespace) -> tuple:
     lines = ["CAREER_OS_RUN_SLATE (system recommendations only; STOP for Bora decision)"]
     for item in slate:
         if item["tracking_status"] == "ALREADY_TRACKED":
-            lines.append("%s | %s | %s | ALREADY_TRACKED | Bora=%s | Package=%s | Application=%s" % (
-                item["job_id"], item["company"], item["role"], item.get("current_Bora_Decision") or "",
-                item.get("current_Package_Status") or "", item.get("current_Application_Status") or ""))
+            # Always the Ledger Job_ID: every later command (decide, pursuit-state, resume-model, package) must use it.
+            screened = "" if item["tracked_job_id"] == item["job_id"] else " | screened_as=%s" % item["job_id"]
+            lines.append("%s | %s | %s | ALREADY_TRACKED | Bora=%s | Package=%s | Application=%s%s" % (
+                item["tracked_job_id"], item["company"], item["role"], item.get("current_Bora_Decision") or "",
+                item.get("current_Package_Status") or "", item.get("current_Application_Status") or "", screened))
         else:
             lines.append("%s | %s | %s | %s | geo=%s | opt=%s | gaps=%s | %s" % (
                 item["job_id"], item["company"], item["role"], item["recommendation"], item["Geography_State"], item["OPT_Screen_State"],
@@ -1138,6 +1267,7 @@ def closeout_missing(slate: Sequence[Mapping[str, Any]], ledger: Mapping[str, An
             missing.append("%s: %s" % (job_id, "JOBS_ROW_MISSING" if not rows else "JOBS_ROW_DUPLICATE"))
             continue
         row = rows[0]
+        job_id = row["Job_ID"]  # report and match plans/folders by the Ledger Job_ID
         if not any(non_empty(row.get(key)) for key in ("Decision", "Bora_Decision", "Package_Status", "Application_Status")):
             missing.append("%s: JOBS_DURABLE_STATE_MISSING" % job_id)
         submitted = str(row.get("Application_Status") or "").strip().upper() == "SUBMITTED"
@@ -1217,6 +1347,10 @@ def build_parser() -> argparse.ArgumentParser:
     source.add_argument("--xlsx", help="the whole Ledger exported from Google Drive as .xlsx (preferred: nothing is retyped)")
     source.add_argument("--raw", help="raw Sheets values: {JOBS|APPLICATIONS|LOG[|NETWORK]: [[header...], [row...], ...]}")
     item.add_argument("--out", required=True, help="Ledger file to write; use it for every --ledger in this run")
+    item = add("confirm-write", cmd_confirm_write)
+    item.add_argument("--ledger", required=True, help="a fresh readback taken after the write")
+    item.add_argument("--readback-receipt", required=True, help="the receipt of that readback (binds the exact ledger file)")
+    item.add_argument("--written", required=True, action="append", help="receipt of the command whose rows were written (repeatable)")
     item = add("pursuit-state", cmd_pursuit_state)
     item.add_argument("--ledger", required=True)
     item.add_argument("--job-id", required=True)

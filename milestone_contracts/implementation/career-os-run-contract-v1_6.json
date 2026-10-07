@@ -1,0 +1,50 @@
+{
+  "milestone_id": "CAREER_OS_RUN_CONTRACT_V1_6",
+  "kind": "IMPLEMENTATION",
+  "goal": "Fix what the 2026-10-06 evening batch exposed. (1) The slate printed an already-tracked role under the operator's new screening id (ENTEGRIS::REQ-14498) instead of the Ledger Job_ID, so decide failed with JOB_UNRESOLVED. (2) The employer-site-only posting rule blocked a genuine Babson-hosted AE Ventures internship and the role was kept out of the Ledger while closeout reported COMPLETE; Bora chose, after research (Handshake trust and safety data, FTC and university fraud guidance, AE Ventures' own careers page naming the same contact), to verify the employer and the live posting instead of the hosting site. (3) Ledger writes pass through the operator's hands with no deterministic proof; the operator mistyped CLI output in chat during the batch.",
+  "baseline_sha": "f94640899f8d7b0e5f9a7f930a5b20af05294759",
+  "allowed_paths": [
+    "src/career_os_run_v1.py",
+    "tests/career_os_run_contract_cli_v1_test.py",
+    "docs/CAREER_OS_OPERATE_MODE_V1.md",
+    "docs/CAREER_OS_OPERATE_MODE_V1.json",
+    "AGENTS.md",
+    "milestone_contracts/implementation/career-os-run-contract-v1_6.json"
+  ],
+  "forbidden_paths": [
+    "src/pursuit_decision.py",
+    "src/pursue_to_gold_package.py",
+    "src/gold_resume_qa.py",
+    "src/gold_resume_docx_builder.py",
+    "src/gold_package_handoff.py",
+    "src/career_os_cloud_operate_v1.py",
+    "src/career_os_network_v1.py",
+    "src/claim_repository.py",
+    "claims/**",
+    "evidence/**",
+    "experiences/**",
+    "docs/resume/**",
+    "schemas/**",
+    "docs/rendering/**",
+    ".github/**",
+    "BLUEPRINT.md"
+  ],
+  "acceptance_conditions": [
+    "An ALREADY_TRACKED slate line starts with the Ledger Job_ID, with screened_as=<screening id> only when they differ; closeout reports and matches plans/folders by the Ledger Job_ID.",
+    "Every slate role's source starts with EMPLOYER_SITE, SCHOOL_PORTAL or JOB_BOARD (word boundary); anything else is SLATE_INVALID. Existing Ledger rows are not re-validated.",
+    "confirm-write requires --ledger to be the exact file of a readback (its sha256 equals --readback-receipt ledger_sha256, spec CAREER_OS_RUN_READBACK_RECEIPT_V1; otherwise CONFIRM_WRITE_LEDGER_NOT_READBACK) and one or more receipts of writing commands (slate, decide, verify-persisted, record-submit, record-external-submit, network-add, network-update, record-outcome). It prints PASS only if every printed full row exists exactly once with every cell equal and every printed JOBS cell update holds; otherwise WRITE_NOT_CONFIRMED naming the row and differing cells (bounded). A receipt that printed no rows (e.g. an all-ALREADY_TRACKED slate), alone or beside others, is refused with CONFIRM_WRITE_RECEIPT_UNSUPPORTED; a non-write or unknown receipt is refused with CONFIRM_WRITE_RECEIPT_UNSUPPORTED; every receipt is validated against an exact per-spec shape before any comparison (exact key set per row or cell update: full JOBS/LOG/APPLICATIONS/NETWORK headers, decide {Job_ID, Bora_Decision in PURSUE|WATCH|REJECT}, submit {Job_ID, Application_Status=SUBMITTED}, persist {Job_ID, Package_Status=READY} from a PERSISTED_COMPLETE receipt; text values, None only in slate rows; non-empty keys; all rows of one non-slate receipt bound to one job); any deviation is CONFIRM_WRITE_RECEIPT_INVALID, never a crash or a pass. confirm-write never reports PASS without at least one verified row. Spec and readback-receipt fields are type-checked before use, and any other exception while reading a receipt becomes CONFIRM_WRITE_RECEIPT_INVALID; a type fuzz over every field of every receipt (lists, objects, numbers, booleans, null) ends in a controlled refusal, never a crash or a PASS.",
+    "Runbook/config document the posting tiers with evidence, scam signs that always stop a role, that every role Bora sends goes through slate, that already-applied roles use record-external-submit, the Ledger Job_ID rule and confirm-write after every write. AGENTS.md carries Bora's dated operator amendment; BLUEPRINT.md is unchanged.",
+    "No change to the pursuit gate, package gates, Gold builder or QA, decide semantics, readback, resume-model, the network CLI or the cloud adapter. Contract id is CAREER_OS_RUN_CONTRACT_V1_6."
+  ],
+  "review_requirements": "STOP after one PR is opened. Do not merge until Bora obtains a fresh independent read-only SAFE review.",
+  "required_tests": [
+    "python tests/career_os_run_contract_cli_v1_test.py",
+    "python scripts/verify_assurance_baseline.py (all four phases)",
+    "git diff --check"
+  ],
+  "stop_conditions": [
+    "Any need to loosen the semantic quorum, dead-state veto or fresh re-open.",
+    "Any change to BLUEPRINT.md or protected source files."
+  ],
+  "human_approval_requirements": "Bora chose the 'verify employer, not site' rule on 2026-10-06 after the research summary; he retains merge authority, every decision and every submission."
+}

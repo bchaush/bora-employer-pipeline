@@ -1,6 +1,6 @@
-# Career OS Operate Mode V1 — Run Contract V1.5
+# Career OS Operate Mode V1 — Run Contract V1.6
 
-Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_5).
+Operator CLI: src/career_os_run_v1.py (CAREER_OS_RUN_CONTRACT_V1_6).
 
 It is pure/local. It reads caller-supplied files and writes local receipts/output. It never calls Drive, Sheets, the web, or an employer application surface. ChatGPT connectors perform external reads/writes and hand exact readbacks to the CLI.
 
@@ -10,7 +10,7 @@ Upload package files as-is. Never convert the PDF, DOCX, or ZIP into Google Docs
 
 ## State machine
 
-0. readback (again after every Ledger write)
+0. readback (again after every Ledger write, then confirm-write)
 1. preflight
 2. slate
 3. STOP for Bora decision, then decide
@@ -53,6 +53,18 @@ With --raw it changes only three things: null cells become "", short rows are pa
 
 Both sources fail closed on any header that is not exactly the live header (no trimming), a non-string cell, a bare-number cell (READBACK_SUSPECT_NUMERIC_CELL: no Ledger cell holds one; it means the read was corrupted), or a duplicate Job_ID. Use the resulting ledger.json for every --ledger, and run readback again after every Ledger write. If neither source can be read whole, stop and tell Bora.
 
+### 0b. confirm-write (after every Ledger write)
+
+After writing the rows a command printed, read the whole Ledger again and prove the write:
+
+    python src/career_os_run_v1.py confirm-write \
+      --ledger ledger_after_write.json \
+      --readback-receipt receipts/readback_after_write.json \
+      --written receipts/decide_acme.json \
+      --receipt receipts/confirm_decide_acme.json
+
+--ledger and --readback-receipt are the file and receipt of that fresh readback; any other file is refused (CONFIRM_WRITE_LEDGER_NOT_READBACK). --written takes the receipt of each command whose rows were written (slate, decide, verify-persisted, record-submit, record-external-submit, network-add, network-update, record-outcome); repeat it for several. A receipt that printed no rows (for example a slate whose roles were all ALREADY_TRACKED) wrote nothing and needs no confirm-write; passing it is refused, never a PASS. PASS means every printed row is in the Ledger exactly. WRITE_NOT_CONFIRMED names the row and the cells that differ: fix only those cells to the printed values, read back, and run confirm-write again.
+
 ### 1. preflight
 
     python src/career_os_run_v1.py preflight \
@@ -72,6 +84,18 @@ CANONICAL_MAIN_SHA, RUNTIME_BUNDLE_SHA256, CLOUD_ADAPTER_SHA256, OPERATE_MODE_CO
 
 CLOUD_RENDER_PROFILE must equal CHATGPT_CLOUD_OPERATIONAL_RENDER_V1.
 
+### Posting verification (before slate)
+
+Verify the employer and the live posting, not where it is posted (Bora's rule, 2026-10-06). Open the posting live in this session; a cached search result or an index snippet is never enough. Then give every role one tier, written first in its screening "source", followed by the evidence:
+
+- EMPLOYER_SITE: the posting is open on the employer's own careers site or applicant system.
+- SCHOOL_PORTAL: the posting is open on Handshake or a university career portal, and the employer checks out: a real company website, the posting's contact email on the company's own domain (not Gmail/Yahoo/Outlook), and a public footprint (address, leadership, news). Write that evidence, e.g. "SCHOOL_PORTAL (Babson; contact dkent@ae-ventures.com, same person listed on ae-ventures.com/careers)".
+- JOB_BOARD: only a job board or repost (LinkedIn, Indeed, aggregators). First look for the employer's own posting or contact; if none, tell Bora in one line. His PURSUE then stands as his verification; write it, e.g. "JOB_BOARD (LinkedIn repost; Bora verified)".
+
+Scam signs always stop the role, whatever the tier: a fee to apply or train, a check to cash or money to forward, bank, card or SSN details before an offer, a free-mail contact address, an interview only by chat, or pay far above the role. Name the sign and stop.
+
+Every role Bora sends is screened and goes through slate, even when it is not ready to package; never keep a role outside the Ledger. If Bora already applied (he says so, or a screenshot shows "Applied"), record it with record-external-submit; do not package it.
+
 ### 2. slate
 
     python src/career_os_run_v1.py slate \
@@ -82,7 +106,8 @@ CLOUD_RENDER_PROFILE must equal CHATGPT_CLOUD_OPERATIONAL_RENDER_V1.
 
 --as-of is the screening time with its UTC offset; it is written to First_Seen and Last_Verified of every new JOBS row.
 
-A role already present by Job_ID or non-empty Official_URL is ALREADY_TRACKED and produces no new JOBS row.
+A role already present by Job_ID or non-empty Official_URL is ALREADY_TRACKED and produces no new JOBS row. Its line starts with the Ledger Job_ID (with screened_as=<your id> when they differ): use that Ledger Job_ID in every later command.
+"source" must start with EMPLOYER_SITE, SCHOOL_PORTAL or JOB_BOARD (see Posting verification); anything else is SLATE_INVALID.
 Unknown/unclear onsite geography requires HOLD. Numeric/letter fit scoring is forbidden. Bora_Decision remains empty until Bora acts.
 
 Minimal screening.json:
@@ -93,7 +118,7 @@ Minimal screening.json:
         "company": "Acme",
         "role": "Data Analyst",
         "official_url": "https://careers.acme.example/jobs/123",
-        "source": "FIRST_PARTY",
+        "source": "EMPLOYER_SITE (careers.acme.example, opened live 2026-10-06)",
         "location_arrangement": "Remote",
         "Geography_State": "PASS",
         "work_authorization_text": "No sponsorship restriction stated.",
