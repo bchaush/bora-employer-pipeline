@@ -1075,6 +1075,37 @@ def test_tracked_ids_source_tiers_and_confirm_write():
                          write(tmp/"rc.json",review_case),"--receipt",tmp/"x.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_INVALID","a decide receipt without Bora_Decision is refused")
         assert_true(mutations>100,"the sweep covered %d malformed receipts"%mutations)
+        # Type fuzz: every non-text JSON value in the spec and in every field of every receipt (and in the readback receipt) ends in a
+        # controlled refusal; nothing crashes (the review case: {"spec": []}).
+        junk=[[],{},5,1.5,True,None,["x"],{"a":"b"},[{}],[[]]]
+        fuzzed=0
+        for value in junk:
+            for spec_receipt in ({"spec":value},{"spec":value,"jobs_rows":[]},value):
+                code,out=invoke(["confirm-write","--ledger",tmp/"ok-ledger.json","--readback-receipt",tmp/"ok-rb.json","--written",
+                                 write(tmp/"junk.json",spec_receipt),"--receipt",tmp/"x.json"])
+                assert_true(code==run.EXIT_ERROR and failure(out)["code"] in ("CONFIRM_WRITE_RECEIPT_UNSUPPORTED","CONFIRM_WRITE_RECEIPT_INVALID"),
+                            "junk spec refused: %r -> %s"%(spec_receipt,out[:160])); fuzzed+=1
+            for name,rec in receipts.items():
+                for field,_shape,many in run.RECEIPT_WRITES[rec["spec"]]:
+                    variants=[dict(rec,**{field:value})]
+                    original=rec[field][0] if many else rec[field]
+                    for key in list(original)[:4]+[list(original)[-1]]:
+                        cell=dict(original,**{key:value})
+                        variants.append(dict(rec,**{field:[cell] if many else cell}))
+                    if name=="persist":
+                        variants.append(dict(rec,status=value))
+                    for variant in variants:
+                        code,out=invoke(["confirm-write","--ledger",tmp/"ok-ledger.json","--readback-receipt",tmp/"ok-rb.json","--written",
+                                         write(tmp/"junk.json",variant),"--receipt",tmp/"x.json"])
+                        assert_true(code==run.EXIT_ERROR and failure(out)["code"] in ("CONFIRM_WRITE_RECEIPT_UNSUPPORTED","CONFIRM_WRITE_RECEIPT_INVALID",
+                                                                                       "WRITE_NOT_CONFIRMED"),
+                                    "junk %s.%s is a controlled refusal, never a crash or PASS: %s"%(name,field,out[:160])); fuzzed+=1
+            for rb in ({"spec":value,"ledger_sha256":"x"},{"spec":"CAREER_OS_RUN_READBACK_RECEIPT_V1","ledger_sha256":value},value):
+                code,out=invoke(["confirm-write","--ledger",tmp/"ok-ledger.json","--readback-receipt",write(tmp/"rbjunk.json",rb),"--written",
+                                 tmp/"decide.json","--receipt",tmp/"x.json"])
+                assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_LEDGER_NOT_READBACK","junk readback receipt refused: %s"%out[:160])
+                fuzzed+=1
+        assert_true(fuzzed>500,"the type fuzz covered %d malformed inputs"%fuzzed)
     print("PASS: tracked roles use their Ledger Job_ID, every source carries a verification tier, and confirm-write proves each write.")
 
 

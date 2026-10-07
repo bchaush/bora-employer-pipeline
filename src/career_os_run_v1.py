@@ -684,6 +684,15 @@ WRITE_KEYS = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID
 
 
 def _receipt_expectations(path: str) -> list:
+    try:
+        return _receipt_expectations_checked(path)
+    except RunError:
+        raise
+    except Exception as error:  # any malformed receipt is a controlled refusal, never a crash
+        raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s is malformed: %s" % (_short(Path(path).name), type(error).__name__)) from error
+
+
+def _receipt_expectations_checked(path: str) -> list:
     """(tab, kind, row) for every Ledger write the receipt printed, after strict validation: a known writing spec, exactly the
     expected keys per row or cell update, string values (None only in slate rows), fixed values where the command fixes them, a
     non-empty key, and every row of one receipt bound to the same job. A receipt that printed no rows (e.g. an all-ALREADY_TRACKED
@@ -691,7 +700,7 @@ def _receipt_expectations(path: str) -> list:
     receipt = read_json(path, "written receipt")
     name = _short(Path(path).name)
     spec = receipt.get("spec") if isinstance(receipt, Mapping) else None
-    if spec not in RECEIPT_WRITES:
+    if not isinstance(spec, str) or spec not in RECEIPT_WRITES:
         raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s: spec %s writes nothing to the Ledger or is unknown" % (name, _short(spec)))
     if spec == PERSIST_RECEIPT_SPEC and receipt.get("status") != "PERSISTED_COMPLETE":
         raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s: persistence was not PERSISTED_COMPLETE, so nothing was written" % name)
@@ -727,7 +736,8 @@ def _receipt_expectations(path: str) -> list:
 def cmd_confirm_write(args: argparse.Namespace) -> tuple:
     readback_receipt = read_json(args.readback_receipt, "readback receipt")
     ledger_sha = sha256_hex(read_bytes(args.ledger, "Ledger readback"))
-    if not isinstance(readback_receipt, Mapping) or readback_receipt.get("spec") != "CAREER_OS_RUN_READBACK_RECEIPT_V1" \
+    if not isinstance(readback_receipt, Mapping) or not isinstance(readback_receipt.get("spec"), str) \
+            or readback_receipt.get("spec") != "CAREER_OS_RUN_READBACK_RECEIPT_V1" or not isinstance(readback_receipt.get("ledger_sha256"), str) \
             or readback_receipt.get("ledger_sha256") != ledger_sha:
         raise RunError("CONFIRM_WRITE_LEDGER_NOT_READBACK", "--ledger must be the exact file written by the readback whose receipt is --readback-receipt")
     ledger = load_ledger(args.ledger)
