@@ -59,10 +59,11 @@ After writing the rows a command printed, read the whole Ledger again and prove 
 
     python src/career_os_run_v1.py confirm-write \
       --ledger ledger_after_write.json \
+      --readback-receipt receipts/readback_after_write.json \
       --written receipts/decide_acme.json \
       --receipt receipts/confirm_decide_acme.json
 
---written takes the receipt of each command whose rows were written (slate, decide, verify-persisted, record-submit, record-external-submit, network-add, network-update, record-outcome); repeat it for several. PASS means every printed row is in the Ledger exactly. WRITE_NOT_CONFIRMED names the row and the cells that differ: fix only those cells to the printed values, read back, and run confirm-write again.
+--ledger and --readback-receipt are the file and receipt of that fresh readback; any other file is refused (CONFIRM_WRITE_LEDGER_NOT_READBACK). --written takes the receipt of each command whose rows were written (slate, decide, verify-persisted, record-submit, record-external-submit, network-add, network-update, record-outcome); repeat it for several. A receipt that printed no rows (for example a slate whose roles were all ALREADY_TRACKED) wrote nothing and needs no confirm-write; passing it is refused, never a PASS. PASS means every printed row is in the Ledger exactly. WRITE_NOT_CONFIRMED names the row and the cells that differ: fix only those cells to the printed values, read back, and run confirm-write again.
 
 ### 1. preflight
 

@@ -911,6 +911,16 @@ def test_resume_model():
     print("PASS: resume-model builds only approved one-page recipes (MarketMind or Market Empire) that pass page fill and pre-render QA.")
 
 
+def confirm(tmp, ledger_value, written, name="cw"):
+    """confirm-write over a genuine readback of LEDGER_VALUE (raw values -> readback -> ledger file + readback receipt)."""
+    assert_true(readback(tmp,raw_values(ledger_value,network=[]),name+"-ledger.json")[0]==0,"readback for confirm-write")
+    shutil.copy(tmp/"readback.json",tmp/(name+"-rb.json"))
+    argv=["confirm-write","--ledger",tmp/(name+"-ledger.json"),"--readback-receipt",tmp/(name+"-rb.json")]
+    for path in written:
+        argv+=["--written",path]
+    return invoke(argv+["--receipt",tmp/(name+"-receipt.json")])
+
+
 def test_tracked_ids_source_tiers_and_confirm_write():
     with tempfile.TemporaryDirectory() as raw_dir:
         tmp=Path(raw_dir)
@@ -941,14 +951,13 @@ def test_tracked_ids_source_tiers_and_confirm_write():
         code,out=run_slate(tmp,[role()],ledger([]))
         rows=json.loads((tmp/"slate.json").read_text())["jobs_rows"]
         good_row={k:("" if v is None else v) for k,v in rows[0].items()}
-        after=write(tmp/"after.json",ledger([good_row]))
-        code,out=invoke(["confirm-write","--ledger",after,"--written",tmp/"slate.json","--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,ledger([good_row]),[tmp/"slate.json"])
         assert_true(code==0 and "CONFIRM_WRITE: PASS" in out and "JOBS 'FIXTURE::DATA-ANALYST'" in out,"slate rows confirmed: "+out)
         typo=dict(good_row,Official_URL=good_row["Official_URL"]+"x")
-        code,out=invoke(["confirm-write","--ledger",write(tmp/"typo.json",ledger([typo])),"--written",tmp/"slate.json","--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,ledger([typo]),[tmp/"slate.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="WRITE_NOT_CONFIRMED" and "Official_URL" in failure(out)["detail"],
                     "a mistyped cell is caught and named: "+out)
-        code,out=invoke(["confirm-write","--ledger",write(tmp/"none.json",ledger([])),"--written",tmp/"slate.json","--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,ledger([]),[tmp/"slate.json"])
         assert_true(code==run.EXIT_ERROR and "found 0 rows" in failure(out)["detail"],"a missing row is caught")
         # decide: the one JOBS cell plus the exact LOG row; a shortened fingerprint inside Notes is caught.
         base=write(tmp/"base.json",ledger([job_row(First_Seen=AS_OF)],[],[log_row()]))
@@ -956,25 +965,53 @@ def test_tracked_ids_source_tiers_and_confirm_write():
                             "--receipt",tmp/"decide.json"])[0]==0,"decide")
         rec=json.loads((tmp/"decide.json").read_text())
         good=ledger([job_row(First_Seen=AS_OF,Bora_Decision="PURSUE")],[],[log_row(),rec["log_row"]])
-        code,out=invoke(["confirm-write","--ledger",write(tmp/"d-ok.json",good),"--written",tmp/"decide.json","--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,good,[tmp/"decide.json"])
         assert_true(code==0 and out.count("confirmed: ")==2,"decide cell and LOG row confirmed: "+out)
         fp=rec["request"]["reviewed_context_fingerprint"]
         mangled=dict(rec["log_row"],Notes=rec["log_row"]["Notes"].replace(fp,fp[:40]+fp[52:]))
         bad=ledger([job_row(First_Seen=AS_OF,Bora_Decision="PURSUE")],[],[log_row(),mangled])
-        code,out=invoke(["confirm-write","--ledger",write(tmp/"d-bad.json",bad),"--written",tmp/"decide.json","--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,bad,[tmp/"decide.json"])
         assert_true(code==run.EXIT_ERROR and "Notes differ" in failure(out)["detail"],"a shortened fingerprint in the LOG row is caught: "+out)
         wrong_cell=ledger([job_row(First_Seen=AS_OF,Bora_Decision="WATCH")],[],[log_row(),rec["log_row"]])
-        code,out=invoke(["confirm-write","--ledger",write(tmp/"d-cell.json",wrong_cell),"--written",tmp/"decide.json","--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,wrong_cell,[tmp/"decide.json"])
         assert_true(code==run.EXIT_ERROR and "Bora_Decision" in failure(out)["detail"],"a wrong decision cell is caught")
         # Two receipts at once, and receipts that write nothing are refused.
         assert_true(run_slate(tmp,[role(job_id="OTHER::JOB",official_url="https://careers.example/other")],ledger([]))[0]==0,"second slate")
         other={k:("" if v is None else v) for k,v in json.loads((tmp/"slate.json").read_text())["jobs_rows"][0].items()}
         both=ledger([other,job_row(First_Seen=AS_OF,Bora_Decision="PURSUE")],[],[log_row(),rec["log_row"]])
-        code,out=invoke(["confirm-write","--ledger",write(tmp/"both.json",both),"--written",tmp/"slate.json","--written",tmp/"decide.json",
-                         "--receipt",tmp/"cw.json"])
+        code,out=confirm(tmp,both,[tmp/"slate.json",tmp/"decide.json"])
         assert_true(code==0 and out.count("confirmed: ")==3,"several receipts are confirmed together: "+out)
-        code,out=invoke(["confirm-write","--ledger",base,"--written",tmp/"cw.json","--receipt",tmp/"cw2.json"])
+        code,out=confirm(tmp,ledger([job_row(First_Seen=AS_OF)],[],[log_row()]),[tmp/"cw-rb.json"],"cw2")
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_UNSUPPORTED","a non-write receipt is refused")
+        # Never a pass without a check: a slate whose roles were all ALREADY_TRACKED printed no rows, alone or beside a real receipt.
+        assert_true(run_slate(tmp,[role(job_id="ENTEGRIS::REQ-14498")],ledger([tracked]))[0]==0,"all-tracked slate")
+        empty=tmp/"slate-empty.json"; shutil.copy(tmp/"slate.json",empty)
+        assert_true(json.loads(empty.read_text())["jobs_rows"]==[],"the all-tracked slate receipt writes nothing")
+        for argv in (["--written",empty],["--written",empty,"--written",tmp/"decide.json"],["--written",tmp/"decide.json","--written",empty]):
+            code,out=confirm(tmp,good,[a for a in argv if a!="--written"],"cw3")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_UNSUPPORTED" and "nothing to confirm" in failure(out)["detail"],
+                        "a zero-write receipt is refused, never PASS: "+out)
+        # Malformed or incomplete receipts are refused, never a crash or a pass.
+        for broken in ({"spec":"CAREER_OS_RUN_DECIDE_RECEIPT_V1"},{"spec":"CAREER_OS_RUN_DECIDE_RECEIPT_V1","jobs_update":{"Job_ID":JOB_ID},"log_row":rec["log_row"]},
+                       {"spec":"CAREER_OS_RUN_DECIDE_RECEIPT_V1","jobs_update":{"Bora_Decision":"PURSUE"},"log_row":rec["log_row"]},
+                       {"spec":"CAREER_OS_RUN_SLATE_RECEIPT_V1","jobs_rows":[{"Company":"x"}]},{"spec":"CAREER_OS_RUN_SLATE_RECEIPT_V1","jobs_rows":"x"},
+                       {"spec":"CAREER_OS_RECORD_OUTCOME_RECEIPT_V1","applications_row":None,"log_row":rec["log_row"]},["not","a","receipt"]):
+            code,out=confirm(tmp,good,[write(tmp/"broken.json",broken)],"cw4")
+            assert_true(code==run.EXIT_ERROR and failure(out)["code"] in ("CONFIRM_WRITE_RECEIPT_INVALID","CONFIRM_WRITE_RECEIPT_UNSUPPORTED"),
+                        "a malformed receipt is refused: %s -> %s"%(str(broken)[:60],out))
+    with tempfile.TemporaryDirectory() as raw_dir:
+        tmp=Path(raw_dir)
+        assert_true(run_slate(tmp,[role()],ledger([]))[0]==0,"slate")
+        row={k:("" if v is None else v) for k,v in json.loads((tmp/"slate.json").read_text())["jobs_rows"][0].items()}
+        assert_true(confirm(tmp,ledger([row]),[tmp/"slate.json"])[0]==0,"genuine readback confirms")
+        edited=json.loads((tmp/"cw-ledger.json").read_text()); edited["JOBS"][0]["Role"]="Edited"
+        write(tmp/"cw-ledger.json",edited)
+        code,out=invoke(["confirm-write","--ledger",tmp/"cw-ledger.json","--readback-receipt",tmp/"cw-rb.json","--written",tmp/"slate.json","--receipt",tmp/"x.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_LEDGER_NOT_READBACK","a ledger file edited after readback is refused")
+        code,out=invoke(["confirm-write","--ledger",tmp/"cw-ledger.json","--readback-receipt",tmp/"slate.json","--written",tmp/"slate.json","--receipt",tmp/"x.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_LEDGER_NOT_READBACK","a non-readback receipt is refused")
+        code,out=invoke(["confirm-write","--ledger",tmp/"cw-ledger.json","--written",tmp/"slate.json","--receipt",tmp/"x.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="ARGUMENT_ERROR","--readback-receipt is required")
     print("PASS: tracked roles use their Ledger Job_ID, every source carries a verification tier, and confirm-write proves each write.")
 
 

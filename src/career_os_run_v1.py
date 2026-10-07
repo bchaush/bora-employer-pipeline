@@ -679,12 +679,34 @@ def _written_expectations(receipt: Mapping[str, Any]) -> list:
     return out
 
 
+def _receipt_expectations(path: str) -> list:
+    """The checked expectations of one receipt. A receipt that printed no rows (e.g. a slate whose roles were all ALREADY_TRACKED) is
+    refused, never counted as a pass; a malformed receipt is refused, never a crash."""
+    key_of = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
+    try:
+        expectations = _written_expectations(read_json(path, "written receipt"))
+    except (KeyError, TypeError, AttributeError) as error:
+        raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s is not a complete receipt: %s" % (_short(path), type(error).__name__)) from error
+    if not expectations:
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s printed no rows to write, so there is nothing to confirm" % _short(path))
+    for tab, kind, expected in expectations:
+        key = key_of[tab]
+        if not isinstance(expected, Mapping) or not non_empty(expected.get(key)) or (kind == "cells" and len(set(expected) - {key}) == 0):
+            raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s has an incomplete %s expectation" % (_short(path), tab))
+    return expectations
+
+
 def cmd_confirm_write(args: argparse.Namespace) -> tuple:
+    readback_receipt = read_json(args.readback_receipt, "readback receipt")
+    ledger_sha = sha256_hex(read_bytes(args.ledger, "Ledger readback"))
+    if not isinstance(readback_receipt, Mapping) or readback_receipt.get("spec") != "CAREER_OS_RUN_READBACK_RECEIPT_V1" \
+            or readback_receipt.get("ledger_sha256") != ledger_sha:
+        raise RunError("CONFIRM_WRITE_LEDGER_NOT_READBACK", "--ledger must be the exact file written by the readback whose receipt is --readback-receipt")
     ledger = load_ledger(args.ledger)
     keys = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
     confirmed, problems = [], []
     for path in args.written:
-        for tab, kind, expected in _written_expectations(read_json(path, "written receipt")):
+        for tab, kind, expected in _receipt_expectations(path):
             rows = ledger.get(tab)
             if rows is None:
                 problems.append("%s tab missing from the readback (read the whole Ledger)" % tab)
@@ -708,7 +730,8 @@ def cmd_confirm_write(args: argparse.Namespace) -> tuple:
         raise RunError("WRITE_NOT_CONFIRMED", detail if len(detail) <= 600 else detail[:597] + "...")
     receipt = {"spec": "CAREER_OS_RUN_CONFIRM_WRITE_RECEIPT_V1", "contract": RUN_CONTRACT_ID,
                "written_receipts_sha256": [sha256_hex(read_bytes(path, "written receipt")) for path in args.written],
-               "ledger_sha256": sha256_hex(read_bytes(args.ledger, "Ledger readback")), "confirmed": confirmed}
+               "ledger_sha256": ledger_sha, "readback_receipt_sha256": sha256_hex(read_bytes(args.readback_receipt, "readback receipt")),
+               "confirmed": confirmed}
     receipt_sha = write_receipt(args.receipt, receipt)
     lines = ["CAREER_OS_RUN_CONFIRM_WRITE: PASS (every printed row is in the Ledger exactly)"] + ["confirmed: " + item for item in confirmed]
     lines.append("receipt_sha256: " + receipt_sha)
@@ -1288,6 +1311,7 @@ def build_parser() -> argparse.ArgumentParser:
     item.add_argument("--out", required=True, help="Ledger file to write; use it for every --ledger in this run")
     item = add("confirm-write", cmd_confirm_write)
     item.add_argument("--ledger", required=True, help="a fresh readback taken after the write")
+    item.add_argument("--readback-receipt", required=True, help="the receipt of that readback (binds the exact ledger file)")
     item.add_argument("--written", required=True, action="append", help="receipt of the command whose rows were written (repeatable)")
     item = add("pursuit-state", cmd_pursuit_state)
     item.add_argument("--ledger", required=True)
