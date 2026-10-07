@@ -913,7 +913,8 @@ def test_resume_model():
 
 def confirm(tmp, ledger_value, written, name="cw"):
     """confirm-write over a genuine readback of LEDGER_VALUE (raw values -> readback -> ledger file + readback receipt)."""
-    assert_true(readback(tmp,raw_values(ledger_value,network=[]),name+"-ledger.json")[0]==0,"readback for confirm-write")
+    network=[[row[h] for h in run.NETWORK_HEADERS] for row in ledger_value.get("NETWORK",[])]
+    assert_true(readback(tmp,raw_values(ledger_value,network=network),name+"-ledger.json")[0]==0,"readback for confirm-write")
     shutil.copy(tmp/"readback.json",tmp/(name+"-rb.json"))
     argv=["confirm-write","--ledger",tmp/(name+"-ledger.json"),"--readback-receipt",tmp/(name+"-rb.json")]
     for path in written:
@@ -1012,6 +1013,68 @@ def test_tracked_ids_source_tiers_and_confirm_write():
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_LEDGER_NOT_READBACK","a non-readback receipt is refused")
         code,out=invoke(["confirm-write","--ledger",tmp/"cw-ledger.json","--written",tmp/"slate.json","--receipt",tmp/"x.json"])
         assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="ARGUMENT_ERROR","--readback-receipt is required")
+    # Exact receipt shapes: one valid receipt of every writing spec passes, and every missing key, extra key, non-text value, wrong fixed
+    # value, empty key and cross-job mix is refused before any comparison (the review case: a decide receipt without Bora_Decision).
+    with tempfile.TemporaryDirectory() as raw_dir:
+        tmp=Path(raw_dir)
+        assert_true(run_slate(tmp,[role()],ledger([]))[0]==0,"slate")
+        slate_rec=json.loads((tmp/"slate.json").read_text())
+        net=blank(run.NETWORK_HEADERS); net.update({"Contact_ID":"NET::A","Name":"N","Company":"C","Role_Title":"T","How_Found":"https://x.example/a",
+                                                 "Relationship":"OTHER","Purpose":"INFO_CHAT","Linked_Job_ID":JOB_ID,"Status":"SENT"})
+        app=app_row(); lg=log_row(Run_ID="RUN::SHAPE")
+        receipts={
+            "slate":slate_rec,
+            "decide":{"spec":"CAREER_OS_RUN_DECIDE_RECEIPT_V1","jobs_update":{"Job_ID":JOB_ID,"Bora_Decision":"PURSUE"},"log_row":lg},
+            "submit":{"spec":"CAREER_OS_RECORD_SUBMIT_RECEIPT_V1","applications_row":app,"jobs_row":{"Job_ID":JOB_ID,"Application_Status":"SUBMITTED"},"log_row":lg},
+            "external":{"spec":"CAREER_OS_RECORD_EXTERNAL_SUBMIT_RECEIPT_V1","applications_row":app,
+                        "jobs_row":{"Job_ID":JOB_ID,"Application_Status":"SUBMITTED"},"log_row":lg},
+            "persist":{"spec":run.PERSIST_RECEIPT_SPEC,"status":"PERSISTED_COMPLETE","jobs_row_values":{"Job_ID":JOB_ID,"Package_Status":"READY"}},
+            "net_add":{"spec":"CAREER_OS_NETWORK_ADD_RECEIPT_V1","network_row":net,"log_row":lg},
+            "net_update":{"spec":"CAREER_OS_NETWORK_UPDATE_RECEIPT_V1","network_row":net,"log_row":lg},
+            "outcome":{"spec":"CAREER_OS_RECORD_OUTCOME_RECEIPT_V1","applications_row":app,"log_row":lg}}
+        slate_row={k:("" if v is None else v) for k,v in slate_rec["jobs_rows"][0].items()}
+        full=dict(slate_row,Bora_Decision="PURSUE",Application_Status="SUBMITTED",Package_Status="READY")
+        everything=ledger([full],[app],[lg]); everything["NETWORK"]=[net]
+        mutations=0
+        for name,rec in receipts.items():
+            state=ledger([slate_row]) if name=="slate" else everything  # confirm right after each write, as the runbook says
+            code,out=confirm(tmp,state,[write(tmp/(name+".json"),rec)],"ok")
+            assert_true(code==0 and "CONFIRM_WRITE: PASS" in out,"valid %s receipt confirms: %s"%(name,out))
+            ledger_path,rb_path=tmp/"ok-ledger.json",tmp/"ok-rb.json"
+            fields=[(f,many) for f,_s,many in run.RECEIPT_WRITES[rec["spec"]]]
+            for field,many in fields:
+                original=rec[field][0] if many else rec[field]
+                variants=[]
+                for key in original:
+                    variants.append(("drop "+key,{k:v for k,v in original.items() if k!=key}))
+                variants.append(("extra key",dict(original,Extra="x")))
+                variants.append(("non-text",dict(original,**{list(original)[-1]:5})))
+                keyname=run.WRITE_KEYS[run.WRITE_SHAPES[[s for f,s,m in run.RECEIPT_WRITES[rec["spec"]] if f==field][0]][0]]
+                variants.append(("empty key",dict(original,**{keyname:""})))
+                for fixed_key in run.WRITE_SHAPES[[s for f,s,m in run.RECEIPT_WRITES[rec["spec"]] if f==field][0]][3]:
+                    variants.append(("wrong "+fixed_key,dict(original,**{fixed_key:"MAYBE"})))
+                if name!="slate" and len(fields)>1:  # a cross-job mix needs at least two rows
+                    job_key="Linked_Job_ID" if field=="network_row" else ("Job_ID" if "Job_ID" in original else None)
+                    if job_key and keyname!=job_key:
+                        variants.append(("other job",dict(original,**{job_key:"OTHER::JOB"})))
+                    elif job_key:
+                        variants.append(("other job",dict(original,**{job_key:"OTHER::JOB"})))
+                for label,variant in variants:
+                    bad=dict(rec,**{field:[variant] if many else variant})
+                    code,out=invoke(["confirm-write","--ledger",ledger_path,"--readback-receipt",rb_path,"--written",write(tmp/"bad.json",bad),
+                                     "--receipt",tmp/"x.json"])
+                    assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_INVALID",
+                                "%s %s %s is refused as invalid: %s"%(name,field,label,out[:200]))
+                    mutations+=1
+        not_complete=dict(receipts["persist"],status="PERSISTENCE_INCOMPLETE")
+        code,out=invoke(["confirm-write","--ledger",tmp/"ok-ledger.json","--readback-receipt",tmp/"ok-rb.json","--written",
+                         write(tmp/"nc.json",not_complete),"--receipt",tmp/"x.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_UNSUPPORTED","an incomplete persistence wrote nothing")
+        review_case=dict(receipts["decide"],jobs_update={"Job_ID":JOB_ID,"Company":COMPANY})
+        code,out=invoke(["confirm-write","--ledger",tmp/"ok-ledger.json","--readback-receipt",tmp/"ok-rb.json","--written",
+                         write(tmp/"rc.json",review_case),"--receipt",tmp/"x.json"])
+        assert_true(code==run.EXIT_ERROR and failure(out)["code"]=="CONFIRM_WRITE_RECEIPT_INVALID","a decide receipt without Bora_Decision is refused")
+        assert_true(mutations>100,"the sweep covered %d malformed receipts"%mutations)
     print("PASS: tracked roles use their Ledger Job_ID, every source carries a verification tier, and confirm-write proves each write.")
 
 

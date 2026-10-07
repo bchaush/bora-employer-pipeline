@@ -657,43 +657,71 @@ def cmd_decide(args: argparse.Namespace) -> tuple:
 
 # confirm-write ----------------------------------------------------------------------------------
 
-def _written_expectations(receipt: Mapping[str, Any]) -> list:
-    """(tab, kind, row) for every Ledger write a CLI receipt printed. kind is 'row' (an exact full row: append or overwrite) or
-    'cells' (the listed cells of the JOBS row with that Job_ID)."""
-    spec = receipt.get("spec") if isinstance(receipt, Mapping) else None
-    out = []
-    if spec == "CAREER_OS_RUN_SLATE_RECEIPT_V1":
-        out += [("JOBS", "row", {key: ("" if value is None else value) for key, value in row.items()}) for row in receipt.get("jobs_rows", [])]
-    elif spec == "CAREER_OS_RUN_DECIDE_RECEIPT_V1":
-        out += [("JOBS", "cells", receipt["jobs_update"]), ("LOG", "row", receipt["log_row"])]
-    elif spec in ("CAREER_OS_RECORD_SUBMIT_RECEIPT_V1", "CAREER_OS_RECORD_EXTERNAL_SUBMIT_RECEIPT_V1"):
-        out += [("APPLICATIONS", "row", receipt["applications_row"]), ("JOBS", "cells", receipt["jobs_row"]), ("LOG", "row", receipt["log_row"])]
-    elif spec == PERSIST_RECEIPT_SPEC and receipt.get("jobs_row_values"):
-        out += [("JOBS", "cells", receipt["jobs_row_values"])]
-    elif spec in ("CAREER_OS_NETWORK_ADD_RECEIPT_V1", "CAREER_OS_NETWORK_UPDATE_RECEIPT_V1"):
-        out += [("NETWORK", "row", receipt["network_row"]), ("LOG", "row", receipt["log_row"])]
-    elif spec == "CAREER_OS_RECORD_OUTCOME_RECEIPT_V1":
-        out += [("APPLICATIONS", "row", receipt["applications_row"]), ("LOG", "row", receipt["log_row"])]
-    else:
-        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "spec %s writes nothing to the Ledger or is unknown" % _short(spec))
-    return out
+# The exact shape of every Ledger write a receipt may carry: (tab, kind, required keys, fixed cell values). A receipt whose rows or cell
+# updates do not have exactly these keys, string values and fixed values is refused before anything is compared.
+WRITE_SHAPES = {
+    "SLATE_JOBS_ROW": ("JOBS", "row", tuple(JOBS_HEADERS), {}),
+    "DECIDE_JOBS": ("JOBS", "cells", ("Job_ID", "Bora_Decision"), {"Bora_Decision": tuple(pursuit_decision.VALID_DECISIONS)}),
+    "SUBMIT_JOBS": ("JOBS", "cells", ("Job_ID", "Application_Status"), {"Application_Status": ("SUBMITTED",)}),
+    "PERSIST_JOBS": ("JOBS", "cells", ("Job_ID", "Package_Status"), {"Package_Status": ("READY",)}),
+    "LOG_ROW": ("LOG", "row", tuple(LOG_HEADERS), {}),
+    "APPLICATIONS_ROW": ("APPLICATIONS", "row", tuple(APPLICATIONS_HEADERS), {}),
+    "NETWORK_ROW": ("NETWORK", "row", tuple(NETWORK_HEADERS), {}),
+}
+RECEIPT_WRITES = {  # spec -> [(receipt field, shape, many rows?)]
+    "CAREER_OS_RUN_SLATE_RECEIPT_V1": [("jobs_rows", "SLATE_JOBS_ROW", True)],
+    "CAREER_OS_RUN_DECIDE_RECEIPT_V1": [("jobs_update", "DECIDE_JOBS", False), ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_RECORD_SUBMIT_RECEIPT_V1": [("applications_row", "APPLICATIONS_ROW", False), ("jobs_row", "SUBMIT_JOBS", False),
+                                           ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_RECORD_EXTERNAL_SUBMIT_RECEIPT_V1": [("applications_row", "APPLICATIONS_ROW", False), ("jobs_row", "SUBMIT_JOBS", False),
+                                                    ("log_row", "LOG_ROW", False)],
+    PERSIST_RECEIPT_SPEC: [("jobs_row_values", "PERSIST_JOBS", False)],
+    "CAREER_OS_NETWORK_ADD_RECEIPT_V1": [("network_row", "NETWORK_ROW", False), ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_NETWORK_UPDATE_RECEIPT_V1": [("network_row", "NETWORK_ROW", False), ("log_row", "LOG_ROW", False)],
+    "CAREER_OS_RECORD_OUTCOME_RECEIPT_V1": [("applications_row", "APPLICATIONS_ROW", False), ("log_row", "LOG_ROW", False)],
+}
+WRITE_KEYS = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
 
 
 def _receipt_expectations(path: str) -> list:
-    """The checked expectations of one receipt. A receipt that printed no rows (e.g. a slate whose roles were all ALREADY_TRACKED) is
-    refused, never counted as a pass; a malformed receipt is refused, never a crash."""
-    key_of = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
-    try:
-        expectations = _written_expectations(read_json(path, "written receipt"))
-    except (KeyError, TypeError, AttributeError) as error:
-        raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s is not a complete receipt: %s" % (_short(path), type(error).__name__)) from error
-    if not expectations:
-        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s printed no rows to write, so there is nothing to confirm" % _short(path))
-    for tab, kind, expected in expectations:
-        key = key_of[tab]
-        if not isinstance(expected, Mapping) or not non_empty(expected.get(key)) or (kind == "cells" and len(set(expected) - {key}) == 0):
-            raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s has an incomplete %s expectation" % (_short(path), tab))
-    return expectations
+    """(tab, kind, row) for every Ledger write the receipt printed, after strict validation: a known writing spec, exactly the
+    expected keys per row or cell update, string values (None only in slate rows), fixed values where the command fixes them, a
+    non-empty key, and every row of one receipt bound to the same job. A receipt that printed no rows (e.g. an all-ALREADY_TRACKED
+    slate) is refused, never counted as a pass; a malformed receipt is refused, never a crash."""
+    receipt = read_json(path, "written receipt")
+    name = _short(Path(path).name)
+    spec = receipt.get("spec") if isinstance(receipt, Mapping) else None
+    if spec not in RECEIPT_WRITES:
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s: spec %s writes nothing to the Ledger or is unknown" % (name, _short(spec)))
+    if spec == PERSIST_RECEIPT_SPEC and receipt.get("status") != "PERSISTED_COMPLETE":
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s: persistence was not PERSISTED_COMPLETE, so nothing was written" % name)
+    out = []
+    for field, shape_name, many in RECEIPT_WRITES[spec]:
+        tab, kind, keys, fixed = WRITE_SHAPES[shape_name]
+        value = receipt.get(field)
+        items = value if many else [value]
+        if not isinstance(items, list):
+            raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s must be a list" % (name, field))
+        for item in items:
+            if not isinstance(item, Mapping) or set(item) != set(keys):
+                raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s must have exactly the keys %s" % (name, field, ", ".join(keys)))
+            for key, cell in item.items():
+                if not (isinstance(cell, str) or (cell is None and shape_name == "SLATE_JOBS_ROW")):
+                    raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s.%s must be text" % (name, field, key))
+            for key, allowed in fixed.items():
+                if item[key] not in allowed:
+                    raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s.%s must be one of %s" % (name, field, key, ", ".join(allowed)))
+            if not non_empty(item[WRITE_KEYS[tab]]):
+                raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: %s has an empty %s" % (name, field, WRITE_KEYS[tab]))
+            out.append((tab, kind, {key: ("" if cell is None else cell) for key, cell in item.items()}))
+    if not out:
+        raise RunError("CONFIRM_WRITE_RECEIPT_UNSUPPORTED", "%s printed no rows to write, so there is nothing to confirm" % name)
+    if spec != "CAREER_OS_RUN_SLATE_RECEIPT_V1":
+        jobs = {row.get("Job_ID") for tab, _kind, row in out if tab in ("JOBS", "APPLICATIONS", "LOG")}
+        jobs |= {row.get("Linked_Job_ID") for tab, _kind, row in out if tab == "NETWORK"}
+        if len(jobs) != 1:
+            raise RunError("CONFIRM_WRITE_RECEIPT_INVALID", "%s: its rows name different jobs" % name)
+    return out
 
 
 def cmd_confirm_write(args: argparse.Namespace) -> tuple:
@@ -703,7 +731,7 @@ def cmd_confirm_write(args: argparse.Namespace) -> tuple:
             or readback_receipt.get("ledger_sha256") != ledger_sha:
         raise RunError("CONFIRM_WRITE_LEDGER_NOT_READBACK", "--ledger must be the exact file written by the readback whose receipt is --readback-receipt")
     ledger = load_ledger(args.ledger)
-    keys = {"JOBS": "Job_ID", "APPLICATIONS": "Application_ID", "LOG": "Run_ID", "NETWORK": "Contact_ID"}
+    keys = WRITE_KEYS
     confirmed, problems = [], []
     for path in args.written:
         for tab, kind, expected in _receipt_expectations(path):
